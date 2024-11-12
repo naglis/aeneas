@@ -22,12 +22,14 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import unittest
+import importlib.util
 
 from aeneas.downloader import Downloader
 from aeneas.downloader import DownloadError
 import aeneas.globalfunctions as gf
 
 
+@unittest.skipIf(importlib.util.find_spec("youtube_dl") is None, "youtube-dl is not installed")
 class TestDownloader(unittest.TestCase):
 
     URL_MALFORMED = u"foo"

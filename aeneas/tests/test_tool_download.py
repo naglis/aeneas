@@ -23,11 +23,13 @@
 
 import os
 import unittest
+import importlib.util
 
 from aeneas.tools.download import DownloadCLI
 import aeneas.globalfunctions as gf
 
 
+@unittest.skipIf(importlib.util.find_spec("youtube_dl") is None, "youtube-dl is not installed")
 class TestDownloadCLI(unittest.TestCase):
 
     def execute(self, parameters, expected_exit_code):
