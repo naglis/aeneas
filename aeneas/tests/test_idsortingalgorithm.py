@@ -32,7 +32,7 @@ class TestIDSortingAlgorithm(unittest.TestCase):
 
     def test_invalid_algorithm(self):
         with self.assertRaises(ValueError):
-            idsa = IDSortingAlgorithm(u"foo")
+            IDSortingAlgorithm(u"foo")
 
     def test_unsorted(self):
         expected = [u"b001", u"c03", u"d4", u"a2"]

@@ -33,7 +33,6 @@ from aeneas.audiofile import AudioFileConverterError
 from aeneas.audiofile import AudioFileNotInitializedError
 from aeneas.audiofile import AudioFileUnsupportedFormatError
 from aeneas.audiofilemfcc import AudioFileMFCC
-from aeneas.language import Language
 from aeneas.runtimeconfiguration import RuntimeConfiguration
 from aeneas.sd import SD
 from aeneas.textfile import TextFileFormat

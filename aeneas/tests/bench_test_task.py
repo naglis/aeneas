@@ -27,7 +27,6 @@ import unittest
 import tempfile
 
 from aeneas.tools.execute_task import ExecuteTaskCLI
-import aeneas.globalfunctions as gf
 
 
 # TODO actually parse this file to know what extras

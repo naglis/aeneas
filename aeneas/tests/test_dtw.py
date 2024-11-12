@@ -22,11 +22,9 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import numpy
-import os
 import unittest
 
 from aeneas.audiofilemfcc import AudioFileMFCC
-from aeneas.dtw import DTWAlgorithm
 from aeneas.dtw import DTWAligner
 from aeneas.dtw import DTWAlignerNotInitialized
 import aeneas.globalfunctions as gf

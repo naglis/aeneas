@@ -165,12 +165,8 @@ def main():
 
     # convert to bytes/unicode as required by subprocess
     c_text = []
-    if gf.PY2:
-        for f_voice_code, f_text in s_text:
-            c_text.append((gf.safe_bytes(f_voice_code), gf.safe_bytes(f_text)))
-    else:
-        for f_voice_code, f_text in s_text:
-            c_text.append((gf.safe_unicode(f_voice_code), gf.safe_unicode(f_text)))
+    for f_voice_code, f_text in s_text:
+        c_text.append((gf.safe_unicode(f_voice_code), gf.safe_unicode(f_text)))
 
     try:
         import aeneas.cew.cew

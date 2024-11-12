@@ -25,7 +25,6 @@ import os
 import unittest
 
 from aeneas.tests.common import ExecuteTaskCLICase, slow_test
-import aeneas.globalfunctions as gf
 
 
 # TODO actually parse this file to know what extras

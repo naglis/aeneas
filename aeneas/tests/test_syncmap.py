@@ -23,15 +23,13 @@
 
 import unittest
 
-from aeneas.exacttiming import Decimal
 from aeneas.exacttiming import TimeInterval
 from aeneas.exacttiming import TimeValue
 from aeneas.language import Language
 from aeneas.syncmap import SyncMap
 from aeneas.syncmap import SyncMapFormat
 from aeneas.syncmap import SyncMapFragment
-from aeneas.syncmap import SyncMapMissingParameterError
-from aeneas.textfile import TextFragment
+from aeneas.syncmap.missingparametererror import SyncMapMissingParameterError
 from aeneas.tree import Tree
 import aeneas.globalconstants as gc
 import aeneas.globalfunctions as gf
@@ -79,7 +77,7 @@ class TestSyncMap(unittest.TestCase):
 
     def test_constructor_invalid(self):
         with self.assertRaises(TypeError):
-            syn = SyncMap(tree=[])
+            SyncMap(tree=[])
 
     def test_fragments_tree_not_given(self):
         syn = SyncMap()
@@ -176,9 +174,9 @@ class TestSyncMap(unittest.TestCase):
             ([("0.000", "1.000"), ("2.000", "2.000")], False),
             ([("0.000", "1.000"), ("2.000", "3.000")], False),
         ]
-        for l, exp in params:
+        for lst, exp in params:
             tree = Tree()
-            for b, e in l:
+            for b, e in lst:
                 interval = TimeInterval(begin=TimeValue(b), end=TimeValue(e))
                 smf = SyncMapFragment(interval=interval)
                 child = Tree(value=smf)
@@ -205,9 +203,9 @@ class TestSyncMap(unittest.TestCase):
             ([("0.000", "1.000"), ("2.000", "2.000")], True),
             ([("0.000", "1.000"), ("2.000", "3.000")], False),
         ]
-        for l, exp in params:
+        for lst, exp in params:
             tree = Tree()
-            for b, e in l:
+            for b, e in lst:
                 interval = TimeInterval(begin=TimeValue(b), end=TimeValue(e))
                 smf = SyncMapFragment(interval=interval)
                 child = Tree(value=smf)
@@ -249,9 +247,9 @@ class TestSyncMap(unittest.TestCase):
             ([("0.000", "1.000"), ("2.000", "3.000"), ("1.500", "2.500")], False),
             ([("0.000", "1.000"), ("0.960", "2.000")], False),
         ]
-        for l, exp in params:
+        for lst, exp in params:
             tree = Tree()
-            for b, e in l:
+            for b, e in lst:
                 interval = TimeInterval(begin=TimeValue(b), end=TimeValue(e))
                 smf = SyncMapFragment(interval=interval)
                 child = Tree(value=smf)

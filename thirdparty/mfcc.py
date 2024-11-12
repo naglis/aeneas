@@ -13,7 +13,8 @@ system.
 __author__ = "David Huggins-Daines <dhuggins@cs.cmu.edu>"
 __version__ = "$Revision: 6390 $"
 
-import numpy, numpy.fft
+import numpy
+import numpy.fft
 
 def mel(f):
     return 2595. * numpy.log10(1. + f / 700.)

@@ -50,8 +50,8 @@ class SyncMapFormatTextGrid(SyncMapFormatBase):
 
         # from https://github.com/hbuschme/TextGridTools/blob/master/tgt/io.py
         # get all non-empty lines
-        lines = [l.strip() for l in input_text.splitlines()]
-        lines = [l for l in lines if l not in ["", "\""]]
+        lines = [line.strip() for line in input_text.splitlines()]
+        lines = [line for line in lines if line not in ["", "\""]]
         # long format => has "xmin = 0.0" in its 3rd line
         if lines[2].startswith("xmin"):
             read_function = tgt.io.read_long_textgrid

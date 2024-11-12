@@ -264,7 +264,7 @@ class ExecuteJob(Loggable):
                 self.log([u"Outputting sync map for task '%s'...", custom_id])
                 task.output_sync_map_file(self.tmp_directory.name)
                 self.log([u"Outputting sync map for task '%s'... done", custom_id])
-            except Exception as exc:
+            except Exception:
                 self.log_exc(u"Error while outputting sync map for task '%s'" % (custom_id), None, True, ExecuteJobOutputError)
 
         # get output container info

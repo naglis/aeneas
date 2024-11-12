@@ -268,7 +268,7 @@ class FFPROBEWrapper(Loggable):
             self.log([u"Duration found in stdout: '%s'", results[self.STDOUT_DURATION]])
             results[self.STDOUT_DURATION] = TimeValue(results[self.STDOUT_DURATION])
             self.log(u"Valid duration")
-        except:
+        except Exception:
             self.log_warn(u"Invalid duration")
             results[self.STDOUT_DURATION] = None
             # try scanning ffprobe stderr output

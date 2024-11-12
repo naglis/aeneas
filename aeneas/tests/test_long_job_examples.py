@@ -22,9 +22,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import unittest
-import os
 
-from aeneas.tools.execute_job import ExecuteJobCLI
 from aeneas.tests.common import ExecuteJobCLICase, slow_test
 
 

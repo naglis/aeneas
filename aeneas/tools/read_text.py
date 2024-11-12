@@ -121,7 +121,7 @@ class ReadTextCLI(AbstractCLIProgram):
             return self.ERROR_EXIT_CODE
         if (text_format in [TextFileFormat.PLAIN, TextFileFormat.SUBTITLES]) and (id_format is not None):
             try:
-                identifier = id_format % 1
+                id_format % 1
             except (TypeError, ValueError):
                 self.print_error(u"The given string '%s' is not a valid id format" % id_format)
                 return self.ERROR_EXIT_CODE

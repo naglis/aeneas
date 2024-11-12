@@ -138,7 +138,7 @@ class SyncMapFormatGenericSubtitles(SyncMapFormatBase):
             end = self.parse_time_function(end)
             return (begin, end)
 
-        input_lines = [l.strip() for l in input_text.splitlines()]
+        input_lines = [line.strip() for line in input_text.splitlines()]
         i = 0
         cue_index = 1
 

@@ -116,7 +116,7 @@ Example::
 """
 
 PPN_JOB_IS_AUDIO_FILE_NAME_REGEX = "is_audio_file_name_regex"
-"""
+r"""
 The regex to match audio files in this job.
 
 Usage: config string, TXT config file
@@ -196,7 +196,7 @@ Example::
 """
 
 PPN_JOB_IS_TEXT_FILE_NAME_REGEX = "is_text_file_name_regex"
-"""
+r"""
 The regex for matching the text file name
 of tasks in input containers.
 

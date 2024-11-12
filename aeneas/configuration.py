@@ -191,13 +191,14 @@ class Configuration(object):
             """ Convert field type and default value to string """
             if ftype is None:
                 return u""
+
             if ftype in [TimeValue, Decimal, float]:
                 cftype = u"float"
                 cfdefault = u"%.3f" % ftype(fdefault) if fdefault is not None else u"None"
-            elif ftype == int:
+            elif ftype is int:
                 cftype = u"int"
                 cfdefault = u"%d" % ftype(fdefault) if fdefault is not None else u"None"
-            elif ftype == bool:
+            elif ftype is bool:
                 cftype = u"bool"
                 cfdefault = u"%s" % fdefault if fdefault is not None else u"None"
             else:
@@ -209,6 +210,6 @@ class Configuration(object):
         if sort:
             parameters = sorted(parameters)
         if as_strings:
-            l = max([len(t[0]) for t in parameters])
-            parameters = [u"%s : %s%s" % (f.ljust(l), d, cft(t, df)) for (f, d, t, df) in parameters]
+            max_length = max(len(t[0]) for t in parameters)
+            parameters = [u"%s : %s%s" % (f.ljust(max_length), d, cft(t, df)) for (f, d, t, df) in parameters]
         return parameters

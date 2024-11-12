@@ -23,7 +23,6 @@
 
 import unittest
 
-from aeneas.logger import Logger
 from aeneas.validator import Validator
 import aeneas.globalfunctions as gf
 

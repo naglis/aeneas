@@ -89,16 +89,16 @@ class Diagnostics(object):
             from aeneas.ffprobewrapper import FFPROBEWrapper
             file_path = gf.absolute_path(u"tools/res/audio.mp3", __file__)
             prober = FFPROBEWrapper()
-            properties = prober.read_properties(file_path)
+            prober.read_properties(file_path)
             gf.print_success(u"ffprobe        OK")
+        except Exception:
+            gf.print_error(u"ffprobe        ERROR")
+            gf.print_info(u"  Please make sure you have ffprobe installed correctly")
+            gf.print_info(u"  (usually it is provided by the ffmpeg installer)")
+            gf.print_info(u"  and that its path is in your PATH environment variable")
+            return True
+        else:
             return False
-        except:
-            pass
-        gf.print_error(u"ffprobe        ERROR")
-        gf.print_info(u"  Please make sure you have ffprobe installed correctly")
-        gf.print_info(u"  (usually it is provided by the ffmpeg installer)")
-        gf.print_info(u"  and that its path is in your PATH environment variable")
-        return True
 
     @classmethod
     def check_ffmpeg(cls):
@@ -119,7 +119,7 @@ class Diagnostics(object):
             if result:
                 gf.print_success(u"ffmpeg         OK")
                 return False
-        except:
+        except Exception:
             pass
         gf.print_error(u"ffmpeg         ERROR")
         gf.print_info(u"  Please make sure you have ffmpeg installed correctly")
@@ -146,15 +146,15 @@ class Diagnostics(object):
             ESPEAKTTSWrapper().synthesize_multiple(text_file, output_file_path)
             gf.delete_file(handler, output_file_path)
             gf.print_success(u"espeak         OK")
+        except Exception:
+            gf.print_error(u"espeak         ERROR")
+            gf.print_info(u"  Please make sure you have espeak installed correctly")
+            gf.print_info(u"  and that its path is in your PATH environment variable")
+            gf.print_info(u"  You might also want to check that the espeak-data directory")
+            gf.print_info(u"  is set up correctly, for example, it has the correct permissions")
+            return True
+        else:
             return False
-        except:
-            pass
-        gf.print_error(u"espeak         ERROR")
-        gf.print_info(u"  Please make sure you have espeak installed correctly")
-        gf.print_info(u"  and that its path is in your PATH environment variable")
-        gf.print_info(u"  You might also want to check that the espeak-data directory")
-        gf.print_info(u"  is set up correctly, for example, it has the correct permissions")
-        return True
 
     @classmethod
     def check_tools(cls):
@@ -166,30 +166,18 @@ class Diagnostics(object):
         :rtype: bool
         """
         try:
-            from aeneas.tools.convert_syncmap import ConvertSyncMapCLI
             # disabling this check, as it requires the optional dependency youtube-dl
             # COMMENTED from aeneas.tools.download import DownloadCLI
-            from aeneas.tools.execute_job import ExecuteJobCLI
-            from aeneas.tools.execute_task import ExecuteTaskCLI
-            from aeneas.tools.extract_mfcc import ExtractMFCCCLI
-            from aeneas.tools.ffmpeg_wrapper import FFMPEGWrapperCLI
-            from aeneas.tools.ffprobe_wrapper import FFPROBEWrapperCLI
             # disabling this check, as it requires the optional dependency Pillow
             # COMMENTED from aeneas.tools.plot_waveform import PlotWaveformCLI
-            from aeneas.tools.read_audio import ReadAudioCLI
-            from aeneas.tools.read_text import ReadTextCLI
-            from aeneas.tools.run_sd import RunSDCLI
-            from aeneas.tools.run_vad import RunVADCLI
-            from aeneas.tools.synthesize_text import SynthesizeTextCLI
-            from aeneas.tools.validate import ValidateCLI
             gf.print_success(u"aeneas.tools   OK")
+        except Exception:
+            gf.print_error(u"aeneas.tools   ERROR")
+            gf.print_info(u"  Unable to import one or more aeneas.tools")
+            gf.print_info(u"  Please check that you installed aeneas properly")
+            return True
+        else:
             return False
-        except:
-            pass
-        gf.print_error(u"aeneas.tools   ERROR")
-        gf.print_info(u"  Unable to import one or more aeneas.tools")
-        gf.print_info(u"  Please check that you installed aeneas properly")
-        return True
 
     @classmethod
     def check_cdtw(cls):

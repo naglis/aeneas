@@ -97,8 +97,8 @@ class SyncMapFormatGenericTabular(SyncMapFormatBase):
         self.write_template = self.FIELD_DELIMITER.join([u"{%s}" % p for p in placeholders])
 
     def parse(self, input_text, syncmap):
-        lines = [l.strip() for l in input_text.splitlines()]
-        lines = [l for l in lines if len(l) > 0]
+        lines = [line.strip() for line in input_text.splitlines()]
+        lines = [line for line in lines if len(line) > 0]
         for index, line in enumerate(lines, 1):
             split = line.strip().split(self.FIELD_DELIMITER)
 

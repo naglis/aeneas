@@ -97,11 +97,11 @@ class TestAnalyzeContainer(unittest.TestCase):
 
     def test_none(self):
         with self.assertRaises(TypeError):
-            analyzer = AnalyzeContainer(None)
+            AnalyzeContainer(None)
 
     def test_not_container(self):
         with self.assertRaises(TypeError):
-            analyzer = AnalyzeContainer(self.NOT_EXISTING_PATH)
+            AnalyzeContainer(self.NOT_EXISTING_PATH)
 
     def test_container_not_existing(self):
         analyzer = AnalyzeContainer(Container(self.NOT_EXISTING_PATH))

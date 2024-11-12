@@ -329,9 +329,9 @@ class TestExactTiming(unittest.TestCase):
             ("1.000", "1.000", "0.000"),
             ("1.234", "1.235", "0.001"),
         ]
-        for b, e, l in params:
-            ti = TimeInterval(begin=TimeValue(b), end=TimeValue(e))
-            self.assertEqual(ti.length, TimeValue(l))
+        for begin, end, length in params:
+            ti = TimeInterval(begin=TimeValue(begin), end=TimeValue(end))
+            self.assertEqual(ti.length, TimeValue(length))
 
     def test_time_interval_has_zero_length(self):
         params = [

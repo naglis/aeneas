@@ -92,8 +92,7 @@ class TestTask(unittest.TestCase):
         self.tc_from_string(config_string, properties)
 
     def test_task_logger(self):
-        logger = Logger()
-        task = Task(logger=logger)
+        Task(logger=Logger())
 
     def test_task_identifier(self):
         task = Task()
@@ -105,11 +104,11 @@ class TestTask(unittest.TestCase):
 
     def test_task_string_configuration_invalid(self):
         with self.assertRaises(TypeError):
-            task = Task(1)
+            Task(1)
 
     def test_task_string_configuration_str(self):
         with self.assertRaises(TypeError):
-            task = Task(b"task_language=en")
+            Task(b"task_language=en")
 
     def test_task_string_configuration_unicode(self):
         task = Task(u"task_language=en")

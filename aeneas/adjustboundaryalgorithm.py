@@ -37,7 +37,6 @@ from __future__ import print_function
 
 from aeneas.audiofilemfcc import AudioFileMFCC
 from aeneas.exacttiming import Decimal
-from aeneas.exacttiming import TimeInterval
 from aeneas.exacttiming import TimeValue
 from aeneas.logger import Loggable
 from aeneas.runtimeconfiguration import RuntimeConfiguration
