@@ -24,25 +24,11 @@
 import os
 import unittest
 
-from aeneas.tools.execute_job import ExecuteJobCLI
+from aeneas.tests.common import ExecuteJobCLICase
 import aeneas.globalfunctions as gf
 
 
-class TestExecuteJobCLI(unittest.TestCase):
-
-    def execute(self, parameters, expected_exit_code):
-        output_path = gf.tmp_directory()
-        params = ["placeholder"]
-        for p_type, p_value in parameters:
-            if p_type == "in":
-                params.append(gf.absolute_path(p_value, __file__))
-            elif p_type == "out":
-                params.append(os.path.join(output_path, p_value))
-            else:
-                params.append(p_value)
-        exit_code = ExecuteJobCLI(use_sys=False).run(arguments=params)
-        gf.delete_directory(output_path)
-        self.assertEqual(exit_code, expected_exit_code)
+class TestExecuteJobCLI(ExecuteJobCLICase):
 
     def test_help(self):
         self.execute([], 2)

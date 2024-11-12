@@ -24,25 +24,11 @@
 import os
 import unittest
 
-from aeneas.tools.execute_task import ExecuteTaskCLI
+from aeneas.tests.common import ExecuteTaskCLICase
 import aeneas.globalfunctions as gf
 
 
-class TestExecuteTaskCLI(unittest.TestCase):
-
-    def execute(self, parameters, expected_exit_code):
-        output_path = gf.tmp_directory()
-        params = ["placeholder"]
-        for p_type, p_value in parameters:
-            if p_type == "in":
-                params.append(gf.absolute_path(p_value, __file__))
-            elif p_type == "out":
-                params.append(os.path.join(output_path, p_value))
-            else:
-                params.append(p_value)
-        exit_code = ExecuteTaskCLI(use_sys=False).run(arguments=params)
-        gf.delete_directory(output_path)
-        self.assertEqual(exit_code, expected_exit_code)
+class TestExecuteTaskCLI(ExecuteTaskCLICase):
 
     def test_help(self):
         self.execute([], 2)

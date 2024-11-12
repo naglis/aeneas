@@ -25,24 +25,13 @@ import os
 import unittest
 
 from aeneas.tools.run_sd import RunSDCLI
+from aeneas.tests.common import ExecuteCLICase
 import aeneas.globalfunctions as gf
 
 
-class TestRunSDCLI(unittest.TestCase):
+class TestRunSDCLI(ExecuteCLICase):
 
-    def execute(self, parameters, expected_exit_code):
-        output_path = gf.tmp_directory()
-        params = ["placeholder"]
-        for p_type, p_value in parameters:
-            if p_type == "in":
-                params.append(gf.absolute_path(p_value, __file__))
-            elif p_type == "out":
-                params.append(os.path.join(output_path, p_value))
-            else:
-                params.append(p_value)
-        exit_code = RunSDCLI(use_sys=False).run(arguments=params)
-        gf.delete_directory(output_path)
-        self.assertEqual(exit_code, expected_exit_code)
+    CLI_CLS = RunSDCLI
 
     def test_help(self):
         self.execute([], 2)
