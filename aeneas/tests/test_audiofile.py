@@ -131,12 +131,13 @@ class TestAudioFile(unittest.TestCase):
 
     def test_read_properties_formats(self):
         for f in self.FILES:
-            audiofile = self.load(f["path"], rp=True)
-            self.assertEqual(audiofile.file_size, f["size"])
-            self.assertEqual(audiofile.audio_sample_rate, f["rate"])
-            self.assertEqual(audiofile.audio_channels, f["channels"])
-            self.assertEqual(audiofile.audio_format, f["format"])
-            self.assertAlmostEqual(audiofile.audio_length, f["length"], places=1)
+            with self.subTest(path=f["path"]):
+                audiofile = self.load(f["path"], rp=True)
+                self.assertEqual(audiofile.file_size, f["size"])
+                self.assertEqual(audiofile.audio_sample_rate, f["rate"])
+                self.assertEqual(audiofile.audio_channels, f["channels"])
+                self.assertEqual(audiofile.audio_format, f["format"])
+                self.assertAlmostEqual(audiofile.audio_length, f["length"], places=1)
 
     def test_read_samples_from_none(self):
         with self.assertRaises(OSError):
