@@ -39,6 +39,7 @@ import io
 import os
 import tarfile
 import zipfile
+import sys
 
 from aeneas.logger import Loggable
 import aeneas.globalconstants as gc
@@ -430,7 +431,11 @@ class _ContainerTAR(Loggable):
         try:
             argument = "r" + self.variant
             with tarfile.open(self.file_path, argument) as tar_file:
-                tar_file.extractall(output_path)
+                # TODO: Remove when dropping support for Python 3.11.
+                if sys.version_info < (3, 12):
+                    tar_file.extractall(output_path)
+                else:
+                    tar_file.extractall(output_path, filter="data")
         except Exception as exc:
             self.log_exc(u"Cannot decompress TAR file", exc, True, OSError)
 
