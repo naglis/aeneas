@@ -45,7 +45,7 @@ class TestAudioFile(unittest.TestCase):
             "rate": 44100,
             "channels": 2,
             "format": "aac",
-            "length": TimeValue("7.9"),     # 7.907558 Estimating duration from bitrate, this may be inaccurate
+            "length": TimeValue("9.4"),     # 9.403429
         },
         {
             "path": "res/audioformats/p001.aiff",
