@@ -98,7 +98,7 @@ class TestBaseTTSWrapper(unittest.TestCase):
 
     def test_not_implemented(self):
         with self.assertRaises(NotImplementedError):
-            tts_engine = BaseTTSWrapper()
+            BaseTTSWrapper()
 
     def test_use_cache(self):
         if self.TTS == u"":

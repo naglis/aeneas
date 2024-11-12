@@ -267,8 +267,8 @@ class TestTree(unittest.TestCase):
             s = 0
         else:
             s = 1
-        for l in levels:
-            s += len(prev_levels[l])
+        for level in levels:
+            s += len(prev_levels[level])
         tree.keep_levels(levels)
         self.assertEqual(len(tree.subtree), s)
 
@@ -352,7 +352,3 @@ class TestTree(unittest.TestCase):
         c1.remove()
         self.assertEqual(len(list(root.dfs)), 1)
         self.assertEqual(len(list(c1.dfs)), 6)
-
-
-if __name__ == "__main__":
-    unittest.main()

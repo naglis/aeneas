@@ -72,13 +72,12 @@ class TestExecuteTaskCLI(unittest.TestCase):
         ], 0)
 
     # NOTE disabling this test since it requires a speect voice
-    def zzz_test_example_ctw_speect(self):
+    def test_example_ctw_speect(self):
         # unable to run speect with Python 3,
         # perform the test only on Python 2
-        if gf.PY2:
-            self.execute([
-                ("", "--example-ctw-speect")
-            ], 0)
+        self.execute([
+            ("", "--example-ctw-speect")
+        ], 0)
 
     def test_example_eaf(self):
         self.execute([

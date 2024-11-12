@@ -23,15 +23,9 @@
 
 import unittest
 
-from aeneas.exacttiming import Decimal
-from aeneas.exacttiming import TimeInterval
-from aeneas.exacttiming import TimeValue
 from aeneas.language import Language
 from aeneas.syncmap import SyncMap
 from aeneas.syncmap import SyncMapFormat
-from aeneas.syncmap import SyncMapFragment
-from aeneas.syncmap import SyncMapMissingParameterError
-from aeneas.textfile import TextFragment
 import aeneas.globalconstants as gc
 import aeneas.globalfunctions as gf
 
@@ -72,25 +66,37 @@ class TestSyncMap(unittest.TestCase):
         for fmt in SyncMapFormat.ALLOWED_VALUES:
             syn = self.read(fmt)
             self.assertEqual(len(syn), 15)
-            ignored = str(syn)
+            try:
+                str(syn)
+            except Exception as e:
+                self.fail("Failed to convert to string: %s" % e)
 
     def test_read_m(self):
         for fmt in SyncMapFormat.ALLOWED_VALUES:
             syn = self.read(fmt, multiline=True)
             self.assertEqual(len(syn), 15)
-            ignored = str(syn)
+            try:
+                str(syn)
+            except Exception as e:
+                self.fail("Failed to convert to string: %s" % e)
 
     def test_read_u(self):
         for fmt in SyncMapFormat.ALLOWED_VALUES:
             syn = self.read(fmt, utf8=True)
             self.assertEqual(len(syn), 15)
-            ignored = str(syn)
+            try:
+                str(syn)
+            except Exception as e:
+                self.fail("Failed to convert to string: %s" % e)
 
     def test_read_mu(self):
         for fmt in SyncMapFormat.ALLOWED_VALUES:
             syn = self.read(fmt, multiline=True, utf8=True)
             self.assertEqual(len(syn), 15)
-            ignored = str(syn)
+            try:
+                str(syn)
+            except Exception as e:
+                self.fail("Failed to convert to string: %s" % e)
 
     def test_write(self):
         for fmt in SyncMapFormat.ALLOWED_VALUES:

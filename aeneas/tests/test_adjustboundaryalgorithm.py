@@ -23,7 +23,6 @@
 
 import unittest
 
-from aeneas.adjustboundaryalgorithm import AdjustBoundaryAlgorithm
 
 
 class TestAdjustBoundaryAlgorithm(unittest.TestCase):

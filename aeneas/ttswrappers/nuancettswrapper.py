@@ -47,12 +47,10 @@ import numpy
 import time
 import uuid
 
-from aeneas.audiofile import AudioFile
 from aeneas.exacttiming import TimeValue
 from aeneas.language import Language
 from aeneas.runtimeconfiguration import RuntimeConfiguration
 from aeneas.ttswrappers.basettswrapper import BaseTTSWrapper
-import aeneas.globalfunctions as gf
 
 
 class NuanceTTSWrapper(BaseTTSWrapper):

@@ -40,7 +40,6 @@ from aeneas.container import Container
 from aeneas.hierarchytype import HierarchyType
 from aeneas.job import Job
 from aeneas.logger import Loggable
-from aeneas.runtimeconfiguration import RuntimeConfiguration
 from aeneas.task import Task
 import aeneas.globalconstants as gc
 import aeneas.globalfunctions as gf

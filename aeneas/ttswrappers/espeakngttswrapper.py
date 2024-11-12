@@ -35,11 +35,8 @@ for further details.
 from __future__ import absolute_import
 from __future__ import print_function
 
-from aeneas.exacttiming import TimeValue
 from aeneas.language import Language
-from aeneas.runtimeconfiguration import RuntimeConfiguration
 from aeneas.ttswrappers.basettswrapper import BaseTTSWrapper
-import aeneas.globalfunctions as gf
 
 
 class ESPEAKNGTTSWrapper(BaseTTSWrapper):

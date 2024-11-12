@@ -27,7 +27,6 @@ Set the aeneas package up.
 
 from setuptools import Extension
 from setuptools import setup
-import io
 import os
 import shutil
 import sys

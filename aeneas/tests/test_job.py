@@ -25,13 +25,11 @@ import unittest
 
 from aeneas.container import ContainerFormat
 from aeneas.hierarchytype import HierarchyType
-from aeneas.idsortingalgorithm import IDSortingAlgorithm
 from aeneas.job import Job
 from aeneas.job import JobConfiguration
 from aeneas.language import Language
 from aeneas.logger import Logger
 from aeneas.task import Task
-from aeneas.textfile import TextFileFormat
 
 
 class TestJob(unittest.TestCase):
@@ -46,8 +44,10 @@ class TestJob(unittest.TestCase):
             self.assertEqual(read_value, value)
 
     def test_job_logger(self):
-        logger = Logger()
-        job = Job(logger=logger)
+        try:
+            Job(logger=Logger())
+        except Exception as e:
+            self.fail("Failed to initialize Job with logger: %s" % e)
 
     def test_job_identifier(self):
         job = Job()
@@ -63,11 +63,11 @@ class TestJob(unittest.TestCase):
 
     def test_job_string_configuration_invalid(self):
         with self.assertRaises(TypeError):
-            job = Job(1)
+            Job(1)
 
     def test_job_string_configuration_bytes(self):
         with self.assertRaises(TypeError):
-            job = Job(b"job_language=eng")
+            Job(b"job_language=eng")
 
     def test_job_string_configuration_unicode(self):
         job = Job(u"job_language=eng")

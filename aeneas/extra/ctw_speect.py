@@ -33,7 +33,6 @@ import speect
 import speect.audio
 import speect.audio_riff
 
-from aeneas.audiofile import AudioFile
 from aeneas.language import Language
 from aeneas.exacttiming import TimeValue
 from aeneas.ttswrappers.basettswrapper import BaseTTSWrapper

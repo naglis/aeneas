@@ -589,10 +589,7 @@ class BaseTTSWrapper(Loggable):
             )
             if self.CLI_PARAMETER_TEXT_STDIN in self.subprocess_arguments:
                 self.log(u"Passing text via stdin...")
-                if gf.PY2:
-                    (stdoutdata, stderrdata) = proc.communicate(input=gf.safe_bytes(text))
-                else:
-                    (stdoutdata, stderrdata) = proc.communicate(input=text)
+                (stdoutdata, stderrdata) = proc.communicate(input=text)
                 self.log(u"Passing text via stdin... done")
             else:
                 self.log(u"Passing text via file...")

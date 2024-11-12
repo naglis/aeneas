@@ -34,6 +34,8 @@ This module contains the following classes:
 from __future__ import absolute_import
 from __future__ import print_function
 
+import importlib.util
+
 from aeneas.logger import Loggable
 from aeneas.runtimeconfiguration import RuntimeConfiguration
 from aeneas.textfile import TextFile
@@ -122,17 +124,13 @@ class Synthesizer(Loggable):
             except Exception as exc:
                 self.log_exc(u"Unable to load custom TTS wrapper", exc, True, OSError)
         elif requested_tts_engine == self.AWS:
-            try:
-                import boto3
-            except ImportError as exc:
-                self.log_exc(u"Unable to import boto3 for AWS Polly TTS API wrapper", exc, True, ImportError)
+            if importlib.util.find_spec("boto3") is None:
+                self.log_exc(u"Unable to import boto3 for AWS Polly TTS API wrapper", critical=True, raise_type=ImportError)
             self.log(u"TTS engine: AWS Polly TTS API")
             self.tts_engine = AWSTTSWrapper(rconf=self.rconf, logger=self.logger)
         elif requested_tts_engine == self.NUANCE:
-            try:
-                import requests
-            except ImportError as exc:
-                self.log_exc(u"Unable to import requests for Nuance TTS API wrapper", exc, True, ImportError)
+            if importlib.util.find_spec("requests") is None:
+                self.log_exc(u"Unable to import requests for Nuance TTS API wrapper", critical=True, raise_type=ImportError)
             self.log(u"TTS engine: Nuance TTS API")
             self.tts_engine = NuanceTTSWrapper(rconf=self.rconf, logger=self.logger)
         elif requested_tts_engine == self.ESPEAKNG:

@@ -644,19 +644,10 @@ class TestGlobalFunctions(unittest.TestCase):
             ([], False),
             ([u"foo"], False),
             ({u"foo": u"baz"}, False),
+            ("", True),
+            ("foo", True),
+            ("fox99", True),
         ]
-        if gf.PY2:
-            tests.extend([
-                ("", False),
-                ("foo", False),
-                ("fox99", False),
-            ])
-        else:
-            tests.extend([
-                ("", True),
-                ("foo", True),
-                ("fox99", True),
-            ])
         for test in tests:
             self.assertEqual(gf.is_unicode(test[0]), test[1])
 
@@ -685,19 +676,10 @@ class TestGlobalFunctions(unittest.TestCase):
             ([], False),
             ([b"foo"], False),
             ({b"foo": b"baz"}, False),
+            ("", False),
+            ("foo", False),
+            ("fox99", False),
         ]
-        if gf.PY2:
-            tests.extend([
-                ("", True),
-                ("foo", True),
-                ("fox99", True),
-            ])
-        else:
-            tests.extend([
-                ("", False),
-                ("foo", False),
-                ("fox99", False),
-            ])
         for test in tests:
             self.assertEqual(gf.is_bytes(test[0]), test[1])
 
@@ -718,11 +700,8 @@ class TestGlobalFunctions(unittest.TestCase):
             (0x20, u"\u0020"),
             (0x200, u"\u0200"),
             (0x2000, u"\u2000"),
+            (0x20000, "\U00020000"),
         ]
-        if gf.PY2:
-            tests.append((0x20000, "\\U00020000".decode("unicode-escape")))
-        else:
-            tests.append((0x20000, "\U00020000"))
         for test in tests:
             self.assertEqual(gf.safe_unichr(test[0]), test[1])
 

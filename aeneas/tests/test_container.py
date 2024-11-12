@@ -66,7 +66,7 @@ class TestContainer(unittest.TestCase):
             "format": ContainerFormat.TAR_BZ2,
             "config_size": 599
         },
-        "tar": {
+        "tar_gz": {
             "path": gf.absolute_path("res/container/job.tar.gz", __file__),
             "format": ContainerFormat.TAR_GZ,
             "config_size": 599
@@ -90,11 +90,11 @@ class TestContainer(unittest.TestCase):
 
     def test_path_none(self):
         with self.assertRaises(TypeError):
-            cont = Container(file_path=None)
+            Container(file_path=None)
 
     def test_invalid_container_format(self):
         with self.assertRaises(ValueError):
-            con = Container(file_path=self.FILES["zip"]["path"], container_format="foo")
+            Container(file_path=self.FILES["zip"]["path"], container_format="foo")
 
     def test_constructor(self):
         for key in self.FILES:
@@ -129,7 +129,7 @@ class TestContainer(unittest.TestCase):
     def test_entries_file_not_existing(self):
         cont = Container(self.NOT_EXISTING)
         with self.assertRaises(TypeError):
-            entries = cont.entries
+            cont.entries
 
     def test_entries_empty_file(self):
         for f in self.EMPTY_FILES:

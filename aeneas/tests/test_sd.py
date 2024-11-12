@@ -21,7 +21,6 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import os
 import unittest
 
 from aeneas.audiofilemfcc import AudioFileMFCC
@@ -44,7 +43,11 @@ class TestSD(unittest.TestCase):
         return SD(audio_file_mfcc, text_file)
 
     def test_create_sd(self):
-        sd = self.load()
+        try:
+            self.load()
+        except Exception as e:
+            self.fail("Failed to create sd: %s" % e)
+
 
     def test_detect_interval(self):
         begin, end = self.load().detect_interval()

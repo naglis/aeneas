@@ -500,8 +500,8 @@ class Tree(Loggable):
         """
         if not isinstance(level_indices, list):
             self.log_exc(u"level_indices is not an instance of list", None, True, TypeError)
-        for l in level_indices:
-            if not isinstance(l, int):
+        for level in level_indices:
+            if not isinstance(level, int):
                 self.log_exc(u"level_indices contains an element not int", None, True, TypeError)
         prev_levels = self.levels
         level_indices = set(level_indices)
@@ -510,12 +510,12 @@ class Tree(Loggable):
         level_indices = level_indices & set(range(self.height))
         level_indices = sorted(level_indices)[::-1]
         # first, remove children
-        for l in level_indices:
-            for node in prev_levels[l]:
+        for level in level_indices:
+            for node in prev_levels[level]:
                 node.remove_children(reset_parent=False)
         # then, connect to the right new parent
         for i in range(len(level_indices) - 1):
-            l = level_indices[i]
-            for node in prev_levels[l]:
-                parent_node = node.ancestor(l - level_indices[i + 1])
+            level = level_indices[i]
+            for node in prev_levels[level]:
+                parent_node = node.ancestor(level - level_indices[i + 1])
                 parent_node.add_child(node)

@@ -294,7 +294,7 @@ class Container(Loggable):
         self.log([u"Reading contents of entry '%s'", entry])
         try:
             return self.actual_container.read_entry(entry)
-        except:
+        except Exception:
             self.log([u"An error occurred while reading the contents of '%s'", entry])
             return None
 

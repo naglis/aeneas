@@ -657,7 +657,7 @@ class ExecuteTaskCLI(AbstractCLIProgram):
                 gf.delete_file(None, audio_file_path)
 
         if print_zero:
-            zero_duration = [l for l in task.sync_map_leaves(SyncMapFragment.REGULAR) if l.begin == l.end]
+            zero_duration = [leaf for leaf in task.sync_map_leaves(SyncMapFragment.REGULAR) if leaf.begin == leaf.end]
             if len(zero_duration) > 0:
                 self.print_warning(u"Fragments with zero duration:")
                 for fragment in zero_duration:
@@ -671,7 +671,7 @@ class ExecuteTaskCLI(AbstractCLIProgram):
         if print_faster_rate:
             max_rate = task.configuration["aba_rate_value"]
             if max_rate is not None:
-                faster = [l for l in task.sync_map_leaves(SyncMapFragment.REGULAR) if l.rate >= max_rate + Decimal("0.001")]
+                faster = [leaf for leaf in task.sync_map_leaves(SyncMapFragment.REGULAR) if leaf.rate >= max_rate + Decimal("0.001")]
                 if len(faster) > 0:
                     self.print_warning(u"Fragments with rate greater than %.3f:" % max_rate)
                     for fragment in faster:

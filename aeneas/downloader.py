@@ -210,7 +210,7 @@ class Downloader(Loggable):
             try:
                 audiostreams = _list_audiostreams(self, source_url)
                 break
-            except:
+            except Exception:
                 self.log_warn(u"Unable to list audio streams, retry")
                 att -= 1
         if att <= 0:
@@ -233,7 +233,7 @@ class Downloader(Loggable):
             try:
                 _download_audiostream(self, source_url, audiostream["format"], output_path)
                 break
-            except:
+            except Exception:
                 self.log_warn(u"Unable to download audio streams, retry")
                 att -= 1
         if att <= 0:

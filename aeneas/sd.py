@@ -35,12 +35,13 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
+import decimal
+
 import numpy
 
 from aeneas.audiofilemfcc import AudioFileMFCC
 from aeneas.dtw import DTWAligner
 from aeneas.exacttiming import Decimal
-from aeneas.exacttiming import InvalidOperation
 from aeneas.exacttiming import TimeValue
 from aeneas.logger import Loggable
 from aeneas.runtimeconfiguration import RuntimeConfiguration
@@ -219,7 +220,7 @@ class SD(Loggable):
                 value = default
             try:
                 value = TimeValue(value)
-            except (TypeError, ValueError, InvalidOperation) as exc:
+            except (TypeError, ValueError, decimal.InvalidOperation) as exc:
                 self.log_exc(u"The value of %s is not a number" % (name), exc, True, TypeError)
             if value < 0:
                 self.log_exc(u"The value of %s is negative" % (name), None, True, ValueError)

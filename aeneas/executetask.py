@@ -38,19 +38,14 @@ from aeneas.adjustboundaryalgorithm import AdjustBoundaryAlgorithm
 from aeneas.audiofile import AudioFile
 from aeneas.audiofilemfcc import AudioFileMFCC
 from aeneas.dtw import DTWAligner
-from aeneas.exacttiming import TimeInterval
 from aeneas.exacttiming import TimeValue
-from aeneas.ffmpegwrapper import FFMPEGWrapper
 from aeneas.logger import Loggable
 from aeneas.runtimeconfiguration import RuntimeConfiguration
 from aeneas.sd import SD
 from aeneas.syncmap import SyncMap
-from aeneas.syncmap import SyncMapFragment
-from aeneas.syncmap import SyncMapHeadTailFormat
 from aeneas.synthesizer import Synthesizer
 from aeneas.task import Task
 from aeneas.textfile import TextFileFormat
-from aeneas.textfile import TextFragment
 from aeneas.tree import Tree
 import aeneas.globalfunctions as gf
 

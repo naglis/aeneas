@@ -38,8 +38,6 @@ This package contains the following classes:
 from __future__ import absolute_import
 from __future__ import print_function
 from copy import deepcopy
-from functools import partial
-from itertools import chain
 import io
 import json
 import os
@@ -49,8 +47,6 @@ from aeneas.syncmap.format import SyncMapFormat
 from aeneas.syncmap.fragment import SyncMapFragment
 from aeneas.syncmap.fragmentlist import SyncMapFragmentList
 from aeneas.syncmap.headtailformat import SyncMapHeadTailFormat
-from aeneas.syncmap.missingparametererror import SyncMapMissingParameterError
-from aeneas.textfile import TextFragment
 from aeneas.tree import Tree
 import aeneas.globalconstants as gc
 import aeneas.globalfunctions as gf
@@ -163,7 +159,7 @@ class SyncMap(Loggable):
         leaves = self.fragments_tree.vleaves_not_empty
         if fragment_type is None:
             return leaves
-        return [l for l in leaves if l.fragment_type == fragment_type]
+        return [leaf for leaf in leaves if leaf.fragment_type == fragment_type]
 
     @property
     def has_adjacent_leaves_only(self):
@@ -195,8 +191,8 @@ class SyncMap(Loggable):
 
         .. versionadded:: 1.7.0
         """
-        for l in self.leaves():
-            if l.has_zero_length:
+        for leaf in self.leaves():
+            if leaf.has_zero_length:
                 return True
         return False
 
@@ -218,9 +214,9 @@ class SyncMap(Loggable):
         if len(leaves) < 1:
             self.log(u"Empty leaves => return True")
             return True
-        min_time = min([l.interval.begin for l in leaves])
+        min_time = min(leaf.interval.begin for leaf in leaves)
         self.log([u"  Min time: %.3f", min_time])
-        max_time = max([l.interval.end for l in leaves])
+        max_time = max(leaf.interval.end for leaf in leaves)
         self.log([u"  Max time: %.3f", max_time])
         self.log(u"  Creating SyncMapFragmentList...")
         smf = SyncMapFragmentList(
@@ -232,9 +228,9 @@ class SyncMap(Loggable):
         self.log(u"  Creating SyncMapFragmentList... done")
         self.log(u"  Sorting SyncMapFragmentList...")
         result = True
-        not_head_tail = [l for l in leaves if not l.is_head_or_tail]
-        for l in not_head_tail:
-            smf.add(l, sort=False)
+        not_head_tail = [leaf for leaf in leaves if not leaf.is_head_or_tail]
+        for leaf in not_head_tail:
+            smf.add(leaf, sort=False)
         try:
             smf.sort()
             self.log(u"  Sorting completed => return True")
@@ -438,7 +434,7 @@ class SyncMap(Loggable):
             if levels is None:
                 return
             try:
-                levels = [int(l) for l in levels if int(l) > 0]
+                levels = [int(level) for level in levels if int(level) > 0]
                 syncmap.fragments_tree.keep_levels(levels)
                 self.log([u"Selected levels: %s", levels])
             except ValueError:
@@ -489,11 +485,11 @@ class SyncMap(Loggable):
         pruned_syncmap = self.clone()
         try:
             select_levels(pruned_syncmap, parameters[gc.PPN_TASK_OS_FILE_LEVELS])
-        except:
+        except Exception:
             self.log_warn([u"No %s parameter specified", gc.PPN_TASK_OS_FILE_LEVELS])
         try:
             set_head_tail_format(pruned_syncmap, parameters[gc.PPN_TASK_OS_FILE_HEAD_TAIL_FORMAT])
-        except:
+        except Exception:
             self.log_warn([u"No %s parameter specified", gc.PPN_TASK_OS_FILE_HEAD_TAIL_FORMAT])
 
         # create writer

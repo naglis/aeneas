@@ -53,14 +53,11 @@ from __future__ import division
 from __future__ import print_function
 import numpy
 import time
-import uuid
 
-from aeneas.audiofile import AudioFile
 from aeneas.exacttiming import TimeValue
 from aeneas.language import Language
 from aeneas.runtimeconfiguration import RuntimeConfiguration
 from aeneas.ttswrappers.basettswrapper import BaseTTSWrapper
-import aeneas.globalfunctions as gf
 
 
 class AWSTTSWrapper(BaseTTSWrapper):
@@ -302,7 +299,7 @@ class AWSTTSWrapper(BaseTTSWrapper):
                 status_code = response["ResponseMetadata"]["HTTPStatusCode"]
                 response_content = response["AudioStream"].read()
             except Exception as exc:
-                self.log_warn(u"Error while reading the response status code or the response content")
+                self.log_warn(u"Error while reading the response status code or the response content: %s" % exc)
                 status_code = 999
             self.log(u"Reading response... done")
             self.log([u"Status code: %d", status_code])

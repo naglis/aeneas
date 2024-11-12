@@ -50,7 +50,7 @@ class TestAudioFileMFCC(unittest.TestCase):
 
     def test_load_on_none(self):
         with self.assertRaises(ValueError):
-            audiofile = self.load(None)
+            self.load(None)
 
     def test_load_audio_file(self):
         af = AudioFile(gf.absolute_path(self.AUDIO_FILE_WAVE, __file__))
@@ -73,7 +73,7 @@ class TestAudioFileMFCC(unittest.TestCase):
 
     def test_load_on_non_existing_path(self):
         with self.assertRaises(OSError):
-            audiofile = self.load(self.NOT_EXISTING_FILE)
+            self.load(self.NOT_EXISTING_FILE)
 
     def test_load_on_empty(self):
         with self.assertRaises(AudioFileUnsupportedFormatError):

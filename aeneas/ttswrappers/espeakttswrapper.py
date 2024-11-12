@@ -856,12 +856,7 @@ class ESPEAKTTSWrapper(BaseTTSWrapper):
 
         if sr is None:
             self.log(u"Preparing c_text...")
-            if gf.PY2:
-                # Python 2 => pass byte strings
-                c_text = [(gf.safe_bytes(t[0]), gf.safe_bytes(t[1])) for t in u_text]
-            else:
-                # Python 3 => pass Unicode strings
-                c_text = [(gf.safe_unicode(t[0]), gf.safe_unicode(t[1])) for t in u_text]
+            c_text = [(gf.safe_unicode(t[0]), gf.safe_unicode(t[1])) for t in u_text]
             self.log(u"Preparing c_text... done")
 
             self.log(u"Calling aeneas.cew directly")

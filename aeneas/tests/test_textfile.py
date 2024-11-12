@@ -95,7 +95,7 @@ class TestTextFile(unittest.TestCase):
 
     def test_tf_identifier_str(self):
         with self.assertRaises(TypeError):
-            tf = TextFragment(identifier=b"foo")
+            TextFragment(identifier=b"foo")
 
     def test_tf_identifier_unicode(self):
         tf = TextFragment(identifier=u"foo")
@@ -103,23 +103,23 @@ class TestTextFile(unittest.TestCase):
 
     def test_tf_lines_invalid(self):
         with self.assertRaises(TypeError):
-            tf = TextFragment(lines="foo")
+            TextFragment(lines="foo")
 
     def test_tf_lines_invalid_none(self):
         with self.assertRaises(TypeError):
-            tf = TextFragment(lines=[None])
+            TextFragment(lines=[None])
 
     def test_tf_lines_invalid_none_mixed(self):
         with self.assertRaises(TypeError):
-            tf = TextFragment(lines=[u"foo", None, u"bar"])
+            TextFragment(lines=[u"foo", None, u"bar"])
 
     def test_tf_lines_invalid_str(self):
         with self.assertRaises(TypeError):
-            tf = TextFragment(lines=[b"foo"])
+            TextFragment(lines=[b"foo"])
 
     def test_tf_lines_invalid_str_mixed(self):
         with self.assertRaises(TypeError):
-            tf = TextFragment(lines=[u"foo", b"bar", u"baz"])
+            TextFragment(lines=[u"foo", b"bar", u"baz"])
 
     def test_tf_lines_unicode(self):
         tf = TextFragment(lines=[u"foo"])
@@ -143,15 +143,15 @@ class TestTextFile(unittest.TestCase):
 
     def test_file_path_not_existing(self):
         with self.assertRaises(OSError):
-            tfl = TextFile(file_path=self.NOT_EXISTING_PATH)
+            TextFile(file_path=self.NOT_EXISTING_PATH)
 
     def test_invalid_format(self):
         with self.assertRaises(ValueError):
-            tfl = TextFile(file_format="foo")
+            TextFile(file_format="foo")
 
     def test_invalid_parameters(self):
         with self.assertRaises(TypeError):
-            tfl = TextFile(parameters=["foo"])
+            TextFile(parameters=["foo"])
 
     def test_empty_fragments(self):
         tfl = TextFile()
@@ -234,7 +234,7 @@ class TestTextFile(unittest.TestCase):
             gc.PPN_TASK_IS_TEXT_MUNPARSED_L2_ID_REGEX: "s[0-9]+",
             gc.PPN_TASK_IS_TEXT_MUNPARSED_L3_ID_REGEX: "w[0-9]+",
         }
-        tfl = self.load("res/inputtext/sonnet_munparsed_diff_id.xhtml", TextFileFormat.MUNPARSED, 0, parameters)
+        self.load("res/inputtext/sonnet_munparsed_diff_id.xhtml", TextFileFormat.MUNPARSED, 0, parameters)
 
     def test_read_munparsed_bad_param_l2(self):
         parameters = {
@@ -242,7 +242,7 @@ class TestTextFile(unittest.TestCase):
             gc.PPN_TASK_IS_TEXT_MUNPARSED_L2_ID_REGEX: "k[0-9]+",
             gc.PPN_TASK_IS_TEXT_MUNPARSED_L3_ID_REGEX: "w[0-9]+",
         }
-        tfl = self.load("res/inputtext/sonnet_munparsed_diff_id.xhtml", TextFileFormat.MUNPARSED, 0, parameters)
+        self.load("res/inputtext/sonnet_munparsed_diff_id.xhtml", TextFileFormat.MUNPARSED, 0, parameters)
 
     def test_read_munparsed_bad_param_l3(self):
         parameters = {
@@ -250,7 +250,7 @@ class TestTextFile(unittest.TestCase):
             gc.PPN_TASK_IS_TEXT_MUNPARSED_L2_ID_REGEX: "s[0-9]+",
             gc.PPN_TASK_IS_TEXT_MUNPARSED_L3_ID_REGEX: "k[0-9]+",
         }
-        tfl = self.load("res/inputtext/sonnet_munparsed_diff_id.xhtml", TextFileFormat.MUNPARSED, 0, parameters)
+        self.load("res/inputtext/sonnet_munparsed_diff_id.xhtml", TextFileFormat.MUNPARSED, 0, parameters)
 
     def test_read_plain(self):
         self.load(self.PLAIN_FILE_PATH, TextFileFormat.PLAIN, 15)
@@ -416,11 +416,11 @@ class TestTextFile(unittest.TestCase):
     def test_get_subtree_bad(self):
         tfl = self.load()
         with self.assertRaises(TypeError):
-            sub = tfl.get_subtree("abc")
+            tfl.get_subtree("abc")
         with self.assertRaises(TypeError):
-            sub = tfl.get_subtree(None)
+            tfl.get_subtree(None)
         with self.assertRaises(TypeError):
-            sub = tfl.get_subtree(tfl.fragments[0])
+            tfl.get_subtree(tfl.fragments[0])
 
     def test_get_subtree(self):
         tfl = self.load(input_file_path=self.MPLAIN_FILE_PATH, fmt=TextFileFormat.MPLAIN, expected_length=5)
@@ -559,7 +559,3 @@ class TestTextFile(unittest.TestCase):
         else:
             self.filter_transliterate([u"x" + gf.safe_unichr(0x88888) + u"z"], [u"xaz"])
             self.filter_transliterate([u"x" + gf.safe_unichr(0x108888) + u"z"], [u"xaz"])
-
-
-if __name__ == "__main__":
-    unittest.main()

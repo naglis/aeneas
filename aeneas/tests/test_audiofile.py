@@ -115,19 +115,22 @@ class TestAudioFile(unittest.TestCase):
 
     def test_read_properties_from_none(self):
         with self.assertRaises(OSError):
-            audiofile = self.load(None, rp=True)
+            self.load(None, rp=True)
 
     def test_read_properties_from_non_existing_path(self):
         with self.assertRaises(OSError):
-            audiofile = self.load("not_existing.mp3", rp=True)
+            self.load("not_existing.mp3", rp=True)
 
     def test_read_properties_from_empty(self):
         with self.assertRaises(AudioFileUnsupportedFormatError):
-            audiofile = self.load(self.AUDIO_FILE_EMPTY, rp=True)
+            self.load(self.AUDIO_FILE_EMPTY, rp=True)
 
     def test_str(self):
         audiofile = self.load(self.AUDIO_FILE_WAVE, rp=True)
-        ignored = str(audiofile)
+        try:
+            str(audiofile)
+        except Exception as e:
+            self.fail(f"Failed to format AudioFile instance as string: {e}")
 
     def test_read_properties_formats(self):
         for f in self.FILES:
@@ -141,15 +144,15 @@ class TestAudioFile(unittest.TestCase):
 
     def test_read_samples_from_none(self):
         with self.assertRaises(OSError):
-            audiofile = self.load(None, rs=True)
+            self.load(None, rs=True)
 
     def test_read_samples_from_non_existing_path(self):
         with self.assertRaises(OSError):
-            audiofile = self.load(self.NOT_EXISTING_FILE, rs=True)
+            self.load(self.NOT_EXISTING_FILE, rs=True)
 
     def test_read_samples_from_empty(self):
         with self.assertRaises(AudioFileUnsupportedFormatError):
-            audiofile = self.load(self.AUDIO_FILE_EMPTY, rs=True)
+            self.load(self.AUDIO_FILE_EMPTY, rs=True)
 
     def test_read_samples_from_file(self):
         audiofile = self.load(self.AUDIO_FILE_WAVE, rs=True)
@@ -233,7 +236,10 @@ class TestAudioFile(unittest.TestCase):
         gf.delete_file(handler, output_file_path)
 
     def test_create_none(self):
-        audiofile = AudioFile()
+        try:
+            AudioFile()
+        except Exception as e:
+            self.fail(f"Failed to initialize AudioFile: {e}")
 
     def test_preallocate(self):
         audiofile = AudioFile()

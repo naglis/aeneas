@@ -363,7 +363,7 @@ def config_txt_to_string(string):
     """
     if string is None:
         return None
-    pairs = [l.strip() for l in string.splitlines() if len(l.strip()) > 0]
+    pairs = [line.strip() for line in string.splitlines() if line.strip()]
     return gc.CONFIG_STRING_SEPARATOR_SYMBOL.join(pairs)
 
 
@@ -433,7 +433,7 @@ def config_xml_to_dict(contents, result, parse_job=True):
                             ))
                     output_list.append(pairs_to_dict(pairs))
             return output_list
-    except:
+    except Exception:
         if result is not None:
             result.passed = False
             result.add_error("An error occurred while parsing XML file")
@@ -641,7 +641,7 @@ def time_from_hhmmssmmm(string, decimal_separator="."):
             v_s = int(match.group(3))
             v_f = TimeValue("0." + match.group(4))
             v_length = v_h * 3600 + v_m * 60 + v_s + v_f
-    except:
+    except Exception:
         pass
     return v_length
 
@@ -920,7 +920,7 @@ def file_can_be_read(path):
     if path is None:
         return False
     try:
-        with io.open(path, "rb") as test_file:
+        with io.open(path, "rb"):
             pass
         return True
     except (IOError, OSError):
@@ -943,7 +943,7 @@ def file_can_be_written(path):
     if path is None:
         return False
     try:
-        with io.open(path, "wb") as test_file:
+        with io.open(path, "wb"):
             pass
         delete_file(None, path)
         return True
@@ -1001,7 +1001,7 @@ def delete_directory(path):
     if path is not None:
         try:
             shutil.rmtree(path)
-        except:
+        except Exception:
             pass
 
 
@@ -1014,7 +1014,7 @@ def close_file_handler(handler):
     if handler is not None:
         try:
             os.close(handler)
-        except:
+        except Exception:
             pass
 
 
@@ -1029,7 +1029,7 @@ def delete_file(handler, path):
     if path is not None:
         try:
             os.remove(path)
-        except:
+        except Exception:
             pass
 
 
@@ -1111,7 +1111,7 @@ def read_file_bytes(input_file_path):
     try:
         with io.open(input_file_path, "rb") as input_file:
             contents = input_file.read()
-    except:
+    except Exception:
         pass
     return contents
 
@@ -1251,7 +1251,7 @@ def safe_unicode_stdin(string):
             return string.decode(sys.stdin.encoding)
         except UnicodeDecodeError:
             return string.decode(sys.stdin.encoding, "replace")
-        except:
+        except Exception:
             return string.decode("utf-8")
     return string
 

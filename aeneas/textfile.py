@@ -695,7 +695,6 @@ class TextFile(Loggable):
         word_separator = self._mplain_word_separator()
         self.log([u"Word separator is: '%s'", word_separator])
         lines = [line.strip() for line in lines]
-        pairs = []
         i = 1
         current = 0
         tree = Tree()
@@ -790,8 +789,6 @@ class TextFile(Loggable):
         self.log(u"Creating soup")
         soup = BeautifulSoup("\n".join(lines), "lxml")
         # extract according to class_regex and id_regex
-        text_from_id = {}
-        ids = []
         self.log(u"Finding l1 elements")
         tree = Tree()
         for l1_node in nodes_at_level(soup, 1):
@@ -799,13 +796,11 @@ class TextFile(Loggable):
             try:
                 l1_id = gf.safe_unicode(l1_node["id"])
                 self.log([u"Found l1 node with id:   '%s'", l1_id])
-                l1_text = []
                 paragraph_node = Tree()
                 paragraph_text = []
                 for l2_node in nodes_at_level(l1_node, 2):
                     l2_id = gf.safe_unicode(l2_node["id"])
                     self.log([u"  Found l2 node with id:   '%s'", l2_id])
-                    l2_text = []
                     sentence_node = Tree()
                     paragraph_node.add_child(sentence_node)
                     sentence_text = []
@@ -986,7 +981,7 @@ class TextFile(Loggable):
             can_return_none=False
         )
         try:
-            identifier = id_format % 1
+            id_format % 1
         except (TypeError, ValueError) as exc:
             self.log_exc(u"String '%s' is not a valid id format" % (id_format), exc, True, ValueError)
         return id_format
@@ -1113,7 +1108,7 @@ class TextFilterIgnoreRegex(TextFilter):
     def __init__(self, regex, rconf=None, logger=None):
         try:
             self.regex = re.compile(regex)
-        except:
+        except Exception:
             raise ValueError(u"String '%s' is not a valid regular expression" % regex)
         TextFilter.__init__(self, rconf=rconf, logger=logger)
 
@@ -1233,7 +1228,7 @@ class TransliterationMap(Loggable):
         for char in string:
             try:
                 result.append(self.trans_map[char])
-            except:
+            except Exception:
                 result.append(char)
         result = u"".join(result)
         return result
@@ -1309,7 +1304,7 @@ class TransliterationMap(Loggable):
         result = group
         try:
             result = re.sub(self.CODEPOINT_REGEX, _replace_codepoint, result)
-        except:
+        except Exception:
             pass
         return result
 
@@ -1334,7 +1329,7 @@ class TransliterationMap(Loggable):
         """
         try:
             return int(match.group(1), 16)
-        except:
+        except Exception:
             pass
         return -1
 
@@ -1345,6 +1340,6 @@ class TransliterationMap(Loggable):
         """
         try:
             return ord(char)
-        except:
+        except Exception:
             pass
         return -1

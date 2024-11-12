@@ -24,9 +24,7 @@
 from __future__ import absolute_import
 from __future__ import print_function
 
-from aeneas.syncmap.fragment import SyncMapFragment
 from aeneas.syncmap.smfgxml import SyncMapFormatGenericXML
-from aeneas.textfile import TextFragment
 import aeneas.globalconstants as gc
 import aeneas.globalfunctions as gf
 
@@ -42,9 +40,6 @@ class SyncMapFormatEAF(SyncMapFormatGenericXML):
 
     def parse(self, input_text, syncmap):
         from lxml import etree
-        # namespaces
-        xsi = "http://www.w3.org/2001/XMLSchema-instance"
-        ns_map = {"xsi": xsi}
         # get root
         root = etree.fromstring(gf.safe_bytes(input_text))
         # get time slots

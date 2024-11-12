@@ -41,11 +41,9 @@ This module contains the following classes:
 from __future__ import absolute_import
 from __future__ import print_function
 from PIL import Image, ImageDraw, ImageFont
-import math
 import numpy
 
 from aeneas.logger import Loggable
-from aeneas.runtimeconfiguration import RuntimeConfiguration
 import aeneas.globalfunctions as gf
 
 
@@ -383,7 +381,7 @@ class PlotLabelset(PlotElement):
     def width(self):
         try:
             return int(self.labelset[-1][1] / self.rconf.mws)
-        except:
+        except Exception:
             return 0
 
     def draw_png(self, image, h_zoom, v_zoom, current_y):
@@ -518,7 +516,7 @@ class PlotWaveform(PlotElement):
     def width(self):
         try:
             return int(self.audio_file.audio_length / self.rconf.mws)
-        except:
+        except Exception:
             return 0
 
     def draw_png(self, image, h_zoom, v_zoom, current_y):
@@ -535,14 +533,12 @@ class PlotWaveform(PlotElement):
         mws = self.rconf.mws
         rate = self.audio_file.audio_sample_rate
         samples = self.audio_file.audio_samples
-        duration = self.audio_file.audio_length
 
         current_y_px = current_y * v_zoom
         half_waveform_px = (self.height // 2) * v_zoom
         zero_y_px = current_y_px + half_waveform_px
 
         samples_per_pixel = int(rate * mws / h_zoom)
-        pixels_per_second = int(h_zoom / mws)
         windows = len(samples) // samples_per_pixel
 
         if self.label is not None:
