@@ -28,6 +28,10 @@ from aeneas.tools.execute_job import ExecuteJobCLI
 import aeneas.globalfunctions as gf
 
 
+@unittest.skipIf(
+    (val := os.getenv("UNITTEST_RUN_SLOW_TESTS")) is None or val.strip() == "0",
+    "slow tests are disabled. Set `UNITTEST_RUN_SLOW_TESTS=1` in the environment to enable them.",
+)
 class TestExecuteJobCLI(unittest.TestCase):
 
     def execute(self, parameters, expected_exit_code):

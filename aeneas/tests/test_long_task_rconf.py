@@ -33,6 +33,10 @@ import aeneas.globalfunctions as gf
 EXTRA_TESTS = os.path.exists(os.path.join(os.path.expanduser("~"), ".aeneas.conf"))
 
 
+@unittest.skipIf(
+    (val := os.getenv("UNITTEST_RUN_SLOW_TESTS")) is None or val.strip() == "0",
+    "slow tests are disabled. Set `UNITTEST_RUN_SLOW_TESTS=1` in the environment to enable them.",
+)
 class TestExecuteTaskCLI(unittest.TestCase):
 
     def execute(self, parameters, expected_exit_code):
