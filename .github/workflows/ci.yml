@@ -22,7 +22,9 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y ffmpeg espeak
           python -m pip install --upgrade pip
-          pip install -r requirements.txt
+          # FIXME: `tgt` is temporarily installed since tests break without it.
+          # Consider adding it as a hard dependency or ignore(skip) in tests if it is not installed intead of failing.
+          pip install -r requirements.txt tgt
       - name: Tests
         run: |
           python -m unittest discover -v
