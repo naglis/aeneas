@@ -1,6 +1,7 @@
 import unittest
 import typing
 import os
+import tempfile
 
 from aeneas.tools.execute_task import ExecuteTaskCLI
 from aeneas.tools.execute_job import ExecuteJobCLI
@@ -18,17 +19,18 @@ class ExecuteCLICase(unittest.TestCase):
     CLI_CLS: typing.ClassVar
 
     def execute(self, parameters: typing.Sequence[tuple[str, str]], expected_exit_code: int):
-        output_path = gf.tmp_directory()
         params = ["placeholder"]
-        for p_type, p_value in parameters:
-            if p_type == "in":
-                params.append(gf.absolute_path(p_value, __file__))
-            elif p_type == "out":
-                params.append(os.path.join(output_path, p_value))
-            else:
-                params.append(p_value)
-        exit_code = self.CLI_CLS(use_sys=False).run(arguments=params)
-        gf.delete_directory(output_path)
+        with tempfile.TemporaryDirectory(prefix="aeneas.") as temp_dir:
+            for p_type, p_value in parameters:
+                if p_type == "in":
+                    params.append(gf.absolute_path(p_value, __file__))
+                elif p_type == "out":
+                    params.append(os.path.join(temp_dir, p_value))
+                else:
+                    params.append(p_value)
+
+            exit_code = self.CLI_CLS(use_sys=False).run(arguments=params)
+
         self.assertEqual(exit_code, expected_exit_code)
 
 
