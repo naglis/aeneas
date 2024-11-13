@@ -28,9 +28,6 @@ import tempfile
 from aeneas.tools.execute_task import ExecuteTaskCLI
 
 
-# TODO actually parse this file to know what extras
-#      (festival, speect, etc.) are available to test
-EXTRA_TESTS = os.path.exists(os.path.join(os.path.expanduser("~"), ".aeneas.conf"))
 BENCH_DIR = os.path.join(os.path.expanduser("~"), ".aeneas", "benchmark_input")
 BENCH_TESTS = os.path.exists(BENCH_DIR)
 

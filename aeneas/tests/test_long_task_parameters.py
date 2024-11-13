@@ -20,15 +20,9 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import os
 
 from aeneas.tests.common import ExecuteTaskCLICase, slow_test
 import aeneas.globalfunctions as gf
-
-
-# TODO actually parse this file to know what extras
-#      (festival, speect, etc.) are available to test
-EXTRA_TESTS = os.path.exists(os.path.join(os.path.expanduser("~"), ".aeneas.conf"))
 
 
 @slow_test

@@ -20,14 +20,7 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import os
-
-from aeneas.tests.common import ExecuteTaskCLICase, slow_test
-
-
-# TODO actually parse this file to know what extras
-#      (festival, speect, etc.) are available to test
-EXTRA_TESTS = os.path.exists(os.path.join(os.path.expanduser("~"), ".aeneas.conf"))
+from aeneas.tests.common import ExecuteTaskCLICase, slow_test, extra_test
 
 
 @slow_test
@@ -68,9 +61,8 @@ class TestExecuteTaskCLI(ExecuteTaskCLICase):
             0,
         )
 
+    @extra_test
     def test_exec_tts_cache_empty_fragments_festival(self):
-        if not EXTRA_TESTS:
-            return
         self.execute(
             [
                 ("in", "../tools/res/audio.mp3"),
@@ -82,9 +74,8 @@ class TestExecuteTaskCLI(ExecuteTaskCLICase):
             0,
         )
 
+    @extra_test
     def test_exec_tts_cache_empty_fragments_festival_pure(self):
-        if not EXTRA_TESTS:
-            return
         self.execute(
             [
                 ("in", "../tools/res/audio.mp3"),

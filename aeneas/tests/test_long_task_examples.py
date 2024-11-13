@@ -20,14 +20,8 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import os
 
-from aeneas.tests.common import ExecuteTaskCLICase, slow_test
-
-
-# TODO actually parse this file to know what extras
-#      (festival, speect, etc.) are available to test
-EXTRA_TESTS = os.path.exists(os.path.join(os.path.expanduser("~"), ".aeneas.conf"))
+from aeneas.tests.common import ExecuteTaskCLICase, slow_test, extra_test
 
 
 @slow_test
@@ -41,9 +35,8 @@ class TestExecuteTaskCLI(ExecuteTaskCLICase):
     def test_example_cewsubprocess(self):
         self.execute([("", "--example-cewsubprocess")], 0)
 
+    @extra_test
     def test_example_ctw_espeak(self):
-        if not EXTRA_TESTS:
-            return
         self.execute([("", "--example-ctw-espeak")], 0)
 
     # NOTE disabling this test since it requires a speect voice
@@ -58,9 +51,8 @@ class TestExecuteTaskCLI(ExecuteTaskCLICase):
     def test_example_faster_rate(self):
         self.execute([("", "--example-faster-rate")], 0)
 
+    @extra_test
     def test_example_festival(self):
-        if not EXTRA_TESTS:
-            return
         self.execute([("", "--example-festival")], 0)
 
     def test_example_flatten_12(self):
@@ -84,9 +76,8 @@ class TestExecuteTaskCLI(ExecuteTaskCLICase):
     def test_example_mplain_smil(self):
         self.execute([("", "--example-mplain-smil")], 0)
 
+    @extra_test
     def test_example_multilevel_tts(self):
-        if not EXTRA_TESTS:
-            return
         self.execute([("", "--example-multilevel-tts")], 0)
 
     def test_example_munparsed_json(self):
@@ -140,9 +131,8 @@ class TestExecuteTaskCLI(ExecuteTaskCLICase):
     def test_example_words(self):
         self.execute([("", "--example-words")], 0)
 
+    @extra_test
     def test_example_words_festival_cache(self):
-        if not EXTRA_TESTS:
-            return
         self.execute([("", "--example-words-festival-cache")], 0)
 
     def test_example_words_multilevel(self):

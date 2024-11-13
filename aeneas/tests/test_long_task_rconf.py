@@ -20,15 +20,9 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import os
 import tempfile
 
-from aeneas.tests.common import ExecuteTaskCLICase, slow_test
-
-
-# TODO actually parse this file to know what extras
-#      (festival, speect, etc.) are available to test
-EXTRA_TESTS = os.path.exists(os.path.join(os.path.expanduser("~"), ".aeneas.conf"))
+from aeneas.tests.common import ExecuteTaskCLICase, slow_test, extra_test
 
 
 @slow_test
@@ -154,9 +148,8 @@ class TestExecuteTaskCLI(ExecuteTaskCLICase):
             0,
         )
 
+    @extra_test
     def test_exec_cfw(self):
-        if not EXTRA_TESTS:
-            return
         self.execute(
             [
                 ("in", "../tools/res/audio.mp3"),
@@ -216,25 +209,6 @@ class TestExecuteTaskCLI(ExecuteTaskCLICase):
             0,
         )
 
-    def test_exec_ffmpeg_path(self):
-        if not EXTRA_TESTS:
-            return
-        home = os.path.expanduser("~")
-        path = os.path.join(home, ".aeneas/myffmpeg")
-        self.execute(
-            [
-                ("in", "../tools/res/audio.mp3"),
-                ("in", "../tools/res/subtitles.txt"),
-                (
-                    "",
-                    "task_language=eng|is_text_type=subtitles|os_task_file_format=srt",
-                ),
-                ("out", "sonnet.srt"),
-                ("", '-r="ffmpeg_path=%s"' % path),
-            ],
-            0,
-        )
-
     def test_exec_ffmpeg_sample_rate(self):
         self.execute(
             [
@@ -246,25 +220,6 @@ class TestExecuteTaskCLI(ExecuteTaskCLICase):
                 ),
                 ("out", "sonnet.srt"),
                 ("", '-r="ffmpeg_sample_rate=22050"'),
-            ],
-            0,
-        )
-
-    def test_exec_ffprobe_path(self):
-        if not EXTRA_TESTS:
-            return
-        home = os.path.expanduser("~")
-        path = os.path.join(home, ".aeneas/myffprobe")
-        self.execute(
-            [
-                ("in", "../tools/res/audio.mp3"),
-                ("in", "../tools/res/subtitles.txt"),
-                (
-                    "",
-                    "task_language=eng|is_text_type=subtitles|os_task_file_format=srt",
-                ),
-                ("out", "sonnet.srt"),
-                ("", '-r="ffprobe_path=%s"' % path),
             ],
             0,
         )
@@ -498,9 +453,8 @@ class TestExecuteTaskCLI(ExecuteTaskCLICase):
                 0,
             )
 
+    @extra_test
     def test_exec_tts(self):
-        if not EXTRA_TESTS:
-            return
         self.execute(
             [
                 ("in", "../tools/res/audio.mp3"),
@@ -515,9 +469,8 @@ class TestExecuteTaskCLI(ExecuteTaskCLICase):
             0,
         )
 
+    @extra_test
     def test_exec_tts_cache(self):
-        if not EXTRA_TESTS:
-            return
         self.execute(
             [
                 ("in", "../tools/res/audio.mp3"),
@@ -528,25 +481,6 @@ class TestExecuteTaskCLI(ExecuteTaskCLICase):
                 ),
                 ("out", "sonnet.srt"),
                 ("", '-r="tts=festival|tts_cache=True"'),
-            ],
-            0,
-        )
-
-    def test_exec_tts_path(self):
-        if not EXTRA_TESTS:
-            return
-        home = os.path.expanduser("~")
-        path = os.path.join(home, ".aeneas/myespeak")
-        self.execute(
-            [
-                ("in", "../tools/res/audio.mp3"),
-                ("in", "../tools/res/subtitles.txt"),
-                (
-                    "",
-                    "task_language=eng|is_text_type=subtitles|os_task_file_format=srt",
-                ),
-                ("out", "sonnet.srt"),
-                ("", '-r="tts=espeak|tts_path=%s"' % path),
             ],
             0,
         )

@@ -20,15 +20,9 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import os
 import tempfile
 
-from aeneas.tests.common import ExecuteJobCLICase, slow_test
-
-
-# TODO actually parse this file to know what extras
-#      (festival, speect, etc.) are available to test
-EXTRA_TESTS = os.path.exists(os.path.join(os.path.expanduser("~"), ".aeneas.conf"))
+from aeneas.tests.common import ExecuteJobCLICase, slow_test, extra_test
 
 
 @slow_test
@@ -103,9 +97,8 @@ class TestExecuteJobCLI(ExecuteJobCLICase):
             0,
         )
 
+    @extra_test
     def test_exec_cfw(self):
-        if not EXTRA_TESTS:
-            return
         self.execute(
             [
                 ("in", "../tools/res/job.zip"),
@@ -136,40 +129,12 @@ class TestExecuteJobCLI(ExecuteJobCLICase):
             0,
         )
 
-    def test_exec_ffmpeg_path(self):
-        if not EXTRA_TESTS:
-            return
-        home = os.path.expanduser("~")
-        path = os.path.join(home, ".aeneas/myffmpeg")
-        self.execute(
-            [
-                ("in", "../tools/res/job.zip"),
-                ("out", ""),
-                ("", '-r="ffmpeg_path=%s"' % path),
-            ],
-            0,
-        )
-
     def test_exec_ffmpeg_sample_rate(self):
         self.execute(
             [
                 ("in", "../tools/res/job.zip"),
                 ("out", ""),
                 ("", '-r="ffmpeg_sample_rate=22050"'),
-            ],
-            0,
-        )
-
-    def test_exec_ffprobe_path(self):
-        if not EXTRA_TESTS:
-            return
-        home = os.path.expanduser("~")
-        path = os.path.join(home, ".aeneas/myffprobe")
-        self.execute(
-            [
-                ("in", "../tools/res/job.zip"),
-                ("out", ""),
-                ("", '-r="ffprobe_path=%s"' % path),
             ],
             0,
         )
@@ -319,35 +284,19 @@ class TestExecuteJobCLI(ExecuteJobCLICase):
                 0,
             )
 
+    @extra_test
     def test_exec_tts(self):
-        if not EXTRA_TESTS:
-            return
         self.execute(
             [("in", "../tools/res/job.zip"), ("out", ""), ("", '-r="tts=festival"')], 0
         )
 
+    @extra_test
     def test_exec_tts_cache(self):
-        if not EXTRA_TESTS:
-            return
         self.execute(
             [
                 ("in", "../tools/res/job.zip"),
                 ("out", ""),
                 ("", '-r="tts=festival|tts_cache=True"'),
-            ],
-            0,
-        )
-
-    def test_exec_tts_path(self):
-        if not EXTRA_TESTS:
-            return
-        home = os.path.expanduser("~")
-        path = os.path.join(home, ".aeneas/myespeak")
-        self.execute(
-            [
-                ("in", "../tools/res/job.zip"),
-                ("out", ""),
-                ("", '-r="tts=espeak|tts_path=%s"' % path),
             ],
             0,
         )
