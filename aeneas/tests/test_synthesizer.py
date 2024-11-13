@@ -21,14 +21,15 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import unittest
+import itertools
+import tempfile
 
 from aeneas.exacttiming import TimeValue
 from aeneas.language import Language
 from aeneas.logger import Logger
 from aeneas.runtimeconfiguration import RuntimeConfiguration
 from aeneas.synthesizer import Synthesizer
-from aeneas.textfile import TextFile
-from aeneas.textfile import TextFileFormat
+from aeneas.textfile import TextFile, TextFileFormat
 import aeneas.globalfunctions as gf
 
 
@@ -37,33 +38,33 @@ class TestSynthesizer(unittest.TestCase):
 
     def perform(
         self,
-        path,
-        expected,
-        expected2=None,
-        logger=None,
-        quit_after=None,
-        backwards=False,
+        path: str,
+        expected_anchors: int,
+        *,
+        expected_total_time: TimeValue | None = None,
+        logger: Logger | None = None,
+        quit_after: TimeValue | None = None,
+        backwards: bool = False,
     ):
-        def inner(c_ext, cew_subprocess, tts_cache):
-            handler, output_file_path = gf.tmp_file(suffix=".wav")
+        def inner(c_ext: bool, cew_subprocess: bool, tts_cache: bool):
             tfl = TextFile(gf.absolute_path(path, __file__), TextFileFormat.PLAIN)
             tfl.set_language(Language.ENG)
             synth = Synthesizer(logger=logger)
             synth.rconf[RuntimeConfiguration.C_EXTENSIONS] = c_ext
             synth.rconf[RuntimeConfiguration.CEW_SUBPROCESS_ENABLED] = cew_subprocess
             synth.rconf[RuntimeConfiguration.TTS_CACHE] = tts_cache
-            result = synth.synthesize(
-                tfl, output_file_path, quit_after=quit_after, backwards=backwards
-            )
-            gf.delete_file(handler, output_file_path)
-            self.assertEqual(len(result[0]), expected)
-            if expected2 is not None:
-                self.assertAlmostEqual(result[1], expected2, places=0)
+            with tempfile.NamedTemporaryFile(suffix=".wav") as tmp_file:
+                anchors, total_time, _ = synth.synthesize(
+                    tfl, tmp_file.name, quit_after=quit_after, backwards=backwards
+                )
+            self.assertEqual(len(anchors), expected_anchors)
+            if expected_total_time is not None:
+                self.assertAlmostEqual(total_time, expected_total_time, places=0)
 
-        for c_ext in [True, False]:
-            for cew_subprocess in [True, False]:
-                for tts_cache in [True, False]:
-                    inner(c_ext, cew_subprocess, tts_cache)
+        for c_ext, cew_subprocess, tts_cache in itertools.product(
+            [True, False], repeat=3
+        ):
+            inner(c_ext, cew_subprocess, tts_cache)
 
     def test_clear_cache(self):
         synth = Synthesizer()
@@ -99,7 +100,7 @@ class TestSynthesizer(unittest.TestCase):
         self.perform(
             "res/inputtext/sonnet_plain.txt",
             6,
-            TimeValue("12.000"),
+            expected_total_time=TimeValue("12.000"),
             quit_after=TimeValue("10.000"),
         )
 
@@ -110,7 +111,7 @@ class TestSynthesizer(unittest.TestCase):
         self.perform(
             "res/inputtext/sonnet_plain.txt",
             4,
-            TimeValue("10.000"),
+            expected_total_time=TimeValue("10.000"),
             quit_after=TimeValue("10.000"),
             backwards=True,
         )

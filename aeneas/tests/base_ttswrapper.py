@@ -25,9 +25,9 @@ import os
 import tempfile
 import contextlib
 import typing
+import itertools
 
-from aeneas.textfile import TextFile
-from aeneas.textfile import TextFragment
+from aeneas.textfile import TextFile, TextFragment
 from aeneas.ttswrappers.basettswrapper import BaseTTSWrapper
 from aeneas.runtimeconfiguration import RuntimeConfiguration
 
@@ -83,20 +83,19 @@ class TestBaseTTSWrapper(unittest.TestCase):
                     else:
                         self.assertGreater(total_time, 0.0)
                 except (OSError, TypeError, UnicodeDecodeError, ValueError) as exc:
-                    if (cache) and (tts_engine is not None):
+                    if cache and tts_engine is not None:
                         tts_engine.clear_cache()
                     with self.assertRaises(expected_exc):
                         raise exc
 
         if self.TTS == "espeak":
-            for c_ext in [True, False]:
-                for cew_subprocess in [True, False]:
-                    for cache in [True, False]:
-                        inner(c_ext=c_ext, cew_subprocess=cew_subprocess, cache=cache)
+            for c_ext, cew_subprocess, cache in itertools.product(
+                [True, False], repeat=3
+            ):
+                inner(c_ext=c_ext, cew_subprocess=cew_subprocess, cache=cache)
         elif self.TTS == "festival":
-            for c_ext in [True, False]:
-                for cache in [True, False]:
-                    inner(c_ext=c_ext, cew_subprocess=False, cache=cache)
+            for c_ext, cache in itertools.product([True, False], repeat=2):
+                inner(c_ext=c_ext, cew_subprocess=False, cache=cache)
         else:
             for cache in [True, False]:
                 inner(c_ext=True, cew_subprocess=False, cache=cache)
