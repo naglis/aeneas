@@ -47,7 +47,9 @@ class FFPROBEWrapperCLI(AbstractCLIProgram):
     HELP = {
         "description": "Read audio file properties using the ffprobe wrapper.",
         "synopsis": [("AUDIO_FILE", True)],
+        "options": [],
         "examples": ["%s" % (AUDIO_FILE)],
+        "parameters": [],
     }
 
     def perform_command(self):

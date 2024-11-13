@@ -432,6 +432,7 @@ class ExecuteTaskCLI(AbstractCLIProgram):
             "--zero : print fragments with zero duration",
             "-y, --youtube : download audio from YouTube video",
         ],
+        "parameters": [],
     }
 
     def perform_command(self):

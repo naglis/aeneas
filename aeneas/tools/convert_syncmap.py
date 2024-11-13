@@ -74,6 +74,7 @@ class ConvertSyncMapCLI(AbstractCLIProgram):
             "--output-html : output HTML file for fine tuning",
             "--page-ref=REF : use REF for the text ref attribute (smil, smilh, smilm)",
         ],
+        "parameters": [],
     }
 
     def perform_command(self):

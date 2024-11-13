@@ -62,6 +62,7 @@ class DownloadCLI(AbstractCLIProgram):
             "--list : list all available audio streams but do not download",
             "--smallest-audio : download smallest audio stream",
         ],
+        "parameters": [],
     }
 
     def perform_command(self):

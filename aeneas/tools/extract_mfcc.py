@@ -58,6 +58,7 @@ class ExtractMFCCCLI(AbstractCLIProgram):
             "-z, --npz : output MFCCs as a NumPy compressed .npz binary file",
             "--format=FMT : output to text file using format FMT (default: '%.18e')",
         ],
+        "parameters": [],
     }
 
     def perform_command(self):

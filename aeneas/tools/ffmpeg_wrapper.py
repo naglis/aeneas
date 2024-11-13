@@ -46,7 +46,9 @@ class FFMPEGWrapperCLI(AbstractCLIProgram):
     HELP = {
         "description": "Convert audio files to mono WAV using the ffmpeg wrapper.",
         "synopsis": [("INPUT_FILE OUTPUT_FILE", True)],
+        "options": [],
         "examples": [f"{INPUT_FILE} {OUTPUT_FILE}"],
+        "parameters": [],
     }
 
     def perform_command(self):

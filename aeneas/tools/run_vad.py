@@ -61,6 +61,7 @@ class RunVADCLI(AbstractCLIProgram):
         "options": [
             "-i, --index : output intervals as indices instead of seconds",
         ],
+        "parameters": [],
     }
 
     def perform_command(self):

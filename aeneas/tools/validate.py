@@ -70,6 +70,7 @@ class ValidateCLI(AbstractCLIProgram):
             ("task CONFIG_STRING", True),
             ("wizard CONFIG_STRING CONTAINER", True),
         ],
+        "options": [],
         "examples": [
             f"config {CONFIG_FILE_TXT}",
             f"config {CONFIG_FILE_XML}",
@@ -78,6 +79,7 @@ class ValidateCLI(AbstractCLIProgram):
             f'task "{TASK_CONFIG_STRING}"',
             f'wizard "{GOOD_CONFIG_STRING}" {CONTAINER_FILE}',
         ],
+        "parameters": [],
     }
 
     def perform_command(self):

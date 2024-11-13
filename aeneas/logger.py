@@ -61,27 +61,25 @@ class Logger:
     SUCCESS = "SUCC"
     """ ``SUCCESS`` message """
 
-    def __init__(self, tee=False, indentation=0, tee_show_datetime=True):
+    def __init__(
+        self, tee: bool = False, indentation: int = 0, tee_show_datetime: bool = True
+    ):
         self.entries = []
         self.tee = tee
         self.indentation = indentation
         self.tee_show_datetime = tee_show_datetime
 
-    def __len__(self):
+    def __len__(self) -> int:
         return len(self.entries)
 
     def __str__(self):
         return self.pretty_print()
 
     def __repr__(self):
-        return "Logger(tee=%s, indentation=%d, tee_show_datetime=%s)" % (
-            self.tee,
-            self.indentation,
-            self.tee_show_datetime,
-        )
+        return f"Logger(tee={self.tee}, indentation={self.indentation:d}, tee_show_datetime={self.tee_show_datetime})"
 
     @property
-    def tee(self):
+    def tee(self) -> bool:
         """
         If ``True``, tee (i.e., log and print to stdout).
 
@@ -90,11 +88,11 @@ class Logger:
         return self.__tee
 
     @tee.setter
-    def tee(self, tee):
+    def tee(self, tee: bool):
         self.__tee = tee
 
     @property
-    def tee_show_datetime(self):
+    def tee_show_datetime(self) -> bool:
         """
         If ``True``, print date and time when teeing.
 
@@ -103,11 +101,11 @@ class Logger:
         return self.__tee_show_datetime
 
     @tee_show_datetime.setter
-    def tee_show_datetime(self, tee_show_datetime):
+    def tee_show_datetime(self, tee_show_datetime: bool):
         self.__tee_show_datetime = tee_show_datetime
 
     @property
-    def indentation(self):
+    def indentation(self) -> int:
         """
         The current indentation of the log.
         Useful to visually distinguish log levels.
@@ -117,14 +115,14 @@ class Logger:
         return self.__indentation
 
     @indentation.setter
-    def indentation(self, indentation):
+    def indentation(self, indentation: int):
         self.__indentation = indentation
 
-    def pretty_print(self, as_list=False, show_datetime=True):
+    def pretty_print(self, as_list=False, show_datetime=True) -> str | list[str]:
         """
-        Return a Unicode string pretty print of the log entries.
+        Return a string pretty print of the log entries.
 
-        :param bool as_list: if ``True``, return a list of Unicode strings,
+        :param bool as_list: if ``True``, return a list of strings,
                              one for each entry, instead of a Unicode string
         :param bool show_datetime: if ``True``, show the date and time of the entries
         :rtype: string or list of strings

@@ -97,6 +97,7 @@ class SynthesizeTextCLI(AbstractCLIProgram):
             "--start=INDEX : slice the text file from fragment INDEX",
             "-b, --backwards : synthesize from the last fragment to the first one",
         ],
+        "parameters": [],
     }
 
     def perform_command(self):

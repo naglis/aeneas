@@ -79,6 +79,7 @@ class RunSDCLI(AbstractCLIProgram):
             "--min-tail=DUR : audio tail has at least DUR seconds",
             "--sort=ALGORITHM : sort the matched element id attributes using ALGORITHM (lexicographic, numeric, unsorted)",
         ],
+        "parameters": [],
     }
 
     def perform_command(self):

@@ -69,6 +69,7 @@ class ExecuteJobCLI(AbstractCLIProgram):
             "--cewsubprocess : run cew in separate process (see docs)",
             "--skip-validator : do not validate the given container and/or config string",
         ],
+        "parameters": [],
     }
 
     def perform_command(self):

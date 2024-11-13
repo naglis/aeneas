@@ -77,6 +77,7 @@ class ReadTextCLI(AbstractCLIProgram):
             "unparsed %s --id-regex=f[0-9]* --sort=lexicographic"
             % (TEXT_FILE_UNPARSED),
         ],
+        "parameters": [],
     }
 
     def perform_command(self):

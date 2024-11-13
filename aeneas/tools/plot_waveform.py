@@ -58,6 +58,7 @@ class PlotWaveformCLI(AbstractCLIProgram):
             "--time-step=STEP : print time ticks every STEP seconds (int)",
             "--vzoom=ZOOM : vertical zoom (int, default: 30)",
         ],
+        "parameters": [],
     }
 
     def perform_command(self):

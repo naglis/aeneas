@@ -27,6 +27,7 @@ to the CLI programs in aeneas.tools.
 
 import os
 import sys
+import typing
 
 from aeneas import __version__ as aeneas_version
 from aeneas.logger import Loggable
@@ -35,6 +36,14 @@ from aeneas.runtimeconfiguration import RuntimeConfiguration
 from aeneas.textfile import TextFile
 from aeneas.textfile import TextFileFormat
 import aeneas.globalfunctions as gf
+
+
+class CLIHelp(typing.TypedDict):
+    description: str
+    synopsis: typing.Sequence[tuple[str, bool]]
+    options: typing.Sequence[str]
+    parameters: typing.Sequence[str]
+    examples: typing.Sequence[str]
 
 
 class AbstractCLIProgram(Loggable):
@@ -55,7 +64,7 @@ class AbstractCLIProgram(Loggable):
     :type  rconf: :class:`aeneas.runtimeconfiguration.RuntimeConfiguration`
     """
 
-    NAME = gf.file_name_without_extension(__file__)
+    NAME: typing.ClassVar[str] = gf.file_name_without_extension(__file__)
 
     AENEAS_URL = "https://www.readbeyond.it/aeneas/"
     DOCS_URL = "https://www.readbeyond.it/aeneas/docs/"
@@ -63,11 +72,11 @@ class AbstractCLIProgram(Loggable):
     ISSUES_URL = "https://github.com/ReadBeyond/aeneas/issues/"
     RB_URL = "https://www.readbeyond.it"
 
-    NO_ERROR_EXIT_CODE = 0
-    ERROR_EXIT_CODE = 1
-    HELP_EXIT_CODE = 2
+    NO_ERROR_EXIT_CODE: typing.ClassVar[int] = 0
+    ERROR_EXIT_CODE: typing.ClassVar[int] = 1
+    HELP_EXIT_CODE: typing.ClassVar[int] = 2
 
-    HELP = {
+    HELP: typing.ClassVar[CLIHelp] = {
         "description": "An abstract CLI program",
         "synopsis": [],
         "options": [],
@@ -77,7 +86,7 @@ class AbstractCLIProgram(Loggable):
 
     RCONF_PARAMETERS = RuntimeConfiguration.parameters(sort=True, as_strings=True)
 
-    TAG = "CLI"
+    TAG: typing.ClassVar[str] = "CLI"
 
     def __init__(self, use_sys=True, invoke=None, rconf=None, logger=None):
         super().__init__(rconf=rconf, logger=logger)
