@@ -74,7 +74,7 @@ class TestFFMPEGWrapper(unittest.TestCase):
             @contextlib.contextmanager
             def delete_file(path):
                 try:
-                    pass
+                    yield
                 finally:
                     gf.delete_file(None, path)
 
@@ -82,18 +82,11 @@ class TestFFMPEGWrapper(unittest.TestCase):
             output_file_path = ofp
 
         with exit_stack:
-            try:
-                converter = FFMPEGWrapper(rconf=runtime_configuration)
-                result = converter.convert(
-                    gf.absolute_path(input_file_path, __file__), output_file_path
-                )
-                self.assertEqual(result, output_file_path)
-            except OSError as exc:
-                if ofp is None:
-                    gf.delete_directory(output_path)
-                else:
-                    gf.delete_file(None, ofp)
-                raise exc
+            converter = FFMPEGWrapper(rconf=runtime_configuration)
+            result = converter.convert(
+                gf.absolute_path(input_file_path, __file__), output_file_path
+            )
+            self.assertEqual(result, output_file_path)
 
     def test_convert(self):
         for f in self.FILES:
