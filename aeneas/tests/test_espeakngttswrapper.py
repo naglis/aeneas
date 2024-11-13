@@ -20,7 +20,6 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import unittest
 
 from aeneas.tests.base_ttswrapper import TestBaseTTSWrapper
 from aeneas.ttswrappers.espeakngttswrapper import ESPEAKNGTTSWrapper
@@ -32,7 +31,3 @@ class TestESPEAKNGTTSWrapper(TestBaseTTSWrapper):
     TTS_CLASS = ESPEAKNGTTSWrapper
     TTS_LANGUAGE = ESPEAKNGTTSWrapper.ENG
     TTS_LANGUAGE_VARIATION = ESPEAKNGTTSWrapper.ENG_GBR
-
-
-if __name__ == "__main__":
-    unittest.main()

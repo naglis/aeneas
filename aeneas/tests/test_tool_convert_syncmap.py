@@ -20,7 +20,6 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import unittest
 
 from aeneas.tools.convert_syncmap import ConvertSyncMapCLI
 from aeneas.tests.common import ExecuteCLICase
@@ -152,7 +151,3 @@ class TestConvertSyncMapCLI(ExecuteCLICase):
             ],
             1,
         )
-
-
-if __name__ == "__main__":
-    unittest.main()

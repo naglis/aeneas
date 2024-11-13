@@ -20,7 +20,6 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import unittest
 
 from aeneas.tools.validate import ValidateCLI
 from aeneas.tests.common import ExecuteCLICase
@@ -170,7 +169,3 @@ class TestValidateCLI(ExecuteCLICase):
 
     def test_read_cannot_read_4(self):
         self.execute([("", "container"), ("", "../tools/res/config.txt")], 1)
-
-
-if __name__ == "__main__":
-    unittest.main()

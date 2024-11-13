@@ -43,7 +43,3 @@ class TestConfiguration(unittest.TestCase):
         d = c.clone()
         self.assertNotEqual(id(c), id(d))
         self.assertEqual(c.config_string, d.config_string)
-
-
-if __name__ == "__main__":
-    unittest.main()

@@ -471,7 +471,3 @@ class TestValidator(unittest.TestCase):
 
     def test_check_container_xml_not_root_nested(self):
         self.container("res/validator/job_xml_config_not_root_nested", True)
-
-
-if __name__ == "__main__":
-    unittest.main()

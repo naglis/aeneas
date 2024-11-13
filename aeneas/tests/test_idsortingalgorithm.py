@@ -55,7 +55,3 @@ class TestIDSortingAlgorithm(unittest.TestCase):
         idsa = IDSortingAlgorithm(IDSortingAlgorithm.NUMERIC)
         sids = idsa.sort(bad_ids)
         self.assertTrue(sids == bad_ids)
-
-
-if __name__ == "__main__":
-    unittest.main()

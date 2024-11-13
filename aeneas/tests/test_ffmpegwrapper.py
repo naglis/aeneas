@@ -109,7 +109,3 @@ class TestFFMPEGWrapper(unittest.TestCase):
     def test_cannot_be_written(self):
         with self.assertRaises(OSError):
             self.convert(self.FILES[0]["path"], ofp=self.CANNOT_BE_WRITTEN_PATH)
-
-
-if __name__ == "__main__":
-    unittest.main()

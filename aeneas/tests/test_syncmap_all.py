@@ -111,7 +111,3 @@ class TestSyncMap(unittest.TestCase):
     def test_write_mu(self):
         for fmt in SyncMapFormat.ALLOWED_VALUES:
             self.write(fmt, multiline=True, utf8=True)
-
-
-if __name__ == "__main__":
-    unittest.main()

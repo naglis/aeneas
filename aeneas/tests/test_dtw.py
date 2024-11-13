@@ -132,7 +132,3 @@ class TestDTWAligner(unittest.TestCase):
     def test_compute_path(self):
         # NOTE this takes too long, run as part of the long_ tests
         pass
-
-
-if __name__ == "__main__":
-    unittest.main()

@@ -21,7 +21,6 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import os
-import unittest
 
 from aeneas.tools.ffprobe_wrapper import FFPROBEWrapperCLI
 import aeneas.globalfunctions as gf
@@ -61,7 +60,3 @@ class TestFFPROBEWrapperCLI(ExecuteCLICase):
 
     def test_probe_cannot_read(self):
         self.execute([("", "/foo/bar/baz.wav")], 1)
-
-
-if __name__ == "__main__":
-    unittest.main()

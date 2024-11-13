@@ -306,7 +306,3 @@ class TestContainer(unittest.TestCase):
                 self.assertTrue(os.path.isfile(output_path.name))
                 copy = Container(output_path.name, fmt)
                 self.assertEqual(copy.entries, self.EXPECTED_ENTRIES)
-
-
-if __name__ == "__main__":
-    unittest.main()

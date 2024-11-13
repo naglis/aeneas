@@ -21,7 +21,6 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import os
-import unittest
 
 from aeneas.tests.common import ExecuteTaskCLICase, slow_test
 
@@ -152,7 +151,3 @@ class TestExecuteTaskCLI(ExecuteTaskCLICase):
     # NOTE disabling this test since it requires a network connection
     def zzz_test_example_youtube(self):
         self.execute([("", "--example-youtube")], 0)
-
-
-if __name__ == "__main__":
-    unittest.main()

@@ -22,7 +22,6 @@
 
 import os
 import tempfile
-import unittest
 
 from aeneas.tests.common import ExecuteJobCLICase, slow_test
 
@@ -402,7 +401,3 @@ class TestExecuteJobCLI(ExecuteJobCLICase):
             ],
             0,
         )
-
-
-if __name__ == "__main__":
-    unittest.main()

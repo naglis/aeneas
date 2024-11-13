@@ -186,7 +186,3 @@ class TestBaseTTSWrapper(unittest.TestCase):
         if self.TTS_LANGUAGE_VARIATION is not None:
             tfl = self.tfl([(self.TTS_LANGUAGE_VARIATION, ["Word"])])
             self.synthesize(tfl)
-
-
-if __name__ == "__main__":
-    unittest.main()

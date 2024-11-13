@@ -338,7 +338,3 @@ class TestSyncMap(unittest.TestCase):
                     end=TimeValue("1.000"),
                 )
                 self.assertEqual(frag.rate_slack(Decimal(r)), TimeValue(e_nonzero))
-
-
-if __name__ == "__main__":
-    unittest.main()

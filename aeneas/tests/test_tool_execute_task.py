@@ -20,7 +20,6 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import unittest
 
 from aeneas.tests.common import ExecuteTaskCLICase
 
@@ -203,7 +202,3 @@ class TestExecuteTaskCLI(ExecuteTaskCLICase):
             ],
             2,
         )
-
-
-if __name__ == "__main__":
-    unittest.main()

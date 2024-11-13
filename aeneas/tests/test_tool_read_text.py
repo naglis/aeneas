@@ -20,7 +20,6 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import unittest
 
 from aeneas.tests.common import ExecuteCLICase
 from aeneas.tools.read_text import ReadTextCLI
@@ -114,7 +113,3 @@ class TestReadTextCLI(ExecuteCLICase):
 
     def test_read_unparsed_missing(self):
         self.execute([("", "unparsed"), ("in", "../tools/res/unparsed.xhtml")], 1)
-
-
-if __name__ == "__main__":
-    unittest.main()

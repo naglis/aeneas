@@ -749,7 +749,3 @@ class TestExactTiming(unittest.TestCase):
             ti2 = TimeInterval(begin=TimeValue(ti2[0]), end=TimeValue(ti2[1]))
             self.assertEqual(ti1.is_non_zero_before_non_zero(ti2), exp)
             self.assertEqual(ti2.is_non_zero_after_non_zero(ti1), exp)
-
-
-if __name__ == "__main__":
-    unittest.main()

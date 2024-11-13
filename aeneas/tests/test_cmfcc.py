@@ -53,7 +53,3 @@ class TestCMFCC(unittest.TestCase):
             self.assertGreater(mfcc_c.shape[1], 0)
         except ImportError:
             pass
-
-
-if __name__ == "__main__":
-    unittest.main()

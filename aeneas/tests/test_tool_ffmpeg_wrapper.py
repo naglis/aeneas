@@ -21,7 +21,6 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import os
-import unittest
 
 from aeneas.tools.ffmpeg_wrapper import FFMPEGWrapperCLI
 from aeneas.tests.common import ExecuteCLICase
@@ -115,7 +114,3 @@ class TestFFMPEGWrapperCLI(ExecuteCLICase):
 
     def test_convert_cannot_write(self):
         self.execute([("in", "../tools/res/audio.wav"), ("", "/foo/bar/baz.wav")], 1)
-
-
-if __name__ == "__main__":
-    unittest.main()

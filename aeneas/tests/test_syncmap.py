@@ -327,7 +327,3 @@ class TestSyncMap(unittest.TestCase):
         audio_file_path = "foo.mp3"
         syn.output_html_for_tuning(audio_file_path, output_file_path, None)
         gf.delete_file(handler, output_file_path)
-
-
-if __name__ == "__main__":
-    unittest.main()

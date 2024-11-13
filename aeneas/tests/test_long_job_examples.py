@@ -20,7 +20,6 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import unittest
 
 from aeneas.tests.common import ExecuteJobCLICase, slow_test
 
@@ -85,7 +84,3 @@ class TestExecuteJobCLI(ExecuteJobCLICase):
 
     def test_zip(self):
         self.execute([("in", "res/container/job.zip"), ("out", "")], 0)
-
-
-if __name__ == "__main__":
-    unittest.main()

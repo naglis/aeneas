@@ -113,7 +113,3 @@ class TestAnalyzeContainer(unittest.TestCase):
         job = analyzer.analyze(config_string=self.CONFIG_STRING)
         self.assertIsNotNone(job)
         self.assertEqual(len(job), f["length"])
-
-
-if __name__ == "__main__":
-    unittest.main()

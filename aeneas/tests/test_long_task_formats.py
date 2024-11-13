@@ -21,7 +21,6 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import os
-import unittest
 
 from aeneas.tests.common import ExecuteTaskCLICase, slow_test
 
@@ -420,7 +419,3 @@ class TestExecuteTaskCLI(ExecuteTaskCLICase):
             ],
             0,
         )
-
-
-if __name__ == "__main__":
-    unittest.main()

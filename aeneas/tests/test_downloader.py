@@ -102,7 +102,3 @@ class TestDownloader(unittest.TestCase):
 
     def test_download_bad_format(self):
         self.download(1146884, download_format="-1")
-
-
-if __name__ == "__main__":
-    unittest.main()

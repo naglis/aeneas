@@ -706,7 +706,3 @@ class TestGlobalFunctions(unittest.TestCase):
     def test_safe_print(self):
         # TODO
         pass
-
-
-if __name__ == "__main__":
-    unittest.main()

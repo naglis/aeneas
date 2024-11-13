@@ -377,7 +377,3 @@ class TestAudioFileMFCC(unittest.TestCase):
             head_length=TimeValue("10.000"), tail_length=TimeValue("10.000")
         )
         self.assertNotEqual(pre, audiofile.masked_middle_length)
-
-
-if __name__ == "__main__":
-    unittest.main()

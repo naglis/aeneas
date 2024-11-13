@@ -47,7 +47,3 @@ class TestCDTW(unittest.TestCase):
             self.assertEqual(best_path[-1], (n - 1, m - 1))
         except ImportError:
             pass
-
-
-if __name__ == "__main__":
-    unittest.main()

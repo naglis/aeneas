@@ -187,7 +187,3 @@ class TestJob(unittest.TestCase):
         jobconf = JobConfiguration(config_string)
         self.assertEqual(jobconf["language"], Language.ITA)
         self.assertEqual(jobconf["description"], "Test description")
-
-
-if __name__ == "__main__":
-    unittest.main()

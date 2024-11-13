@@ -190,7 +190,3 @@ class TestLogger(unittest.TestCase):
         with self.assertRaises(TypeError):
             loggable.log_exc("Message", exc, True, TypeError)
             self.assertEqual(len(loggable.logger), 1)
-
-
-if __name__ == "__main__":
-    unittest.main()

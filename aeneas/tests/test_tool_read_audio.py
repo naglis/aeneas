@@ -21,7 +21,6 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import os
-import unittest
 
 from aeneas.tools.read_audio import ReadAudioCLI
 from aeneas.tests.common import ExecuteCLICase
@@ -67,7 +66,3 @@ class TestReadAudioCLI(ExecuteCLICase):
 
     def test_read_audio_cannot_read(self):
         self.execute([("", "/foo/bar/baz.wav")], 1)
-
-
-if __name__ == "__main__":
-    unittest.main()

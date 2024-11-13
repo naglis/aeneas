@@ -278,7 +278,3 @@ class TestBenchmarkExecuteTaskCLI(unittest.TestCase):
             0,
             180,
         )
-
-
-if __name__ == "__main__":
-    unittest.main()

@@ -460,7 +460,3 @@ class TestTask(unittest.TestCase):
             "task_description=Test description|foo=|=bar|foo=bar|||task_language=ita",
             "Test description",
         )
-
-
-if __name__ == "__main__":
-    unittest.main()

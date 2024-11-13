@@ -20,7 +20,6 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import unittest
 
 from aeneas.tools.extract_mfcc import ExtractMFCCCLI
 from aeneas.tests.common import ExecuteCLICase
@@ -175,7 +174,3 @@ class TestExtractMFCCCLI(ExecuteCLICase):
 
     def test_extract_cannot_write(self):
         self.execute([("in", "../tools/res/audio.wav"), ("", "/foo/bar/baz.wav")], 1)
-
-
-if __name__ == "__main__":
-    unittest.main()

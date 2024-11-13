@@ -117,7 +117,3 @@ class TestSynthesizer(unittest.TestCase):
 
     def test_synthesize_plain_with_empty_lines(self):
         self.perform("res/inputtext/plain_with_empty_lines.txt", 19)
-
-
-if __name__ == "__main__":
-    unittest.main()

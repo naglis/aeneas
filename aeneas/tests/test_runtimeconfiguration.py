@@ -202,7 +202,3 @@ class TestRuntimeConfiguration(unittest.TestCase):
         for string, key, value in params:
             rconf = RuntimeConfiguration(string)
             self.assertEqual(rconf[key], value)
-
-
-if __name__ == "__main__":
-    unittest.main()

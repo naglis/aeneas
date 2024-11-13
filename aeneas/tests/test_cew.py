@@ -72,7 +72,3 @@ class TestCEW(unittest.TestCase):
         except ImportError:
             pass
         gf.delete_file(handler, output_file_path)
-
-
-if __name__ == "__main__":
-    unittest.main()

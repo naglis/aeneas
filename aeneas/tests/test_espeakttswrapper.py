@@ -20,7 +20,6 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import unittest
 
 from aeneas.tests.base_ttswrapper import TestBaseTTSWrapper
 from aeneas.ttswrappers.espeakttswrapper import ESPEAKTTSWrapper
@@ -64,7 +63,3 @@ class TestESPEAKTTSWrapper(TestBaseTTSWrapper):
             ]
         )
         self.synthesize(tfl)
-
-
-if __name__ == "__main__":
-    unittest.main()

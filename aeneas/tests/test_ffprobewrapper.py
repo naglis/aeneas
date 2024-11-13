@@ -86,7 +86,3 @@ class TestFFPROBEWrapper(unittest.TestCase):
         for f in self.FILES:
             properties = self.load(f["path"])
             self.assertIsNotNone(properties["duration"])
-
-
-if __name__ == "__main__":
-    unittest.main()
