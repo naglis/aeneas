@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# coding=utf-8
 
 # aeneas is a Python/C library and a set of tools
 # to automagically synchronize audio and text (aka forced alignment)
@@ -27,8 +26,6 @@ A generic rooted, ordered, levelled tree.
 .. versionadded:: 1.5.0
 """
 
-from __future__ import absolute_import
-from __future__ import print_function
 from copy import deepcopy
 
 from aeneas.logger import Loggable
@@ -63,17 +60,17 @@ class Tree(Loggable):
     :type  logger: :class:`~aeneas.logger.Logger`
     """
 
-    TAG = u"Tree"
+    TAG = "Tree"
 
     def __init__(self, value=None, rconf=None, logger=None):
-        super(Tree, self).__init__(rconf=rconf, logger=logger)
+        super().__init__(rconf=rconf, logger=logger)
         self.value = value
         self.__children = []
         self.__parent = None
         self.__level = 0
 
     def __unicode__(self):
-        return u"%s (l: %s, c: %s)" % (self.value, gf.safe_int(self.level), gf.safe_int(len(self)))
+        return "{} (l: {}, c: {})".format(self.value, gf.safe_int(self.level), gf.safe_int(len(self)))
 
     def __str__(self):
         return gf.safe_str(self.__unicode__())
@@ -232,7 +229,7 @@ class Tree(Loggable):
         :raises: TypeError if ``node`` is not an instance of :class:`~aeneas.tree.Tree`
         """
         if not isinstance(node, Tree):
-            self.log_exc(u"node is not an instance of Tree", None, True, TypeError)
+            self.log_exc("node is not an instance of Tree", None, True, TypeError)
         if as_last:
             self.__children.append(node)
         else:
@@ -376,8 +373,7 @@ class Tree(Loggable):
         :rtype: generator of :class:`~aeneas.tree.Tree`
         """
         for node in self.children:
-            for v in node.dfs:
-                yield v
+            yield from node.dfs
         yield self
 
     @property
@@ -390,8 +386,7 @@ class Tree(Loggable):
         """
         yield self
         for node in self.children:
-            for v in node.pre:
-                yield v
+            yield from node.pre
 
     @property
     def levels(self):
@@ -433,10 +428,10 @@ class Tree(Loggable):
         :raises: ValueError if the given ``index`` is not valid
         """
         if not isinstance(index, int):
-            self.log_exc(u"Index is not an integer", None, True, TypeError)
+            self.log_exc("Index is not an integer", None, True, TypeError)
         levels = self.levels
         if (index < 0) or (index >= len(levels)):
-            self.log_exc(u"The given level index '%d' is not valid" % (index), None, True, ValueError)
+            self.log_exc("The given level index '%d' is not valid" % (index), None, True, ValueError)
         return self.levels[index]
 
     def vlevel_at_index(self, index):
@@ -465,9 +460,9 @@ class Tree(Loggable):
         :raises: ValueError if ``index`` is negative
         """
         if not isinstance(index, int):
-            self.log_exc(u"index is not an integer", None, True, TypeError)
+            self.log_exc("index is not an integer", None, True, TypeError)
         if index < 0:
-            self.log_exc(u"index cannot be negative", None, True, ValueError)
+            self.log_exc("index cannot be negative", None, True, ValueError)
         parent_node = self
         for i in range(index):
             if parent_node is None:
@@ -499,10 +494,10 @@ class Tree(Loggable):
                  it contains an element which is not an int
         """
         if not isinstance(level_indices, list):
-            self.log_exc(u"level_indices is not an instance of list", None, True, TypeError)
+            self.log_exc("level_indices is not an instance of list", None, True, TypeError)
         for level in level_indices:
             if not isinstance(level, int):
-                self.log_exc(u"level_indices contains an element not int", None, True, TypeError)
+                self.log_exc("level_indices contains an element not int", None, True, TypeError)
         prev_levels = self.levels
         level_indices = set(level_indices)
         if 0 not in level_indices:

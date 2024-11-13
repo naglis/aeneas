@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# coding=utf-8
 
 # aeneas is a Python/C library and a set of tools
 # to automagically synchronize audio and text (aka forced alignment)
@@ -25,8 +24,6 @@
 Plot a waveform and labels to file.
 """
 
-from __future__ import absolute_import
-from __future__ import print_function
 import sys
 
 from aeneas.audiofile import AudioFile
@@ -47,20 +44,20 @@ class PlotWaveformCLI(AbstractCLIProgram):
     NAME = gf.file_name_without_extension(__file__)
 
     HELP = {
-        "description": u"Plot a waveform and labels to file.",
+        "description": "Plot a waveform and labels to file.",
         "synopsis": [
-            (u"AUDIO_FILE OUTPUT_FILE [-i LABEL_FILE [-i LABEL_FILE [...]]]", True)
+            ("AUDIO_FILE OUTPUT_FILE [-i LABEL_FILE [-i LABEL_FILE [...]]]", True)
         ],
         "examples": [
-            u"%s %s -i %s" % (AUDIO_FILE, OUTPUT_FILE, VAD_FILE)
+            "{} {} -i {}".format(AUDIO_FILE, OUTPUT_FILE, VAD_FILE)
         ],
         "options": [
-            u"--fast : enable fast waveform rendering (default: False)",
-            u"--hzoom=ZOOM : horizontal zoom (int, default: 5)",
-            u"--label=LABEL : label for the plot (str)",
-            u"--text : show fragment text instead of identifier",
-            u"--time-step=STEP : print time ticks every STEP seconds (int)",
-            u"--vzoom=ZOOM : vertical zoom (int, default: 30)"
+            "--fast : enable fast waveform rendering (default: False)",
+            "--hzoom=ZOOM : horizontal zoom (int, default: 5)",
+            "--label=LABEL : label for the plot (str)",
+            "--text : show fragment text instead of identifier",
+            "--time-step=STEP : print time ticks every STEP seconds (int)",
+            "--vzoom=ZOOM : vertical zoom (int, default: 30)"
         ]
     }
 
@@ -101,7 +98,7 @@ class PlotWaveformCLI(AbstractCLIProgram):
             from aeneas.plotter import Plotter
 
             # create plotter object
-            self.print_info(u"Plotting to file...")
+            self.print_info("Plotting to file...")
             plotter = Plotter(rconf=self.rconf, logger=self.logger)
 
             # add waveform
@@ -139,17 +136,17 @@ class PlotWaveformCLI(AbstractCLIProgram):
 
             # output to file
             plotter.draw_png(output_file_path, h_zoom=h_zoom, v_zoom=v_zoom)
-            self.print_info(u"Plotting to file... done")
-            self.print_success(u"Created file '%s'" % output_file_path)
+            self.print_info("Plotting to file... done")
+            self.print_success("Created file '%s'" % output_file_path)
             return self.NO_ERROR_EXIT_CODE
         except ImportError:
-            self.print_error(u"You need to install Python module Pillow to output image to file. Run:")
-            self.print_error(u"$ pip install Pillow")
-            self.print_error(u"or, to install for all users:")
-            self.print_error(u"$ sudo pip install Pillow")
+            self.print_error("You need to install Python module Pillow to output image to file. Run:")
+            self.print_error("$ pip install Pillow")
+            self.print_error("or, to install for all users:")
+            self.print_error("$ sudo pip install Pillow")
         except Exception as exc:
-            self.print_error(u"An unexpected error occurred while generating the image file:")
-            self.print_error(u"%s" % exc)
+            self.print_error("An unexpected error occurred while generating the image file:")
+            self.print_error("%s" % exc)
 
         return self.ERROR_EXIT_CODE
 
@@ -158,7 +155,7 @@ class PlotWaveformCLI(AbstractCLIProgram):
         syncmap = SyncMap(logger=self.logger)
         syncmap.read(extension, path, parameters=None)
         if text:
-            return [(f.begin, f.end, u" ".join(f.text_fragment.lines)) for f in syncmap.fragments]
+            return [(f.begin, f.end, " ".join(f.text_fragment.lines)) for f in syncmap.fragments]
         return [(f.begin, f.end, f.text_fragment.identifier) for f in syncmap.fragments]
 
 

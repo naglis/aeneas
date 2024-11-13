@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# coding=utf-8
 
 # aeneas is a Python/C library and a set of tools
 # to automagically synchronize audio and text (aka forced alignment)
@@ -31,8 +30,6 @@ This module contains the following classes:
 .. warning:: This module is likely to be refactored in a future version
 """
 
-from __future__ import absolute_import
-from __future__ import print_function
 import re
 
 from aeneas.logger import Loggable
@@ -68,12 +65,12 @@ class IDSortingAlgorithm(Loggable):
     ALLOWED_VALUES = [LEXICOGRAPHIC, NUMERIC, UNSORTED]
     """ List of all the allowed values """
 
-    TAG = u"IDSortingAlgorithm"
+    TAG = "IDSortingAlgorithm"
 
     def __init__(self, algorithm, rconf=None, logger=None):
         if algorithm not in self.ALLOWED_VALUES:
-            raise ValueError(u"Algorithm value not allowed")
-        super(IDSortingAlgorithm, self).__init__(rconf=rconf, logger=logger)
+            raise ValueError("Algorithm value not allowed")
+        super().__init__(rconf=rconf, logger=logger)
         self.algorithm = algorithm
 
     def sort(self, ids):
@@ -95,15 +92,15 @@ class IDSortingAlgorithm(Loggable):
 
         tmp = list(ids)
         if self.algorithm == IDSortingAlgorithm.UNSORTED:
-            self.log(u"Sorting using UNSORTED")
+            self.log("Sorting using UNSORTED")
         elif self.algorithm == IDSortingAlgorithm.LEXICOGRAPHIC:
-            self.log(u"Sorting using LEXICOGRAPHIC")
+            self.log("Sorting using LEXICOGRAPHIC")
             tmp = sorted(ids)
         elif self.algorithm == IDSortingAlgorithm.NUMERIC:
-            self.log(u"Sorting using NUMERIC")
+            self.log("Sorting using NUMERIC")
             tmp = ids
             try:
                 tmp = sorted(tmp, key=extract_int)
             except (ValueError, TypeError) as exc:
-                self.log_exc(u"Not all id values contain a numeric part. Returning the id list unchanged.", exc, False, None)
+                self.log_exc("Not all id values contain a numeric part. Returning the id list unchanged.", exc, False, None)
         return tmp

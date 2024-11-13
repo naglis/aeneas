@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# coding=utf-8
 
 # aeneas is a Python/C library and a set of tools
 # to automagically synchronize audio and text (aka forced alignment)
@@ -21,8 +20,6 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from __future__ import absolute_import
-from __future__ import print_function
 
 from aeneas.syncmap.smfbase import SyncMapFormatBase
 import aeneas.globalfunctions as gf
@@ -33,7 +30,7 @@ class SyncMapFormatGenericSubtitles(SyncMapFormatBase):
     Base class for subtitles-like I/O format handlers.
     """
 
-    TAG = u"SyncMapFormatGenericSubtitles"
+    TAG = "SyncMapFormatGenericSubtitles"
 
     DEFAULT = "subtitles"
     """
@@ -42,7 +39,7 @@ class SyncMapFormatGenericSubtitles(SyncMapFormatBase):
     """
 
     def __init__(self, variant=DEFAULT, parameters=None, rconf=None, logger=None):
-        super(SyncMapFormatGenericSubtitles, self).__init__(variant=variant, parameters=parameters, rconf=rconf, logger=logger)
+        super().__init__(variant=variant, parameters=parameters, rconf=rconf, logger=logger)
 
         #
         # NOTE since we store functions (parse_..., format_...)
@@ -73,12 +70,12 @@ class SyncMapFormatGenericSubtitles(SyncMapFormatBase):
         If ``True``, each cue might have an identifier in its first line.
         """
 
-        self.time_values_separator = u" --> "
+        self.time_values_separator = " --> "
         """
         The separator between time values.
         """
 
-        self.line_break_symbol = u"\n"
+        self.line_break_symbol = "\n"
         """
         Symbol to place between CC lines.
         """
@@ -108,10 +105,10 @@ class SyncMapFormatGenericSubtitles(SyncMapFormatBase):
             (i.e., the line where the next block starts).
             """
             acc = []
-            while (i < len(input_lines)) and (input_lines[i] != u""):
+            while (i < len(input_lines)) and (input_lines[i] != ""):
                 acc.append(input_lines[i])
                 i += 1
-            while (i < len(input_lines)) and (input_lines[i] == u""):
+            while (i < len(input_lines)) and (input_lines[i] == ""):
                 i += 1
             return (acc, i)
 
@@ -121,7 +118,7 @@ class SyncMapFormatGenericSubtitles(SyncMapFormatBase):
             """
             split = string.split(self.time_values_separator)
             if len(split) < 2:
-                self.log_exc(u"The following timing string is malformed: '%s'" % (string), None, True, ValueError)
+                self.log_exc("The following timing string is malformed: '%s'" % (string), None, True, ValueError)
             #
             # certain formats might have time lines like:
             # "00:00:20,000 --> 00:00:22,000  X1:40 X2:600 Y1:20 Y2:50"
@@ -133,7 +130,7 @@ class SyncMapFormatGenericSubtitles(SyncMapFormatBase):
             #
             begin, end = split[0:2]
             begin = begin.strip()
-            end = ((end.strip()).split(u" "))[0]
+            end = ((end.strip()).split(" "))[0]
             begin = self.parse_time_function(begin)
             end = self.parse_time_function(end)
             return (begin, end)
@@ -154,7 +151,7 @@ class SyncMapFormatGenericSubtitles(SyncMapFormatBase):
                 i += 1
 
         # skip any blank lines after the header
-        while (i < len(input_lines)) and (input_lines[i] == u""):
+        while (i < len(input_lines)) and (input_lines[i] == ""):
             i += 1
 
         # input_lines[i] is not empty
@@ -175,7 +172,7 @@ class SyncMapFormatGenericSubtitles(SyncMapFormatBase):
             if not self.ignore_block(acc):
                 # get identifier, if any
                 j = 0
-                identifier = u"f%06d" % cue_index
+                identifier = "f%06d" % cue_index
                 if self.cue_has_identifier:
                     identifier = acc[j]
                     j += 1
@@ -190,7 +187,7 @@ class SyncMapFormatGenericSubtitles(SyncMapFormatBase):
                 j += 1
 
                 # get text lines
-                lines = (u"\n".join(acc[j:])).split(self.line_break_symbol)
+                lines = ("\n".join(acc[j:])).split(self.line_break_symbol)
 
                 # append fragment
                 self._add_fragment(
@@ -208,21 +205,21 @@ class SyncMapFormatGenericSubtitles(SyncMapFormatBase):
         msg = []
         if self.header_string is not None:
             msg.append(self.header_string)
-            msg.append(u"")
+            msg.append("")
         for i, fragment in enumerate(syncmap.fragments, 1):
             text = fragment.text_fragment
             if self.cue_has_identifier or self.cue_has_optional_identifier:
-                msg.append(u"%d" % i)
-            msg.append(u"%s%s%s" % (
+                msg.append("%d" % i)
+            msg.append("{}{}{}".format(
                 self.format_time_function(fragment.begin),
                 self.time_values_separator,
                 self.format_time_function(fragment.end),
             ))
             lines = self.line_break_symbol.join(text.lines)
             msg.append(lines)
-            msg.append(u"")
+            msg.append("")
         if self.footer_string is not None:
             msg.append(self.footer_string)
         else:
-            msg.append(u"")
-        return u"\n".join(msg)
+            msg.append("")
+        return "\n".join(msg)

@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# coding=utf-8
 
 # aeneas is a Python/C library and a set of tools
 # to automagically synchronize audio and text (aka forced alignment)
@@ -130,13 +129,13 @@ class TestGlobalFunctions(unittest.TestCase):
 
     def test_safe_get(self):
         tests = [
-            (None, None, u"default", u"default"),
-            (None, u"key", u"default", u"default"),
-            ({}, None, u"default", u"default"),
-            ({}, u"key", u"default", u"default"),
-            ([], u"key", u"default", u"default"),
-            ({u"key": u"value"}, None, u"default", u"default"),
-            ({u"key": u"value"}, u"key", u"default", u"value"),
+            (None, None, "default", "default"),
+            (None, "key", "default", "default"),
+            ({}, None, "default", "default"),
+            ({}, "key", "default", "default"),
+            ([], "key", "default", "default"),
+            ({"key": "value"}, None, "default", "default"),
+            ({"key": "value"}, "key", "default", "value"),
         ]
         for test in tests:
             self.assertEqual(gf.safe_get(test[0], test[1], test[2]), test[3])
@@ -188,13 +187,13 @@ class TestGlobalFunctions(unittest.TestCase):
 
     def test_config_txt_to_string(self):
         tests = [
-            (u"", u""),
-            (u"k1=v1", u"k1=v1"),
-            (u"k1=v1\n\n", u"k1=v1"),
-            (u"k1=v1\nk2=v2", u"k1=v1|k2=v2"),
-            (u"k1=v1\nk2=v2\n\n\nk3=v3\n", u"k1=v1|k2=v2|k3=v3"),
-            (u" k1=v1\n k2=v2 \n\n\nk3=v3 \n", u"k1=v1|k2=v2|k3=v3"),
-            (u"k1=v1\nk2\nk3=v3", "k1=v1|k2|k3=v3"),
+            ("", ""),
+            ("k1=v1", "k1=v1"),
+            ("k1=v1\n\n", "k1=v1"),
+            ("k1=v1\nk2=v2", "k1=v1|k2=v2"),
+            ("k1=v1\nk2=v2\n\n\nk3=v3\n", "k1=v1|k2=v2|k3=v3"),
+            (" k1=v1\n k2=v2 \n\n\nk3=v3 \n", "k1=v1|k2=v2|k3=v3"),
+            ("k1=v1\nk2\nk3=v3", "k1=v1|k2|k3=v3"),
         ]
         self.assertIsNone(gf.config_txt_to_string(None))
         for test in tests:
@@ -203,18 +202,18 @@ class TestGlobalFunctions(unittest.TestCase):
     def test_config_string_to_dict(self):
         tests = [
             (None, {}),
-            (u"", {}),
-            (u"k1=v1", {u"k1": u"v1"}),
-            (u"k1=v1|", {u"k1": u"v1"}),
-            (u"|k1=v1|", {u"k1": u"v1"}),
-            (u"|k1=v1", {u"k1": u"v1"}),
-            (u"k1=v1|k1=v2", {u"k1": u"v2"}),
-            (u"k1=v1|k2=v2", {u"k1": u"v1", u"k2": u"v2"}),
-            (u"k1=v1|k2=v2|k1=v3", {u"k1": u"v3", u"k2": u"v2"}),
-            (u"k1=v1||k2=v2", {u"k1": u"v1", u"k2": u"v2"}),
-            (u"k1=v1|k2=v2|k3=v3", {u"k1": u"v1", u"k2": u"v2", u"k3": u"v3"}),
-            (u"k1=v1|k2=|k3=v3", {u"k1": u"v1", u"k3": u"v3"}),
-            (u"k1=v1|=v2|k3=v3", {u"k1": u"v1", u"k3": u"v3"}),
+            ("", {}),
+            ("k1=v1", {"k1": "v1"}),
+            ("k1=v1|", {"k1": "v1"}),
+            ("|k1=v1|", {"k1": "v1"}),
+            ("|k1=v1", {"k1": "v1"}),
+            ("k1=v1|k1=v2", {"k1": "v2"}),
+            ("k1=v1|k2=v2", {"k1": "v1", "k2": "v2"}),
+            ("k1=v1|k2=v2|k1=v3", {"k1": "v3", "k2": "v2"}),
+            ("k1=v1||k2=v2", {"k1": "v1", "k2": "v2"}),
+            ("k1=v1|k2=v2|k3=v3", {"k1": "v1", "k2": "v2", "k3": "v3"}),
+            ("k1=v1|k2=|k3=v3", {"k1": "v1", "k3": "v3"}),
+            ("k1=v1|=v2|k3=v3", {"k1": "v1", "k3": "v3"}),
         ]
         for test in tests:
             self.assertEqual(gf.config_string_to_dict(test[0]), test[1])
@@ -222,15 +221,15 @@ class TestGlobalFunctions(unittest.TestCase):
     def test_config_xml_to_dict_job(self):
         tests = [
             (None, {}),
-            (u"", {}),
-            (u"<job></job>", {}),
-            (u"<job><k1>v1</k1></job>", {u"k1": u"v1"}),
-            (u"<job><k1>v1</k1><k2></k2></job>", {u"k1": u"v1"}),
-            (u"<job><k1>v1</k1><k2>  </k2></job>", {u"k1": u"v1"}),
-            (u"<job><k1>v1</k1><k2>v2</k2></job>", {u"k1": u"v1", u"k2": u"v2"}),
-            (u"<job><k1>v1</k1><k2> v2</k2></job>", {u"k1": u"v1", u"k2": u"v2"}),
-            (u"<job><k1>v1</k1><k2> v2 </k2></job>", {u"k1": u"v1", u"k2": u"v2"}),
-            (u"<job><k1>v1</k1><k2>v2 </k2></job>", {u"k1": u"v1", u"k2": u"v2"}),
+            ("", {}),
+            ("<job></job>", {}),
+            ("<job><k1>v1</k1></job>", {"k1": "v1"}),
+            ("<job><k1>v1</k1><k2></k2></job>", {"k1": "v1"}),
+            ("<job><k1>v1</k1><k2>  </k2></job>", {"k1": "v1"}),
+            ("<job><k1>v1</k1><k2>v2</k2></job>", {"k1": "v1", "k2": "v2"}),
+            ("<job><k1>v1</k1><k2> v2</k2></job>", {"k1": "v1", "k2": "v2"}),
+            ("<job><k1>v1</k1><k2> v2 </k2></job>", {"k1": "v1", "k2": "v2"}),
+            ("<job><k1>v1</k1><k2>v2 </k2></job>", {"k1": "v1", "k2": "v2"}),
         ]
         for test in tests:
             self.assertEqual(gf.config_xml_to_dict(test[0], result=None, parse_job=True), test[1])
@@ -238,48 +237,48 @@ class TestGlobalFunctions(unittest.TestCase):
     def test_config_xml_to_dict_task(self):
         tests = [
             (None, []),
-            (u"", []),
-            (u"<job></job>", []),
-            (u"<job><k1>v1</k1></job>", []),
-            (u"<job><k1>v1</k1><k2></k2></job>", []),
-            (u"<job><tasks></tasks></job>", []),
-            (u"<job><tasks><foo></foo></tasks></job>", []),
-            (u"<job><tasks><task></task></tasks></job>", [{}]),
-            (u"<job><tasks><task></task><foo></foo></tasks></job>", [{}]),
-            (u"<job><tasks><task></task><foo></foo><task></task></tasks></job>", [{}, {}]),
-            (u"<job><tasks><task><k1></k1></task><foo></foo></tasks></job>", [{}]),
-            (u"<job><tasks><task><k1>v1</k1></task></tasks></job>", [{u"k1": u"v1"}]),
-            (u"<job><tasks><task><k1>v1</k1><k2>v2</k2></task></tasks></job>", [{u"k1": u"v1", u"k2": u"v2"}]),
-            (u"<job><tasks><task><k1>v1</k1><k2> v2</k2></task></tasks></job>", [{u"k1": u"v1", u"k2": u"v2"}]),
-            (u"<job><tasks><task><k1>v1</k1><k2> v2 </k2></task></tasks></job>", [{u"k1": u"v1", u"k2": u"v2"}]),
-            (u"<job><tasks><task><k1>v1</k1><k2>v2 </k2></task></tasks></job>", [{u"k1": u"v1", u"k2": u"v2"}]),
-            (u"<job><tasks><task><k1>v1</k1></task><task><k2>v2</k2></task></tasks></job>", [{u"k1": u"v1"}, {u"k2": u"v2"}]),
-            (u"<job><tasks><task><k1>v1</k1></task><task><k2>v2</k2></task><task></task></tasks></job>", [{u"k1": u"v1"}, {u"k2": u"v2"}, {}]),
+            ("", []),
+            ("<job></job>", []),
+            ("<job><k1>v1</k1></job>", []),
+            ("<job><k1>v1</k1><k2></k2></job>", []),
+            ("<job><tasks></tasks></job>", []),
+            ("<job><tasks><foo></foo></tasks></job>", []),
+            ("<job><tasks><task></task></tasks></job>", [{}]),
+            ("<job><tasks><task></task><foo></foo></tasks></job>", [{}]),
+            ("<job><tasks><task></task><foo></foo><task></task></tasks></job>", [{}, {}]),
+            ("<job><tasks><task><k1></k1></task><foo></foo></tasks></job>", [{}]),
+            ("<job><tasks><task><k1>v1</k1></task></tasks></job>", [{"k1": "v1"}]),
+            ("<job><tasks><task><k1>v1</k1><k2>v2</k2></task></tasks></job>", [{"k1": "v1", "k2": "v2"}]),
+            ("<job><tasks><task><k1>v1</k1><k2> v2</k2></task></tasks></job>", [{"k1": "v1", "k2": "v2"}]),
+            ("<job><tasks><task><k1>v1</k1><k2> v2 </k2></task></tasks></job>", [{"k1": "v1", "k2": "v2"}]),
+            ("<job><tasks><task><k1>v1</k1><k2>v2 </k2></task></tasks></job>", [{"k1": "v1", "k2": "v2"}]),
+            ("<job><tasks><task><k1>v1</k1></task><task><k2>v2</k2></task></tasks></job>", [{"k1": "v1"}, {"k2": "v2"}]),
+            ("<job><tasks><task><k1>v1</k1></task><task><k2>v2</k2></task><task></task></tasks></job>", [{"k1": "v1"}, {"k2": "v2"}, {}]),
         ]
         for test in tests:
             self.assertEqual(gf.config_xml_to_dict(test[0], result=None, parse_job=False), test[1])
 
     def test_config_dict_to_string(self):
-        self.assertTrue(gf.config_dict_to_string({}) == u"")
-        self.assertTrue(gf.config_dict_to_string({u"k1": u"v1"}) == u"k1=v1")
+        self.assertTrue(gf.config_dict_to_string({}) == "")
+        self.assertTrue(gf.config_dict_to_string({"k1": "v1"}) == "k1=v1")
         self.assertTrue(
-            (gf.config_dict_to_string({u"k1": u"v1", u"k2": u"v2"}) == u"k1=v1|k2=v2") or
-            (gf.config_dict_to_string({u"k1": u"v1", u"k2": u"v2"}) == u"k2=v2|k1=v1")
+            (gf.config_dict_to_string({"k1": "v1", "k2": "v2"}) == "k1=v1|k2=v2") or
+            (gf.config_dict_to_string({"k1": "v1", "k2": "v2"}) == "k2=v2|k1=v1")
         )
 
     def test_pairs_to_dict(self):
         tests = [
             ([], {}),
-            ([u""], {}),
-            ([u"k1"], {}),
-            ([u"k1="], {}),
-            ([u"=v1"], {}),
-            ([u"k1=v1"], {u"k1": u"v1"}),
-            ([u"k1=v1", u""], {u"k1": u"v1"}),
-            ([u"k1=v1", u"k2"], {u"k1": u"v1"}),
-            ([u"k1=v1", u"k2="], {u"k1": u"v1"}),
-            ([u"k1=v1", u"=v2"], {u"k1": u"v1"}),
-            ([u"k1=v1", u"k2=v2"], {u"k1": u"v1", u"k2": u"v2"}),
+            ([""], {}),
+            (["k1"], {}),
+            (["k1="], {}),
+            (["=v1"], {}),
+            (["k1=v1"], {"k1": "v1"}),
+            (["k1=v1", ""], {"k1": "v1"}),
+            (["k1=v1", "k2"], {"k1": "v1"}),
+            (["k1=v1", "k2="], {"k1": "v1"}),
+            (["k1=v1", "=v2"], {"k1": "v1"}),
+            (["k1=v1", "k2=v2"], {"k1": "v1", "k2": "v2"}),
         ]
         for test in tests:
             self.assertEqual(gf.pairs_to_dict(test[0]), test[1])
@@ -287,8 +286,8 @@ class TestGlobalFunctions(unittest.TestCase):
     def test_copytree(self):
         with tempfile.TemporaryDirectory() as orig, tempfile.TemporaryDirectory() as dest:
             tmp_path = os.path.join(orig, "foo.bar")
-            with io.open(tmp_path, "w", encoding="utf-8") as tmp_file:
-                tmp_file.write(u"Foo bar")
+            with open(tmp_path, "w", encoding="utf-8") as tmp_file:
+                tmp_file.write("Foo bar")
 
             gf.copytree(orig, dest)
 
@@ -317,10 +316,10 @@ class TestGlobalFunctions(unittest.TestCase):
             gf.ensure_parent_directory("/foo/bar/baz", ensure_parent=False)
 
     def test_datetime_string(self):
-        self.assertEqual(type(gf.datetime_string()), type(u""))
-        self.assertEqual(len(gf.datetime_string()), len(u"2016-01-01T00:00:00"))
-        self.assertEqual(type(gf.datetime_string(time_zone=True)), type(u""))
-        self.assertEqual(len(gf.datetime_string(time_zone=True)), len(u"2016-01-01T00:00:00+00:00"))
+        self.assertEqual(type(gf.datetime_string()), str)
+        self.assertEqual(len(gf.datetime_string()), len("2016-01-01T00:00:00"))
+        self.assertEqual(type(gf.datetime_string(time_zone=True)), str)
+        self.assertEqual(len(gf.datetime_string(time_zone=True)), len("2016-01-01T00:00:00+00:00"))
 
     def test_time_from_ttml(self):
         tests = [
@@ -521,8 +520,8 @@ class TestGlobalFunctions(unittest.TestCase):
 
     def test_file_size_nonzero(self):
         handler, path = gf.tmp_file()
-        with io.open(path, "w", encoding="utf-8") as tmp_file:
-            tmp_file.write(u"Foo bar")
+        with open(path, "w", encoding="utf-8") as tmp_file:
+            tmp_file.write("Foo bar")
         self.assertEqual(gf.file_size(path), 7)
         gf.delete_file(handler, path)
 
@@ -594,8 +593,8 @@ class TestGlobalFunctions(unittest.TestCase):
 
     def test_read_file_bytes(self):
         handler, path = gf.tmp_file()
-        with io.open(path, "w", encoding="utf-8") as tmp_file:
-            tmp_file.write(u"Foo bar")
+        with open(path, "w", encoding="utf-8") as tmp_file:
+            tmp_file.write("Foo bar")
         contents = gf.read_file_bytes(path)
         self.assertTrue(gf.is_bytes(contents))
         self.assertEqual(len(contents), 7)
@@ -622,13 +621,13 @@ class TestGlobalFunctions(unittest.TestCase):
     def test_is_unicode(self):
         tests = [
             (None, False),
-            (u"", True),
-            (u"foo", True),
-            (u"fox99", True),
+            ("", True),
+            ("foo", True),
+            ("fox99", True),
             (b"foo", False),
             ([], False),
-            ([u"foo"], False),
-            ({u"foo": u"baz"}, False),
+            (["foo"], False),
+            ({"foo": "baz"}, False),
             ("", True),
             ("foo", True),
             ("fox99", True),
@@ -638,15 +637,15 @@ class TestGlobalFunctions(unittest.TestCase):
 
     def test_is_utf8_encoded(self):
         tests = [
-            (u"foo".encode("ascii"), True),
-            (u"foo".encode("latin-1"), True),
-            (u"foo".encode("utf-8"), True),
-            (u"foo".encode("utf-16"), False),
-            (u"foo".encode("utf-32"), False),
-            (u"foà".encode("latin-1"), False),
-            (u"foà".encode("utf-8"), True),
-            (u"foà".encode("utf-16"), False),
-            (u"foà".encode("utf-32"), False),
+            (b"foo", True),
+            (b"foo", True),
+            (b"foo", True),
+            ("foo".encode("utf-16"), False),
+            ("foo".encode("utf-32"), False),
+            ("foà".encode("latin-1"), False),
+            ("foà".encode(), True),
+            ("foà".encode("utf-16"), False),
+            ("foà".encode("utf-32"), False),
         ]
         for test in tests:
             self.assertEqual(gf.is_utf8_encoded(test[0]), test[1])
@@ -657,7 +656,7 @@ class TestGlobalFunctions(unittest.TestCase):
             (b"", True),
             (b"foo", True),
             (b"fo\xff", True),
-            (u"foo", False),
+            ("foo", False),
             ([], False),
             ([b"foo"], False),
             ({b"foo": b"baz"}, False),
@@ -670,9 +669,9 @@ class TestGlobalFunctions(unittest.TestCase):
 
     def test_safe_str(self):
         tests = [
-            (u"", ""),
-            (u"foo", "foo"),
-            (u"foà", "foà"),
+            ("", ""),
+            ("foo", "foo"),
+            ("foà", "foà"),
         ]
         self.assertIsNone(gf.safe_str(None))
         for test in tests:
@@ -680,11 +679,11 @@ class TestGlobalFunctions(unittest.TestCase):
 
     def test_safe_unichr(self):
         tests = [
-            (65, u"A"),
-            (90, u"Z"),
-            (0x20, u"\u0020"),
-            (0x200, u"\u0200"),
-            (0x2000, u"\u2000"),
+            (65, "A"),
+            (90, "Z"),
+            (0x20, "\u0020"),
+            (0x200, "\u0200"),
+            (0x2000, "\u2000"),
             (0x20000, "\U00020000"),
         ]
         for test in tests:
@@ -692,12 +691,12 @@ class TestGlobalFunctions(unittest.TestCase):
 
     def test_safe_unicode(self):
         tests = [
-            ("", u""),
-            ("foo", u"foo"),
-            ("foà", u"foà"),
-            (u"", u""),
-            (u"foo", u"foo"),
-            (u"foà", u"foà"),
+            ("", ""),
+            ("foo", "foo"),
+            ("foà", "foà"),
+            ("", ""),
+            ("foo", "foo"),
+            ("foà", "foà"),
         ]
         self.assertIsNone(gf.safe_unicode(None))
         for test in tests:

@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# coding=utf-8
 
 # aeneas is a Python/C library and a set of tools
 # to automagically synchronize audio and text (aka forced alignment)
@@ -25,8 +24,6 @@
 Download an audio file from a YouTube video.
 """
 
-from __future__ import absolute_import
-from __future__ import print_function
 import sys
 
 from aeneas.tools.download import DownloadCLI

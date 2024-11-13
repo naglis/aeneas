@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# coding=utf-8
 
 # aeneas is a Python/C library and a set of tools
 # to automagically synchronize audio and text (aka forced alignment)
@@ -30,8 +29,6 @@ and/or if you are interested in contributing to the
 development of aeneas.
 """
 
-from __future__ import absolute_import
-from __future__ import print_function
 import os
 import sys
 
@@ -46,10 +43,10 @@ __license__ = "GNU AGPL 3"
 __status__ = "Production"
 __version__ = "1.7.3"
 
-ANSI_ERROR = u"\033[91m"
-ANSI_OK = u"\033[92m"
-ANSI_WARNING = u"\033[93m"
-ANSI_END = u"\033[0m"
+ANSI_ERROR = "\033[91m"
+ANSI_OK = "\033[92m"
+ANSI_WARNING = "\033[93m"
+ANSI_END = "\033[0m"
 
 IS_POSIX = (os.name == "posix")
 
@@ -57,30 +54,30 @@ IS_POSIX = (os.name == "posix")
 def print_error(msg):
     """ Print an error message """
     if IS_POSIX:
-        print(u"%s[ERRO] %s%s" % (ANSI_ERROR, msg, ANSI_END))
+        print("{}[ERRO] {}{}".format(ANSI_ERROR, msg, ANSI_END))
     else:
-        print(u"[ERRO] %s" % (msg))
+        print("[ERRO] %s" % (msg))
 
 
 def print_info(msg):
     """ Print an info message """
-    print(u"[INFO] %s" % (msg))
+    print("[INFO] %s" % (msg))
 
 
 def print_success(msg):
     """ Print a warning message """
     if IS_POSIX:
-        print(u"%s[INFO] %s%s" % (ANSI_OK, msg, ANSI_END))
+        print("{}[INFO] {}{}".format(ANSI_OK, msg, ANSI_END))
     else:
-        print(u"[INFO] %s" % (msg))
+        print("[INFO] %s" % (msg))
 
 
 def print_warning(msg):
     """ Print a warning message """
     if IS_POSIX:
-        print(u"%s[WARN] %s%s" % (ANSI_WARNING, msg, ANSI_END))
+        print("{}[WARN] {}{}".format(ANSI_WARNING, msg, ANSI_END))
     else:
-        print(u"[WARN] %s" % (msg))
+        print("[WARN] %s" % (msg))
 
 
 def check_import():
@@ -89,17 +86,17 @@ def check_import():
     """
     try:
         import aeneas
-        print_success(u"aeneas         OK")
+        print_success("aeneas         OK")
         return False
     except ImportError:
-        print_error(u"aeneas         ERROR")
-        print_info(u"  Unable to load the aeneas Python package")
-        print_info(u"  This error is probably caused by:")
-        print_info(u"    A. you did not download/git-clone the aeneas package properly; or")
-        print_info(u"    B. you did not install the required Python packages:")
-        print_info(u"      1. BeautifulSoup4")
-        print_info(u"      2. lxml")
-        print_info(u"      3. numpy")
+        print_error("aeneas         ERROR")
+        print_info("  Unable to load the aeneas Python package")
+        print_info("  This error is probably caused by:")
+        print_info("    A. you did not download/git-clone the aeneas package properly; or")
+        print_info("    B. you did not install the required Python packages:")
+        print_info("      1. BeautifulSoup4")
+        print_info("      2. lxml")
+        print_info("      3. numpy")
     except Exception as e:
         print_error(e)
     return True
@@ -117,13 +114,13 @@ def main():
     if errors:
         sys.exit(1)
     if c_ext_warnings:
-        print_warning(u"All required dependencies are met but at least one Python C extension is not available")
-        print_warning(u"You can still run aeneas but it will be slower")
-        print_warning(u"Enjoy running aeneas!")
+        print_warning("All required dependencies are met but at least one Python C extension is not available")
+        print_warning("You can still run aeneas but it will be slower")
+        print_warning("Enjoy running aeneas!")
         sys.exit(2)
     else:
-        print_success(u"All required dependencies are met and all available Python C extensions are working")
-        print_success(u"Enjoy running aeneas!")
+        print_success("All required dependencies are met and all available Python C extensions are working")
+        print_success("Enjoy running aeneas!")
         sys.exit(0)
 
 

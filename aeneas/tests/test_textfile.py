@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# coding=utf-8
 
 # aeneas is a Python/C library and a set of tools
 # to automagically synchronize audio and text (aka forced alignment)
@@ -55,10 +54,10 @@ class TestTextFile(unittest.TestCase):
         gc.PPN_TASK_IS_TEXT_UNPARSED_ID_SORT: IDSortingAlgorithm.UNSORTED,
     }
     ID_REGEX_PARAMETERS = {
-        gc.PPN_TASK_OS_FILE_ID_REGEX: u"word%06d"
+        gc.PPN_TASK_OS_FILE_ID_REGEX: "word%06d"
     }
     ID_REGEX_PARAMETERS_BAD = {
-        gc.PPN_TASK_OS_FILE_ID_REGEX: u"word"
+        gc.PPN_TASK_OS_FILE_ID_REGEX: "word"
     }
     TRANSLITERATION_MAP_FILE_PATH = gf.absolute_path("res/transliteration/transliteration.map", __file__)
 
@@ -98,7 +97,7 @@ class TestTextFile(unittest.TestCase):
             TextFragment(identifier=b"foo")
 
     def test_tf_identifier_unicode(self):
-        tf = TextFragment(identifier=u"foo")
+        tf = TextFragment(identifier="foo")
         self.assertEqual(len(tf), 0)
 
     def test_tf_lines_invalid(self):
@@ -111,7 +110,7 @@ class TestTextFile(unittest.TestCase):
 
     def test_tf_lines_invalid_none_mixed(self):
         with self.assertRaises(TypeError):
-            TextFragment(lines=[u"foo", None, u"bar"])
+            TextFragment(lines=["foo", None, "bar"])
 
     def test_tf_lines_invalid_str(self):
         with self.assertRaises(TypeError):
@@ -119,22 +118,22 @@ class TestTextFile(unittest.TestCase):
 
     def test_tf_lines_invalid_str_mixed(self):
         with self.assertRaises(TypeError):
-            TextFragment(lines=[u"foo", b"bar", u"baz"])
+            TextFragment(lines=["foo", b"bar", "baz"])
 
     def test_tf_lines_unicode(self):
-        tf = TextFragment(lines=[u"foo"])
+        tf = TextFragment(lines=["foo"])
         self.assertEqual(len(tf), 1)
 
     def test_tf_lines_unicode_multiple(self):
-        tf = TextFragment(lines=[u"foo", u"bar", u"baz"])
+        tf = TextFragment(lines=["foo", "bar", "baz"])
         self.assertEqual(len(tf), 3)
 
     def test_tf_lines_unicode_empty_string(self):
-        tf = TextFragment(lines=[u""])
+        tf = TextFragment(lines=[""])
         self.assertEqual(len(tf), 1)
 
     def test_tf_lines_unicode_empty_string_multiple(self):
-        tf = TextFragment(lines=[u"", u"", u""])
+        tf = TextFragment(lines=["", "", ""])
         self.assertEqual(len(tf), 3)
 
     def test_constructor(self):
@@ -318,7 +317,7 @@ class TestTextFile(unittest.TestCase):
             "res/inputtext/sonnet_unparsed_order_1.txt",
             "f[0-9]*",
             IDSortingAlgorithm.UNSORTED,
-            [u"f001", u"f003", u"f005", u"f004", u"f002"]
+            ["f001", "f003", "f005", "f004", "f002"]
         )
 
     def test_read_unparsed_numeric(self):
@@ -326,7 +325,7 @@ class TestTextFile(unittest.TestCase):
             "res/inputtext/sonnet_unparsed_order_2.txt",
             "f[0-9]*",
             IDSortingAlgorithm.NUMERIC,
-            [u"f001", u"f2", u"f003", u"f4", u"f050"]
+            ["f001", "f2", "f003", "f4", "f050"]
         )
 
     def test_read_unparsed_numeric_2(self):
@@ -334,7 +333,7 @@ class TestTextFile(unittest.TestCase):
             "res/inputtext/sonnet_unparsed_order_3.txt",
             "f[0-9]*",
             IDSortingAlgorithm.NUMERIC,
-            [u"f001", u"f2", u"f003", u"f4", u"f050"]
+            ["f001", "f2", "f003", "f4", "f050"]
         )
 
     def test_read_unparsed_lexicographic(self):
@@ -342,7 +341,7 @@ class TestTextFile(unittest.TestCase):
             "res/inputtext/sonnet_unparsed_order_4.txt",
             "[a-z][0-9]*",
             IDSortingAlgorithm.LEXICOGRAPHIC,
-            [u"a005", u"b002", u"c004", u"d001", u"e003"]
+            ["a005", "b002", "c004", "d001", "e003"]
         )
 
     def test_read_unparsed_numeric_3(self):
@@ -350,7 +349,7 @@ class TestTextFile(unittest.TestCase):
             "res/inputtext/sonnet_unparsed_order_5.txt",
             "[a-z][0-9]*",
             IDSortingAlgorithm.NUMERIC,
-            [u"d001", u"b002", u"e003", u"c004", u"a005"]
+            ["d001", "b002", "e003", "c004", "a005"]
         )
 
     def test_set_language(self):
@@ -372,11 +371,11 @@ class TestTextFile(unittest.TestCase):
     def test_read_from_list(self):
         tfl = TextFile()
         text_list = [
-            u"fragment 1",
-            u"fragment 2",
-            u"fragment 3",
-            u"fragment 4",
-            u"fragment 5"
+            "fragment 1",
+            "fragment 2",
+            "fragment 3",
+            "fragment 4",
+            "fragment 5"
         ]
         tfl.read_from_list(text_list)
         self.assertEqual(len(tfl), 5)
@@ -385,11 +384,11 @@ class TestTextFile(unittest.TestCase):
     def test_read_from_list_with_ids(self):
         tfl = TextFile()
         text_list = [
-            (u"a1", u"fragment 1"),
-            (u"b2", u"fragment 2"),
-            (u"c3", u"fragment 3"),
-            (u"d4", u"fragment 4"),
-            (u"e5", u"fragment 5")
+            ("a1", "fragment 1"),
+            ("b2", "fragment 2"),
+            ("c3", "fragment 3"),
+            ("d4", "fragment 4"),
+            ("e5", "fragment 5")
         ]
         tfl.read_from_list_with_ids(text_list)
         self.assertEqual(len(tfl), 5)
@@ -398,18 +397,18 @@ class TestTextFile(unittest.TestCase):
     def test_add_fragment(self):
         tfl = TextFile()
         self.assertEqual(len(tfl), 0)
-        tfl.add_fragment(TextFragment(u"a1", Language.ENG, [u"fragment 1"]))
+        tfl.add_fragment(TextFragment("a1", Language.ENG, ["fragment 1"]))
         self.assertEqual(len(tfl), 1)
         self.assertEqual(tfl.chars, 10)
 
     def test_add_fragment_multiple(self):
         tfl = TextFile()
         self.assertEqual(len(tfl), 0)
-        tfl.add_fragment(TextFragment(u"a1", Language.ENG, [u"fragment 1"]))
+        tfl.add_fragment(TextFragment("a1", Language.ENG, ["fragment 1"]))
         self.assertEqual(len(tfl), 1)
-        tfl.add_fragment(TextFragment(u"a2", Language.ENG, [u"fragment 2"]))
+        tfl.add_fragment(TextFragment("a2", Language.ENG, ["fragment 2"]))
         self.assertEqual(len(tfl), 2)
-        tfl.add_fragment(TextFragment(u"a3", Language.ENG, [u"fragment 3"]))
+        tfl.add_fragment(TextFragment("a3", Language.ENG, ["fragment 3"]))
         self.assertEqual(len(tfl), 3)
         self.assertEqual(tfl.chars, 30)
 
@@ -478,84 +477,84 @@ class TestTextFile(unittest.TestCase):
 
     def test_filter_identity(self):
         fil = TextFilter()
-        string_in = [u"abc"]
+        string_in = ["abc"]
         string_out = fil.apply_filter(string_in)
         expected_out = string_in
         self.assertEqual(string_out, expected_out)
 
     def test_filter_ignore_regex_error(self):
         with self.assertRaises(ValueError):
-            self.filter_ignore_regex("word[abc", [u"abc"], [u"abc"])
+            self.filter_ignore_regex("word[abc", ["abc"], ["abc"])
 
     def test_filter_ignore_regex_replace_empty(self):
-        self.filter_ignore_regex("word", [u""], [u""])
+        self.filter_ignore_regex("word", [""], [""])
 
     def test_filter_ignore_regex_replace_none(self):
         self.filter_ignore_regex("word", [None], [None])
 
     def test_filter_ignore_regex_no_match(self):
-        self.filter_ignore_regex("word", [u"abc"], [u"abc"])
+        self.filter_ignore_regex("word", ["abc"], ["abc"])
 
     def test_filter_ignore_regex_one_match(self):
-        self.filter_ignore_regex("word", [u"abc word abc"], [u"abc abc"])
+        self.filter_ignore_regex("word", ["abc word abc"], ["abc abc"])
 
     def test_filter_ignore_regex_many_matches(self):
-        self.filter_ignore_regex("word", [u"abc word word abc word abc"], [u"abc abc abc"])
+        self.filter_ignore_regex("word", ["abc word word abc word abc"], ["abc abc abc"])
 
     def test_filter_ignore_regex_strip(self):
-        self.filter_ignore_regex("word", [u"word abc word"], [u"abc"])
+        self.filter_ignore_regex("word", ["word abc word"], ["abc"])
 
     def test_filter_ignore_regex_parenthesis(self):
-        self.filter_ignore_regex("\(.*?\)", [u"(CHAR) bla bla bla"], [u"bla bla bla"])
+        self.filter_ignore_regex(r"\(.*?\)", ["(CHAR) bla bla bla"], ["bla bla bla"])
 
     def test_filter_ignore_regex_brackets(self):
-        self.filter_ignore_regex("\[.*?\]", [u"[CHAR] bla bla bla"], [u"bla bla bla"])
+        self.filter_ignore_regex(r"\[.*?\]", ["[CHAR] bla bla bla"], ["bla bla bla"])
 
     def test_filter_ignore_regex_braces(self):
-        self.filter_ignore_regex("\{.*?\}", [u"{CHAR} bla bla bla"], [u"bla bla bla"])
+        self.filter_ignore_regex(r"\{.*?\}", ["{CHAR} bla bla bla"], ["bla bla bla"])
 
     def test_filter_ignore_regex_entire_match(self):
-        self.filter_ignore_regex("word", [u"word"], [u""])
+        self.filter_ignore_regex("word", ["word"], [""])
 
     def test_filter_transliterate_identity(self):
-        self.filter_transliterate([u"worm"], [u"worm"])
+        self.filter_transliterate(["worm"], ["worm"])
 
     def test_filter_transliterate_error(self):
         with self.assertRaises(OSError):
-            self.filter_transliterate([u"worm"], [u"worm"], self.NOT_EXISTING_PATH)
+            self.filter_transliterate(["worm"], ["worm"], self.NOT_EXISTING_PATH)
 
     def test_filter_transliterate_replace_empty(self):
-        self.filter_transliterate([u""], [u""])
+        self.filter_transliterate([""], [""])
 
     def test_filter_transliterate_replace_none(self):
         self.filter_transliterate([None], [None])
 
     def test_filter_transliterate_replace_single(self):
-        self.filter_transliterate([u"warm"], [u"wArm"])
+        self.filter_transliterate(["warm"], ["wArm"])
 
     def test_filter_transliterate_replace_range(self):
-        self.filter_transliterate([u"pill"], [u"pull"])
+        self.filter_transliterate(["pill"], ["pull"])
 
     def test_filter_transliterate_replace_single_unicode(self):
-        self.filter_transliterate([u"wàrm"], [u"warm"])
+        self.filter_transliterate(["wàrm"], ["warm"])
 
     def test_filter_transliterate_replace_range_unicode(self):
-        self.filter_transliterate([u"wàrèm"], [u"warem"])
+        self.filter_transliterate(["wàrèm"], ["warem"])
 
     def test_filter_transliterate_replace_codepoint(self):
-        self.filter_transliterate([u"Xylophon"], [u"xylophon"])
+        self.filter_transliterate(["Xylophon"], ["xylophon"])
 
     def test_filter_transliterate_replace_codepoint_range(self):
-        self.filter_transliterate([u"TUTTE"], [u"wwwwE"])
+        self.filter_transliterate(["TUTTE"], ["wwwwE"])
 
     def test_filter_transliterate_replace_codepoint_length(self):
-        self.filter_transliterate([u"x" + gf.safe_unichr(0x0008) + u"z"], [u"xaz"])
-        self.filter_transliterate([u"x" + gf.safe_unichr(0x0088) + u"z"], [u"xaz"])
-        self.filter_transliterate([u"x" + gf.safe_unichr(0x0888) + u"z"], [u"xaz"])
-        self.filter_transliterate([u"x" + gf.safe_unichr(0x8888) + u"z"], [u"xaz"])
+        self.filter_transliterate(["x" + gf.safe_unichr(0x0008) + "z"], ["xaz"])
+        self.filter_transliterate(["x" + gf.safe_unichr(0x0088) + "z"], ["xaz"])
+        self.filter_transliterate(["x" + gf.safe_unichr(0x0888) + "z"], ["xaz"])
+        self.filter_transliterate(["x" + gf.safe_unichr(0x8888) + "z"], ["xaz"])
         if gf.is_py2_narrow_build():
             # NOTE Python 2 narrow builds cannot handle codepoints above 0x10000 correctly
             pass
         else:
-            self.filter_transliterate([u"x" + gf.safe_unichr(0x88888) + u"z"], [u"xaz"])
-            self.filter_transliterate([u"x" + gf.safe_unichr(0x108888) + u"z"], [u"xaz"])
+            self.filter_transliterate(["x" + gf.safe_unichr(0x88888) + "z"], ["xaz"])
+            self.filter_transliterate(["x" + gf.safe_unichr(0x108888) + "z"], ["xaz"])

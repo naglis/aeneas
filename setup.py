@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# coding=utf-8
 
 # aeneas is a Python/C library and a set of tools
 # to automagically synchronize audio and text (aka forced alignment)
@@ -96,7 +95,7 @@ def prepare_cew_for_windows():
             for src_path in espeak_dll_src_paths:
                 if os.path.exists(src_path):
                     found = True
-                    print("[INFO] Copying eSpeak DLL from %s into %s" % (src_path, espeak_dll_dst_path))
+                    print("[INFO] Copying eSpeak DLL from {} into {}".format(src_path, espeak_dll_dst_path))
                     try:
                         shutil.copyfile(src_path, espeak_dll_dst_path)
                         copied = True

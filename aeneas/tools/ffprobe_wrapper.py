@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# coding=utf-8
 
 # aeneas is a Python/C library and a set of tools
 # to automagically synchronize audio and text (aka forced alignment)
@@ -25,8 +24,6 @@
 Read audio file properties using the ``ffprobe`` wrapper.
 """
 
-from __future__ import absolute_import
-from __future__ import print_function
 import sys
 
 from aeneas.ffprobewrapper import FFPROBEParsingError
@@ -47,12 +44,12 @@ class FFPROBEWrapperCLI(AbstractCLIProgram):
     NAME = gf.file_name_without_extension(__file__)
 
     HELP = {
-        "description": u"Read audio file properties using the ffprobe wrapper.",
+        "description": "Read audio file properties using the ffprobe wrapper.",
         "synopsis": [
-            (u"AUDIO_FILE", True)
+            ("AUDIO_FILE", True)
         ],
         "examples": [
-            u"%s" % (AUDIO_FILE)
+            "%s" % (AUDIO_FILE)
         ]
     }
 
@@ -73,14 +70,14 @@ class FFPROBEWrapperCLI(AbstractCLIProgram):
             prober = FFPROBEWrapper(rconf=self.rconf, logger=self.logger)
             dictionary = prober.read_properties(audio_file_path)
             for key in sorted(dictionary.keys()):
-                self.print_generic(u"%s %s" % (key, dictionary[key]))
+                self.print_generic("{} {}".format(key, dictionary[key]))
             return self.NO_ERROR_EXIT_CODE
         except FFPROBEPathError:
-            self.print_error(u"Unable to call the ffprobe executable '%s'" % (self.rconf[RuntimeConfiguration.FFPROBE_PATH]))
-            self.print_error(u"Make sure the path to ffprobe is correct")
+            self.print_error("Unable to call the ffprobe executable '%s'" % (self.rconf[RuntimeConfiguration.FFPROBE_PATH]))
+            self.print_error("Make sure the path to ffprobe is correct")
         except (FFPROBEUnsupportedFormatError, FFPROBEParsingError):
-            self.print_error(u"Cannot read properties of file '%s'" % (audio_file_path))
-            self.print_error(u"Make sure the input file has a format supported by ffprobe")
+            self.print_error("Cannot read properties of file '%s'" % (audio_file_path))
+            self.print_error("Make sure the input file has a format supported by ffprobe")
 
         return self.ERROR_EXIT_CODE
 

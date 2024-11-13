@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# coding=utf-8
 
 # aeneas is a Python/C library and a set of tools
 # to automagically synchronize audio and text (aka forced alignment)
@@ -27,8 +26,6 @@ as a container and a configuration string
 (i.e., from a wizard).
 """
 
-from __future__ import absolute_import
-from __future__ import print_function
 import sys
 
 from aeneas.executejob import ExecuteJob
@@ -48,26 +45,26 @@ class ExecuteJobCLI(AbstractCLIProgram):
     CONTAINER_FILE = gf.relative_path("res/job.zip", __file__)
     CONTAINER_FILE_NO_CONFIG = gf.relative_path("res/job_no_config.zip", __file__)
     OUTPUT_DIRECTORY = "output/"
-    CONFIG_STRING = u"is_hierarchy_type=flat|is_hierarchy_prefix=assets/|is_text_file_relative_path=.|is_text_file_name_regex=.*\.xhtml|is_text_type=unparsed|is_audio_file_relative_path=.|is_audio_file_name_regex=.*\.mp3|is_text_unparsed_id_regex=f[0-9]+|is_text_unparsed_id_sort=numeric|os_job_file_name=demo_sync_job_output|os_job_file_container=zip|os_job_file_hierarchy_type=flat|os_job_file_hierarchy_prefix=assets/|os_task_file_name=\\$PREFIX.xhtml.smil|os_task_file_format=smil|os_task_file_smil_page_ref=\\$PREFIX.xhtml|os_task_file_smil_audio_ref=../Audio/\\$PREFIX.mp3|job_language=eng|job_description=Demo Sync Job"
+    CONFIG_STRING = "is_hierarchy_type=flat|is_hierarchy_prefix=assets/|is_text_file_relative_path=.|is_text_file_name_regex=.*\\.xhtml|is_text_type=unparsed|is_audio_file_relative_path=.|is_audio_file_name_regex=.*\\.mp3|is_text_unparsed_id_regex=f[0-9]+|is_text_unparsed_id_sort=numeric|os_job_file_name=demo_sync_job_output|os_job_file_container=zip|os_job_file_hierarchy_type=flat|os_job_file_hierarchy_prefix=assets/|os_task_file_name=\\$PREFIX.xhtml.smil|os_task_file_format=smil|os_task_file_smil_page_ref=\\$PREFIX.xhtml|os_task_file_smil_audio_ref=../Audio/\\$PREFIX.mp3|job_language=eng|job_description=Demo Sync Job"
 
     PARAMETERS = JobConfiguration.parameters(sort=True, as_strings=True)
 
     NAME = gf.file_name_without_extension(__file__)
 
     HELP = {
-        "description": u"Execute a Job, passed as a container.",
+        "description": "Execute a Job, passed as a container.",
         "synopsis": [
-            (u"--list-parameters", False),
-            (u"CONTAINER OUTPUT_DIR [CONFIG_STRING]", True)
+            ("--list-parameters", False),
+            ("CONTAINER OUTPUT_DIR [CONFIG_STRING]", True)
         ],
         "examples": [
-            u"%s %s" % (CONTAINER_FILE, OUTPUT_DIRECTORY),
-            u"%s %s --cewsubprocess" % (CONTAINER_FILE, OUTPUT_DIRECTORY),
-            u"%s %s \"%s\"" % (CONTAINER_FILE_NO_CONFIG, OUTPUT_DIRECTORY, CONFIG_STRING)
+            "{} {}".format(CONTAINER_FILE, OUTPUT_DIRECTORY),
+            "{} {} --cewsubprocess".format(CONTAINER_FILE, OUTPUT_DIRECTORY),
+            "{} {} \"{}\"".format(CONTAINER_FILE_NO_CONFIG, OUTPUT_DIRECTORY, CONFIG_STRING)
         ],
         "options": [
-            u"--cewsubprocess : run cew in separate process (see docs)",
-            u"--skip-validator : do not validate the given container and/or config string"
+            "--cewsubprocess : run cew in separate process (see docs)",
+            "--skip-validator : do not validate the given container and/or config string"
         ]
     }
 
@@ -77,7 +74,7 @@ class ExecuteJobCLI(AbstractCLIProgram):
 
         :rtype: int
         """
-        if self.has_option([u"--list-parameters"]):
+        if self.has_option(["--list-parameters"]):
             return self.print_parameters()
 
         if len(self.actual_arguments) < 2:
@@ -86,10 +83,10 @@ class ExecuteJobCLI(AbstractCLIProgram):
         container_path = self.actual_arguments[0]
         output_directory_path = self.actual_arguments[1]
         config_string = None
-        if (len(self.actual_arguments)) > 2 and (not self.actual_arguments[2].startswith(u"-")):
+        if (len(self.actual_arguments)) > 2 and (not self.actual_arguments[2].startswith("-")):
             config_string = self.actual_arguments[2]
-        validate = not self.has_option(u"--skip-validator")
-        if self.has_option(u"--cewsubprocess"):
+        validate = not self.has_option("--skip-validator")
+        if self.has_option("--cewsubprocess"):
             self.rconf[RuntimeConfiguration.CEW_SUBPROCESS_ENABLED] = True
 
         if not self.check_input_file_or_directory(container_path):
@@ -100,48 +97,48 @@ class ExecuteJobCLI(AbstractCLIProgram):
 
         if validate:
             try:
-                self.print_info(u"Validating the container (specify --skip-validator to bypass)...")
+                self.print_info("Validating the container (specify --skip-validator to bypass)...")
                 validator = Validator(rconf=self.rconf, logger=self.logger)
                 result = validator.check_container(container_path, config_string=config_string)
                 if not result.passed:
-                    self.print_error(u"The given container is not valid:")
+                    self.print_error("The given container is not valid:")
                     self.print_error(result.pretty_print())
                     return self.ERROR_EXIT_CODE
-                self.print_info(u"Validating the container... done")
+                self.print_info("Validating the container... done")
             except Exception as exc:
-                self.print_error(u"An unexpected error occurred while validating the container:")
-                self.print_error(u"%s" % exc)
+                self.print_error("An unexpected error occurred while validating the container:")
+                self.print_error("%s" % exc)
                 return self.ERROR_EXIT_CODE
 
         try:
-            self.print_info(u"Loading job from container...")
+            self.print_info("Loading job from container...")
             executor = ExecuteJob(rconf=self.rconf, logger=self.logger)
             executor.load_job_from_container(container_path, config_string)
-            self.print_info(u"Loading job from container... done")
+            self.print_info("Loading job from container... done")
         except Exception as exc:
-            self.print_error(u"An unexpected error occurred while loading the job:")
-            self.print_error(u"%s" % exc)
+            self.print_error("An unexpected error occurred while loading the job:")
+            self.print_error("%s" % exc)
             return self.ERROR_EXIT_CODE
 
         try:
-            self.print_info(u"Executing...")
+            self.print_info("Executing...")
             executor.execute()
-            self.print_info(u"Executing... done")
+            self.print_info("Executing... done")
         except Exception as exc:
-            self.print_error(u"An unexpected error occurred while executing the job:")
-            self.print_error(u"%s" % exc)
+            self.print_error("An unexpected error occurred while executing the job:")
+            self.print_error("%s" % exc)
             return self.ERROR_EXIT_CODE
 
         try:
-            self.print_info(u"Creating output container...")
+            self.print_info("Creating output container...")
             path = executor.write_output_container(output_directory_path)
-            self.print_info(u"Creating output container... done")
-            self.print_success(u"Created output file '%s'" % path)
+            self.print_info("Creating output container... done")
+            self.print_success("Created output file '%s'" % path)
             executor.clean(True)
             return self.NO_ERROR_EXIT_CODE
         except Exception as exc:
-            self.print_error(u"An unexpected error occurred while writing the output container:")
-            self.print_error(u"%s" % exc)
+            self.print_error("An unexpected error occurred while writing the output container:")
+            self.print_error("%s" % exc)
 
         return self.ERROR_EXIT_CODE
 
@@ -149,8 +146,8 @@ class ExecuteJobCLI(AbstractCLIProgram):
         """
         Print the list of parameters and exit.
         """
-        self.print_info(u"Available parameters:")
-        self.print_generic(u"\n" + u"\n".join(self.PARAMETERS) + u"\n")
+        self.print_info("Available parameters:")
+        self.print_generic("\n" + "\n".join(self.PARAMETERS) + "\n")
         return self.HELP_EXIT_CODE
 
 

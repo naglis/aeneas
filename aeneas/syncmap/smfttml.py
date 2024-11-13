@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# coding=utf-8
 
 # aeneas is a Python/C library and a set of tools
 # to automagically synchronize audio and text (aka forced alignment)
@@ -21,8 +20,6 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from __future__ import absolute_import
-from __future__ import print_function
 
 from aeneas.syncmap.smfgxml import SyncMapFormatGenericXML
 import aeneas.globalfunctions as gf
@@ -33,7 +30,7 @@ class SyncMapFormatTTML(SyncMapFormatGenericXML):
     Handler for TTML I/O format.
     """
 
-    TAG = u"SyncMapFormatTTML"
+    TAG = "SyncMapFormatTTML"
 
     TTML = "ttml"
 
@@ -89,11 +86,11 @@ class SyncMapFormatTTML(SyncMapFormatGenericXML):
             # single level
             for fragment in syncmap.fragments:
                 text = fragment.text_fragment
-                p_string = u"<p xml:id=\"%s\" begin=\"%s\" end=\"%s\">%s</p>" % (
+                p_string = "<p xml:id=\"{}\" begin=\"{}\" end=\"{}\">{}</p>".format(
                     text.identifier,
                     gf.time_to_ttml(fragment.begin),
                     gf.time_to_ttml(fragment.end),
-                    u"<br/>".join(text.lines)
+                    "<br/>".join(text.lines)
                 )
                 p_elem = etree.fromstring(p_string)
                 div_elem.append(p_elem)
@@ -114,6 +111,6 @@ class SyncMapFormatTTML(SyncMapFormatGenericXML):
                         wor_span_elem.attrib["id"] = fragment.text_fragment.identifier
                         wor_span_elem.attrib["begin"] = gf.time_to_ttml(fragment.begin)
                         wor_span_elem.attrib["end"] = gf.time_to_ttml(fragment.end)
-                        wor_span_elem.text = u"<br/>".join(fragment.text_fragment.lines)
+                        wor_span_elem.text = "<br/>".join(fragment.text_fragment.lines)
         # write tree
         return self._tree_to_string(tt_elem)

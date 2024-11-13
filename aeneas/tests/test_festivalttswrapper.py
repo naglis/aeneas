@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# coding=utf-8
 
 # aeneas is a Python/C library and a set of tools
 # to automagically synchronize audio and text (aka forced alignment)
@@ -29,8 +28,8 @@ from aeneas.ttswrappers.festivalttswrapper import FESTIVALTTSWrapper
 
 class TestFESTIVALTTSWrapper(TestBaseTTSWrapper):
 
-    TTS = u"festival"
-    TTS_PATH = u"/usr/bin/text2wave"
+    TTS = "festival"
+    TTS_PATH = "/usr/bin/text2wave"
     TTS_CLASS = FESTIVALTTSWrapper
     TTS_LANGUAGE = FESTIVALTTSWrapper.ENG
     TTS_LANGUAGE_VARIATION = FESTIVALTTSWrapper.ENG_GBR

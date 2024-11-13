@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# coding=utf-8
 
 # aeneas is a Python/C library and a set of tools
 # to automagically synchronize audio and text (aka forced alignment)
@@ -28,8 +27,6 @@ This module contains the following classes:
 * :class:`~aeneas.ffmpegwrapper.FFMPEGPathError`, representing a failure to locate the ``ffmpeg`` executable.
 """
 
-from __future__ import absolute_import
-from __future__ import print_function
 import subprocess
 
 from aeneas.logger import Loggable
@@ -158,7 +155,7 @@ class FFMPEGWrapper(Loggable):
     FFMPEG_PARAMETERS_DEFAULT = FFMPEG_PARAMETERS_SAMPLE_16000
     """ Default set of parameters for ``ffmpeg`` """
 
-    TAG = u"FFMPEGWrapper"
+    TAG = "FFMPEGWrapper"
 
     def convert(
             self,
@@ -195,11 +192,11 @@ class FFMPEGWrapper(Loggable):
         """
         # test if we can read the input file
         if not gf.file_can_be_read(input_file_path):
-            self.log_exc(u"Input file '%s' cannot be read" % (input_file_path), None, True, OSError)
+            self.log_exc("Input file '%s' cannot be read" % (input_file_path), None, True, OSError)
 
         # test if we can write the output file
         if not gf.file_can_be_written(output_file_path):
-            self.log_exc(u"Output file '%s' cannot be written" % (output_file_path), None, True, OSError)
+            self.log_exc("Output file '%s' cannot be written" % (output_file_path), None, True, OSError)
 
         # call ffmpeg
         arguments = [self.rconf[RuntimeConfiguration.FFMPEG_PATH]]
@@ -213,7 +210,7 @@ class FFMPEGWrapper(Loggable):
         else:
             arguments.extend(self.FFMPEG_PARAMETERS_DEFAULT)
         arguments.append(output_file_path)
-        self.log([u"Calling with arguments '%s'", arguments])
+        self.log(["Calling with arguments '%s'", arguments])
         try:
             proc = subprocess.Popen(
                 arguments,
@@ -226,13 +223,13 @@ class FFMPEGWrapper(Loggable):
             proc.stdin.close()
             proc.stderr.close()
         except OSError as exc:
-            self.log_exc(u"Unable to call the '%s' ffmpeg executable" % (self.rconf[RuntimeConfiguration.FFMPEG_PATH]), exc, True, FFMPEGPathError)
-        self.log(u"Call completed")
+            self.log_exc("Unable to call the '%s' ffmpeg executable" % (self.rconf[RuntimeConfiguration.FFMPEG_PATH]), exc, True, FFMPEGPathError)
+        self.log("Call completed")
 
         # check if the output file exists
         if not gf.file_exists(output_file_path):
-            self.log_exc(u"Output file '%s' was not written" % (output_file_path), None, True, OSError)
+            self.log_exc("Output file '%s' was not written" % (output_file_path), None, True, OSError)
 
         # returning the output file path
-        self.log([u"Returning output file path '%s'", output_file_path])
+        self.log(["Returning output file path '%s'", output_file_path])
         return output_file_path

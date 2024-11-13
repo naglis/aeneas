@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# coding=utf-8
 
 # aeneas is a Python/C library and a set of tools
 # to automagically synchronize audio and text (aka forced alignment)
@@ -21,8 +20,6 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from __future__ import absolute_import
-from __future__ import print_function
 
 from aeneas.syncmap.missingparametererror import SyncMapMissingParameterError
 from aeneas.syncmap.smfgxml import SyncMapFormatGenericXML
@@ -35,7 +32,7 @@ class SyncMapFormatSMIL(SyncMapFormatGenericXML):
     Handler for SMIL for EPUB 3 I/O format.
     """
 
-    TAG = u"SyncMapFormatSMIL"
+    TAG = "SyncMapFormatSMIL"
 
     DEFAULT = "smil"
 
@@ -46,7 +43,7 @@ class SyncMapFormatSMIL(SyncMapFormatGenericXML):
     MACHINE_ALIASES = [MACHINE]
 
     def __init__(self, variant=DEFAULT, parameters=None, rconf=None, logger=None):
-        super(SyncMapFormatSMIL, self).__init__(variant=variant, parameters=parameters, rconf=rconf, logger=logger)
+        super().__init__(variant=variant, parameters=parameters, rconf=rconf, logger=logger)
         if self.variant in self.MACHINE_ALIASES:
             self.format_time_function = gf.time_to_ssmmm
         else:
@@ -83,7 +80,7 @@ class SyncMapFormatSMIL(SyncMapFormatGenericXML):
             self._add_fragment(
                 syncmap=syncmap,
                 identifier=identifier,
-                lines=[u""],
+                lines=[""],
                 begin=begin,
                 end=end
             )
@@ -95,7 +92,7 @@ class SyncMapFormatSMIL(SyncMapFormatGenericXML):
                 gc.PPN_TASK_OS_FILE_SMIL_AUDIO_REF
         ]:
             if gf.safe_get(self.parameters, key, None) is None:
-                self.log_exc(u"Parameter %s must be specified for format %s" % (key, self.variant), None, True, SyncMapMissingParameterError)
+                self.log_exc("Parameter {} must be specified for format {}".format(key, self.variant), None, True, SyncMapMissingParameterError)
 
         from lxml import etree
         # we are sure we have them
@@ -112,7 +109,7 @@ class SyncMapFormatSMIL(SyncMapFormatGenericXML):
         smil_elem.attrib["version"] = "3.0"
         body_elem = etree.SubElement(smil_elem, "{%s}body" % smil_ns)
         seq_elem = etree.SubElement(body_elem, "{%s}seq" % smil_ns)
-        seq_elem.attrib["id"] = u"seq000001"
+        seq_elem.attrib["id"] = "seq000001"
         seq_elem.attrib["{%s}textref" % epub_ns] = text_ref
 
         if syncmap.is_single_level:
@@ -122,7 +119,7 @@ class SyncMapFormatSMIL(SyncMapFormatGenericXML):
                 par_elem = etree.SubElement(seq_elem, "{%s}par" % smil_ns)
                 par_elem.attrib["id"] = "par%06d" % (i)
                 text_elem = etree.SubElement(par_elem, "{%s}text" % smil_ns)
-                text_elem.attrib["src"] = "%s#%s" % (text_ref, text.identifier)
+                text_elem.attrib["src"] = "{}#{}".format(text_ref, text.identifier)
                 audio_elem = etree.SubElement(par_elem, "{%s}audio" % smil_ns)
                 audio_elem.attrib["src"] = audio_ref
                 audio_elem.attrib["clipBegin"] = self.format_time_function(fragment.begin)
@@ -149,7 +146,7 @@ class SyncMapFormatSMIL(SyncMapFormatGenericXML):
                         wor_seq_elem.attrib["{%s}textref" % epub_ns] = text_ref + "#" + text.identifier
                         wor_par_elem = etree.SubElement(wor_seq_elem, "{%s}par" % smil_ns)
                         text_elem = etree.SubElement(wor_par_elem, "{%s}text" % smil_ns)
-                        text_elem.attrib["src"] = "%s#%s" % (text_ref, text.identifier)
+                        text_elem.attrib["src"] = "{}#{}".format(text_ref, text.identifier)
                         audio_elem = etree.SubElement(wor_par_elem, "{%s}audio" % smil_ns)
                         audio_elem.attrib["src"] = audio_ref
                         audio_elem.attrib["clipBegin"] = self.format_time_function(fragment.begin)

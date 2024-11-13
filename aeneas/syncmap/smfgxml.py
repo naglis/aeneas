@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# coding=utf-8
 
 # aeneas is a Python/C library and a set of tools
 # to automagically synchronize audio and text (aka forced alignment)
@@ -21,8 +20,6 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from __future__ import absolute_import
-from __future__ import print_function
 from itertools import chain
 
 from aeneas.syncmap.smfbase import SyncMapFormatBase
@@ -34,7 +31,7 @@ class SyncMapFormatGenericXML(SyncMapFormatBase):
     Base class for XML-like I/O format handlers.
     """
 
-    TAG = u"SyncMapFormatGenericTabular"
+    TAG = "SyncMapFormatGenericTabular"
 
     DEFAULT = "genericxml"
     """
@@ -52,7 +49,7 @@ class SyncMapFormatGenericXML(SyncMapFormatBase):
         from lxml import etree
         parts = ([node.text] + list(chain(*([etree.tostring(c, with_tail=False), c.tail] for c in node.getchildren()))) + [node.tail])
         parts = [gf.safe_unicode(p) for p in parts]
-        parts = [p.strip() for p in parts if not p.startswith(u"<br ")]
+        parts = [p.strip() for p in parts if not p.startswith("<br ")]
         parts = [p for p in parts if len(p) > 0]
         uparts = []
         for part in parts:

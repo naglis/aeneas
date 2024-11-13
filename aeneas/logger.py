@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# coding=utf-8
 
 # aeneas is a Python/C library and a set of tools
 # to automagically synchronize audio and text (aka forced alignment)
@@ -29,8 +28,6 @@ This module contains the following classes:
 
 """
 
-from __future__ import absolute_import
-from __future__ import print_function
 import datetime
 import io
 
@@ -38,7 +35,7 @@ from aeneas.runtimeconfiguration import RuntimeConfiguration
 import aeneas.globalfunctions as gf
 
 
-class Logger(object):
+class Logger:
     """
     A logger class for debugging and performance profiling.
 
@@ -81,7 +78,7 @@ class Logger(object):
         return gf.safe_str(self.__unicode__())
 
     def __repr__(self):
-        return u"Logger(tee=%s, indentation=%d, tee_show_datetime=%s)" % (
+        return "Logger(tee=%s, indentation=%d, tee_show_datetime=%s)" % (
             self.tee,
             self.indentation,
             self.tee_show_datetime
@@ -139,9 +136,9 @@ class Logger(object):
         ppl = [entry.pretty_print(show_datetime) for entry in self.entries]
         if as_list:
             return ppl
-        return u"\n".join(ppl)
+        return "\n".join(ppl)
 
-    def log(self, message, severity=INFO, tag=u""):
+    def log(self, message, severity=INFO, tag=""):
         """
         Add a given message to the log, and return its time.
 
@@ -176,7 +173,7 @@ class Logger(object):
 
         :param string path: the path of the log file to be written
         """
-        with io.open(path, "w", encoding="utf-8") as log_file:
+        with open(path, "w", encoding="utf-8") as log_file:
             log_file.write(self.pretty_print())
 
     @classmethod
@@ -192,7 +189,7 @@ class Logger(object):
         """
         if isinstance(message, list):
             if len(message) == 0:
-                sanitized = u"Empty log message"
+                sanitized = "Empty log message"
             elif len(message) == 1:
                 sanitized = message[0]
             else:
@@ -204,7 +201,7 @@ class Logger(object):
         return sanitized
 
 
-class _LogEntry(object):
+class _LogEntry:
     """
     A structure for a log entry.
     """
@@ -225,16 +222,16 @@ class _LogEntry(object):
         :rtype: string
         """
         if show_datetime:
-            return u"[%s] %s %s%s: %s" % (
+            return "[{}] {} {}{}: {}".format(
                 self.severity,
                 gf.object_to_unicode(self.time),
-                u" " * self.indentation,
+                " " * self.indentation,
                 self.tag,
                 self.message
             )
-        return u"[%s] %s%s: %s" % (
+        return "[{}] {}{}: {}".format(
             self.severity,
-            u" " * self.indentation,
+            " " * self.indentation,
             self.tag,
             self.message
         )
@@ -305,7 +302,7 @@ class _LogEntry(object):
         self.__time = time
 
 
-class Loggable(object):
+class Loggable:
     """
     A base class supporting logging and runtime configuration.
 
@@ -314,7 +311,7 @@ class Loggable(object):
     :param rconf: the runtime configuration object
     :type  rconf: :class:`~aeneas.runtimeconfiguration.RuntimeConfiguration`
     """
-    TAG = u"Loggable"
+    TAG = "Loggable"
 
     def __init__(self, logger=None, rconf=None):
         self.logger = logger if logger is not None else Logger()
@@ -343,11 +340,11 @@ class Loggable(object):
         log_function = self.log_crit if critical else self.log_warn
         log_function(message)
         if exc is not None:
-            log_function([u"%s", exc])
+            log_function(["%s", exc])
         if raise_type is not None:
             raise_message = message
             if exc is not None:
-                raise_message = u"%s : %s" % (message, exc)
+                raise_message = "{} : {}".format(message, exc)
             raise raise_type(raise_message)
 
     def log(self, message):

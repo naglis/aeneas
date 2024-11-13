@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# coding=utf-8
 
 # aeneas is a Python/C library and a set of tools
 # to automagically synchronize audio and text (aka forced alignment)
@@ -37,7 +36,7 @@ class TestConfiguration(unittest.TestCase):
             Configuration(b"not a unicode string")
 
     def test_set_config_string_good(self):
-        c = Configuration(u"foo=bar")
+        c = Configuration("foo=bar")
         c.config_string
 
     def test_clone(self):

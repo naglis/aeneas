@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# coding=utf-8
 
 # aeneas is a Python/C library and a set of tools
 # to automagically synchronize audio and text (aka forced alignment)
@@ -31,9 +30,6 @@ This module contains the following classes:
 .. versionadded:: 1.2.0
 """
 
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
 
 import decimal
 
@@ -117,10 +113,10 @@ class SD(Loggable):
     .. versionadded:: 1.2.0
     """
 
-    TAG = u"SD"
+    TAG = "SD"
 
     def __init__(self, real_wave_mfcc, text_file, rconf=None, logger=None):
-        super(SD, self).__init__(rconf=rconf, logger=logger)
+        super().__init__(rconf=rconf, logger=logger)
         self.real_wave_mfcc = real_wave_mfcc
         self.text_file = text_file
 
@@ -159,15 +155,15 @@ class SD(Loggable):
         tail = self.detect_tail(min_tail_length, max_tail_length)
         begin = head
         end = self.real_wave_mfcc.audio_length - tail
-        self.log([u"Audio length: %.3f", self.real_wave_mfcc.audio_length])
-        self.log([u"Head length:  %.3f", head])
-        self.log([u"Tail length:  %.3f", tail])
-        self.log([u"Begin:        %.3f", begin])
-        self.log([u"End:          %.3f", end])
+        self.log(["Audio length: %.3f", self.real_wave_mfcc.audio_length])
+        self.log(["Head length:  %.3f", head])
+        self.log(["Tail length:  %.3f", tail])
+        self.log(["Begin:        %.3f", begin])
+        self.log(["End:          %.3f", end])
         if (begin >= TimeValue("0.000")) and (end > begin):
-            self.log([u"Returning %.3f %.3f", begin, end])
+            self.log(["Returning %.3f %.3f", begin, end])
             return (begin, end)
-        self.log(u"Returning (0.000, 0.000)")
+        self.log("Returning (0.000, 0.000)")
         return (TimeValue("0.000"), TimeValue("0.000"))
 
     def detect_head(self, min_head_length=None, max_head_length=None):
@@ -221,9 +217,9 @@ class SD(Loggable):
             try:
                 value = TimeValue(value)
             except (TypeError, ValueError, decimal.InvalidOperation) as exc:
-                self.log_exc(u"The value of %s is not a number" % (name), exc, True, TypeError)
+                self.log_exc("The value of %s is not a number" % (name), exc, True, TypeError)
             if value < 0:
-                self.log_exc(u"The value of %s is negative" % (name), None, True, ValueError)
+                self.log_exc("The value of %s is negative" % (name), None, True, ValueError)
             return value
 
         min_length = _sanitize(min_length, self.MIN_LENGTH, "min_length")
@@ -231,17 +227,17 @@ class SD(Loggable):
         mws = self.rconf.mws
         min_length_frames = int(min_length / mws)
         max_length_frames = int(max_length / mws)
-        self.log([u"MFCC window shift s:     %.3f", mws])
-        self.log([u"Min start length s:      %.3f", min_length])
-        self.log([u"Min start length frames: %d", min_length_frames])
-        self.log([u"Max start length s:      %.3f", max_length])
-        self.log([u"Max start length frames: %d", max_length_frames])
-        self.log([u"Tail?:                   %s", str(tail)])
+        self.log(["MFCC window shift s:     %.3f", mws])
+        self.log(["Min start length s:      %.3f", min_length])
+        self.log(["Min start length frames: %d", min_length_frames])
+        self.log(["Max start length s:      %.3f", max_length])
+        self.log(["Max start length frames: %d", max_length_frames])
+        self.log(["Tail?:                   %s", str(tail)])
 
-        self.log(u"Synthesizing query...")
+        self.log("Synthesizing query...")
         synt_duration = max_length * self.QUERY_FACTOR
-        self.log([u"Synthesizing at least %.3f seconds", synt_duration])
-        tmp_handler, tmp_file_path = gf.tmp_file(suffix=u".wav", root=self.rconf[RuntimeConfiguration.TMP_PATH])
+        self.log(["Synthesizing at least %.3f seconds", synt_duration])
+        tmp_handler, tmp_file_path = gf.tmp_file(suffix=".wav", root=self.rconf[RuntimeConfiguration.TMP_PATH])
         synt = Synthesizer(rconf=self.rconf, logger=self.logger)
         anchors, total_time, synthesized_chars = synt.synthesize(
             self.text_file,
@@ -249,32 +245,32 @@ class SD(Loggable):
             quit_after=synt_duration,
             backwards=tail
         )
-        self.log(u"Synthesizing query... done")
+        self.log("Synthesizing query... done")
 
-        self.log(u"Extracting MFCCs for query...")
+        self.log("Extracting MFCCs for query...")
         query_mfcc = AudioFileMFCC(tmp_file_path, rconf=self.rconf, logger=self.logger)
-        self.log(u"Extracting MFCCs for query... done")
+        self.log("Extracting MFCCs for query... done")
 
-        self.log(u"Cleaning up...")
+        self.log("Cleaning up...")
         gf.delete_file(tmp_handler, tmp_file_path)
-        self.log(u"Cleaning up... done")
+        self.log("Cleaning up... done")
 
         search_window = max_length * self.AUDIO_FACTOR
         search_window_end = min(int(search_window / mws), self.real_wave_mfcc.all_length)
-        self.log([u"Query MFCC length (frames): %d", query_mfcc.all_length])
-        self.log([u"Real MFCC length (frames):  %d", self.real_wave_mfcc.all_length])
-        self.log([u"Search window end (s):      %.3f", search_window])
-        self.log([u"Search window end (frames): %d", search_window_end])
+        self.log(["Query MFCC length (frames): %d", query_mfcc.all_length])
+        self.log(["Real MFCC length (frames):  %d", self.real_wave_mfcc.all_length])
+        self.log(["Search window end (s):      %.3f", search_window])
+        self.log(["Search window end (frames): %d", search_window_end])
 
         if tail:
-            self.log(u"Tail => reversing real_wave_mfcc and query_mfcc")
+            self.log("Tail => reversing real_wave_mfcc and query_mfcc")
             self.real_wave_mfcc.reverse()
             query_mfcc.reverse()
 
         # NOTE: VAD will be run here, if not done before
         speech_intervals = self.real_wave_mfcc.intervals(speech=True, time=False)
         if len(speech_intervals) < 1:
-            self.log(u"No speech intervals, hence no start found")
+            self.log("No speech intervals, hence no start found")
             if tail:
                 self.real_wave_mfcc.reverse()
             return TimeValue("0.000")
@@ -296,7 +292,7 @@ class SD(Loggable):
         # against a portion of the real wave
         candidates = []
         for candidate_begin in candidates_begin:
-            self.log([u"Candidate interval starting at %d == %.3f", candidate_begin, candidate_begin * mws])
+            self.log(["Candidate interval starting at %d == %.3f", candidate_begin, candidate_begin * mws])
             try:
                 rwm = AudioFileMFCC(
                     mfcc_matrix=self.real_wave_mfcc.all_mfcc[:, candidate_begin:search_end],
@@ -313,25 +309,25 @@ class SD(Loggable):
                 last_column = acm[:, -1]
                 min_value = numpy.min(last_column)
                 min_index = numpy.argmin(last_column)
-                self.log([u"Candidate interval: %d %d == %.3f %.3f", candidate_begin, search_end, candidate_begin * mws, search_end * mws])
-                self.log([u"  Min value: %.6f", min_value])
-                self.log([u"  Min index: %d == %.3f", min_index, min_index * mws])
+                self.log(["Candidate interval: %d %d == %.3f %.3f", candidate_begin, search_end, candidate_begin * mws, search_end * mws])
+                self.log(["  Min value: %.6f", min_value])
+                self.log(["  Min index: %d == %.3f", min_index, min_index * mws])
                 candidates.append((min_value, candidate_begin, min_index))
             except Exception as exc:
-                self.log_exc(u"An unexpected error occurred while running _detect", exc, False, None)
+                self.log_exc("An unexpected error occurred while running _detect", exc, False, None)
 
         # reverse again the real wave
         if tail:
-            self.log(u"Tail => reversing real_wave_mfcc again")
+            self.log("Tail => reversing real_wave_mfcc again")
             self.real_wave_mfcc.reverse()
 
         # return
         if len(candidates) < 1:
-            self.log(u"No candidates found")
+            self.log("No candidates found")
             return TimeValue("0.000")
-        self.log(u"Candidates:")
+        self.log("Candidates:")
         for candidate in candidates:
-            self.log([u"  Value: %.6f Begin Time: %.3f Min Index: %d", candidate[0], candidate[1] * mws, candidate[2]])
+            self.log(["  Value: %.6f Begin Time: %.3f Min Index: %d", candidate[0], candidate[1] * mws, candidate[2]])
         best = sorted(candidates)[0][1]
-        self.log([u"Best candidate: %d == %.3f", best, best * mws])
+        self.log(["Best candidate: %d == %.3f", best, best * mws])
         return best * mws

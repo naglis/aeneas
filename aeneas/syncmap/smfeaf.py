@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# coding=utf-8
 
 # aeneas is a Python/C library and a set of tools
 # to automagically synchronize audio and text (aka forced alignment)
@@ -21,8 +20,6 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from __future__ import absolute_import
-from __future__ import print_function
 
 from aeneas.syncmap.smfgxml import SyncMapFormatGenericXML
 import aeneas.globalconstants as gc
@@ -34,7 +31,7 @@ class SyncMapFormatEAF(SyncMapFormatGenericXML):
     Handler for ELAN I/O format (EAF).
     """
 
-    TAG = u"SyncMapFormatEAF"
+    TAG = "SyncMapFormatEAF"
 
     DEFAULT = "eaf"
 
@@ -105,7 +102,7 @@ class SyncMapFormatEAF(SyncMapFormatGenericXML):
             alignable.attrib["TIME_SLOT_REF1"] = begin_id
             alignable.attrib["TIME_SLOT_REF2"] = end_id
             value = etree.SubElement(alignable, "ANNOTATION_VALUE")
-            value.text = u" ".join(fragment.text_fragment.lines)
+            value.text = " ".join(fragment.text_fragment.lines)
         # linguistic type
         ling = etree.SubElement(doc, "LINGUISTIC_TYPE")
         ling.attrib["LINGUISTIC_TYPE_ID"] = "utterance"

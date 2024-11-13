@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# coding=utf-8
 
 # aeneas is a Python/C library and a set of tools
 # to automagically synchronize audio and text (aka forced alignment)
@@ -27,8 +26,6 @@ Compile the Python C Extension for synthesizing text with Festival.
 .. versionadded:: 1.6.0
 """
 
-from __future__ import absolute_import
-from __future__ import print_function
 from setuptools import Extension
 from setuptools import setup
 import sys

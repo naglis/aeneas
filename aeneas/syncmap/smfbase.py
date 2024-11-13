@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# coding=utf-8
 
 # aeneas is a Python/C library and a set of tools
 # to automagically synchronize audio and text (aka forced alignment)
@@ -21,8 +20,6 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from __future__ import absolute_import
-from __future__ import print_function
 
 from aeneas.logger import Loggable
 from aeneas.syncmap.fragment import SyncMapFragment
@@ -34,7 +31,7 @@ class SyncMapFormatBase(Loggable):
     Base class for I/O handlers.
     """
 
-    TAG = u"SyncMapFormatBase"
+    TAG = "SyncMapFormatBase"
 
     def __init__(self, variant=None, parameters=None, rconf=None, logger=None):
         """
@@ -45,7 +42,7 @@ class SyncMapFormatBase(Loggable):
         :param parameters: additional parameters to read or write
         :type paramenters: ``None`` or ``dict``
         """
-        super(SyncMapFormatBase, self).__init__(rconf=rconf, logger=logger)
+        super().__init__(rconf=rconf, logger=logger)
         self.variant = variant
         self.parameters = parameters
 
@@ -89,7 +86,7 @@ class SyncMapFormatBase(Loggable):
         :param syncmap: the syncmap to append to
         :type syncmap: :class:`~aeneas.syncmap.SyncMap`
         """
-        self.log_exc(u"%s is abstract and cannot be called directly" % (self.TAG), None, True, NotImplementedError)
+        self.log_exc("%s is abstract and cannot be called directly" % (self.TAG), None, True, NotImplementedError)
 
     def format(self, syncmap):
         """
@@ -99,4 +96,4 @@ class SyncMapFormatBase(Loggable):
         :type syncmap: :class:`~aeneas.syncmap.SyncMap`
         :rtype: string
         """
-        self.log_exc(u"%s is abstract and cannot be called directly" % (self.TAG), None, True, NotImplementedError)
+        self.log_exc("%s is abstract and cannot be called directly" % (self.TAG), None, True, NotImplementedError)

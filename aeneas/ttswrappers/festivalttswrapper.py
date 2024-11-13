@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# coding=utf-8
 
 # aeneas is a Python/C library and a set of tools
 # to automagically synchronize audio and text (aka forced alignment)
@@ -32,8 +31,6 @@ http://www.cstr.ed.ac.uk/projects/festival/
 for further details.
 """
 
-from __future__ import absolute_import
-from __future__ import print_function
 
 from aeneas.exacttiming import TimeValue
 from aeneas.language import Language
@@ -120,31 +117,31 @@ class FESTIVALTTSWrapper(BaseTTSWrapper):
     DEFAULT_LANGUAGE = ENG_USA
 
     CODE_TO_HUMAN = {
-        CES: u"Czech",
-        CYM: u"Welsh",
-        ENG: u"English",
-        FIN: u"Finnish",
-        ITA: u"Italian",
-        RUS: u"Russian",
-        SPA: u"Spanish",
-        ENG_GBR: u"English (GB)",
-        ENG_SCT: u"English (Scotland)",
-        ENG_USA: u"English (USA)",
+        CES: "Czech",
+        CYM: "Welsh",
+        ENG: "English",
+        FIN: "Finnish",
+        ITA: "Italian",
+        RUS: "Russian",
+        SPA: "Spanish",
+        ENG_GBR: "English (GB)",
+        ENG_SCT: "English (Scotland)",
+        ENG_USA: "English (USA)",
     }
 
-    CODE_TO_HUMAN_LIST = sorted([u"%s\t%s" % (k, v) for k, v in CODE_TO_HUMAN.items()])
+    CODE_TO_HUMAN_LIST = sorted(["{}\t{}".format(k, v) for k, v in CODE_TO_HUMAN.items()])
 
     VOICE_CODE_TO_SUBPROCESS = {
-        CES: u"(language_czech)",
-        CYM: u"(language_welsh)",
-        ENG: u"(language_english)",
-        ENG_GBR: u"(language_british_english)",
-        ENG_SCT: u"(language_scots_gaelic)",
-        ENG_USA: u"(language_american_english)",
-        SPA: u"(language_castillian_spanish)",
-        FIN: u"(language_finnish)",
-        ITA: u"(language_italian)",
-        RUS: u"(language_russian)",
+        CES: "(language_czech)",
+        CYM: "(language_welsh)",
+        ENG: "(language_english)",
+        ENG_GBR: "(language_british_english)",
+        ENG_SCT: "(language_scots_gaelic)",
+        ENG_USA: "(language_american_english)",
+        SPA: "(language_castillian_spanish)",
+        FIN: "(language_finnish)",
+        ITA: "(language_italian)",
+        RUS: "(language_russian)",
     }
 
     DEFAULT_TTS_PATH = "text2wave"
@@ -157,20 +154,20 @@ class FESTIVALTTSWrapper(BaseTTSWrapper):
 
     C_EXTENSION_NAME = "cfw"
 
-    TAG = u"FESTIVALTTSWrapper"
+    TAG = "FESTIVALTTSWrapper"
 
     def __init__(self, rconf=None, logger=None):
-        super(FESTIVALTTSWrapper, self).__init__(rconf=rconf, logger=logger)
+        super().__init__(rconf=rconf, logger=logger)
         self.set_subprocess_arguments([
             self.tts_path,
             self.CLI_PARAMETER_VOICE_CODE_FUNCTION,
-            u"-o",
+            "-o",
             self.CLI_PARAMETER_WAVE_PATH,
             self.CLI_PARAMETER_TEXT_STDIN
         ])
 
     def _voice_code_to_subprocess(self, voice_code):
-        return [u"-eval", self.VOICE_CODE_TO_SUBPROCESS[voice_code]]
+        return ["-eval", self.VOICE_CODE_TO_SUBPROCESS[voice_code]]
 
     def _synthesize_multiple_c_extension(self, text_file, output_file_path, quit_after=None, backwards=False):
         """
@@ -180,7 +177,7 @@ class FESTIVALTTSWrapper(BaseTTSWrapper):
 
         :rtype: (bool, (list, :class:`~aeneas.exacttiming.TimeValue`, int))
         """
-        self.log(u"Synthesizing using C extension...")
+        self.log("Synthesizing using C extension...")
 
         # convert parameters from Python values to C values
         try:
@@ -190,10 +187,10 @@ class FESTIVALTTSWrapper(BaseTTSWrapper):
         c_backwards = 0
         if backwards:
             c_backwards = 1
-        self.log([u"output_file_path: %s", output_file_path])
-        self.log([u"c_quit_after:     %.3f", c_quit_after])
-        self.log([u"c_backwards:      %d", c_backwards])
-        self.log(u"Preparing u_text...")
+        self.log(["output_file_path: %s", output_file_path])
+        self.log(["c_quit_after:     %.3f", c_quit_after])
+        self.log(["c_backwards:      %d", c_backwards])
+        self.log("Preparing u_text...")
         u_text = []
         fragments = text_file.fragments
         for fragment in fragments:
@@ -203,38 +200,38 @@ class FESTIVALTTSWrapper(BaseTTSWrapper):
                 f_lang = self.DEFAULT_LANGUAGE
             f_voice_code = self.VOICE_CODE_TO_SUBPROCESS[self._language_to_voice_code(f_lang)]
             if f_text is None:
-                f_text = u""
+                f_text = ""
             u_text.append((f_voice_code, f_text))
-        self.log(u"Preparing u_text... done")
+        self.log("Preparing u_text... done")
 
         # call C extension
         sr = None
         sf = None
         intervals = None
 
-        self.log(u"Preparing c_text...")
+        self.log("Preparing c_text...")
         c_text = [(gf.safe_unicode(t[0]), gf.safe_unicode(t[1])) for t in u_text]
-        self.log(u"Preparing c_text... done")
+        self.log("Preparing c_text... done")
 
-        self.log(u"Calling aeneas.cfw directly")
+        self.log("Calling aeneas.cfw directly")
         try:
-            self.log(u"Importing aeneas.cfw...")
+            self.log("Importing aeneas.cfw...")
             import aeneas.cfw.cfw
-            self.log(u"Importing aeneas.cfw... done")
-            self.log(u"Calling aeneas.cfw...")
+            self.log("Importing aeneas.cfw... done")
+            self.log("Calling aeneas.cfw...")
             sr, sf, intervals = aeneas.cfw.cfw.synthesize_multiple(
                 output_file_path,
                 c_quit_after,
                 c_backwards,
                 c_text
             )
-            self.log(u"Calling aeneas.cfw... done")
+            self.log("Calling aeneas.cfw... done")
         except Exception as exc:
-            self.log_exc(u"An unexpected error occurred while running cfw", exc, False, None)
+            self.log_exc("An unexpected error occurred while running cfw", exc, False, None)
             return (False, None)
 
-        self.log([u"sr: %d", sr])
-        self.log([u"sf: %d", sf])
+        self.log(["sr: %d", sr])
+        self.log(["sf: %d", sf])
 
         # create output
         anchors = []
@@ -258,8 +255,8 @@ class FESTIVALTTSWrapper(BaseTTSWrapper):
 
         # return output
         # NOTE anchors do not make sense if backwards == True
-        self.log([u"Returning %d time anchors", len(anchors)])
-        self.log([u"Current time %.3f", current_time])
-        self.log([u"Synthesized %d characters", num_chars])
-        self.log(u"Synthesizing using C extension... done")
+        self.log(["Returning %d time anchors", len(anchors)])
+        self.log(["Current time %.3f", current_time])
+        self.log(["Synthesized %d characters", num_chars])
+        self.log("Synthesizing using C extension... done")
         return (True, (anchors, current_time, num_chars))

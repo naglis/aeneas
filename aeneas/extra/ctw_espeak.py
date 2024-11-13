@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# coding=utf-8
 
 # aeneas is a Python/C library and a set of tools
 # to automagically synchronize audio and text (aka forced alignment)
@@ -25,8 +24,6 @@
 A wrapper for a custom TTS engine.
 """
 
-from __future__ import absolute_import
-from __future__ import print_function
 
 from aeneas.language import Language
 from aeneas.ttswrappers.basettswrapper import BaseTTSWrapper
@@ -98,7 +95,7 @@ class CustomTTSWrapper(BaseTTSWrapper):
     #
     HAS_SUBPROCESS_CALL = True
 
-    TAG = u"CustomTTSWrapperESPEAK"
+    TAG = "CustomTTSWrapperESPEAK"
 
     def __init__(self, rconf=None, logger=None):
         #
@@ -106,7 +103,7 @@ class CustomTTSWrapper(BaseTTSWrapper):
         #      in a class named CustomTTSWrapper
         #      otherwise the Synthesizer will not work
         #
-        super(CustomTTSWrapper, self).__init__(rconf=rconf, logger=logger)
+        super().__init__(rconf=rconf, logger=logger)
         #
         # NOTE this example is minimal, as we implement only
         #      the subprocess call method
@@ -132,10 +129,10 @@ class CustomTTSWrapper(BaseTTSWrapper):
         #      introduced by the "-v" switch.
         #
         self.set_subprocess_arguments([
-            u"/usr/bin/espeak",                     # path of espeak executable or just "espeak" if it is in your PATH
-            u"-v",                                  # append "-v"
+            "/usr/bin/espeak",                     # path of espeak executable or just "espeak" if it is in your PATH
+            "-v",                                  # append "-v"
             self.CLI_PARAMETER_VOICE_CODE_STRING,   # it will be replaced by the actual voice code
-            u"-w",                                  # append "-w"
+            "-w",                                  # append "-w"
             self.CLI_PARAMETER_WAVE_PATH,           # it will be replaced by the actual output file path
             self.CLI_PARAMETER_TEXT_STDIN           # text is read from stdin
         ])

@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# coding=utf-8
 
 # aeneas is a Python/C library and a set of tools
 # to automagically synchronize audio and text (aka forced alignment)
@@ -21,8 +20,6 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from __future__ import absolute_import
-from __future__ import print_function
 
 from aeneas.syncmap.smfgsubtitles import SyncMapFormatGenericSubtitles
 import aeneas.globalfunctions as gf
@@ -33,7 +30,7 @@ class SyncMapFormatSUB(SyncMapFormatGenericSubtitles):
     Handler for SubViewer (SUB) I/O format.
     """
 
-    TAG = u"SyncMapFormatSUB"
+    TAG = "SyncMapFormatSUB"
 
     SUB = "sub"
 
@@ -42,16 +39,16 @@ class SyncMapFormatSUB(SyncMapFormatGenericSubtitles):
     DEFAULT = SUB
 
     def __init__(self, variant=DEFAULT, parameters=None, rconf=None, logger=None):
-        super(SyncMapFormatSUB, self).__init__(variant=variant, parameters=parameters, rconf=rconf, logger=logger)
-        self.header_string = u"[SUBTITLE]"
+        super().__init__(variant=variant, parameters=parameters, rconf=rconf, logger=logger)
+        self.header_string = "[SUBTITLE]"
         self.header_might_not_have_trailing_blank_line = True
-        self.footer_string = u"[END SUBTITLE]"
+        self.footer_string = "[END SUBTITLE]"
         self.cue_has_identifier = False
         self.cue_has_optional_identifier = False
-        self.time_values_separator = u","
+        self.time_values_separator = ","
         if self.variant == self.DEFAULT:
-            self.line_break_symbol = u"[br]"
+            self.line_break_symbol = "[br]"
         else:
-            self.line_break_symbol = u"\n"
+            self.line_break_symbol = "\n"
         self.parse_time_function = gf.time_from_hhmmssmmm
         self.format_time_function = gf.time_to_hhmmssmmm

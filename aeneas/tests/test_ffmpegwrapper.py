@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# coding=utf-8
 
 # aeneas is a Python/C library and a set of tools
 # to automagically synchronize audio and text (aka forced alignment)
@@ -115,7 +114,7 @@ class TestFFMPEGWrapper(unittest.TestCase):
             self.convert(self.FILES[0]["path"], self.CANNOT_BE_WRITTEN_PATH)
 
     def test_convert_rc(self):
-        rc = RuntimeConfiguration(u"ffmpeg_sample_rate=44100")
+        rc = RuntimeConfiguration("ffmpeg_sample_rate=44100")
         for f in self.FILES:
             self.convert(f["path"], runtime_configuration=rc)
 

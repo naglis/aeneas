@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# coding=utf-8
 
 # aeneas is a Python/C library and a set of tools
 # to automagically synchronize audio and text (aka forced alignment)
@@ -40,9 +39,6 @@ for further details.
 .. versionadded:: 1.5.0
 """
 
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
 import numpy
 import time
 import uuid
@@ -228,56 +224,56 @@ class NuanceTTSWrapper(BaseTTSWrapper):
     """ Spanish (Mexico) """
 
     CODE_TO_HUMAN = {
-        ARA: u"Arabic",
-        CAT: u"Catalan",
-        CES: u"Czech",
-        CMN: u"Mandarin Chinese",
-        DAN: u"Danish",
-        DEU: u"German",
-        ELL: u"Greek (Modern)",
-        ENG: u"English",
-        EUS: u"Basque",
-        FIN: u"Finnish",
-        FRA: u"French",
-        GLG: u"Galician",
-        HEB: u"Hebrew",
-        HIN: u"Hindi",
-        HUN: u"Hungarian",
-        IND: u"Indonesian",
-        ITA: u"Italian",
-        JPN: u"Japanese",
-        KOR: u"Korean",
-        NLD: u"Dutch",
-        NOR: u"Norwegian",
-        POL: u"Polish",
-        POR: u"Portuguese",
-        RON: u"Romanian",
-        RUS: u"Russian",
-        SLK: u"Slovak",
-        SPA: u"Spanish",
-        SWE: u"Swedish",
-        THA: u"Thai",
-        TUR: u"Turkish",
-        YUE: u"Yue Chinese",
-        CMN_CHN: u"Mandarin Chinese (China)",
-        CMN_TWN: u"Mandarin Chinese (Taiwan)",
-        ENG_AUS: u"English (Australia)",
-        ENG_GBR: u"English (GB)",
-        ENG_IND: u"English (India)",
-        ENG_IRL: u"English (Ireland)",
-        ENG_SCT: u"English (Scotland)",
-        ENG_USA: u"English (USA)",
-        ENG_ZAF: u"English (South Africa)",
-        FRA_CAN: u"French (Canada)",
-        NLD_BEL: u"Dutch (Belgium)",
-        POR_BRA: u"Portuguese (Brazil)",
-        POR_PRT: u"Portuguese (Portugal)",
-        SPA_COL: u"Spanish (Colombia)",
-        SPA_ESP: u"Spanish (Spain)",
-        SPA_MEX: u"Spanish (Mexico)",
+        ARA: "Arabic",
+        CAT: "Catalan",
+        CES: "Czech",
+        CMN: "Mandarin Chinese",
+        DAN: "Danish",
+        DEU: "German",
+        ELL: "Greek (Modern)",
+        ENG: "English",
+        EUS: "Basque",
+        FIN: "Finnish",
+        FRA: "French",
+        GLG: "Galician",
+        HEB: "Hebrew",
+        HIN: "Hindi",
+        HUN: "Hungarian",
+        IND: "Indonesian",
+        ITA: "Italian",
+        JPN: "Japanese",
+        KOR: "Korean",
+        NLD: "Dutch",
+        NOR: "Norwegian",
+        POL: "Polish",
+        POR: "Portuguese",
+        RON: "Romanian",
+        RUS: "Russian",
+        SLK: "Slovak",
+        SPA: "Spanish",
+        SWE: "Swedish",
+        THA: "Thai",
+        TUR: "Turkish",
+        YUE: "Yue Chinese",
+        CMN_CHN: "Mandarin Chinese (China)",
+        CMN_TWN: "Mandarin Chinese (Taiwan)",
+        ENG_AUS: "English (Australia)",
+        ENG_GBR: "English (GB)",
+        ENG_IND: "English (India)",
+        ENG_IRL: "English (Ireland)",
+        ENG_SCT: "English (Scotland)",
+        ENG_USA: "English (USA)",
+        ENG_ZAF: "English (South Africa)",
+        FRA_CAN: "French (Canada)",
+        NLD_BEL: "Dutch (Belgium)",
+        POR_BRA: "Portuguese (Brazil)",
+        POR_PRT: "Portuguese (Portugal)",
+        SPA_COL: "Spanish (Colombia)",
+        SPA_ESP: "Spanish (Spain)",
+        SPA_MEX: "Spanish (Mexico)",
     }
 
-    CODE_TO_HUMAN_LIST = sorted([u"%s\t%s" % (k, v) for k, v in CODE_TO_HUMAN.items()])
+    CODE_TO_HUMAN_LIST = sorted(["{}\t{}".format(k, v) for k, v in CODE_TO_HUMAN.items()])
 
     LANGUAGE_TO_VOICE_CODE = {
         ARA: "Laila",           # F, M: Maged, Tarik
@@ -344,24 +340,24 @@ class NuanceTTSWrapper(BaseTTSWrapper):
     URL = "https://tts.nuancemobility.net"
     """ Nuance TTS API URL """
 
-    TAG = u"NuanceTTSWrapper"
+    TAG = "NuanceTTSWrapper"
 
     def __init__(self, rconf=None, logger=None):
-        super(NuanceTTSWrapper, self).__init__(rconf=rconf, logger=logger)
+        super().__init__(rconf=rconf, logger=logger)
 
     def _synthesize_single_python_helper(self, text, voice_code, output_file_path=None, return_audio_data=True):
-        self.log(u"Importing requests...")
+        self.log("Importing requests...")
         import requests
-        self.log(u"Importing requests... done")
+        self.log("Importing requests... done")
 
         # prepare request header and contents
         request_id = str(uuid.uuid4()).replace("-", "")[0:16]
         headers = {
-            u"Content-Type": u"text/plain; charset=utf-8",
-            u"Accept": u"audio/x-wav;codec=pcm;bit=16;rate=%d" % self.SAMPLE_RATE
+            "Content-Type": "text/plain; charset=utf-8",
+            "Accept": "audio/x-wav;codec=pcm;bit=16;rate=%d" % self.SAMPLE_RATE
         }
         text_to_synth = text.encode("utf-8")
-        url = "%s/%s?appId=%s&appKey=%s&id=%s&voice=%s" % (
+        url = "{}/{}?appId={}&appKey={}&id={}&voice={}".format(
             self.URL,
             self.END_POINT,
             self.rconf[RuntimeConfiguration.NUANCE_TTS_API_ID],
@@ -373,35 +369,35 @@ class NuanceTTSWrapper(BaseTTSWrapper):
         # post request
         sleep_delay = self.rconf[RuntimeConfiguration.TTS_API_SLEEP]
         attempts = self.rconf[RuntimeConfiguration.TTS_API_RETRY_ATTEMPTS]
-        self.log([u"Sleep delay:    %.3f", sleep_delay])
-        self.log([u"Retry attempts: %d", attempts])
+        self.log(["Sleep delay:    %.3f", sleep_delay])
+        self.log(["Retry attempts: %d", attempts])
         while attempts > 0:
-            self.log(u"Sleeping to throttle API usage...")
+            self.log("Sleeping to throttle API usage...")
             time.sleep(sleep_delay)
-            self.log(u"Sleeping to throttle API usage... done")
-            self.log(u"Posting...")
+            self.log("Sleeping to throttle API usage... done")
+            self.log("Posting...")
             try:
                 response = requests.post(url, data=text_to_synth, headers=headers)
             except Exception as exc:
-                self.log_exc(u"Unexpected exception on HTTP POST. Are you offline?", exc, True, ValueError)
-            self.log(u"Posting... done")
+                self.log_exc("Unexpected exception on HTTP POST. Are you offline?", exc, True, ValueError)
+            self.log("Posting... done")
             status_code = response.status_code
-            self.log([u"Status code: %d", status_code])
+            self.log(["Status code: %d", status_code])
             if status_code == 200:
-                self.log(u"Got status code 200, break")
+                self.log("Got status code 200, break")
                 break
             else:
-                self.log_warn(u"Got status code other than 200, retry")
+                self.log_warn("Got status code other than 200, retry")
                 attempts -= 1
 
         if attempts <= 0:
-            self.log_exc(u"All API requests returned status code != 200", None, True, ValueError)
+            self.log_exc("All API requests returned status code != 200", None, True, ValueError)
 
         # save to file if requested
         if output_file_path is None:
-            self.log(u"output_file_path is None => not saving to file")
+            self.log("output_file_path is None => not saving to file")
         else:
-            self.log(u"output_file_path is not None => saving to file...")
+            self.log("output_file_path is not None => saving to file...")
             import wave
             output_file = wave.open(output_file_path, "wb")
             output_file.setframerate(self.SAMPLE_RATE)  # sample rate
@@ -409,15 +405,15 @@ class NuanceTTSWrapper(BaseTTSWrapper):
             output_file.setsampwidth(2)                 # 16 bit/sample, i.e. 2 bytes/sample
             output_file.writeframes(response.content)
             output_file.close()
-            self.log(u"output_file_path is not None => saving to file... done")
+            self.log("output_file_path is not None => saving to file... done")
 
         # get length and data
         audio_sample_rate = self.SAMPLE_RATE
         number_of_frames = len(response.content) / 2
         audio_length = TimeValue(number_of_frames / audio_sample_rate)
-        self.log([u"Response (bytes): %d", len(response.content)])
-        self.log([u"Number of frames: %d", number_of_frames])
-        self.log([u"Audio length (s): %.3f", audio_length])
+        self.log(["Response (bytes): %d", len(response.content)])
+        self.log(["Number of frames: %d", number_of_frames])
+        self.log(["Audio length (s): %.3f", audio_length])
         audio_format = "pcm16"
         audio_samples = numpy.fromstring(response.content, dtype=numpy.int16).astype("float64") / 32768
 

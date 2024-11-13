@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# coding=utf-8
 
 # aeneas is a Python/C library and a set of tools
 # to automagically synchronize audio and text (aka forced alignment)
@@ -21,8 +20,6 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from __future__ import absolute_import
-from __future__ import print_function
 
 from aeneas.exacttiming import TimeValue
 from aeneas.syncmap.smfbase import SyncMapFormatBase
@@ -34,7 +31,7 @@ class SyncMapFormatTextGrid(SyncMapFormatBase):
     Handler for TextGrid I/O format.
     """
 
-    TAG = u"SyncMapFormatTextGrid"
+    TAG = "SyncMapFormatTextGrid"
 
     DEFAULT = "textgrid"
 
@@ -46,7 +43,7 @@ class SyncMapFormatTextGrid(SyncMapFormatBase):
         try:
             import tgt
         except ImportError as exc:
-            self.log_exc(u"Python module tgt is not installed", exc, True, ImportError)
+            self.log_exc("Python module tgt is not installed", exc, True, ImportError)
 
         # from https://github.com/hbuschme/TextGridTools/blob/master/tgt/io.py
         # get all non-empty lines
@@ -69,7 +66,7 @@ class SyncMapFormatTextGrid(SyncMapFormatBase):
         for i, interval in enumerate(textgrid.tiers[0].intervals, 1):
             self._add_fragment(
                 syncmap=syncmap,
-                identifier=u"f%06d" % i,
+                identifier="f%06d" % i,
                 lines=[interval.text],
                 begin=TimeValue(interval.start_time.real),
                 end=TimeValue(interval.end_time.real)
@@ -79,7 +76,7 @@ class SyncMapFormatTextGrid(SyncMapFormatBase):
         try:
             import tgt
         except ImportError as exc:
-            self.log_exc(u"Python module tgt is not installed", exc, True, ImportError)
+            self.log_exc("Python module tgt is not installed", exc, True, ImportError)
         # from https://github.com/hbuschme/TextGridTools/blob/master/tgt/io.py
         textgrid = tgt.TextGrid()
         tier = tgt.IntervalTier(name="Token")
@@ -87,8 +84,8 @@ class SyncMapFormatTextGrid(SyncMapFormatBase):
             begin = float(fragment.begin)
             end = float(fragment.end)
             text = fragment.text_fragment.text
-            if text == u"":
-                text = u"SIL"
+            if text == "":
+                text = "SIL"
             interval = tgt.Interval(begin, end, text=text)
             tier.add_interval(interval)
         textgrid.add_tier(tier)

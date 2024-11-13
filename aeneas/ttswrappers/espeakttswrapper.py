@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# coding=utf-8
 
 # aeneas is a Python/C library and a set of tools
 # to automagically synchronize audio and text (aka forced alignment)
@@ -32,8 +31,6 @@ http://espeak.sourceforge.net/
 for further details.
 """
 
-from __future__ import absolute_import
-from __future__ import print_function
 
 from aeneas.exacttiming import TimeValue
 from aeneas.language import Language
@@ -498,143 +495,143 @@ class ESPEAKTTSWrapper(BaseTTSWrapper):
     """ Yue Chinese (not tested) """
 
     CODE_TO_HUMAN = {
-        AFR: u"Afrikaans",
-        ARG: u"Aragonese (not tested)",
-        BOS: u"Bosnian (not tested)",
-        BUL: u"Bulgarian",
-        CAT: u"Catalan",
-        CES: u"Czech",
-        CMN: u"Mandarin Chinese (not tested)",
-        CYM: u"Welsh",
-        DAN: u"Danish",
-        DEU: u"German",
-        ELL: u"Greek (Modern)",
-        ENG: u"English",
-        EPO: u"Esperanto (not tested)",
-        EST: u"Estonian",
-        FAS: u"Persian",
-        FIN: u"Finnish",
-        FRA: u"French",
-        GLE: u"Irish",
-        GRC: u"Greek (Ancient)",
-        HIN: u"Hindi (not tested)",
-        HRV: u"Croatian",
-        HUN: u"Hungarian",
-        HYE: u"Armenian (not tested)",
-        IND: u"Indonesian (not tested)",
-        ISL: u"Icelandic",
-        ITA: u"Italian",
-        JBO: u"Lojban (not tested)",
-        KAN: u"Kannada (not tested)",
-        KAT: u"Georgian (not tested)",
-        KUR: u"Kurdish (not tested)",
-        LAT: u"Latin",
-        LAV: u"Latvian",
-        LFN: u"Lingua Franca Nova (not tested)",
-        LIT: u"Lithuanian",
-        MAL: u"Malayalam (not tested)",
-        MKD: u"Macedonian (not tested)",
-        MSA: u"Malay (not tested)",
-        NEP: u"Nepali (not tested)",
-        NLD: u"Dutch",
-        NOR: u"Norwegian",
-        PAN: u"Panjabi (not tested)",
-        POL: u"Polish",
-        POR: u"Portuguese",
-        RON: u"Romanian",
-        RUS: u"Russian",
-        SLK: u"Slovak",
-        SPA: u"Spanish",
-        SQI: u"Albanian (not tested)",
-        SRP: u"Serbian",
-        SWA: u"Swahili",
-        SWE: u"Swedish",
-        TAM: u"Tamil (not tested)",
-        TUR: u"Turkish",
-        UKR: u"Ukrainian",
-        VIE: u"Vietnamese (not tested)",
-        YUE: u"Yue Chinese (not tested)",
-        ZHO: u"Chinese (not tested)",
-        ENG_GBR: u"English (GB)",
-        ENG_SCT: u"English (Scotland) (not tested)",
-        ENG_USA: u"English (USA)",
-        SPA_ESP: u"Spanish (Castillan)",
-        FRA_BEL: u"French (Belgium) (not tested)",
-        FRA_FRA: u"French (France)",
-        POR_BRA: u"Portuguese (Brazil) (not tested)",
-        POR_PRT: u"Portuguese (Portugal)",
-        AF: u"Afrikaans",
-        AN: u"Aragonese (not tested)",
-        BG: u"Bulgarian",
-        BS: u"Bosnian (not tested)",
-        CA: u"Catalan",
-        CS: u"Czech",
-        CY: u"Welsh",
-        DA: u"Danish",
-        DE: u"German",
-        EL: u"Greek (Modern)",
-        EN: u"English",
-        EN_GB: u"English (GB)",
-        EN_SC: u"English (Scotland) (not tested)",
-        EN_UK_NORTH: u"English (Northern) (not tested)",
-        EN_UK_RP: u"English (Received Pronunciation) (not tested)",
-        EN_UK_WMIDS: u"English (Midlands) (not tested)",
-        EN_US: u"English (USA)",
-        EN_WI: u"English (West Indies) (not tested)",
-        EO: u"Esperanto (not tested)",
-        ES: u"Spanish (Castillan)",
-        ES_LA: u"Spanish (Latin America) (not tested)",
-        ET: u"Estonian",
-        FA: u"Persian",
-        FA_PIN: u"Persian (Pinglish)",
-        FI: u"Finnish",
-        FR: u"French",
-        FR_BE: u"French (Belgium) (not tested)",
-        FR_FR: u"French (France)",
-        GA: u"Irish",
-        HI: u"Hindi (not tested)",
-        HR: u"Croatian",
-        HU: u"Hungarian",
-        HY: u"Armenian (not tested)",
-        HY_WEST: u"Armenian (West) (not tested)",
-        ID: u"Indonesian (not tested)",
-        IS: u"Icelandic",
-        IT: u"Italian",
-        KA: u"Georgian (not tested)",
-        KN: u"Kannada (not tested)",
-        KU: u"Kurdish (not tested)",
-        LA: u"Latin",
-        LT: u"Lithuanian",
-        LV: u"Latvian",
-        MK: u"Macedonian (not tested)",
-        ML: u"Malayalam (not tested)",
-        MS: u"Malay (not tested)",
-        NE: u"Nepali (not tested)",
-        NL: u"Dutch",
-        NO: u"Norwegian",
-        PA: u"Panjabi (not tested)",
-        PL: u"Polish",
-        PT: u"Portuguese",
-        PT_BR: u"Portuguese (Brazil) (not tested)",
-        PT_PT: u"Portuguese (Portugal)",
-        RO: u"Romanian",
-        RU: u"Russian",
-        SQ: u"Albanian (not tested)",
-        SK: u"Slovak",
-        SR: u"Serbian",
-        SV: u"Swedish",
-        SW: u"Swahili",
-        TA: u"Tamil (not tested)",
-        TR: u"Turkish",
-        UK: u"Ukrainian",
-        VI: u"Vietnamese (not tested)",
-        VI_HUE: u"Vietnamese (hue) (not tested)",
-        VI_SGN: u"Vietnamese (sgn) (not tested)",
-        ZH: u"Mandarin Chinese (not tested)",
-        ZH_YUE: u"Yue Chinese (not tested)",
+        AFR: "Afrikaans",
+        ARG: "Aragonese (not tested)",
+        BOS: "Bosnian (not tested)",
+        BUL: "Bulgarian",
+        CAT: "Catalan",
+        CES: "Czech",
+        CMN: "Mandarin Chinese (not tested)",
+        CYM: "Welsh",
+        DAN: "Danish",
+        DEU: "German",
+        ELL: "Greek (Modern)",
+        ENG: "English",
+        EPO: "Esperanto (not tested)",
+        EST: "Estonian",
+        FAS: "Persian",
+        FIN: "Finnish",
+        FRA: "French",
+        GLE: "Irish",
+        GRC: "Greek (Ancient)",
+        HIN: "Hindi (not tested)",
+        HRV: "Croatian",
+        HUN: "Hungarian",
+        HYE: "Armenian (not tested)",
+        IND: "Indonesian (not tested)",
+        ISL: "Icelandic",
+        ITA: "Italian",
+        JBO: "Lojban (not tested)",
+        KAN: "Kannada (not tested)",
+        KAT: "Georgian (not tested)",
+        KUR: "Kurdish (not tested)",
+        LAT: "Latin",
+        LAV: "Latvian",
+        LFN: "Lingua Franca Nova (not tested)",
+        LIT: "Lithuanian",
+        MAL: "Malayalam (not tested)",
+        MKD: "Macedonian (not tested)",
+        MSA: "Malay (not tested)",
+        NEP: "Nepali (not tested)",
+        NLD: "Dutch",
+        NOR: "Norwegian",
+        PAN: "Panjabi (not tested)",
+        POL: "Polish",
+        POR: "Portuguese",
+        RON: "Romanian",
+        RUS: "Russian",
+        SLK: "Slovak",
+        SPA: "Spanish",
+        SQI: "Albanian (not tested)",
+        SRP: "Serbian",
+        SWA: "Swahili",
+        SWE: "Swedish",
+        TAM: "Tamil (not tested)",
+        TUR: "Turkish",
+        UKR: "Ukrainian",
+        VIE: "Vietnamese (not tested)",
+        YUE: "Yue Chinese (not tested)",
+        ZHO: "Chinese (not tested)",
+        ENG_GBR: "English (GB)",
+        ENG_SCT: "English (Scotland) (not tested)",
+        ENG_USA: "English (USA)",
+        SPA_ESP: "Spanish (Castillan)",
+        FRA_BEL: "French (Belgium) (not tested)",
+        FRA_FRA: "French (France)",
+        POR_BRA: "Portuguese (Brazil) (not tested)",
+        POR_PRT: "Portuguese (Portugal)",
+        AF: "Afrikaans",
+        AN: "Aragonese (not tested)",
+        BG: "Bulgarian",
+        BS: "Bosnian (not tested)",
+        CA: "Catalan",
+        CS: "Czech",
+        CY: "Welsh",
+        DA: "Danish",
+        DE: "German",
+        EL: "Greek (Modern)",
+        EN: "English",
+        EN_GB: "English (GB)",
+        EN_SC: "English (Scotland) (not tested)",
+        EN_UK_NORTH: "English (Northern) (not tested)",
+        EN_UK_RP: "English (Received Pronunciation) (not tested)",
+        EN_UK_WMIDS: "English (Midlands) (not tested)",
+        EN_US: "English (USA)",
+        EN_WI: "English (West Indies) (not tested)",
+        EO: "Esperanto (not tested)",
+        ES: "Spanish (Castillan)",
+        ES_LA: "Spanish (Latin America) (not tested)",
+        ET: "Estonian",
+        FA: "Persian",
+        FA_PIN: "Persian (Pinglish)",
+        FI: "Finnish",
+        FR: "French",
+        FR_BE: "French (Belgium) (not tested)",
+        FR_FR: "French (France)",
+        GA: "Irish",
+        HI: "Hindi (not tested)",
+        HR: "Croatian",
+        HU: "Hungarian",
+        HY: "Armenian (not tested)",
+        HY_WEST: "Armenian (West) (not tested)",
+        ID: "Indonesian (not tested)",
+        IS: "Icelandic",
+        IT: "Italian",
+        KA: "Georgian (not tested)",
+        KN: "Kannada (not tested)",
+        KU: "Kurdish (not tested)",
+        LA: "Latin",
+        LT: "Lithuanian",
+        LV: "Latvian",
+        MK: "Macedonian (not tested)",
+        ML: "Malayalam (not tested)",
+        MS: "Malay (not tested)",
+        NE: "Nepali (not tested)",
+        NL: "Dutch",
+        NO: "Norwegian",
+        PA: "Panjabi (not tested)",
+        PL: "Polish",
+        PT: "Portuguese",
+        PT_BR: "Portuguese (Brazil) (not tested)",
+        PT_PT: "Portuguese (Portugal)",
+        RO: "Romanian",
+        RU: "Russian",
+        SQ: "Albanian (not tested)",
+        SK: "Slovak",
+        SR: "Serbian",
+        SV: "Swedish",
+        SW: "Swahili",
+        TA: "Tamil (not tested)",
+        TR: "Turkish",
+        UK: "Ukrainian",
+        VI: "Vietnamese (not tested)",
+        VI_HUE: "Vietnamese (hue) (not tested)",
+        VI_SGN: "Vietnamese (sgn) (not tested)",
+        ZH: "Mandarin Chinese (not tested)",
+        ZH_YUE: "Yue Chinese (not tested)",
     }
 
-    CODE_TO_HUMAN_LIST = sorted([u"%s\t%s" % (k, v) for k, v in CODE_TO_HUMAN.items()])
+    CODE_TO_HUMAN_LIST = sorted(["{}\t{}".format(k, v) for k, v in CODE_TO_HUMAN.items()])
 
     LANGUAGE_TO_VOICE_CODE = {
         AF: "af",
@@ -787,15 +784,15 @@ class ESPEAKTTSWrapper(BaseTTSWrapper):
 
     C_EXTENSION_NAME = "cew"
 
-    TAG = u"ESPEAKTTSWrapper"
+    TAG = "ESPEAKTTSWrapper"
 
     def __init__(self, rconf=None, logger=None):
-        super(ESPEAKTTSWrapper, self).__init__(rconf=rconf, logger=logger)
+        super().__init__(rconf=rconf, logger=logger)
         self.set_subprocess_arguments([
             self.tts_path,
-            u"-v",
+            "-v",
             self.CLI_PARAMETER_VOICE_CODE_STRING,
-            u"-w",
+            "-w",
             self.CLI_PARAMETER_WAVE_PATH,
             self.CLI_PARAMETER_TEXT_STDIN
         ])
@@ -808,7 +805,7 @@ class ESPEAKTTSWrapper(BaseTTSWrapper):
 
         :rtype: (bool, (list, :class:`~aeneas.exacttiming.TimeValue`, int))
         """
-        self.log(u"Synthesizing using C extension...")
+        self.log("Synthesizing using C extension...")
 
         # convert parameters from Python values to C values
         try:
@@ -818,10 +815,10 @@ class ESPEAKTTSWrapper(BaseTTSWrapper):
         c_backwards = 0
         if backwards:
             c_backwards = 1
-        self.log([u"output_file_path: %s", output_file_path])
-        self.log([u"c_quit_after:     %.3f", c_quit_after])
-        self.log([u"c_backwards:      %d", c_backwards])
-        self.log(u"Preparing u_text...")
+        self.log(["output_file_path: %s", output_file_path])
+        self.log(["c_quit_after:     %.3f", c_quit_after])
+        self.log(["c_backwards:      %d", c_backwards])
+        self.log("Preparing u_text...")
         u_text = []
         fragments = text_file.fragments
         for fragment in fragments:
@@ -831,53 +828,53 @@ class ESPEAKTTSWrapper(BaseTTSWrapper):
                 f_lang = self.DEFAULT_LANGUAGE
             f_voice_code = self._language_to_voice_code(f_lang)
             if f_text is None:
-                f_text = u""
+                f_text = ""
             u_text.append((f_voice_code, f_text))
-        self.log(u"Preparing u_text... done")
+        self.log("Preparing u_text... done")
 
         # call C extension
         sr = None
         sf = None
         intervals = None
         if self.rconf[RuntimeConfiguration.CEW_SUBPROCESS_ENABLED]:
-            self.log(u"Using cewsubprocess to call aeneas.cew")
+            self.log("Using cewsubprocess to call aeneas.cew")
             try:
-                self.log(u"Importing aeneas.cewsubprocess...")
+                self.log("Importing aeneas.cewsubprocess...")
                 from aeneas.cewsubprocess import CEWSubprocess
-                self.log(u"Importing aeneas.cewsubprocess... done")
-                self.log(u"Calling aeneas.cewsubprocess...")
+                self.log("Importing aeneas.cewsubprocess... done")
+                self.log("Calling aeneas.cewsubprocess...")
                 cewsub = CEWSubprocess(rconf=self.rconf, logger=self.logger)
                 sr, sf, intervals = cewsub.synthesize_multiple(output_file_path, c_quit_after, c_backwards, u_text)
-                self.log(u"Calling aeneas.cewsubprocess... done")
+                self.log("Calling aeneas.cewsubprocess... done")
             except Exception as exc:
-                self.log_exc(u"An unexpected error occurred while running cewsubprocess", exc, False, None)
+                self.log_exc("An unexpected error occurred while running cewsubprocess", exc, False, None)
                 # NOTE not critical, try calling aeneas.cew directly
                 # COMMENTED return (False, None)
 
         if sr is None:
-            self.log(u"Preparing c_text...")
+            self.log("Preparing c_text...")
             c_text = [(gf.safe_unicode(t[0]), gf.safe_unicode(t[1])) for t in u_text]
-            self.log(u"Preparing c_text... done")
+            self.log("Preparing c_text... done")
 
-            self.log(u"Calling aeneas.cew directly")
+            self.log("Calling aeneas.cew directly")
             try:
-                self.log(u"Importing aeneas.cew...")
+                self.log("Importing aeneas.cew...")
                 import aeneas.cew.cew
-                self.log(u"Importing aeneas.cew... done")
-                self.log(u"Calling aeneas.cew...")
+                self.log("Importing aeneas.cew... done")
+                self.log("Calling aeneas.cew...")
                 sr, sf, intervals = aeneas.cew.cew.synthesize_multiple(
                     output_file_path,
                     c_quit_after,
                     c_backwards,
                     c_text
                 )
-                self.log(u"Calling aeneas.cew... done")
+                self.log("Calling aeneas.cew... done")
             except Exception as exc:
-                self.log_exc(u"An unexpected error occurred while running cew", exc, False, None)
+                self.log_exc("An unexpected error occurred while running cew", exc, False, None)
                 return (False, None)
 
-        self.log([u"sr: %d", sr])
-        self.log([u"sf: %d", sf])
+        self.log(["sr: %d", sr])
+        self.log(["sf: %d", sf])
 
         # create output
         anchors = []
@@ -901,8 +898,8 @@ class ESPEAKTTSWrapper(BaseTTSWrapper):
 
         # return output
         # NOTE anchors do not make sense if backwards == True
-        self.log([u"Returning %d time anchors", len(anchors)])
-        self.log([u"Current time %.3f", current_time])
-        self.log([u"Synthesized %d characters", num_chars])
-        self.log(u"Synthesizing using C extension... done")
+        self.log(["Returning %d time anchors", len(anchors)])
+        self.log(["Current time %.3f", current_time])
+        self.log(["Synthesized %d characters", num_chars])
+        self.log("Synthesizing using C extension... done")
         return (True, (anchors, current_time, num_chars))

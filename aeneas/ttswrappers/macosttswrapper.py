@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# coding=utf-8
 
 # aeneas is a Python/C library and a set of tools
 # to automagically synchronize audio and text (aka forced alignment)
@@ -32,8 +31,6 @@ https://developer.apple.com/library/content/documentation/UserExperience/Concept
 for further details.
 """
 
-from __future__ import absolute_import
-from __future__ import print_function
 
 from aeneas.language import Language
 from aeneas.ttswrappers.basettswrapper import BaseTTSWrapper
@@ -154,37 +151,37 @@ class MacOSTTSWrapper(BaseTTSWrapper):
     """ English (GB) """
 
     CODE_TO_HUMAN = {
-        ARA: u"Arabic",
-        CES: u"Czech",
-        DAN: u"Danish",
-        DEU: u"German",
-        ELL: u"Greek (Modern)",
-        ENG: u"English",
-        FIN: u"Finnish",
-        FRA: u"French",
-        HEB: u"Hebrew",
-        HIN: u"Hindi",
-        HUN: u"Hungarian",
-        IND: u"Indonesian",
-        ITA: u"Italian",
-        JPN: u"Japanese",
-        KOR: u"Korean",
-        NLD: u"Dutch",
-        NOR: u"Norwegian",
-        POL: u"Polish",
-        POR: u"Portuguese",
-        RON: u"Romanian",
-        RUS: u"Russian",
-        SLK: u"Slovak",
-        SPA: u"Spanish",
-        SWE: u"Swedish",
-        THA: u"Thai",
-        TUR: u"Turkish",
-        ZHO: u"Chinese",
-        ENG_GBR: u"English (GB)",
+        ARA: "Arabic",
+        CES: "Czech",
+        DAN: "Danish",
+        DEU: "German",
+        ELL: "Greek (Modern)",
+        ENG: "English",
+        FIN: "Finnish",
+        FRA: "French",
+        HEB: "Hebrew",
+        HIN: "Hindi",
+        HUN: "Hungarian",
+        IND: "Indonesian",
+        ITA: "Italian",
+        JPN: "Japanese",
+        KOR: "Korean",
+        NLD: "Dutch",
+        NOR: "Norwegian",
+        POL: "Polish",
+        POR: "Portuguese",
+        RON: "Romanian",
+        RUS: "Russian",
+        SLK: "Slovak",
+        SPA: "Spanish",
+        SWE: "Swedish",
+        THA: "Thai",
+        TUR: "Turkish",
+        ZHO: "Chinese",
+        ENG_GBR: "English (GB)",
     }
 
-    CODE_TO_HUMAN_LIST = sorted([u"%s\t%s" % (k, v) for k, v in CODE_TO_HUMAN.items()])
+    CODE_TO_HUMAN_LIST = sorted(["{}\t{}".format(k, v) for k, v in CODE_TO_HUMAN.items()])
 
     LANGUAGE_TO_VOICE_CODE = {
         ARA: "Maged",
@@ -222,18 +219,18 @@ class MacOSTTSWrapper(BaseTTSWrapper):
 
     HAS_SUBPROCESS_CALL = True
 
-    TAG = u"MacOSTTSWrapper"
+    TAG = "MacOSTTSWrapper"
 
     def __init__(self, rconf=None, logger=None):
-        super(MacOSTTSWrapper, self).__init__(rconf=rconf, logger=logger)
+        super().__init__(rconf=rconf, logger=logger)
 
         self.set_subprocess_arguments([
-            u"say",                                 # path to say
-            u"-v",                                  # append "-v"
+            "say",                                 # path to say
+            "-v",                                  # append "-v"
             self.CLI_PARAMETER_VOICE_CODE_STRING,   # it will be replaced by the actual voice code
-            u"-o",                                  # append "-o"
+            "-o",                                  # append "-o"
             self.CLI_PARAMETER_WAVE_PATH,           # it will be replaced by the actual output file
             self.CLI_PARAMETER_TEXT_STDIN,          # text is read from stdin,
-            u"--data-format",                       # set output data format
-            u"LEF32@22050"                          # data format string
+            "--data-format",                       # set output data format
+            "LEF32@22050"                          # data format string
         ])

@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# coding=utf-8
 
 # aeneas is a Python/C library and a set of tools
 # to automagically synchronize audio and text (aka forced alignment)
@@ -149,7 +148,7 @@ class TestSyncMap(unittest.TestCase):
         syn = self.read("txt")
         text_first_fragment = syn.fragments[0].text
         syn2 = syn.clone()
-        syn2.fragments[0].text_fragment.lines = [u"foo"]
+        syn2.fragments[0].text_fragment.lines = ["foo"]
         text_first_fragment2 = syn2.fragments[0].text
         self.assertEqual(syn.fragments[0].text, text_first_fragment)
         self.assertNotEqual(syn2.fragments[0].text, text_first_fragment)

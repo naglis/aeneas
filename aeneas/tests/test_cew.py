@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# coding=utf-8
 
 # aeneas is a Python/C library and a set of tools
 # to automagically synchronize audio and text (aka forced alignment)
@@ -34,9 +33,9 @@ class TestCEW(unittest.TestCase):
             c_quit_after = 0.0
             c_backwards = 0
             c_text = [
-                (u"en", u"Dummy 1"),        # NOTE cew requires the actual eSpeak voice code
-                (u"en", u"Dummy 2"),        # NOTE cew requires the actual eSpeak voice code
-                (u"en", u"Dummy 3"),        # NOTE cew requires the actual eSpeak voice code
+                ("en", "Dummy 1"),        # NOTE cew requires the actual eSpeak voice code
+                ("en", "Dummy 2"),        # NOTE cew requires the actual eSpeak voice code
+                ("en", "Dummy 3"),        # NOTE cew requires the actual eSpeak voice code
             ]
             import aeneas.cew.cew
             sr, sf, intervals = aeneas.cew.cew.synthesize_multiple(
@@ -58,9 +57,9 @@ class TestCEW(unittest.TestCase):
             c_quit_after = 0.0
             c_backwards = 0
             c_text = [
-                (u"en", u"Dummy 1"),        # NOTE cew requires the actual eSpeak voice code
-                (u"it", u"Segnaposto 2"),   # NOTE cew requires the actual eSpeak voice code
-                (u"en", u"Dummy 3"),        # NOTE cew requires the actual eSpeak voice code
+                ("en", "Dummy 1"),        # NOTE cew requires the actual eSpeak voice code
+                ("it", "Segnaposto 2"),   # NOTE cew requires the actual eSpeak voice code
+                ("en", "Dummy 3"),        # NOTE cew requires the actual eSpeak voice code
             ]
             import aeneas.cew.cew
             sr, sf, intervals = aeneas.cew.cew.synthesize_multiple(

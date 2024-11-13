@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# coding=utf-8
 
 # aeneas is a Python/C library and a set of tools
 # to automagically synchronize audio and text (aka forced alignment)
@@ -188,7 +187,7 @@ PKG_LICENSE = "GNU Affero General Public License v3 (AGPL v3)"
 # human-readable descriptions
 PKG_SHORT_DESCRIPTION = "aeneas is a Python/C library and a set of tools to automagically synchronize audio and text (aka forced alignment)"
 try:
-    PKG_LONG_DESCRIPTION = io.open("README.rst", "r", encoding="utf-8").read()
+    PKG_LONG_DESCRIPTION = open("README.rst", encoding="utf-8").read()
 except:
     PKG_LONG_DESCRIPTION = PKG_SHORT_DESCRIPTION
 

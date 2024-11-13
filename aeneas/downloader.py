@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# coding=utf-8
 
 # aeneas is a Python/C library and a set of tools
 # to automagically synchronize audio and text (aka forced alignment)
@@ -31,8 +30,6 @@ This module contains the following classes:
 .. note:: This module requires Python module ``youtube-dl`` (``pip install youtube-dl``).
 """
 
-from __future__ import absolute_import
-from __future__ import print_function
 import time
 
 from aeneas.logger import Loggable
@@ -61,7 +58,7 @@ class Downloader(Loggable):
     :type  logger: :class:`~aeneas.logger.Logger`
     """
 
-    TAG = u"Downloader"
+    TAG = "Downloader"
 
     def audio_from_youtube(
             self,
@@ -114,7 +111,7 @@ class Downloader(Loggable):
             Return a list of dicts, each describing
             an available audiostream for the given ``source_url``.
             """
-            self.log(u"Getting audiostreams...")
+            self.log("Getting audiostreams...")
             audiostreams = []
             options = {
                 "download": False,
@@ -131,7 +128,7 @@ class Downloader(Loggable):
                         "ext": a["ext"],
                         "abr": a["abr"]
                     })
-            self.log(u"Getting audiostreams... done")
+            self.log("Getting audiostreams... done")
             return audiostreams
 
         def _select_audiostream(self, audiostreams, download_format=None, largest_audio=False):
@@ -143,7 +140,7 @@ class Downloader(Loggable):
             of the available audiostreams, then just act
             according to ``largest_audio``.
             """
-            self.log(u"Selecting best-matching audiostream...")
+            self.log("Selecting best-matching audiostream...")
             selected = None
             if download_format is not None:
                 matching = [a for a in audiostreams if a["format"] == download_format]
@@ -152,7 +149,7 @@ class Downloader(Loggable):
             if selected is None:
                 sa = sorted(audiostreams, key=lambda x: x["filesize"])
                 selected = sa[-1] if largest_audio else sa[0]
-            self.log(u"Selecting best-matching audiostream... done")
+            self.log("Selecting best-matching audiostream... done")
             return selected
 
         def _compose_output_file_path(self, extension, output_file_path=None):
@@ -161,24 +158,24 @@ class Downloader(Loggable):
             Otherwise (``output_file_path`` is ``None``),
             create a temporary file with the correct extension.
             """
-            self.log(u"Determining output file path...")
+            self.log("Determining output file path...")
             if output_file_path is None:
-                self.log(u"output_file_path is None: creating temp file")
+                self.log("output_file_path is None: creating temp file")
                 handler, output_file_path = gf.tmp_file(
                     root=self.rconf[RuntimeConfiguration.TMP_PATH],
                     suffix=(".%s" % extension)
                 )
                 gf.delete_file(handler, output_file_path)
             else:
-                self.log(u"output_file_path is not None: cheking that file can be written")
+                self.log("output_file_path is not None: cheking that file can be written")
                 if not gf.file_can_be_written(output_file_path):
-                    self.log_exc(u"Path '%s' cannot be written. Wrong permissions?" % (output_file_path), None, True, OSError)
-            self.log(u"Determining output file path... done")
-            self.log([u"Output file path is '%s'", output_file_path])
+                    self.log_exc("Path '%s' cannot be written. Wrong permissions?" % (output_file_path), None, True, OSError)
+            self.log("Determining output file path... done")
+            self.log(["Output file path is '%s'", output_file_path])
             return output_file_path
 
         def _download_audiostream(self, source_url, fmt, output_path):
-            self.log(u"Downloading audiostream...")
+            self.log("Downloading audiostream...")
             options = {
                 "download": True,
                 "format": fmt,
@@ -188,55 +185,55 @@ class Downloader(Loggable):
             }
             with youtube_dl.YoutubeDL(options) as ydl:
                 ydl.download([source_url])
-            self.log(u"Downloading audiostream... done")
+            self.log("Downloading audiostream... done")
 
         try:
             import youtube_dl
         except ImportError as exc:
-            self.log_exc(u"Python module youtube-dl is not installed", exc, True, ImportError)
+            self.log_exc("Python module youtube-dl is not installed", exc, True, ImportError)
 
         # retry parameters
         sleep_delay = self.rconf[RuntimeConfiguration.DOWNLOADER_SLEEP]
         attempts = self.rconf[RuntimeConfiguration.DOWNLOADER_RETRY_ATTEMPTS]
-        self.log([u"Sleep delay:    %.3f", sleep_delay])
-        self.log([u"Retry attempts: %d", attempts])
+        self.log(["Sleep delay:    %.3f", sleep_delay])
+        self.log(["Retry attempts: %d", attempts])
 
         # get audiostreams
         att = attempts
         while att > 0:
-            self.log(u"Sleeping to throttle API usage...")
+            self.log("Sleeping to throttle API usage...")
             time.sleep(sleep_delay)
-            self.log(u"Sleeping to throttle API usage... done")
+            self.log("Sleeping to throttle API usage... done")
             try:
                 audiostreams = _list_audiostreams(self, source_url)
                 break
             except Exception:
-                self.log_warn(u"Unable to list audio streams, retry")
+                self.log_warn("Unable to list audio streams, retry")
                 att -= 1
         if att <= 0:
-            self.log_exc(u"All downloader requests failed: wrong URL or you are offline", None, True, DownloadError)
+            self.log_exc("All downloader requests failed: wrong URL or you are offline", None, True, DownloadError)
 
         if not download:
-            self.log(u"Returning list of audiostreams")
+            self.log("Returning list of audiostreams")
             return audiostreams
 
         # download the best-matching audiostream
         if len(audiostreams) == 0:
-            self.log_exc(u"No audiostreams available for the provided URL", None, True, OSError)
+            self.log_exc("No audiostreams available for the provided URL", None, True, OSError)
         audiostream = _select_audiostream(self, audiostreams, download_format, largest_audio)
         output_path = _compose_output_file_path(self, audiostream["ext"], output_file_path)
         att = attempts
         while att > 0:
-            self.log(u"Sleeping to throttle API usage...")
+            self.log("Sleeping to throttle API usage...")
             time.sleep(sleep_delay)
-            self.log(u"Sleeping to throttle API usage... done")
+            self.log("Sleeping to throttle API usage... done")
             try:
                 _download_audiostream(self, source_url, audiostream["format"], output_path)
                 break
             except Exception:
-                self.log_warn(u"Unable to download audio streams, retry")
+                self.log_warn("Unable to download audio streams, retry")
                 att -= 1
         if att <= 0:
-            self.log_exc(u"All downloader requests failed: wrong URL or you are offline", None, True, DownloadError)
+            self.log_exc("All downloader requests failed: wrong URL or you are offline", None, True, DownloadError)
 
         return output_path

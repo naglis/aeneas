@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# coding=utf-8
 
 # aeneas is a Python/C library and a set of tools
 # to automagically synchronize audio and text (aka forced alignment)
@@ -33,8 +32,6 @@ This module contains the following classes:
 .. versionadded:: 1.5.0
 """
 
-from __future__ import absolute_import
-from __future__ import print_function
 from decimal import Decimal
 import math
 
@@ -44,10 +41,10 @@ class TimeValue(Decimal):
     A numeric type to represent time values with arbitrary precision.
     """
 
-    TAG = u"TimeValue"
+    TAG = "TimeValue"
 
     def __repr__(self):
-        return super(TimeValue, self).__repr__().replace("Decimal", "TimeValue")
+        return super().__repr__().replace("Decimal", "TimeValue")
 
     @property
     def is_integer(self):
@@ -118,7 +115,7 @@ class TimeValue(Decimal):
         return TimeValue(Decimal.__truediv__(self, other))
 
 
-class TimeInterval(object):
+class TimeInterval:
     """
     A type representing a time interval, that is,
     a pair ``(begin, end)`` of time points.
@@ -275,17 +272,17 @@ class TimeInterval(object):
         RELATIVE_POSITION_II_GG: RELATIVE_POSITION_II_LL,
     }
 
-    TAG = u"TimeInterval"
+    TAG = "TimeInterval"
 
     def __init__(self, begin, end):
         if not isinstance(begin, TimeValue):
-            raise TypeError(u"begin is not an instance of TimeValue")
+            raise TypeError("begin is not an instance of TimeValue")
         if not isinstance(end, TimeValue):
-            raise TypeError(u"end is not an instance of TimeValue")
+            raise TypeError("end is not an instance of TimeValue")
         if begin < 0:
-            raise ValueError(u"begin is negative")
+            raise ValueError("begin is negative")
         if begin > end:
-            raise ValueError(u"begin is bigger than end")
+            raise ValueError("begin is bigger than end")
         self.begin = begin
         self.end = end
 
@@ -314,7 +311,7 @@ class TimeInterval(object):
         return (self < other) or (self == other)
 
     def __repr__(self):
-        return u"[%s, %s]" % (self.begin, self.end)
+        return "[{}, {}]".format(self.begin, self.end)
 
     @property
     def length(self):
@@ -346,7 +343,7 @@ class TimeInterval(object):
         :rtype: bool
         """
         if not isinstance(time_point, TimeValue):
-            raise TypeError(u"time_point is not an instance of TimeValue")
+            raise TypeError("time_point is not an instance of TimeValue")
         return self.begin == time_point
 
     def ends_at(self, time_point):
@@ -359,7 +356,7 @@ class TimeInterval(object):
         :rtype: bool
         """
         if not isinstance(time_point, TimeValue):
-            raise TypeError(u"time_point is not an instance of TimeValue")
+            raise TypeError("time_point is not an instance of TimeValue")
         return self.end == time_point
 
     def percent_value(self, percent):
@@ -372,7 +369,7 @@ class TimeInterval(object):
         :rtype: :class:`~aeneas.exacttiming.TimeValue`
         """
         if not isinstance(percent, Decimal):
-            raise TypeError(u"percent is not an instance of Decimal")
+            raise TypeError("percent is not an instance of Decimal")
         percent = Decimal(max(min(percent, 100), 0) / 100)
         return self.begin + self.length * percent
 
@@ -397,7 +394,7 @@ class TimeInterval(object):
         :rtype: :class:`~aeneas.exacttiming.TimeInterval`
         """
         if not isinstance(offset, TimeValue):
-            raise TypeError(u"offset is not an instance of TimeValue")
+            raise TypeError("offset is not an instance of TimeValue")
         self.begin += offset
         self.end += offset
         if not allow_negative:
@@ -417,7 +414,7 @@ class TimeInterval(object):
         :rtype: bool
         """
         if not isinstance(time_point, TimeValue):
-            raise TypeError(u"time_point is not an instance of TimeValue")
+            raise TypeError("time_point is not an instance of TimeValue")
         return (self.begin <= time_point) and (time_point <= self.end)
 
     def inner_contains(self, time_point):
@@ -430,7 +427,7 @@ class TimeInterval(object):
         :rtype: bool
         """
         if not isinstance(time_point, TimeValue):
-            raise TypeError(u"time_point is not an instance of TimeValue")
+            raise TypeError("time_point is not an instance of TimeValue")
         return (self.begin < time_point) and (time_point < self.end)
 
     def relative_position_of(self, other):
@@ -444,7 +441,7 @@ class TimeInterval(object):
         :rtype: int
         """
         if not isinstance(other, TimeInterval):
-            raise TypeError(u"other is not an instance of TimeInterval")
+            raise TypeError("other is not an instance of TimeInterval")
         if self.has_zero_length:
             if other.has_zero_length:
                 # TABLE 1
@@ -625,7 +622,7 @@ class TimeInterval(object):
         :rtype: bool
         """
         if not isinstance(other, TimeInterval):
-            raise TypeError(u"other is not an instance of TimeInterval")
+            raise TypeError("other is not an instance of TimeInterval")
         return (self.end == other.begin)
 
     def is_adjacent_after(self, other):
@@ -642,16 +639,16 @@ class TimeInterval(object):
 
     def shadow(self, quantity):
         if quantity <= 0:
-            raise ValueError(u"quantity is not positive")
+            raise ValueError("quantity is not positive")
         begin = max(self.begin - quantity, TimeValue("0.000"))
         end = self.end + quantity
         return TimeInterval(begin=begin, end=end)
 
     def shrink(self, quantity, from_begin=True):
         if quantity <= 0:
-            raise ValueError(u"quantity is not positive")
+            raise ValueError("quantity is not positive")
         if quantity > self.length:
-            raise ValueError(u"quantity is greater than length")
+            raise ValueError("quantity is greater than length")
         if from_begin:
             self.begin = self.end - self.length + quantity
         else:
@@ -659,7 +656,7 @@ class TimeInterval(object):
 
     def enlarge(self, quantity, from_begin=True):
         if quantity <= 0:
-            raise ValueError(u"quantity is not positive")
+            raise ValueError("quantity is not positive")
         if from_begin:
             self.begin -= quantity
         else:
@@ -667,14 +664,14 @@ class TimeInterval(object):
 
     def move_end_at(self, point):
         if point < self.begin:
-            raise ValueError(u"point is before begin")
+            raise ValueError("point is before begin")
         length = self.length
         self.end = point
         self.begin = self.end - length
 
     def move_begin_at(self, point):
         if point > self.end:
-            raise ValueError(u"point is after end")
+            raise ValueError("point is after end")
         length = self.length
         self.begin = point
         self.end = self.begin + length

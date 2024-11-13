@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# coding=utf-8
 
 # aeneas is a Python/C library and a set of tools
 # to automagically synchronize audio and text (aka forced alignment)
@@ -25,8 +24,6 @@
 Convert a sync map from a format to another.
 """
 
-from __future__ import absolute_import
-from __future__ import print_function
 import sys
 
 from aeneas.syncmap import SyncMap
@@ -55,26 +52,26 @@ class ConvertSyncMapCLI(AbstractCLIProgram):
     NAME = gf.file_name_without_extension(__file__)
 
     HELP = {
-        "description": u"Convert a sync map from a format to another.",
+        "description": "Convert a sync map from a format to another.",
         "synopsis": [
-            (u"INPUT_SYNCMAP OUTPUT_SYNCMAP", True),
-            (u"INPUT_SYNCMAP OUTPUT_HTML AUDIO_FILE --output-html", True),
+            ("INPUT_SYNCMAP OUTPUT_SYNCMAP", True),
+            ("INPUT_SYNCMAP OUTPUT_HTML AUDIO_FILE --output-html", True),
         ],
         "examples": [
-            u"%s %s" % (SYNC_MAP_JSON, OUTPUT_MAP_SRT),
-            u"%s %s --output-format=txt" % (SYNC_MAP_JSON, OUTPUT_MAP_DAT),
-            u"%s %s --input-format=csv" % (SYNC_MAP_ZZZ, OUTPUT_MAP_TXT),
-            u"%s %s --language=en" % (SYNC_MAP_CSV, OUTPUT_MAP_JSON),
-            u"%s %s %s" % (SYNC_MAP_JSON, OUTPUT_MAP_SMIL, SMIL_PARAMETERS),
-            u"%s %s %s --output-html" % (SYNC_MAP_JSON, OUTPUT_HTML, AUDIO)
+            "{} {}".format(SYNC_MAP_JSON, OUTPUT_MAP_SRT),
+            "{} {} --output-format=txt".format(SYNC_MAP_JSON, OUTPUT_MAP_DAT),
+            "{} {} --input-format=csv".format(SYNC_MAP_ZZZ, OUTPUT_MAP_TXT),
+            "{} {} --language=en".format(SYNC_MAP_CSV, OUTPUT_MAP_JSON),
+            "{} {} {}".format(SYNC_MAP_JSON, OUTPUT_MAP_SMIL, SMIL_PARAMETERS),
+            "{} {} {} --output-html".format(SYNC_MAP_JSON, OUTPUT_HTML, AUDIO)
         ],
         "options": [
-            u"--audio-ref=REF : use REF for the audio ref attribute (smil, smilh, smilm)",
-            u"--input-format=FMT : input sync map file has format FMT",
-            u"--language=CODE : set language to CODE",
-            u"--output-format=FMT : output sync map file has format FMT",
-            u"--output-html : output HTML file for fine tuning",
-            u"--page-ref=REF : use REF for the text ref attribute (smil, smilh, smilm)"
+            "--audio-ref=REF : use REF for the audio ref attribute (smil, smilh, smilm)",
+            "--input-format=FMT : input sync map file has format FMT",
+            "--language=CODE : set language to CODE",
+            "--output-format=FMT : output sync map file has format FMT",
+            "--output-html : output HTML file for fine tuning",
+            "--page-ref=REF : use REF for the text ref attribute (smil, smilh, smilm)"
         ]
     }
 
@@ -88,11 +85,11 @@ class ConvertSyncMapCLI(AbstractCLIProgram):
             return self.print_help()
         input_file_path = self.actual_arguments[0]
         output_file_path = self.actual_arguments[1]
-        output_html = self.has_option(u"--output-html")
+        output_html = self.has_option("--output-html")
 
         if not self.check_input_file(input_file_path):
             return self.ERROR_EXIT_CODE
-        input_sm_format = self.has_option_with_value(u"--input-format")
+        input_sm_format = self.has_option_with_value("--input-format")
         if input_sm_format is None:
             input_sm_format = gf.file_extension(input_file_path)
         if not self.check_format(input_sm_format):
@@ -108,7 +105,7 @@ class ConvertSyncMapCLI(AbstractCLIProgram):
             if not self.check_input_file(audio_file_path):
                 return self.ERROR_EXIT_CODE
         else:
-            output_sm_format = self.has_option_with_value(u"--output-format")
+            output_sm_format = self.has_option_with_value("--output-format")
             if output_sm_format is None:
                 output_sm_format = gf.file_extension(output_file_path)
             if not self.check_format(output_sm_format):
@@ -116,9 +113,9 @@ class ConvertSyncMapCLI(AbstractCLIProgram):
 
         # TODO add a way to specify a text file for input formats like SMIL
         #      that do not carry the source text
-        language = self.has_option_with_value(u"--language")
-        audio_ref = self.has_option_with_value(u"--audio-ref")
-        page_ref = self.has_option_with_value(u"--page-ref")
+        language = self.has_option_with_value("--language")
+        audio_ref = self.has_option_with_value("--audio-ref")
+        page_ref = self.has_option_with_value("--page-ref")
         parameters = {
             gc.PPN_SYNCMAP_LANGUAGE: language,
             gc.PPN_TASK_OS_FILE_SMIL_AUDIO_REF: audio_ref,
@@ -126,37 +123,37 @@ class ConvertSyncMapCLI(AbstractCLIProgram):
         }
 
         try:
-            self.print_info(u"Reading sync map in '%s' format from file '%s'" % (input_sm_format, input_file_path))
-            self.print_info(u"Reading sync map...")
+            self.print_info("Reading sync map in '{}' format from file '{}'".format(input_sm_format, input_file_path))
+            self.print_info("Reading sync map...")
             syncmap = SyncMap(logger=self.logger)
             syncmap.read(input_sm_format, input_file_path, parameters)
-            self.print_info(u"Reading sync map... done")
-            self.print_info(u"Read %d sync map fragments" % (len(syncmap)))
+            self.print_info("Reading sync map... done")
+            self.print_info("Read %d sync map fragments" % (len(syncmap)))
         except Exception as exc:
-            self.print_error(u"An unexpected error occurred while reading the input sync map:")
-            self.print_error(u"%s" % (exc))
+            self.print_error("An unexpected error occurred while reading the input sync map:")
+            self.print_error("%s" % (exc))
             return self.ERROR_EXIT_CODE
 
         if output_html:
             try:
-                self.print_info(u"Writing HTML file...")
+                self.print_info("Writing HTML file...")
                 syncmap.output_html_for_tuning(audio_file_path, output_file_path, parameters)
-                self.print_info(u"Writing HTML file... done")
-                self.print_success(u"Created HTML file '%s'" % (output_file_path))
+                self.print_info("Writing HTML file... done")
+                self.print_success("Created HTML file '%s'" % (output_file_path))
                 return self.NO_ERROR_EXIT_CODE
             except Exception as exc:
-                self.print_error(u"An unexpected error occurred while writing the output HTML file:")
-                self.print_error(u"%s" % (exc))
+                self.print_error("An unexpected error occurred while writing the output HTML file:")
+                self.print_error("%s" % (exc))
         else:
             try:
-                self.print_info(u"Writing sync map...")
+                self.print_info("Writing sync map...")
                 syncmap.write(output_sm_format, output_file_path, parameters)
-                self.print_info(u"Writing sync map... done")
-                self.print_success(u"Created '%s' sync map file '%s'" % (output_sm_format, output_file_path))
+                self.print_info("Writing sync map... done")
+                self.print_success("Created '{}' sync map file '{}'".format(output_sm_format, output_file_path))
                 return self.NO_ERROR_EXIT_CODE
             except Exception as exc:
-                self.print_error(u"An unexpected error occurred while writing the output sync map:")
-                self.print_error(u"%s" % (exc))
+                self.print_error("An unexpected error occurred while writing the output sync map:")
+                self.print_error("%s" % (exc))
 
         return self.ERROR_EXIT_CODE
 
@@ -170,9 +167,9 @@ class ConvertSyncMapCLI(AbstractCLIProgram):
         :rtype: bool
         """
         if sm_format not in SyncMapFormat.ALLOWED_VALUES:
-            self.print_error(u"Sync map format '%s' is not allowed" % (sm_format))
-            self.print_info(u"Allowed formats:")
-            self.print_generic(u" ".join(SyncMapFormat.ALLOWED_VALUES))
+            self.print_error("Sync map format '%s' is not allowed" % (sm_format))
+            self.print_info("Allowed formats:")
+            self.print_generic(" ".join(SyncMapFormat.ALLOWED_VALUES))
             return False
         return True
 

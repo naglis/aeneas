@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# coding=utf-8
 
 # aeneas is a Python/C library and a set of tools
 # to automagically synchronize audio and text (aka forced alignment)
@@ -21,8 +20,6 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from __future__ import absolute_import
-from __future__ import print_function
 
 from aeneas.syncmap.smfgsubtitles import SyncMapFormatGenericSubtitles
 import aeneas.globalfunctions as gf
@@ -33,7 +30,7 @@ class SyncMapFormatSRT(SyncMapFormatGenericSubtitles):
     Handler for SubRip (SRT) I/O format.
     """
 
-    TAG = u"SyncMapFormatSRT"
+    TAG = "SyncMapFormatSRT"
 
     DEFAULT = "srt"
 
@@ -43,13 +40,13 @@ class SyncMapFormatSRT(SyncMapFormatGenericSubtitles):
     #      but for clarity we repeat them here
     #
     def __init__(self, variant=DEFAULT, parameters=None, rconf=None, logger=None):
-        super(SyncMapFormatSRT, self).__init__(variant=variant, parameters=parameters, rconf=rconf, logger=logger)
+        super().__init__(variant=variant, parameters=parameters, rconf=rconf, logger=logger)
         self.header_string = None
         self.header_might_not_have_trailing_blank_line = False
         self.footer_string = None
         self.cue_has_identifier = True
         self.cue_has_optional_identifier = False
-        self.time_values_separator = u" --> "
-        self.line_break_symbol = u"\n"
+        self.time_values_separator = " --> "
+        self.line_break_symbol = "\n"
         self.parse_time_function = gf.time_from_srt
         self.format_time_function = gf.time_to_srt

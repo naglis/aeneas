@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# coding=utf-8
 
 # aeneas is a Python/C library and a set of tools
 # to automagically synchronize audio and text (aka forced alignment)
@@ -69,7 +68,7 @@ class TestAnalyzeContainer(unittest.TestCase):
         },
     ]
 
-    CONFIG_STRING = u"is_hierarchy_type=flat|is_hierarchy_prefix=assets/|is_text_file_relative_path=.|is_text_file_name_regex=.*\.xhtml|is_text_type=unparsed|is_audio_file_relative_path=.|is_audio_file_name_regex=.*\.mp3|is_text_unparsed_id_regex=f[0-9]+|is_text_unparsed_id_sort=numeric|os_job_file_name=demo_sync_job_output|os_job_file_container=zip|os_job_file_hierarchy_type=flat|os_job_file_hierarchy_prefix=assets/|os_task_file_name=$PREFIX.xhtml.smil|os_task_file_format=smil|os_task_file_smil_page_ref=$PREFIX.xhtml|os_task_file_smil_audio_ref=../Audio/$PREFIX.mp3|job_language=en|job_description=Demo Sync Job"
+    CONFIG_STRING = r"is_hierarchy_type=flat|is_hierarchy_prefix=assets/|is_text_file_relative_path=.|is_text_file_name_regex=.*\.xhtml|is_text_type=unparsed|is_audio_file_relative_path=.|is_audio_file_name_regex=.*\.mp3|is_text_unparsed_id_regex=f[0-9]+|is_text_unparsed_id_sort=numeric|os_job_file_name=demo_sync_job_output|os_job_file_container=zip|os_job_file_hierarchy_type=flat|os_job_file_hierarchy_prefix=assets/|os_task_file_name=$PREFIX.xhtml.smil|os_task_file_format=smil|os_task_file_smil_page_ref=$PREFIX.xhtml|os_task_file_smil_audio_ref=../Audio/$PREFIX.mp3|job_language=en|job_description=Demo Sync Job"
 
     EMPTY_CONTAINERS = [
         "res/container/empty_dir",
@@ -122,13 +121,13 @@ class TestAnalyzeContainer(unittest.TestCase):
 
     def test_wizard_container_not_existing(self):
         analyzer = AnalyzeContainer(Container(self.NOT_EXISTING_PATH))
-        job = analyzer.analyze(config_string=u"foo")
+        job = analyzer.analyze(config_string="foo")
         self.assertIsNone(job)
 
     def test_wizard_analyze_empty_container(self):
         for f in self.EMPTY_CONTAINERS:
             analyzer = AnalyzeContainer(Container(f))
-            job = analyzer.analyze(config_string=u"foo")
+            job = analyzer.analyze(config_string="foo")
             self.assertIsNone(job)
 
     def test_wizard_analyze_valid(self):

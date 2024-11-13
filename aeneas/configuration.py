@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# coding=utf-8
 
 # aeneas is a Python/C library and a set of tools
 # to automagically synchronize audio and text (aka forced alignment)
@@ -31,8 +30,6 @@ This module contains the following classes:
 .. versionadded:: 1.4.1
 """
 
-from __future__ import absolute_import
-from __future__ import print_function
 from copy import deepcopy
 
 from aeneas.exacttiming import Decimal
@@ -41,7 +38,7 @@ import aeneas.globalconstants as gc
 import aeneas.globalfunctions as gf
 
 
-class Configuration(object):
+class Configuration:
     """
     A generic configuration object, that is,
     a dictionary with a fixed set of keys,
@@ -84,16 +81,16 @@ class Configuration(object):
     of this object.
     """
 
-    TRUE_ALIASES = [True, u"TRUE", u"True", u"true", u"YES", u"Yes", u"yes", u"1", 1]
+    TRUE_ALIASES = [True, "TRUE", "True", "true", "YES", "Yes", "yes", "1", 1]
     """
     Aliases for a ``True`` value for ``bool`` fields
     """
 
-    TAG = u"Configuration"
+    TAG = "Configuration"
 
     def __init__(self, config_string=None):
         if (config_string is not None) and (not gf.is_unicode(config_string)):
-            raise TypeError(u"config_string is not a Unicode string")
+            raise TypeError("config_string is not a Unicode string")
 
         # set dictionaries up to keep the config data
         self.data = {}
@@ -113,7 +110,7 @@ class Configuration(object):
             if (
                 (len(config_string) > 0) and
                 (config_string[0] == config_string[-1]) and
-                (config_string[0] in [u"\"", u"'"])
+                (config_string[0] in ["\"", "'"])
             ):
                 config_string = config_string[1:-1]
             # populate values from config_string,
@@ -142,7 +139,7 @@ class Configuration(object):
             raise KeyError(key)
 
     def __unicode__(self):
-        return u"\n".join([u"%s: '%s'" % (fn, self.data[fn]) for fn in sorted(self.data.keys())])
+        return "\n".join(["{}: '{}'".format(fn, self.data[fn]) for fn in sorted(self.data.keys())])
 
     def __str__(self):
         return gf.safe_str(self.__unicode__())
@@ -174,7 +171,7 @@ class Configuration(object):
         :rtype: string
         """
         return (gc.CONFIG_STRING_SEPARATOR_SYMBOL).join(
-            [u"%s%s%s" % (fn, gc.CONFIG_STRING_ASSIGNMENT_SYMBOL, self.data[fn]) for fn in sorted(self.data.keys()) if self.data[fn] is not None]
+            ["{}{}{}".format(fn, gc.CONFIG_STRING_ASSIGNMENT_SYMBOL, self.data[fn]) for fn in sorted(self.data.keys()) if self.data[fn] is not None]
         )
 
     @classmethod
@@ -190,26 +187,26 @@ class Configuration(object):
         def cft(ftype, fdefault):
             """ Convert field type and default value to string """
             if ftype is None:
-                return u""
+                return ""
 
             if ftype in [TimeValue, Decimal, float]:
-                cftype = u"float"
-                cfdefault = u"%.3f" % ftype(fdefault) if fdefault is not None else u"None"
+                cftype = "float"
+                cfdefault = "%.3f" % ftype(fdefault) if fdefault is not None else "None"
             elif ftype is int:
-                cftype = u"int"
-                cfdefault = u"%d" % ftype(fdefault) if fdefault is not None else u"None"
+                cftype = "int"
+                cfdefault = "%d" % ftype(fdefault) if fdefault is not None else "None"
             elif ftype is bool:
-                cftype = u"bool"
-                cfdefault = u"%s" % fdefault if fdefault is not None else u"None"
+                cftype = "bool"
+                cfdefault = "%s" % fdefault if fdefault is not None else "None"
             else:
-                cftype = u"unknown"
-                cfdefault = u"%s" % fdefault if fdefault is not None else u"None"
-            return u" (%s, %s)" % (cftype, cfdefault)
+                cftype = "unknown"
+                cfdefault = "%s" % fdefault if fdefault is not None else "None"
+            return " ({}, {})".format(cftype, cfdefault)
 
         parameters = [(field, fdesc, ftype, fdefault) for (field, (fdefault, ftype, faliases, fdesc)) in cls.FIELDS]
         if sort:
             parameters = sorted(parameters)
         if as_strings:
             max_length = max(len(t[0]) for t in parameters)
-            parameters = [u"%s : %s%s" % (f.ljust(max_length), d, cft(t, df)) for (f, d, t, df) in parameters]
+            parameters = ["{} : {}{}".format(f.ljust(max_length), d, cft(t, df)) for (f, d, t, df) in parameters]
         return parameters

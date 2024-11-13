@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# coding=utf-8
 
 # aeneas is a Python/C library and a set of tools
 # to automagically synchronize audio and text (aka forced alignment)
@@ -29,29 +28,29 @@ from aeneas.ttswrappers.espeakttswrapper import ESPEAKTTSWrapper
 
 class TestESPEAKTTSWrapper(TestBaseTTSWrapper):
 
-    TTS = u"espeak"
-    TTS_PATH = u"/usr/bin/espeak"
+    TTS = "espeak"
+    TTS_PATH = "/usr/bin/espeak"
     TTS_CLASS = ESPEAKTTSWrapper
     TTS_LANGUAGE = ESPEAKTTSWrapper.ENG
     TTS_LANGUAGE_VARIATION = ESPEAKTTSWrapper.ENG_GBR
 
     def test_multiple_replace_language(self):
-        tfl = self.tfl([(ESPEAKTTSWrapper.UKR, [u"Временами Сашке хотелось перестать делать то"])])
+        tfl = self.tfl([(ESPEAKTTSWrapper.UKR, ["Временами Сашке хотелось перестать делать то"])])
         self.synthesize(tfl)
 
     def test_multiple_replace_language_mixed(self):
         tfl = self.tfl([
-            (ESPEAKTTSWrapper.UKR, [u"Word"]),
-            (ESPEAKTTSWrapper.UKR, [u"Временами Сашке хотелось перестать делать то"]),
-            (ESPEAKTTSWrapper.UKR, [u"Word"])
+            (ESPEAKTTSWrapper.UKR, ["Word"]),
+            (ESPEAKTTSWrapper.UKR, ["Временами Сашке хотелось перестать делать то"]),
+            (ESPEAKTTSWrapper.UKR, ["Word"])
         ])
         self.synthesize(tfl)
 
     def test_multiple_replace_language_mixed_fragments(self):
         tfl = self.tfl([
-            (ESPEAKTTSWrapper.ENG, [u"Word"]),
-            (ESPEAKTTSWrapper.UKR, [u"Временами Сашке хотелось перестать делать то"]),
-            (ESPEAKTTSWrapper.ENG, [u"Word"])
+            (ESPEAKTTSWrapper.ENG, ["Word"]),
+            (ESPEAKTTSWrapper.UKR, ["Временами Сашке хотелось перестать делать то"]),
+            (ESPEAKTTSWrapper.ENG, ["Word"])
         ])
         self.synthesize(tfl)
 

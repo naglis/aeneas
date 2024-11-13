@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# coding=utf-8
 
 # aeneas is a Python/C library and a set of tools
 # to automagically synchronize audio and text (aka forced alignment)
@@ -38,8 +37,6 @@ This module contains the following classes:
 .. versionadded:: 1.5.0
 """
 
-from __future__ import absolute_import
-from __future__ import print_function
 from PIL import Image, ImageDraw, ImageFont
 import numpy
 
@@ -47,7 +44,7 @@ from aeneas.logger import Loggable
 import aeneas.globalfunctions as gf
 
 
-class PlotterColors(object):
+class PlotterColors:
     """
     Enumeration of colors for :class:`~aeneas.plotter.Plotter`.
     """
@@ -87,10 +84,10 @@ class Plotter(Loggable):
     :type  logger: :class:`~aeneas.logger.Logger`
     """
 
-    TAG = u"Plotter"
+    TAG = "Plotter"
 
     def __init__(self, rconf=None, logger=None):
-        super(Plotter, self).__init__(rconf=rconf, logger=logger)
+        super().__init__(rconf=rconf, logger=logger)
         self.waveform = None
         self.timescale = None
         self.labelsets = []
@@ -104,9 +101,9 @@ class Plotter(Loggable):
         :raises: TypeError: if ``waveform`` is not an instance of :class:`~aeneas.plotter.PlotWaveform`
         """
         if not isinstance(waveform, PlotWaveform):
-            self.log_exc(u"waveform must be an instance of PlotWaveform", None, True, TypeError)
+            self.log_exc("waveform must be an instance of PlotWaveform", None, True, TypeError)
         self.waveform = waveform
-        self.log(u"Added waveform")
+        self.log("Added waveform")
 
     def add_timescale(self, timescale):
         """
@@ -117,9 +114,9 @@ class Plotter(Loggable):
         :raises: TypeError: if ``timescale`` is not an instance of :class:`~aeneas.plotter.PlotTimeScale`
         """
         if not isinstance(timescale, PlotTimeScale):
-            self.log_exc(u"timescale must be an instance of PlotTimeScale", None, True, TypeError)
+            self.log_exc("timescale must be an instance of PlotTimeScale", None, True, TypeError)
         self.timescale = timescale
-        self.log(u"Added timescale")
+        self.log("Added timescale")
 
     def add_labelset(self, labelset):
         """
@@ -130,9 +127,9 @@ class Plotter(Loggable):
         :raises: TypeError: if ``labelset`` is not an instance of :class:`~aeneas.plotter.PlotLabelset`
         """
         if not isinstance(labelset, PlotLabelset):
-            self.log_exc(u"labelset must be an instance of PlotLabelset", None, True, TypeError)
+            self.log_exc("labelset must be an instance of PlotLabelset", None, True, TypeError)
         self.labelsets.append(labelset)
-        self.log(u"Added labelset")
+        self.log("Added labelset")
 
     def draw_png(self, output_file_path, h_zoom=5, v_zoom=30):
         """
@@ -146,7 +143,7 @@ class Plotter(Loggable):
         """
         # check that output_file_path can be written
         if not gf.file_can_be_written(output_file_path):
-            self.log_exc(u"Cannot write to output file '%s'" % (output_file_path), None, True, OSError)
+            self.log_exc("Cannot write to output file '%s'" % (output_file_path), None, True, OSError)
 
         # get widths and cumulative height, in modules
         widths = [ls.width for ls in self.labelsets]
@@ -164,12 +161,12 @@ class Plotter(Loggable):
         image_height_px = image_height * v_zoom
 
         # build image object
-        self.log([u"Building image with size (modules): %d %d", image_width, image_height])
-        self.log([u"Building image with size (px):      %d %d", image_width_px, image_height_px])
+        self.log(["Building image with size (modules): %d %d", image_width, image_height])
+        self.log(["Building image with size (px):      %d %d", image_width_px, image_height_px])
         image_obj = Image.new("RGB", (image_width_px, image_height_px), color=PlotterColors.AUDACITY_BACKGROUND_GREY)
         current_y = 0
         if self.waveform is not None:
-            self.log(u"Drawing waveform")
+            self.log("Drawing waveform")
             self.waveform.draw_png(image_obj, h_zoom, v_zoom, current_y)
             current_y += self.waveform.height
         timescale_y = current_y
@@ -179,13 +176,13 @@ class Plotter(Loggable):
             # COMMENTED self.timescale.draw_png(image_obj, h_zoom, v_zoom, current_y)
             current_y += self.timescale.height
         for labelset in self.labelsets:
-            self.log(u"Drawing labelset")
+            self.log("Drawing labelset")
             labelset.draw_png(image_obj, h_zoom, v_zoom, current_y)
             current_y += labelset.height
         if self.timescale is not None:
-            self.log(u"Drawing timescale")
+            self.log("Drawing timescale")
             self.timescale.draw_png(image_obj, h_zoom, v_zoom, timescale_y)
-        self.log([u"Saving to file '%s'", output_file_path])
+        self.log(["Saving to file '%s'", output_file_path])
         image_obj.save(output_file_path)
 
 
@@ -208,10 +205,10 @@ class PlotElement(Loggable):
     TEXT_MARGIN = 2
     """ Margin between text and anchor point, in pixels """
 
-    TAG = u"PlotElement"
+    TAG = "PlotElement"
 
     def __init__(self, label=None, rconf=None, logger=None):
-        super(PlotElement, self).__init__(rconf=rconf, logger=logger)
+        super().__init__(rconf=rconf, logger=logger)
         self.label = label
 
     @property
@@ -262,15 +259,15 @@ class PlotTimeScale(PlotElement):
     :type  logger: :class:`~aeneas.logger.Logger`
     """
 
-    TAG = u"PlotTimeScale"
+    TAG = "PlotTimeScale"
 
     def __init__(self, max_time, time_step=1, rconf=None, logger=None):
-        super(PlotTimeScale, self).__init__(rconf=rconf, logger=logger)
+        super().__init__(rconf=rconf, logger=logger)
         self.max_time = max_time
         self.time_step = time_step
-        self.log(u"Created time scale with")
-        self.log([u"  max_time:  %.3f", self.max_time])
-        self.log([u"  time_step: %d", self.time_step])
+        self.log("Created time scale with")
+        self.log(["  max_time:  %.3f", self.max_time])
+        self.log(["  time_step: %d", self.time_step])
 
     @property
     def height(self):
@@ -362,16 +359,16 @@ class PlotLabelset(PlotElement):
         "color": PlotterColors.BLACK
     }
 
-    TAG = u"PlotLabelset"
+    TAG = "PlotLabelset"
 
     def __init__(self, labelset, label=None, parameters=None, rconf=None, logger=None):
-        super(PlotLabelset, self).__init__(label=label, rconf=rconf, logger=logger)
+        super().__init__(label=label, rconf=rconf, logger=logger)
         self.labelset = labelset
         self.parameters = dict(self.DEFAULT_PARAMETERS) if parameters is None else parameters
-        self.log(u"Created label set with")
-        self.log([u"  label:            %s", self.label])
-        self.log([u"  number of labels: %d", len(self.labelset)])
-        self.log([u"  parameters:       %s", self.parameters])
+        self.log("Created label set with")
+        self.log(["  label:            %s", self.label])
+        self.log(["  number of labels: %d", len(self.labelset)])
+        self.log(["  parameters:       %s", self.parameters])
 
     @property
     def height(self):
@@ -497,16 +494,16 @@ class PlotWaveform(PlotElement):
     :type  logger: :class:`~aeneas.logger.Logger`
     """
 
-    TAG = u"PlotWaveform"
+    TAG = "PlotWaveform"
 
     def __init__(self, audio_file, label=None, fast=False, rconf=None, logger=None):
-        super(PlotWaveform, self).__init__(label=label, rconf=rconf, logger=logger)
+        super().__init__(label=label, rconf=rconf, logger=logger)
         self.audio_file = audio_file
         self.fast = fast
-        self.log(u"Created waveform with")
-        self.log([u"  label:        %s", self.label])
-        self.log([u"  audio_length: %.3f", self.audio_file.audio_length])
-        self.log([u"  fast:         %s", str(self.fast)])
+        self.log("Created waveform with")
+        self.log(["  label:        %s", self.label])
+        self.log(["  audio_length: %.3f", self.audio_file.audio_length])
+        self.log(["  fast:         %s", str(self.fast)])
 
     @property
     def height(self):

@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# coding=utf-8
 
 # aeneas is a Python/C library and a set of tools
 # to automagically synchronize audio and text (aka forced alignment)
@@ -32,10 +31,10 @@ import aeneas.globalfunctions as gf
 @unittest.skipIf(importlib.util.find_spec("youtube_dl") is None, "youtube-dl is not installed")
 class TestDownloader(unittest.TestCase):
 
-    URL_MALFORMED = u"foo"
-    URL_INVALID = u"aaaaaaaaaaa"
-    URL_VALID = u"https://www.youtube.com/watch?v=rU4a7AA8wM0"
-    OUTPUT_PATH_INVALID = u"/foo/bar/baz"
+    URL_MALFORMED = "foo"
+    URL_INVALID = "aaaaaaaaaaa"
+    URL_VALID = "https://www.youtube.com/watch?v=rU4a7AA8wM0"
+    OUTPUT_PATH_INVALID = "/foo/bar/baz"
 
     def audio_from_youtube(
             self,
@@ -97,13 +96,13 @@ class TestDownloader(unittest.TestCase):
         self.download(353237, largest_audio=False)
 
     def test_download_format(self):
-        self.download(1146884, download_format=u"140")
+        self.download(1146884, download_format="140")
 
     def test_download_format_smallest(self):
-        self.download(1146884, download_format=u"140", largest_audio=False)
+        self.download(1146884, download_format="140", largest_audio=False)
 
     def test_download_bad_format(self):
-        self.download(1146884, download_format=u"-1")
+        self.download(1146884, download_format="-1")
 
 
 if __name__ == "__main__":

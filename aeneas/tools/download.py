@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# coding=utf-8
 
 # aeneas is a Python/C library and a set of tools
 # to automagically synchronize audio and text (aka forced alignment)
@@ -27,8 +26,6 @@ Download a file from a Web source.
 Currently, it downloads an audio file from a YouTube video.
 """
 
-from __future__ import absolute_import
-from __future__ import print_function
 import sys
 
 from aeneas.downloader import Downloader
@@ -49,22 +46,22 @@ class DownloadCLI(AbstractCLIProgram):
     NAME = gf.file_name_without_extension(__file__)
 
     HELP = {
-        "description": u"Download an audio file from a YouTube video.",
+        "description": "Download an audio file from a YouTube video.",
         "synopsis": [
-            (u"YOUTUBE_URL [OUTPUT_FILE]", True)
+            ("YOUTUBE_URL [OUTPUT_FILE]", True)
         ],
         "examples": [
-            u"%s --list" % (URL_YOUTUBE),
-            u"%s %s" % (URL_YOUTUBE, OUTPUT_FILE_M4A),
-            u"%s %s --format=140" % (URL_YOUTUBE, OUTPUT_FILE_M4A),
-            u"%s %s --smallest-audio" % (URL_YOUTUBE, OUTPUT_FILE_OGG),
-            u"%s %s --largest-audio" % (URL_YOUTUBE, OUTPUT_FILE_M4A),
+            "%s --list" % (URL_YOUTUBE),
+            "{} {}".format(URL_YOUTUBE, OUTPUT_FILE_M4A),
+            "{} {} --format=140".format(URL_YOUTUBE, OUTPUT_FILE_M4A),
+            "{} {} --smallest-audio".format(URL_YOUTUBE, OUTPUT_FILE_OGG),
+            "{} {} --largest-audio".format(URL_YOUTUBE, OUTPUT_FILE_M4A),
         ],
         "options": [
-            u"--format=IDX : download audio stream with given format",
-            u"--largest-audio : download largest audio stream (default)",
-            u"--list : list all available audio streams but do not download",
-            u"--smallest-audio : download smallest audio stream",
+            "--format=IDX : download audio stream with given format",
+            "--largest-audio : download largest audio stream (default)",
+            "--list : list all available audio streams but do not download",
+            "--smallest-audio : download smallest audio stream",
         ]
     }
 
@@ -89,7 +86,7 @@ class DownloadCLI(AbstractCLIProgram):
 
         try:
             if download:
-                self.print_info(u"Downloading audio stream from '%s' ..." % source_url)
+                self.print_info("Downloading audio stream from '%s' ..." % source_url)
                 downloader = Downloader(logger=self.logger)
                 result = downloader.audio_from_youtube(
                     source_url,
@@ -98,29 +95,29 @@ class DownloadCLI(AbstractCLIProgram):
                     download_format=download_format,
                     largest_audio=largest_audio,
                 )
-                self.print_info(u"Downloading audio stream from '%s' ... done" % source_url)
-                self.print_success(u"Downloaded file '%s'" % result)
+                self.print_info("Downloading audio stream from '%s' ... done" % source_url)
+                self.print_success("Downloaded file '%s'" % result)
             else:
-                self.print_info(u"Downloading stream info from '%s' ..." % source_url)
+                self.print_info("Downloading stream info from '%s' ..." % source_url)
                 downloader = Downloader(logger=self.logger)
                 result = downloader.audio_from_youtube(
                     source_url,
                     download=False
                 )
-                self.print_info(u"Downloading stream info from '%s' ... done" % source_url)
+                self.print_info("Downloading stream info from '%s' ... done" % source_url)
                 msg = []
-                msg.append(u"%s\t%s\t%s\t%s" % ("Format", "Extension", "Bitrate", "Size"))
+                msg.append("{}\t{}\t{}\t{}".format("Format", "Extension", "Bitrate", "Size"))
                 for r in result:
                     filesize = gf.human_readable_number(r["filesize"])
-                    msg.append(u"%s\t%s\t%s\t%s" % (r["format"], r["ext"], r["abr"], filesize))
-                self.print_generic(u"Available audio streams:")
-                self.print_generic(u"\n".join(msg))
+                    msg.append("{}\t{}\t{}\t{}".format(r["format"], r["ext"], r["abr"], filesize))
+                self.print_generic("Available audio streams:")
+                self.print_generic("\n".join(msg))
             return self.NO_ERROR_EXIT_CODE
         except ImportError:
             self.print_no_dependency_error()
         except Exception as exc:
-            self.print_error(u"An unexpected error occurred while downloading audio from YouTube:")
-            self.print_error(u"%s" % exc)
+            self.print_error("An unexpected error occurred while downloading audio from YouTube:")
+            self.print_error("%s" % exc)
 
         return self.ERROR_EXIT_CODE
 

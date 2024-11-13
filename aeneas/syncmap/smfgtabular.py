@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# coding=utf-8
 
 # aeneas is a Python/C library and a set of tools
 # to automagically synchronize audio and text (aka forced alignment)
@@ -21,8 +20,6 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from __future__ import absolute_import
-from __future__ import print_function
 
 from aeneas.syncmap.smfbase import SyncMapFormatBase
 import aeneas.globalfunctions as gf
@@ -33,7 +30,7 @@ class SyncMapFormatGenericTabular(SyncMapFormatBase):
     Base class for tabular-like I/O format handlers.
     """
 
-    TAG = u"SyncMapFormatGenericTabular"
+    TAG = "SyncMapFormatGenericTabular"
 
     DEFAULT = "tabular"
     """
@@ -58,7 +55,7 @@ class SyncMapFormatGenericTabular(SyncMapFormatBase):
     Aliases for the machine-readable variant.
     """
 
-    FIELD_DELIMITER = u","
+    FIELD_DELIMITER = ","
     """
     The character delimiting fields.
     """
@@ -75,14 +72,14 @@ class SyncMapFormatGenericTabular(SyncMapFormatBase):
     while ``identifier`` and ``text`` are optional.
     """
 
-    TEXT_DELIMITER = u"\""
+    TEXT_DELIMITER = "\""
     """
     If ``None``, the text will not be delimited by a special character.
     Otherwise, use the specified character.
     """
 
     def __init__(self, variant=DEFAULT, parameters=None, rconf=None, logger=None):
-        super(SyncMapFormatGenericTabular, self).__init__(variant=variant, parameters=parameters, rconf=rconf, logger=logger)
+        super().__init__(variant=variant, parameters=parameters, rconf=rconf, logger=logger)
         # store parse/format time functions
         if self.variant in self.MACHINE_ALIASES:
             self.parse_time_function = gf.time_from_ssmmm
@@ -94,7 +91,7 @@ class SyncMapFormatGenericTabular(SyncMapFormatBase):
         placeholders = [None for i in range(len(self.FIELDS))]
         for k in self.FIELDS:
             placeholders[self.FIELDS[k]] = k
-        self.write_template = self.FIELD_DELIMITER.join([u"{%s}" % p for p in placeholders])
+        self.write_template = self.FIELD_DELIMITER.join(["{%s}" % p for p in placeholders])
 
     def parse(self, input_text, syncmap):
         lines = [line.strip() for line in input_text.splitlines()]
@@ -106,7 +103,7 @@ class SyncMapFormatGenericTabular(SyncMapFormatBase):
             if "identifier" in self.FIELDS:
                 identifier = split[self.FIELDS["identifier"]]
             else:
-                identifier = u"f%06d" % index
+                identifier = "f%06d" % index
 
             # set begin and end
             begin = self.parse_time_function(split[self.FIELDS["begin"]])
@@ -123,7 +120,7 @@ class SyncMapFormatGenericTabular(SyncMapFormatBase):
                 ):
                     text = text[1:-1]
             else:
-                text = u""
+                text = ""
 
             self._add_fragment(
                 syncmap=syncmap,
@@ -144,7 +141,7 @@ class SyncMapFormatGenericTabular(SyncMapFormatBase):
             # get text
             text = fragment.text_fragment.text
             if self.TEXT_DELIMITER is not None:
-                text = u"%s%s%s" % (
+                text = "{}{}{}".format(
                     self.TEXT_DELIMITER,
                     text,
                     self.TEXT_DELIMITER
@@ -156,4 +153,4 @@ class SyncMapFormatGenericTabular(SyncMapFormatBase):
                 end=end,
                 text=text
             ))
-        return u"\n".join(msg)
+        return "\n".join(msg)

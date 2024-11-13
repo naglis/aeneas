@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# coding=utf-8
 
 # aeneas is a Python/C library and a set of tools
 # to automagically synchronize audio and text (aka forced alignment)
@@ -27,8 +26,6 @@ Compile the Python C extension for reading WAVE files.
 .. versionadded:: 1.4.1
 """
 
-from __future__ import absolute_import
-from __future__ import print_function
 from numpy import get_include
 from numpy.distutils import misc_util
 from setuptools import Extension

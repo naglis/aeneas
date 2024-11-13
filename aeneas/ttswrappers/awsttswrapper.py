@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# coding=utf-8
 
 # aeneas is a Python/C library and a set of tools
 # to automagically synchronize audio and text (aka forced alignment)
@@ -48,9 +47,6 @@ for further details.
 .. versionadded:: 1.7.0
 """
 
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
 import numpy
 import time
 
@@ -186,37 +182,37 @@ class AWSTTSWrapper(BaseTTSWrapper):
     """ Spanish (USA) """
 
     CODE_TO_HUMAN = {
-        CYM: u"Welsh",
-        DAN: u"Danish",
-        DEU: u"German",
-        ENG: u"English",
-        FRA: u"French",
-        ISL: u"Icelandic",
-        ITA: u"Italian",
-        JPN: u"Japanese",
-        NLD: u"Dutch",
-        NOR: u"Norwegian",
-        POL: u"Polish",
-        POR: u"Portuguese",
-        RON: u"Romanian",
-        RUS: u"Russian",
-        SPA: u"Spanish",
-        SWE: u"Swedish",
-        TUR: u"Turkish",
-        ENG_AUS: u"English (Australia)",
-        ENG_GBR: u"English (GB)",
-        ENG_IND: u"English (India)",
-        ENG_USA: u"English (USA)",
-        ENG_WLS: u"English (Wales)",
-        FRA_CAN: u"French (Canada)",
-        FRA_FRA: u"French (France)",
-        POR_BRA: u"Portuguese (Brazil)",
-        POR_PRT: u"Portuguese (Portugal)",
-        SPA_ESP: u"Spanish (Spain)",
-        SPA_USA: u"Spanish (USA)",
+        CYM: "Welsh",
+        DAN: "Danish",
+        DEU: "German",
+        ENG: "English",
+        FRA: "French",
+        ISL: "Icelandic",
+        ITA: "Italian",
+        JPN: "Japanese",
+        NLD: "Dutch",
+        NOR: "Norwegian",
+        POL: "Polish",
+        POR: "Portuguese",
+        RON: "Romanian",
+        RUS: "Russian",
+        SPA: "Spanish",
+        SWE: "Swedish",
+        TUR: "Turkish",
+        ENG_AUS: "English (Australia)",
+        ENG_GBR: "English (GB)",
+        ENG_IND: "English (India)",
+        ENG_USA: "English (USA)",
+        ENG_WLS: "English (Wales)",
+        FRA_CAN: "French (Canada)",
+        FRA_FRA: "French (France)",
+        POR_BRA: "Portuguese (Brazil)",
+        POR_PRT: "Portuguese (Portugal)",
+        SPA_ESP: "Spanish (Spain)",
+        SPA_USA: "Spanish (USA)",
     }
 
-    CODE_TO_HUMAN_LIST = sorted([u"%s\t%s" % (k, v) for k, v in CODE_TO_HUMAN.items()])
+    CODE_TO_HUMAN_LIST = sorted(["{}\t{}".format(k, v) for k, v in CODE_TO_HUMAN.items()])
 
     LANGUAGE_TO_VOICE_CODE = {
         CYM: "Gwyneth",         # F
@@ -260,15 +256,15 @@ class AWSTTSWrapper(BaseTTSWrapper):
     SAMPLE_RATE = 16000
     """ Synthesize 16kHz PCM16 mono """
 
-    TAG = u"AWSTTSWrapper"
+    TAG = "AWSTTSWrapper"
 
     def __init__(self, rconf=None, logger=None):
-        super(AWSTTSWrapper, self).__init__(rconf=rconf, logger=logger)
+        super().__init__(rconf=rconf, logger=logger)
 
     def _synthesize_single_python_helper(self, text, voice_code, output_file_path=None, return_audio_data=True):
-        self.log(u"Importing boto3...")
+        self.log("Importing boto3...")
         import boto3
-        self.log(u"Importing boto3... done")
+        self.log("Importing boto3... done")
 
         # prepare client
         polly_client = boto3.client("polly")
@@ -276,14 +272,14 @@ class AWSTTSWrapper(BaseTTSWrapper):
         # post request
         sleep_delay = self.rconf[RuntimeConfiguration.TTS_API_SLEEP]
         attempts = self.rconf[RuntimeConfiguration.TTS_API_RETRY_ATTEMPTS]
-        self.log([u"Sleep delay:    %.3f", sleep_delay])
-        self.log([u"Retry attempts: %d", attempts])
+        self.log(["Sleep delay:    %.3f", sleep_delay])
+        self.log(["Retry attempts: %d", attempts])
 
         while attempts > 0:
-            self.log(u"Sleeping to throttle API usage...")
+            self.log("Sleeping to throttle API usage...")
             time.sleep(sleep_delay)
-            self.log(u"Sleeping to throttle API usage... done")
-            self.log(u"Posting...")
+            self.log("Sleeping to throttle API usage... done")
+            self.log("Posting...")
             try:
                 response = polly_client.synthesize_speech(
                     Text=text,
@@ -292,32 +288,32 @@ class AWSTTSWrapper(BaseTTSWrapper):
                     VoiceId=voice_code
                 )
             except Exception as exc:
-                self.log_exc(u"Unexpected exception on HTTP POST. Are you offline?", exc, True, ValueError)
-            self.log(u"Posting... done")
-            self.log(u"Reading response...")
+                self.log_exc("Unexpected exception on HTTP POST. Are you offline?", exc, True, ValueError)
+            self.log("Posting... done")
+            self.log("Reading response...")
             try:
                 status_code = response["ResponseMetadata"]["HTTPStatusCode"]
                 response_content = response["AudioStream"].read()
             except Exception as exc:
-                self.log_warn(u"Error while reading the response status code or the response content: %s" % exc)
+                self.log_warn("Error while reading the response status code or the response content: %s" % exc)
                 status_code = 999
-            self.log(u"Reading response... done")
-            self.log([u"Status code: %d", status_code])
+            self.log("Reading response... done")
+            self.log(["Status code: %d", status_code])
             if status_code == 200:
-                self.log(u"Got status code 200, break")
+                self.log("Got status code 200, break")
                 break
             else:
-                self.log_warn(u"Got status code other than 200, retry")
+                self.log_warn("Got status code other than 200, retry")
                 attempts -= 1
 
         if attempts <= 0:
-            self.log_exc(u"All API requests returned status code != 200", None, True, ValueError)
+            self.log_exc("All API requests returned status code != 200", None, True, ValueError)
 
         # save to file if requested
         if output_file_path is None:
-            self.log(u"output_file_path is None => not saving to file")
+            self.log("output_file_path is None => not saving to file")
         else:
-            self.log(u"output_file_path is not None => saving to file...")
+            self.log("output_file_path is not None => saving to file...")
             import wave
             output_file = wave.open(output_file_path, "wb")
             output_file.setframerate(self.SAMPLE_RATE)  # sample rate
@@ -325,15 +321,15 @@ class AWSTTSWrapper(BaseTTSWrapper):
             output_file.setsampwidth(2)                 # 16 bit/sample, i.e. 2 bytes/sample
             output_file.writeframes(response_content)
             output_file.close()
-            self.log(u"output_file_path is not None => saving to file... done")
+            self.log("output_file_path is not None => saving to file... done")
 
         # get length and data
         audio_sample_rate = self.SAMPLE_RATE
         number_of_frames = len(response_content) / 2
         audio_length = TimeValue(number_of_frames / audio_sample_rate)
-        self.log([u"Response (bytes): %d", len(response_content)])
-        self.log([u"Number of frames: %d", number_of_frames])
-        self.log([u"Audio length (s): %.3f", audio_length])
+        self.log(["Response (bytes): %d", len(response_content)])
+        self.log(["Number of frames: %d", number_of_frames])
+        self.log(["Audio length (s): %.3f", audio_length])
         audio_format = "pcm16"
         audio_samples = numpy.fromstring(response_content, dtype=numpy.int16).astype("float64") / 32768
 

@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# coding=utf-8
 
 # aeneas is a Python/C library and a set of tools
 # to automagically synchronize audio and text (aka forced alignment)
@@ -31,9 +30,6 @@ by David Huggins-Daines from the CMU Sphinx-III project.
 You can find the original file in the ``thirdparty/`` directory.
 """
 
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
 import math
 import numpy
 
@@ -57,10 +53,10 @@ class MFCC(Loggable):
     MEL_10 = 2595.0
     """ Base Mel frequency """
 
-    TAG = u"MFCC"
+    TAG = "MFCC"
 
     def __init__(self, rconf=None, logger=None):
-        super(MFCC, self).__init__(rconf=rconf, logger=logger)
+        super().__init__(rconf=rconf, logger=logger)
 
         # store parameters in local attributes
         self.filter_bank_size = self.rconf[RuntimeConfiguration.MFCC_FILTERS]
@@ -126,7 +122,7 @@ class MFCC(Loggable):
         dfreq = float(self.sample_rate) / self.fft_order
         nyquist_frequency = self.sample_rate / 2
         if self.upper_frequency > nyquist_frequency:
-            self.log_exc(u"Upper frequency %f exceeds Nyquist frequency %f" % (self.upper_frequency, nyquist_frequency), None, True, ValueError)
+            self.log_exc("Upper frequency {:f} exceeds Nyquist frequency {:f}".format(self.upper_frequency, nyquist_frequency), None, True, ValueError)
         melmax = MFCC._hz2mel(self.upper_frequency)
         melmin = MFCC._hz2mel(self.lower_frequency)
         dmelbw = (melmax - melmin) / (self.filter_bank_size + 1)
@@ -201,9 +197,9 @@ class MFCC(Loggable):
             return numpy.log(numpy.dot(power, self.filters).clip(self.CUTOFF, numpy.inf))
 
         if len(data.shape) != 1:
-            self.log_exc(u"The audio data must be a 1D numpy array (mono).", None, True, ValueError)
+            self.log_exc("The audio data must be a 1D numpy array (mono).", None, True, ValueError)
         if len(data) < 1:
-            self.log_exc(u"The audio data must not be empty.", None, True, ValueError)
+            self.log_exc("The audio data must not be empty.", None, True, ValueError)
 
         self.data = data
         self.sample_rate = sample_rate

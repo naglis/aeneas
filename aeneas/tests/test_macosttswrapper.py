@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# coding=utf-8
 
 # aeneas is a Python/C library and a set of tools
 # to automagically synchronize audio and text (aka forced alignment)
@@ -29,8 +28,8 @@ from aeneas.ttswrappers.macosttswrapper import MacOSTTSWrapper
 
 class TestESPEAKNGTTSWrapper(TestBaseTTSWrapper):
 
-    TTS = u"macos"
-    TTS_PATH = u"/usr/bin/say"
+    TTS = "macos"
+    TTS_PATH = "/usr/bin/say"
     TTS_CLASS = MacOSTTSWrapper
     TTS_LANGUAGE = MacOSTTSWrapper.ENG
     TTS_LANGUAGE_VARIATION = MacOSTTSWrapper.ENG_GBR

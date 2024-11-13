@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# coding=utf-8
 
 # aeneas is a Python/C library and a set of tools
 # to automagically synchronize audio and text (aka forced alignment)
@@ -25,8 +24,6 @@
 Global common functions.
 """
 
-from __future__ import absolute_import
-from __future__ import print_function
 import datetime
 import io
 import math
@@ -44,10 +41,10 @@ import aeneas.globalconstants as gc
 # RUNTIME CONSTANTS
 
 # ANSI codes to color output in terminal
-ANSI_END = u"\033[0m"
-ANSI_ERROR = u"\033[91m"
-ANSI_OK = u"\033[92m"
-ANSI_WARNING = u"\033[93m"
+ANSI_END = "\033[0m"
+ANSI_ERROR = "\033[91m"
+ANSI_OK = "\033[92m"
+ANSI_WARNING = "\033[93m"
 
 # timing regex patterns
 HHMMSS_MMM_PATTERN = re.compile(r"([0-9]*):([0-9]*):([0-9]*)\.([0-9]*)")
@@ -79,9 +76,9 @@ def safe_print(msg):
             decoded = encoded.decode(sys.stdout.encoding, "replace")
             print(decoded)
         except (UnicodeDecodeError, UnicodeEncodeError):
-            print(u"[ERRO] An unexpected error happened while printing to stdout.")
-            print(u"[ERRO] Please check that your file/string encoding matches the shell encoding.")
-            print(u"[ERRO] If possible, set your shell encoding to UTF-8 and convert any files with legacy encodings.")
+            print("[ERRO] An unexpected error happened while printing to stdout.")
+            print("[ERRO] Please check that your file/string encoding matches the shell encoding.")
+            print("[ERRO] If possible, set your shell encoding to UTF-8 and convert any files with legacy encodings.")
 
 
 def print_error(msg, color=True):
@@ -92,9 +89,9 @@ def print_error(msg, color=True):
     :param bool color: if ``True``, print with POSIX color
     """
     if color and is_posix():
-        safe_print(u"%s[ERRO] %s%s" % (ANSI_ERROR, msg, ANSI_END))
+        safe_print("{}[ERRO] {}{}".format(ANSI_ERROR, msg, ANSI_END))
     else:
-        safe_print(u"[ERRO] %s" % (msg))
+        safe_print("[ERRO] %s" % (msg))
 
 
 def print_info(msg, color=True):
@@ -104,7 +101,7 @@ def print_info(msg, color=True):
     :param string msg: the message
     :param bool color: if ``True``, print with POSIX color
     """
-    safe_print(u"[INFO] %s" % (msg))
+    safe_print("[INFO] %s" % (msg))
 
 
 def print_success(msg, color=True):
@@ -115,9 +112,9 @@ def print_success(msg, color=True):
     :param bool color: if ``True``, print with POSIX color
     """
     if color and is_posix():
-        safe_print(u"%s[INFO] %s%s" % (ANSI_OK, msg, ANSI_END))
+        safe_print("{}[INFO] {}{}".format(ANSI_OK, msg, ANSI_END))
     else:
-        safe_print(u"[INFO] %s" % (msg))
+        safe_print("[INFO] %s" % (msg))
 
 
 def print_warning(msg, color=True):
@@ -128,9 +125,9 @@ def print_warning(msg, color=True):
     :param bool color: if ``True``, print with POSIX color
     """
     if color and is_posix():
-        safe_print(u"%s[WARN] %s%s" % (ANSI_WARNING, msg, ANSI_END))
+        safe_print("{}[WARN] {}{}".format(ANSI_WARNING, msg, ANSI_END))
     else:
-        safe_print(u"[WARN] %s" % (msg))
+        safe_print("[WARN] %s" % (msg))
 
 
 def uuid_string():
@@ -142,7 +139,7 @@ def uuid_string():
     return safe_unicode(str(uuid.uuid4())).lower()
 
 
-def tmp_file(suffix=u"", root=None):
+def tmp_file(suffix="", root=None):
     """
     Return a (handler, path) tuple
     for a temporary file with given suffix created by ``tempfile``.
@@ -219,9 +216,9 @@ def datetime_string(time_zone=False):
     :rtype: string
     """
     time = datetime.datetime.now()
-    template = u"%04d-%02d-%02dT%02d:%02d:%02d"
+    template = "%04d-%02d-%02dT%02d:%02d:%02d"
     if time_zone:
-        template += u"+00:00"
+        template += "+00:00"
     return template % (
         time.year,
         time.month,
@@ -375,7 +372,7 @@ def config_xml_to_dict(contents, result, parse_job=True):
             # parse job
             for elem in root:
                 if (elem.tag != gc.CONFIG_XML_TASKS_TAG) and (elem.text is not None):
-                    pairs.append(u"%s%s%s" % (
+                    pairs.append("{}{}{}".format(
                         safe_unicode(elem.tag),
                         gc.CONFIG_STRING_ASSIGNMENT_SYMBOL,
                         safe_unicode(elem.text.strip())
@@ -389,7 +386,7 @@ def config_xml_to_dict(contents, result, parse_job=True):
                     pairs = []
                     for elem in task:
                         if elem.text is not None:
-                            pairs.append(u"%s%s%s" % (
+                            pairs.append("{}{}{}".format(
                                 safe_unicode(elem.tag),
                                 gc.CONFIG_STRING_ASSIGNMENT_SYMBOL,
                                 safe_unicode(elem.text.strip())
@@ -424,7 +421,7 @@ def config_dict_to_string(dictionary):
     """
     parameters = []
     for key in dictionary:
-        parameters.append(u"%s%s%s" % (
+        parameters.append("{}{}{}".format(
             key,
             gc.CONFIG_STRING_ASSIGNMENT_SYMBOL,
             dictionary[key]
@@ -512,8 +509,8 @@ def ensure_parent_directory(path, ensure_parent=True):
     if not os.path.exists(parent_directory):
         try:
             os.makedirs(parent_directory)
-        except (IOError, OSError):
-            raise OSError(u"Directory '%s' cannot be created" % parent_directory)
+        except OSError:
+            raise OSError("Directory '%s' cannot be created" % parent_directory)
 
 
 def time_from_ttml(string):
@@ -845,29 +842,29 @@ def run_c_extension_with_fallback(
     .. versionadded:: 1.4.0
     """
     computed = False
-    if not rconf[u"c_extensions"]:
-        log_function(u"C extensions disabled")
+    if not rconf["c_extensions"]:
+        log_function("C extensions disabled")
     elif extension not in rconf:
-        log_function([u"C extension '%s' not recognized", extension])
+        log_function(["C extension '%s' not recognized", extension])
     elif not rconf[extension]:
-        log_function([u"C extension '%s' disabled", extension])
+        log_function(["C extension '%s' disabled", extension])
     else:
-        log_function([u"C extension '%s' enabled", extension])
+        log_function(["C extension '%s' enabled", extension])
         if c_function is None:
-            log_function(u"C function is None")
+            log_function("C function is None")
         elif can_run_c_extension(extension):
-            log_function([u"C extension '%s' enabled and it can be loaded", extension])
+            log_function(["C extension '%s' enabled and it can be loaded", extension])
             computed, result = c_function(*args)
         else:
-            log_function([u"C extension '%s' enabled but it cannot be loaded", extension])
+            log_function(["C extension '%s' enabled but it cannot be loaded", extension])
     if not computed:
         if py_function is None:
-            log_function(u"Python function is None")
+            log_function("Python function is None")
         else:
-            log_function(u"Running the pure Python code")
+            log_function("Running the pure Python code")
             computed, result = py_function(*args)
     if not computed:
-        raise RuntimeError(u"Both the C extension and the pure Python code failed. (Wrong arguments? Input too big?)")
+        raise RuntimeError("Both the C extension and the pure Python code failed. (Wrong arguments? Input too big?)")
     return result
 
 
@@ -883,10 +880,10 @@ def file_can_be_read(path):
     if path is None:
         return False
     try:
-        with io.open(path, "rb"):
+        with open(path, "rb"):
             pass
         return True
-    except (IOError, OSError):
+    except OSError:
         pass
     return False
 
@@ -906,11 +903,11 @@ def file_can_be_written(path):
     if path is None:
         return False
     try:
-        with io.open(path, "wb"):
+        with open(path, "wb"):
             pass
         delete_file(None, path)
         return True
-    except (IOError, OSError):
+    except OSError:
         pass
     return False
 
@@ -1072,7 +1069,7 @@ def read_file_bytes(input_file_path):
     """
     contents = None
     try:
-        with io.open(input_file_path, "rb") as input_file:
+        with open(input_file_path, "rb") as input_file:
             contents = input_file.read()
     except Exception:
         pass
@@ -1091,9 +1088,9 @@ def human_readable_number(number, suffix=""):
     """
     for unit in ["", "K", "M", "G", "T", "P", "E", "Z"]:
         if abs(number) < 1024.0:
-            return "%3.1f%s%s" % (number, unit, suffix)
+            return "{:3.1f}{}{}".format(number, unit, suffix)
         number /= 1024.0
-    return "%.1f%s%s" % (number, "Y", suffix)
+    return "{:.1f}{}{}".format(number, "Y", suffix)
 
 
 def is_unicode(string):

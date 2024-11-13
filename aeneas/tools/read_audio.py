@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# coding=utf-8
 
 # aeneas is a Python/C library and a set of tools
 # to automagically synchronize audio and text (aka forced alignment)
@@ -25,8 +24,6 @@
 Read audio file properties.
 """
 
-from __future__ import absolute_import
-from __future__ import print_function
 import sys
 
 from aeneas.audiofile import AudioFile
@@ -46,17 +43,17 @@ class ReadAudioCLI(AbstractCLIProgram):
     NAME = gf.file_name_without_extension(__file__)
 
     HELP = {
-        "description": u"Read audio file properties.",
+        "description": "Read audio file properties.",
         "synopsis": [
-            (u"AUDIO_FILE", True)
+            ("AUDIO_FILE", True)
         ],
         "options": [
-            u"-f, --full : load samples from file, possibly converting to WAVE"
+            "-f, --full : load samples from file, possibly converting to WAVE"
         ],
         "parameters": [
         ],
         "examples": [
-            u"%s" % (AUDIO_FILE)
+            "%s" % (AUDIO_FILE)
         ]
     }
 
@@ -73,19 +70,19 @@ class ReadAudioCLI(AbstractCLIProgram):
         try:
             audiofile = AudioFile(audio_file_path, rconf=self.rconf, logger=self.logger)
             audiofile.read_properties()
-            if self.has_option([u"-f", u"--full"]):
+            if self.has_option(["-f", "--full"]):
                 audiofile.read_samples_from_file()
             self.print_generic(audiofile.__unicode__())
             return self.NO_ERROR_EXIT_CODE
         except OSError:
-            self.print_error(u"Cannot read file '%s'" % (audio_file_path))
-            self.print_error(u"Make sure the input file path is written/escaped correctly")
+            self.print_error("Cannot read file '%s'" % (audio_file_path))
+            self.print_error("Make sure the input file path is written/escaped correctly")
         except AudioFileProbeError:
-            self.print_error(u"Unable to call the ffprobe executable '%s'" % (self.rconf[RuntimeConfiguration.FFPROBE_PATH]))
-            self.print_error(u"Make sure the path to ffprobe is correct")
+            self.print_error("Unable to call the ffprobe executable '%s'" % (self.rconf[RuntimeConfiguration.FFPROBE_PATH]))
+            self.print_error("Make sure the path to ffprobe is correct")
         except AudioFileUnsupportedFormatError:
-            self.print_error(u"Cannot read properties of file '%s'" % (audio_file_path))
-            self.print_error(u"Make sure the input file has a format supported by ffprobe")
+            self.print_error("Cannot read properties of file '%s'" % (audio_file_path))
+            self.print_error("Make sure the input file has a format supported by ffprobe")
 
         return self.ERROR_EXIT_CODE
 

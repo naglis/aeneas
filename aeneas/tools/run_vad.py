@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# coding=utf-8
 
 # aeneas is a Python/C library and a set of tools
 # to automagically synchronize audio and text (aka forced alignment)
@@ -26,8 +25,6 @@ Extract a list of speech intervals from the given audio file,
 using the MFCC energy-based VAD algorithm.
 """
 
-from __future__ import absolute_import
-from __future__ import print_function
 import io
 import sys
 
@@ -49,22 +46,22 @@ class RunVADCLI(AbstractCLIProgram):
     OUTPUT_BOTH = "output/both.txt"
     OUTPUT_NONSPEECH = "output/nonspeech.txt"
     OUTPUT_SPEECH = "output/speech.txt"
-    MODES = [u"both", u"nonspeech", u"speech"]
+    MODES = ["both", "nonspeech", "speech"]
 
     NAME = gf.file_name_without_extension(__file__)
 
     HELP = {
-        "description": u"Extract a list of speech intervals using the MFCC energy-based VAD.",
+        "description": "Extract a list of speech intervals using the MFCC energy-based VAD.",
         "synopsis": [
-            (u"AUDIO_FILE [%s] [OUTPUT_FILE]" % (u"|".join(MODES)), True)
+            ("AUDIO_FILE [%s] [OUTPUT_FILE]" % ("|".join(MODES)), True)
         ],
         "examples": [
-            u"%s both %s" % (INPUT_FILE, OUTPUT_BOTH),
-            u"%s nonspeech %s" % (INPUT_FILE, OUTPUT_NONSPEECH),
-            u"%s speech %s" % (INPUT_FILE, OUTPUT_SPEECH)
+            "{} both {}".format(INPUT_FILE, OUTPUT_BOTH),
+            "{} nonspeech {}".format(INPUT_FILE, OUTPUT_NONSPEECH),
+            "{} speech {}".format(INPUT_FILE, OUTPUT_SPEECH)
         ],
         "options": [
-            u"-i, --index : output intervals as indices instead of seconds",
+            "-i, --index : output intervals as indices instead of seconds",
         ]
     }
 
@@ -78,12 +75,12 @@ class RunVADCLI(AbstractCLIProgram):
             return self.print_help()
         audio_file_path = self.actual_arguments[0]
         mode = self.actual_arguments[1]
-        if mode not in [u"speech", u"nonspeech", u"both"]:
+        if mode not in ["speech", "nonspeech", "both"]:
             return self.print_help()
         output_file_path = None
         if len(self.actual_arguments) >= 3:
             output_file_path = self.actual_arguments[2]
-        output_time = not self.has_option([u"-i", u"--index"])
+        output_time = not self.has_option(["-i", "--index"])
 
         self.check_c_extensions("cmfcc")
         if not self.check_input_file(audio_file_path):
@@ -91,52 +88,52 @@ class RunVADCLI(AbstractCLIProgram):
         if (output_file_path is not None) and (not self.check_output_file(output_file_path)):
             return self.ERROR_EXIT_CODE
 
-        self.print_info(u"Reading audio...")
+        self.print_info("Reading audio...")
         try:
             audio_file_mfcc = AudioFileMFCC(audio_file_path, rconf=self.rconf, logger=self.logger)
         except AudioFileConverterError:
-            self.print_error(u"Unable to call the ffmpeg executable '%s'" % (self.rconf[RuntimeConfiguration.FFMPEG_PATH]))
-            self.print_error(u"Make sure the path to ffmpeg is correct")
+            self.print_error("Unable to call the ffmpeg executable '%s'" % (self.rconf[RuntimeConfiguration.FFMPEG_PATH]))
+            self.print_error("Make sure the path to ffmpeg is correct")
             return self.ERROR_EXIT_CODE
         except (AudioFileUnsupportedFormatError, AudioFileNotInitializedError):
-            self.print_error(u"Cannot read file '%s'" % (audio_file_path))
-            self.print_error(u"Check that its format is supported by ffmpeg")
+            self.print_error("Cannot read file '%s'" % (audio_file_path))
+            self.print_error("Check that its format is supported by ffmpeg")
             return self.ERROR_EXIT_CODE
         except Exception as exc:
-            self.print_error(u"An unexpected error occurred while reading the audio file:")
-            self.print_error(u"%s" % exc)
+            self.print_error("An unexpected error occurred while reading the audio file:")
+            self.print_error("%s" % exc)
             return self.ERROR_EXIT_CODE
-        self.print_info(u"Reading audio... done")
+        self.print_info("Reading audio... done")
 
-        self.print_info(u"Executing VAD...")
+        self.print_info("Executing VAD...")
         audio_file_mfcc.run_vad()
-        self.print_info(u"Executing VAD... done")
+        self.print_info("Executing VAD... done")
 
         speech = audio_file_mfcc.intervals(speech=True, time=output_time)
         nonspeech = audio_file_mfcc.intervals(speech=False, time=output_time)
-        if mode == u"speech":
+        if mode == "speech":
             if output_time:
                 intervals = [(i.begin, i.end) for i in speech]
-                template = u"%.3f\t%.3f"
+                template = "%.3f\t%.3f"
             else:
                 intervals = speech
-                template = u"%d\t%d"
-        elif mode == u"nonspeech":
+                template = "%d\t%d"
+        elif mode == "nonspeech":
             if output_time:
                 intervals = [(i.begin, i.end) for i in nonspeech]
-                template = u"%.3f\t%.3f"
+                template = "%.3f\t%.3f"
             else:
                 intervals = nonspeech
-                template = u"%d\t%d"
-        elif mode == u"both":
+                template = "%d\t%d"
+        elif mode == "both":
             if output_time:
-                speech = [(i.begin, i.end, u"speech") for i in speech]
-                nonspeech = [(i.begin, i.end, u"nonspeech") for i in nonspeech]
-                template = u"%.3f\t%.3f\t%s"
+                speech = [(i.begin, i.end, "speech") for i in speech]
+                nonspeech = [(i.begin, i.end, "nonspeech") for i in nonspeech]
+                template = "%.3f\t%.3f\t%s"
             else:
-                speech = [(i[0], i[1], u"speech") for i in speech]
-                nonspeech = [(i[0], i[1], u"nonspeech") for i in nonspeech]
-                template = u"%d\t%d\t%s"
+                speech = [(i[0], i[1], "speech") for i in speech]
+                nonspeech = [(i[0], i[1], "nonspeech") for i in nonspeech]
+                template = "%d\t%d\t%s"
             intervals = sorted(speech + nonspeech)
         self.write_to_file(output_file_path, intervals, template)
 
@@ -154,13 +151,13 @@ class RunVADCLI(AbstractCLIProgram):
         """
         msg = [template % (interval) for interval in intervals]
         if output_file_path is None:
-            self.print_info(u"Intervals detected:")
+            self.print_info("Intervals detected:")
             for line in msg:
                 self.print_generic(line)
         else:
-            with io.open(output_file_path, "w", encoding="utf-8") as output_file:
-                output_file.write(u"\n".join(msg))
-                self.print_success(u"Created file '%s'" % output_file_path)
+            with open(output_file_path, "w", encoding="utf-8") as output_file:
+                output_file.write("\n".join(msg))
+                self.print_success("Created file '%s'" % output_file_path)
 
 
 def main():

@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# coding=utf-8
 
 # aeneas is a Python/C library and a set of tools
 # to automagically synchronize audio and text (aka forced alignment)
@@ -29,9 +28,6 @@ This module contains the following classes:
   Mel-frequency ceptral coefficients (MFCC).
 """
 
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
 import numpy
 
 from aeneas.audiofile import AudioFile
@@ -101,7 +97,7 @@ class AudioFileMFCC(Loggable):
     .. versionadded:: 1.5.0
     """
 
-    TAG = u"AudioFileMFCC"
+    TAG = "AudioFileMFCC"
 
     def __init__(
             self,
@@ -113,8 +109,8 @@ class AudioFileMFCC(Loggable):
             logger=None
     ):
         if (file_path is None) and (audio_file is None) and (mfcc_matrix is None):
-            raise ValueError(u"You must initialize with at least one of: file_path, audio_file, or mfcc_matrix")
-        super(AudioFileMFCC, self).__init__(rconf=rconf, logger=logger)
+            raise ValueError("You must initialize with at least one of: file_path, audio_file, or mfcc_matrix")
+        super().__init__(rconf=rconf, logger=logger)
         self.file_path = file_path
         self.audio_file = audio_file
         self.is_reversed = False
@@ -123,7 +119,7 @@ class AudioFileMFCC(Loggable):
         self.__mfcc_mask_map = None
         self.__speech_intervals = None
         self.__nonspeech_intervals = None
-        self.log(u"Initializing MFCCs...")
+        self.log("Initializing MFCCs...")
         if mfcc_matrix is not None:
             self.__mfcc = mfcc_matrix
             self.audio_length = self.all_length * self.rconf.mws
@@ -149,20 +145,20 @@ class AudioFileMFCC(Loggable):
             )
             self.audio_length = self.audio_file.audio_length
             if audio_file_was_none:
-                self.log(u"Clearing the audio data...")
+                self.log("Clearing the audio data...")
                 self.audio_file.clear_data()
                 self.audio_file = None
-                self.log(u"Clearing the audio data... done")
+                self.log("Clearing the audio data... done")
         self.__middle_begin = 0
         self.__middle_end = self.__mfcc.shape[1]
-        self.log(u"Initializing MFCCs... done")
+        self.log("Initializing MFCCs... done")
 
     def __unicode__(self):
         msg = [
-            u"File path:        %s" % self.file_path,
-            u"Audio length (s): %s" % gf.safe_float(self.audio_length),
+            "File path:        %s" % self.file_path,
+            "Audio length (s): %s" % gf.safe_float(self.audio_length),
         ]
-        return u"\n".join(msg)
+        return "\n".join(msg)
 
     def __str__(self):
         return gf.safe_str(self.__unicode__())
@@ -389,10 +385,10 @@ class AudioFileMFCC(Loggable):
         """
         self._ensure_mfcc_mask()
         if speech:
-            self.log(u"Converting speech runs to intervals...")
+            self.log("Converting speech runs to intervals...")
             intervals = self.__speech_intervals
         else:
-            self.log(u"Converting nonspeech runs to intervals...")
+            self.log("Converting nonspeech runs to intervals...")
             intervals = self.__nonspeech_intervals
         if time:
             mws = self.rconf.mws
@@ -400,7 +396,7 @@ class AudioFileMFCC(Loggable):
                 begin=(b * mws),
                 end=((e + 1) * mws)
             ) for b, e in intervals]
-        self.log(u"Converting... done")
+        self.log("Converting... done")
         return intervals
 
     def inside_nonspeech(self, index):
@@ -456,7 +452,7 @@ class AudioFileMFCC(Loggable):
         :param int index: the new index for MIDDLE begin
         """
         if (index < 0) or (index > self.all_length):
-            raise ValueError(u"The given index is not valid")
+            raise ValueError("The given index is not valid")
         self.__middle_begin = index
 
     @property
@@ -485,7 +481,7 @@ class AudioFileMFCC(Loggable):
         :param int index: the new index for MIDDLE end
         """
         if (index < 0) or (index > self.all_length):
-            raise ValueError(u"The given index is not valid")
+            raise ValueError("The given index is not valid")
         self.__middle_end = index
 
     @property
@@ -503,18 +499,18 @@ class AudioFileMFCC(Loggable):
         and hence ``self.__mfcc_mask`` has a meaningful value.
         """
         if self.__mfcc_mask is None:
-            self.log(u"VAD was not run: running it now")
+            self.log("VAD was not run: running it now")
             self.run_vad()
 
     def _compute_mfcc_c_extension(self):
         """
         Compute MFCCs using the Python C extension cmfcc.
         """
-        self.log(u"Computing MFCCs using C extension...")
+        self.log("Computing MFCCs using C extension...")
         try:
-            self.log(u"Importing cmfcc...")
+            self.log("Importing cmfcc...")
             import aeneas.cmfcc.cmfcc
-            self.log(u"Importing cmfcc... done")
+            self.log("Importing cmfcc... done")
             self.__mfcc = (aeneas.cmfcc.cmfcc.compute_from_data(
                 self.audio_file.audio_samples,
                 self.audio_file.audio_sample_rate,
@@ -527,17 +523,17 @@ class AudioFileMFCC(Loggable):
                 self.rconf[RuntimeConfiguration.MFCC_WINDOW_LENGTH],
                 self.rconf[RuntimeConfiguration.MFCC_WINDOW_SHIFT]
             )[0]).transpose()
-            self.log(u"Computing MFCCs using C extension... done")
+            self.log("Computing MFCCs using C extension... done")
             return (True, None)
         except Exception as exc:
-            self.log_exc(u"An unexpected error occurred while running cmfcc", exc, False, None)
+            self.log_exc("An unexpected error occurred while running cmfcc", exc, False, None)
         return (False, None)
 
     def _compute_mfcc_pure_python(self):
         """
         Compute MFCCs using the pure Python code.
         """
-        self.log(u"Computing MFCCs using pure Python code...")
+        self.log("Computing MFCCs using pure Python code...")
         try:
             self.__mfcc = MFCC(
                 rconf=self.rconf,
@@ -546,10 +542,10 @@ class AudioFileMFCC(Loggable):
                 self.audio_file.audio_samples,
                 self.audio_file.audio_sample_rate
             ).transpose()
-            self.log(u"Computing MFCCs using pure Python code... done")
+            self.log("Computing MFCCs using pure Python code... done")
             return (True, None)
         except Exception as exc:
-            self.log_exc(u"An unexpected error occurred while running pure Python code", exc, False, None)
+            self.log_exc("An unexpected error occurred while running pure Python code", exc, False, None)
         return (False, None)
 
     def reverse(self):
@@ -562,7 +558,7 @@ class AudioFileMFCC(Loggable):
         Only speech and nonspeech intervals are actually recomputed
         as Python lists.
         """
-        self.log(u"Reversing...")
+        self.log("Reversing...")
         all_length = self.all_length
         self.__mfcc = self.__mfcc[:, ::-1]
         tmp = self.__middle_end
@@ -579,7 +575,7 @@ class AudioFileMFCC(Loggable):
             self.__speech_intervals = [(all_length - i[1], all_length - i[0]) for i in self.__speech_intervals[::-1]]
             self.__nonspeech_intervals = [(all_length - i[1], all_length - i[0]) for i in self.__nonspeech_intervals[::-1]]
         self.is_reversed = not self.is_reversed
-        self.log(u"Reversing...done")
+        self.log("Reversing...done")
 
     def run_vad(
         self,
@@ -613,9 +609,9 @@ class AudioFileMFCC(Loggable):
             if len(array) < 1:
                 return []
             return numpy.split(array, numpy.where(numpy.diff(array) != 1)[0] + 1)
-        self.log(u"Creating VAD object")
+        self.log("Creating VAD object")
         vad = VAD(rconf=self.rconf, logger=self.logger)
-        self.log(u"Running VAD...")
+        self.log("Running VAD...")
         self.__mfcc_mask = vad.run_vad(
             wave_energy=self.__mfcc[0],
             log_energy_threshold=log_energy_threshold,
@@ -624,8 +620,8 @@ class AudioFileMFCC(Loggable):
             extend_after=extend_after
         )
         self.__mfcc_mask_map = (numpy.where(self.__mfcc_mask))[0]
-        self.log(u"Running VAD... done")
-        self.log(u"Storing speech and nonspeech intervals...")
+        self.log("Running VAD... done")
+        self.log("Storing speech and nonspeech intervals...")
         # where( == True) already computed, reusing
         # COMMENTED runs = _compute_runs((numpy.where(self.__mfcc_mask))[0])
         runs = _compute_runs(self.__mfcc_mask_map)
@@ -633,7 +629,7 @@ class AudioFileMFCC(Loggable):
         # where( == False) not already computed, computing now
         runs = _compute_runs((numpy.where(~self.__mfcc_mask))[0])
         self.__nonspeech_intervals = [(r[0], r[-1]) for r in runs]
-        self.log(u"Storing speech and nonspeech intervals... done")
+        self.log("Storing speech and nonspeech intervals... done")
 
     def set_head_middle_tail(self, head_length=None, middle_length=None, tail_length=None):
         """
@@ -660,17 +656,17 @@ class AudioFileMFCC(Loggable):
             (tail_length, "tail_length")
         ]:
             if (variable is not None) and (not isinstance(variable, TimeValue)):
-                raise TypeError(u"%s is not None or TimeValue" % name)
+                raise TypeError("%s is not None or TimeValue" % name)
             if (variable is not None) and (variable > self.audio_length):
-                raise ValueError(u"%s is greater than the length of the audio file" % name)
-        self.log(u"Setting head middle tail...")
+                raise ValueError("%s is greater than the length of the audio file" % name)
+        self.log("Setting head middle tail...")
         mws = self.rconf.mws
-        self.log([u"Before: 0 %d %d %d", self.middle_begin, self.middle_end, self.all_length])
+        self.log(["Before: 0 %d %d %d", self.middle_begin, self.middle_end, self.all_length])
         if head_length is not None:
             self.middle_begin = int(head_length / mws)
         if middle_length is not None:
             self.middle_end = self.middle_begin + int(middle_length / mws)
         elif tail_length is not None:
             self.middle_end = self.all_length - int(tail_length / mws)
-        self.log([u"After:  0 %d %d %d", self.middle_begin, self.middle_end, self.all_length])
-        self.log(u"Setting head middle tail... done")
+        self.log(["After:  0 %d %d %d", self.middle_begin, self.middle_end, self.all_length])
+        self.log("Setting head middle tail... done")

@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# coding=utf-8
 
 # aeneas is a Python/C library and a set of tools
 # to automagically synchronize audio and text (aka forced alignment)
@@ -21,8 +20,6 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from __future__ import absolute_import
-from __future__ import print_function
 
 from aeneas.syncmap.smfgxml import SyncMapFormatGenericXML
 import aeneas.globalfunctions as gf
@@ -33,7 +30,7 @@ class SyncMapFormatXMLLegacy(SyncMapFormatGenericXML):
     Handler for XML (legacy) I/O format. Deprecated.
     """
 
-    TAG = u"SyncMapFormatXMLLegacy"
+    TAG = "SyncMapFormatXMLLegacy"
 
     DEFAULT = "xml_legacy"
 
@@ -52,20 +49,20 @@ class SyncMapFormatXMLLegacy(SyncMapFormatGenericXML):
             self._add_fragment(
                 syncmap=syncmap,
                 identifier=identifier,
-                lines=[u""],
+                lines=[""],
                 begin=begin,
                 end=end
             )
 
     def format(self, syncmap):
         msg = []
-        msg.append(u"<?xml version=\"1.0\" encoding=\"UTF-8\" ?>")
-        msg.append(u"<map>")
+        msg.append("<?xml version=\"1.0\" encoding=\"UTF-8\" ?>")
+        msg.append("<map>")
         for fragment in syncmap.fragments:
-            msg.append(u" <fragment>")
-            msg.append(u"  <identifier>%s</identifier>" % fragment.text_fragment.identifier)
-            msg.append(u"  <start>%s</start>" % gf.time_to_ssmmm(fragment.begin))
-            msg.append(u"  <end>%s</end>" % gf.time_to_ssmmm(fragment.end))
-            msg.append(u" </fragment>")
-        msg.append(u"</map>")
-        return u"\n".join(msg)
+            msg.append(" <fragment>")
+            msg.append("  <identifier>%s</identifier>" % fragment.text_fragment.identifier)
+            msg.append("  <start>%s</start>" % gf.time_to_ssmmm(fragment.begin))
+            msg.append("  <end>%s</end>" % gf.time_to_ssmmm(fragment.end))
+            msg.append(" </fragment>")
+        msg.append("</map>")
+        return "\n".join(msg)

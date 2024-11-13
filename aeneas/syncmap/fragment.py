@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# coding=utf-8
 
 # aeneas is a Python/C library and a set of tools
 # to automagically synchronize audio and text (aka forced alignment)
@@ -21,8 +20,6 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from __future__ import absolute_import
-from __future__ import print_function
 
 from aeneas.exacttiming import Decimal
 from aeneas.exacttiming import TimeInterval
@@ -30,7 +27,7 @@ from aeneas.exacttiming import TimeValue
 import aeneas.globalfunctions as gf
 
 
-class SyncMapFragment(object):
+class SyncMapFragment:
     """
     A sync map fragment, that is,
     a text fragment and an associated time interval.
@@ -44,7 +41,7 @@ class SyncMapFragment(object):
     :param float confidence: the confidence of the audio timing
     """
 
-    TAG = u"SyncMapFragment"
+    TAG = "SyncMapFragment"
 
     REGULAR = 0
     """ Regular fragment """
@@ -81,7 +78,7 @@ class SyncMapFragment(object):
         self.confidence = confidence
 
     def __unicode__(self):
-        return u"%s %d %.3f %.3f" % (
+        return "%s %d %.3f %.3f" % (
             self.text_fragment.identifier,
             self.fragment_type,
             self.begin,
@@ -210,11 +207,11 @@ class SyncMapFragment(object):
 
         .. versionadded:: 1.7.0
         """
-        return u"%s\t%.3f\t%.3f\t%s" % (
-            (self.identifier or u""),
+        return "{}\t{:.3f}\t{:.3f}\t{}".format(
+            (self.identifier or ""),
             (self.begin if self.begin is not None else TimeValue("-2.000")),
             (self.end if self.end is not None else TimeValue("-1.000")),
-            (self.text or u"")
+            (self.text or "")
         )
 
     @property
@@ -257,9 +254,9 @@ class SyncMapFragment(object):
     @begin.setter
     def begin(self, begin):
         if self.interval is None:
-            raise TypeError(u"Attempting to set begin when interval is None")
+            raise TypeError("Attempting to set begin when interval is None")
         if not isinstance(begin, TimeValue):
-            raise TypeError(u"The given begin value is not an instance of TimeValue")
+            raise TypeError("The given begin value is not an instance of TimeValue")
         self.interval.begin = begin
 
     @property
@@ -276,9 +273,9 @@ class SyncMapFragment(object):
     @end.setter
     def end(self, end):
         if self.interval is None:
-            raise TypeError(u"Attempting to set end when interval is None")
+            raise TypeError("Attempting to set end when interval is None")
         if not isinstance(end, TimeValue):
-            raise TypeError(u"The given end value is not an instance of TimeValue")
+            raise TypeError("The given end value is not an instance of TimeValue")
         self.interval.end = end
 
     @property

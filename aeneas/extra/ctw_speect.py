@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# coding=utf-8
 
 # aeneas is a Python/C library and a set of tools
 # to automagically synchronize audio and text (aka forced alignment)
@@ -25,9 +24,6 @@
 A wrapper for the ``speect`` TTS engine.
 """
 
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
 import numpy
 import speect
 import speect.audio
@@ -82,10 +78,10 @@ class CustomTTSWrapper(BaseTTSWrapper):
     #
     HAS_PYTHON_CALL = True
 
-    TAG = u"CustomTTSWrapperSPEECT"
+    TAG = "CustomTTSWrapperSPEECT"
 
     def __init__(self, rconf=None, logger=None):
-        super(CustomTTSWrapper, self).__init__(rconf=rconf, logger=logger)
+        super().__init__(rconf=rconf, logger=logger)
 
     def _synthesize_single_python_helper(
         self,
@@ -110,7 +106,7 @@ class CustomTTSWrapper(BaseTTSWrapper):
             #      so set them to None instead of the more precise:
             #      return (True, (TimeValue("0.000"), 16000, "pcm_s16le", numpy.array([])))
             #
-            self.log(u"len(text) is zero: returning 0.000")
+            self.log("len(text) is zero: returning 0.000")
             return (True, (TimeValue("0.000"), None, None, None))
 
         #
@@ -132,20 +128,20 @@ class CustomTTSWrapper(BaseTTSWrapper):
         utt = voice.synth(text)
         audio = utt.features["audio"]
         if output_file_path is None:
-            self.log(u"output_file_path is None => not saving to file")
+            self.log("output_file_path is None => not saving to file")
         else:
-            self.log(u"output_file_path is not None => saving to file...")
+            self.log("output_file_path is not None => saving to file...")
             # NOTE apparently, save_riff needs the path to be a byte string
             audio.save_riff(gf.safe_str(output_file_path))
-            self.log(u"output_file_path is not None => saving to file... done")
+            self.log("output_file_path is not None => saving to file... done")
 
         # return immediately if returning audio data is not needed
         if not return_audio_data:
-            self.log(u"return_audio_data is True => return immediately")
+            self.log("return_audio_data is True => return immediately")
             return (True, None)
 
         # get length and data using speect Python API
-        self.log(u"return_audio_data is True => read and return audio data")
+        self.log("return_audio_data is True => read and return audio data")
         waveform = audio.get_audio_waveform()
         audio_sample_rate = int(waveform["samplerate"])
         audio_length = TimeValue(audio.num_samples() / audio_sample_rate)

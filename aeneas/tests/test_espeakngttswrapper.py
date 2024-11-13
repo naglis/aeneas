@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# coding=utf-8
 
 # aeneas is a Python/C library and a set of tools
 # to automagically synchronize audio and text (aka forced alignment)
@@ -29,8 +28,8 @@ from aeneas.ttswrappers.espeakngttswrapper import ESPEAKNGTTSWrapper
 
 class TestESPEAKNGTTSWrapper(TestBaseTTSWrapper):
 
-    TTS = u"espeak-ng"
-    TTS_PATH = u"/usr/bin/espeak-ng"
+    TTS = "espeak-ng"
+    TTS_PATH = "/usr/bin/espeak-ng"
     TTS_CLASS = ESPEAKNGTTSWrapper
     TTS_LANGUAGE = ESPEAKNGTTSWrapper.ENG
     TTS_LANGUAGE_VARIATION = ESPEAKNGTTSWrapper.ENG_GBR

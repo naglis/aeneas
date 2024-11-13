@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# coding=utf-8
 
 # aeneas is a Python/C library and a set of tools
 # to automagically synchronize audio and text (aka forced alignment)
@@ -25,8 +24,6 @@
 Convert audio files to mono WAV using the ``ffmpeg`` wrapper.
 """
 
-from __future__ import absolute_import
-from __future__ import print_function
 import sys
 
 from aeneas.ffmpegwrapper import FFMPEGPathError
@@ -46,12 +43,12 @@ class FFMPEGWrapperCLI(AbstractCLIProgram):
     NAME = gf.file_name_without_extension(__file__)
 
     HELP = {
-        "description": u"Convert audio files to mono WAV using the ffmpeg wrapper.",
+        "description": "Convert audio files to mono WAV using the ffmpeg wrapper.",
         "synopsis": [
-            (u"INPUT_FILE OUTPUT_FILE", True)
+            ("INPUT_FILE OUTPUT_FILE", True)
         ],
         "examples": [
-            u"%s %s" % (INPUT_FILE, OUTPUT_FILE)
+            "{} {}".format(INPUT_FILE, OUTPUT_FILE)
         ]
     }
 
@@ -74,14 +71,14 @@ class FFMPEGWrapperCLI(AbstractCLIProgram):
         try:
             converter = FFMPEGWrapper(rconf=self.rconf, logger=self.logger)
             converter.convert(input_file_path, output_file_path)
-            self.print_success(u"Converted '%s' into '%s'" % (input_file_path, output_file_path))
+            self.print_success("Converted '{}' into '{}'".format(input_file_path, output_file_path))
             return self.NO_ERROR_EXIT_CODE
         except FFMPEGPathError:
-            self.print_error(u"Unable to call the ffmpeg executable '%s'" % (self.rconf[RuntimeConfiguration.FFMPEG_PATH]))
-            self.print_error(u"Make sure the path to ffmpeg is correct")
+            self.print_error("Unable to call the ffmpeg executable '%s'" % (self.rconf[RuntimeConfiguration.FFMPEG_PATH]))
+            self.print_error("Make sure the path to ffmpeg is correct")
         except OSError:
-            self.print_error(u"Cannot convert file '%s' into '%s'" % (input_file_path, output_file_path))
-            self.print_error(u"Make sure the input file has a format supported by ffmpeg")
+            self.print_error("Cannot convert file '{}' into '{}'".format(input_file_path, output_file_path))
+            self.print_error("Make sure the input file has a format supported by ffmpeg")
 
         return self.ERROR_EXIT_CODE
 

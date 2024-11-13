@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# coding=utf-8
 
 # aeneas is a Python/C library and a set of tools
 # to automagically synchronize audio and text (aka forced alignment)
@@ -34,14 +33,12 @@ This module can be executed from command line with::
 .. versionadded:: 1.4.1
 """
 
-from __future__ import absolute_import
-from __future__ import print_function
 import sys
 
 import aeneas.globalfunctions as gf
 
 
-class Diagnostics(object):
+class Diagnostics:
     """
     Check whether the setup of ``aeneas`` was successful.
     """
@@ -61,18 +58,18 @@ class Diagnostics(object):
         if sys.stdout.encoding not in ["UTF-8", "UTF8", "utf-8", "utf8"]:
             is_out_utf8 = False
         if (is_in_utf8) and (is_out_utf8):
-            gf.print_success(u"shell encoding OK")
+            gf.print_success("shell encoding OK")
         else:
-            gf.print_warning(u"shell encoding WARNING")
+            gf.print_warning("shell encoding WARNING")
             if not is_in_utf8:
-                gf.print_warning(u"  The default input encoding of your shell is not UTF-8")
+                gf.print_warning("  The default input encoding of your shell is not UTF-8")
             if not is_out_utf8:
-                gf.print_warning(u"  The default output encoding of your shell is not UTF-8")
-            gf.print_info(u"  If you plan to use aeneas on the command line,")
+                gf.print_warning("  The default output encoding of your shell is not UTF-8")
+            gf.print_info("  If you plan to use aeneas on the command line,")
             if gf.is_posix():
-                gf.print_info(u"  you might want to 'export PYTHONIOENCODING=UTF-8' in your shell")
+                gf.print_info("  you might want to 'export PYTHONIOENCODING=UTF-8' in your shell")
             else:
-                gf.print_info(u"  you might want to 'set PYTHONIOENCODING=UTF-8' in your shell")
+                gf.print_info("  you might want to 'set PYTHONIOENCODING=UTF-8' in your shell")
             return True
         return False
 
@@ -87,15 +84,15 @@ class Diagnostics(object):
         """
         try:
             from aeneas.ffprobewrapper import FFPROBEWrapper
-            file_path = gf.absolute_path(u"tools/res/audio.mp3", __file__)
+            file_path = gf.absolute_path("tools/res/audio.mp3", __file__)
             prober = FFPROBEWrapper()
             prober.read_properties(file_path)
-            gf.print_success(u"ffprobe        OK")
+            gf.print_success("ffprobe        OK")
         except Exception:
-            gf.print_error(u"ffprobe        ERROR")
-            gf.print_info(u"  Please make sure you have ffprobe installed correctly")
-            gf.print_info(u"  (usually it is provided by the ffmpeg installer)")
-            gf.print_info(u"  and that its path is in your PATH environment variable")
+            gf.print_error("ffprobe        ERROR")
+            gf.print_info("  Please make sure you have ffprobe installed correctly")
+            gf.print_info("  (usually it is provided by the ffmpeg installer)")
+            gf.print_info("  and that its path is in your PATH environment variable")
             return True
         else:
             return False
@@ -111,19 +108,19 @@ class Diagnostics(object):
         """
         try:
             from aeneas.ffmpegwrapper import FFMPEGWrapper
-            input_file_path = gf.absolute_path(u"tools/res/audio.mp3", __file__)
-            handler, output_file_path = gf.tmp_file(suffix=u".wav")
+            input_file_path = gf.absolute_path("tools/res/audio.mp3", __file__)
+            handler, output_file_path = gf.tmp_file(suffix=".wav")
             converter = FFMPEGWrapper()
             result = converter.convert(input_file_path, output_file_path)
             gf.delete_file(handler, output_file_path)
             if result:
-                gf.print_success(u"ffmpeg         OK")
+                gf.print_success("ffmpeg         OK")
                 return False
         except Exception:
             pass
-        gf.print_error(u"ffmpeg         ERROR")
-        gf.print_info(u"  Please make sure you have ffmpeg installed correctly")
-        gf.print_info(u"  and that its path is in your PATH environment variable")
+        gf.print_error("ffmpeg         ERROR")
+        gf.print_info("  Please make sure you have ffmpeg installed correctly")
+        gf.print_info("  and that its path is in your PATH environment variable")
         return True
 
     @classmethod
@@ -139,19 +136,19 @@ class Diagnostics(object):
             from aeneas.textfile import TextFile
             from aeneas.textfile import TextFragment
             from aeneas.ttswrappers.espeakttswrapper import ESPEAKTTSWrapper
-            text = u"From fairest creatures we desire increase,"
+            text = "From fairest creatures we desire increase,"
             text_file = TextFile()
-            text_file.add_fragment(TextFragment(language=u"eng", lines=[text], filtered_lines=[text]))
-            handler, output_file_path = gf.tmp_file(suffix=u".wav")
+            text_file.add_fragment(TextFragment(language="eng", lines=[text], filtered_lines=[text]))
+            handler, output_file_path = gf.tmp_file(suffix=".wav")
             ESPEAKTTSWrapper().synthesize_multiple(text_file, output_file_path)
             gf.delete_file(handler, output_file_path)
-            gf.print_success(u"espeak         OK")
+            gf.print_success("espeak         OK")
         except Exception:
-            gf.print_error(u"espeak         ERROR")
-            gf.print_info(u"  Please make sure you have espeak installed correctly")
-            gf.print_info(u"  and that its path is in your PATH environment variable")
-            gf.print_info(u"  You might also want to check that the espeak-data directory")
-            gf.print_info(u"  is set up correctly, for example, it has the correct permissions")
+            gf.print_error("espeak         ERROR")
+            gf.print_info("  Please make sure you have espeak installed correctly")
+            gf.print_info("  and that its path is in your PATH environment variable")
+            gf.print_info("  You might also want to check that the espeak-data directory")
+            gf.print_info("  is set up correctly, for example, it has the correct permissions")
             return True
         else:
             return False
@@ -170,11 +167,11 @@ class Diagnostics(object):
             # COMMENTED from aeneas.tools.download import DownloadCLI
             # disabling this check, as it requires the optional dependency Pillow
             # COMMENTED from aeneas.tools.plot_waveform import PlotWaveformCLI
-            gf.print_success(u"aeneas.tools   OK")
+            gf.print_success("aeneas.tools   OK")
         except Exception:
-            gf.print_error(u"aeneas.tools   ERROR")
-            gf.print_info(u"  Unable to import one or more aeneas.tools")
-            gf.print_info(u"  Please check that you installed aeneas properly")
+            gf.print_error("aeneas.tools   ERROR")
+            gf.print_info("  Unable to import one or more aeneas.tools")
+            gf.print_info("  Please check that you installed aeneas properly")
             return True
         else:
             return False
@@ -189,11 +186,11 @@ class Diagnostics(object):
         :rtype: bool
         """
         if gf.can_run_c_extension("cdtw"):
-            gf.print_success(u"aeneas.cdtw    AVAILABLE")
+            gf.print_success("aeneas.cdtw    AVAILABLE")
             return False
-        gf.print_warning(u"aeneas.cdtw    NOT AVAILABLE")
-        gf.print_info(u"  You can still run aeneas but it will be significantly slower")
-        gf.print_info(u"  Please refer to the installation documentation for details")
+        gf.print_warning("aeneas.cdtw    NOT AVAILABLE")
+        gf.print_info("  You can still run aeneas but it will be significantly slower")
+        gf.print_info("  Please refer to the installation documentation for details")
         return True
 
     @classmethod
@@ -206,11 +203,11 @@ class Diagnostics(object):
         :rtype: bool
         """
         if gf.can_run_c_extension("cmfcc"):
-            gf.print_success(u"aeneas.cmfcc   AVAILABLE")
+            gf.print_success("aeneas.cmfcc   AVAILABLE")
             return False
-        gf.print_warning(u"aeneas.cmfcc   NOT AVAILABLE")
-        gf.print_info(u"  You can still run aeneas but it will be significantly slower")
-        gf.print_info(u"  Please refer to the installation documentation for details")
+        gf.print_warning("aeneas.cmfcc   NOT AVAILABLE")
+        gf.print_info("  You can still run aeneas but it will be significantly slower")
+        gf.print_info("  Please refer to the installation documentation for details")
         return True
 
     @classmethod
@@ -223,11 +220,11 @@ class Diagnostics(object):
         :rtype: bool
         """
         if gf.can_run_c_extension("cew"):
-            gf.print_success(u"aeneas.cew     AVAILABLE")
+            gf.print_success("aeneas.cew     AVAILABLE")
             return False
-        gf.print_warning(u"aeneas.cew     NOT AVAILABLE")
-        gf.print_info(u"  You can still run aeneas but it will be a bit slower")
-        gf.print_info(u"  Please refer to the installation documentation for details")
+        gf.print_warning("aeneas.cew     NOT AVAILABLE")
+        gf.print_info("  You can still run aeneas but it will be a bit slower")
+        gf.print_info("  Please refer to the installation documentation for details")
         return True
 
     @classmethod
@@ -270,10 +267,10 @@ def main():
     if errors:
         sys.exit(1)
     if c_ext_warnings:
-        gf.print_warning(u"All required dependencies are met but at least one Python C extension is not available")
+        gf.print_warning("All required dependencies are met but at least one Python C extension is not available")
         sys.exit(2)
     else:
-        gf.print_success(u"All required dependencies are met and all available Python C extensions are working")
+        gf.print_success("All required dependencies are met and all available Python C extensions are working")
         sys.exit(0)
 
 

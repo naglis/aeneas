@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# coding=utf-8
 
 # aeneas is a Python/C library and a set of tools
 # to automagically synchronize audio and text (aka forced alignment)
@@ -21,8 +20,6 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from __future__ import absolute_import
-from __future__ import print_function
 
 from aeneas.syncmap.smfgsubtitles import SyncMapFormatGenericSubtitles
 import aeneas.globalfunctions as gf
@@ -33,19 +30,19 @@ class SyncMapFormatVTT(SyncMapFormatGenericSubtitles):
     Handler for WebVTT (VTT) I/O format.
     """
 
-    TAG = u"SyncMapFormatVTT"
+    TAG = "SyncMapFormatVTT"
 
     DEFAULT = "vtt"
 
     def __init__(self, variant=DEFAULT, parameters=None, rconf=None, logger=None):
-        super(SyncMapFormatVTT, self).__init__(variant=variant, parameters=parameters, rconf=rconf, logger=logger)
-        self.header_string = u"WEBVTT"
+        super().__init__(variant=variant, parameters=parameters, rconf=rconf, logger=logger)
+        self.header_string = "WEBVTT"
         self.header_might_not_have_trailing_blank_line = False
         self.footer_string = None
         self.cue_has_identifier = False
         self.cue_has_optional_identifier = True
-        self.time_values_separator = u" --> "
-        self.line_break_symbol = u"\n"
+        self.time_values_separator = " --> "
+        self.line_break_symbol = "\n"
         self.parse_time_function = gf.time_from_hhmmssmmm
         self.format_time_function = gf.time_to_hhmmssmmm
 
@@ -53,8 +50,8 @@ class SyncMapFormatVTT(SyncMapFormatGenericSubtitles):
         return (
             (len(block_lines) > 0) and
             (
-                (block_lines[0].startswith(u"NOTE")) or
-                (block_lines[0].startswith(u"REGION")) or
-                (block_lines[0].startswith(u"STYLE"))
+                (block_lines[0].startswith("NOTE")) or
+                (block_lines[0].startswith("REGION")) or
+                (block_lines[0].startswith("STYLE"))
             )
         )

@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# coding=utf-8
 
 # aeneas is a Python/C library and a set of tools
 # to automagically synchronize audio and text (aka forced alignment)
@@ -32,18 +31,18 @@ class TestLogger(unittest.TestCase):
 
     def test_log(self):
         logger = Logger(tee=False, indentation=4)
-        logger.log(u"Message 1", Logger.DEBUG)
-        logger.log(u"Message 2", Logger.INFO)
-        logger.log(u"Message 3", Logger.WARNING)
-        logger.log(u"Message 4", Logger.CRITICAL)
+        logger.log("Message 1", Logger.DEBUG)
+        logger.log("Message 2", Logger.INFO)
+        logger.log("Message 3", Logger.WARNING)
+        logger.log("Message 4", Logger.CRITICAL)
         self.assertEqual(len(logger), 4)
 
     def test_clear(self):
         logger = Logger(tee=False, indentation=4)
-        logger.log(u"Message 1", Logger.DEBUG)
-        logger.log(u"Message 2", Logger.INFO)
-        logger.log(u"Message 3", Logger.WARNING)
-        logger.log(u"Message 4", Logger.CRITICAL)
+        logger.log("Message 1", Logger.DEBUG)
+        logger.log("Message 2", Logger.INFO)
+        logger.log("Message 3", Logger.WARNING)
+        logger.log("Message 4", Logger.CRITICAL)
         self.assertEqual(len(logger), 4)
         logger.clear()
         self.assertEqual(len(logger), 0)
@@ -51,26 +50,26 @@ class TestLogger(unittest.TestCase):
     def test_change_indentation(self):
         logger = Logger(tee=False, indentation=4)
         self.assertEqual(logger.indentation, 4)
-        logger.log(u"Message 1", Logger.DEBUG)
-        logger.log(u"Message 2", Logger.INFO)
+        logger.log("Message 1", Logger.DEBUG)
+        logger.log("Message 2", Logger.INFO)
         logger.indentation = 2
         self.assertEqual(logger.indentation, 2)
-        logger.log(u"Message 3", Logger.WARNING)
-        logger.log(u"Message 4", Logger.CRITICAL)
+        logger.log("Message 3", Logger.WARNING)
+        logger.log("Message 4", Logger.CRITICAL)
         logger.indentation = 0
         self.assertEqual(logger.indentation, 0)
 
     def test_tag(self):
         logger = Logger(tee=False, indentation=4)
-        logger.log(u"Message 1", Logger.DEBUG, tag=u"TEST")
-        logger.log(u"Message 2", Logger.DEBUG)
-        logger.log(u"Message 3", Logger.DEBUG, tag=u"TEST")
-        logger.log(u"Message 4", Logger.DEBUG)
+        logger.log("Message 1", Logger.DEBUG, tag="TEST")
+        logger.log("Message 2", Logger.DEBUG)
+        logger.log("Message 3", Logger.DEBUG, tag="TEST")
+        logger.log("Message 4", Logger.DEBUG)
         strings = logger.pretty_print(as_list=True)
-        self.assertEqual(strings[0].find(u"TEST") > -1, True)
-        self.assertEqual(strings[1].find(u"TEST") > -1, False)
-        self.assertEqual(strings[2].find(u"TEST") > -1, True)
-        self.assertEqual(strings[3].find(u"TEST") > -1, False)
+        self.assertEqual(strings[0].find("TEST") > -1, True)
+        self.assertEqual(strings[1].find("TEST") > -1, False)
+        self.assertEqual(strings[2].find("TEST") > -1, True)
+        self.assertEqual(strings[3].find("TEST") > -1, False)
 
     def run_test_multi(self, msg):
         logger = Logger(tee=False)
@@ -82,49 +81,49 @@ class TestLogger(unittest.TestCase):
             self.run_test_multi(b"These are bytes")
 
     def test_multi_01(self):
-        self.run_test_multi(u"Message ascii")
+        self.run_test_multi("Message ascii")
 
     def test_multi_02(self):
-        self.run_test_multi(u"Message with unicode chars: à and '…'")
+        self.run_test_multi("Message with unicode chars: à and '…'")
 
     def test_multi_03(self):
-        self.run_test_multi([u"Message ascii"])
+        self.run_test_multi(["Message ascii"])
 
     def test_multi_04(self):
-        self.run_test_multi([u"Message with unicode chars: à and '…'"])
+        self.run_test_multi(["Message with unicode chars: à and '…'"])
 
     def test_multi_05(self):
-        self.run_test_multi([u"Message %s", u"1"])
+        self.run_test_multi(["Message %s", "1"])
 
     def test_multi_06(self):
-        self.run_test_multi([u"Message %d", 1])
+        self.run_test_multi(["Message %d", 1])
 
     def test_multi_07(self):
-        self.run_test_multi([u"Message %.3f", 1.234])
+        self.run_test_multi(["Message %.3f", 1.234])
 
     def test_multi_08(self):
-        self.run_test_multi([u"Message %.3f %.3f", 1.234, 2.345])
+        self.run_test_multi(["Message %.3f %.3f", 1.234, 2.345])
 
     def test_multi_09(self):
-        self.run_test_multi([u"Message with unicode chars: à and '…' and %s", u"ascii"])
+        self.run_test_multi(["Message with unicode chars: à and '…' and %s", "ascii"])
 
     def test_multi_10(self):
-        self.run_test_multi(u"unicode but only with ascii chars")
+        self.run_test_multi("unicode but only with ascii chars")
 
     def test_multi_11(self):
-        self.run_test_multi(u"unicode with non-ascii chars: à and '…'")
+        self.run_test_multi("unicode with non-ascii chars: à and '…'")
 
     def test_multi_12(self):
-        self.run_test_multi([u"Message with unicode chars: %s and '…' and ascii", u"àbc"])
+        self.run_test_multi(["Message with unicode chars: %s and '…' and ascii", "àbc"])
 
     def test_multi_13(self):
-        self.run_test_multi([u"Message with unicode chars: %s and '…' and ascii", u"àbc"])
+        self.run_test_multi(["Message with unicode chars: %s and '…' and ascii", "àbc"])
 
     def test_multi_14(self):
-        self.run_test_multi([u"Message %.3f %s %.3f", 1.234, "--->", 2.345])
+        self.run_test_multi(["Message %.3f %s %.3f", 1.234, "--->", 2.345])
 
     def test_multi_15(self):
-        self.run_test_multi([u"Message %.3f %s %.3f", 1.234, u"-à->", 2.345])
+        self.run_test_multi(["Message %.3f %s %.3f", 1.234, "-à->", 2.345])
 
     def test_loggable(self):
         loggable = Loggable()
@@ -152,45 +151,45 @@ class TestLogger(unittest.TestCase):
 
     def test_loggable_log(self):
         loggable = Loggable()
-        loggable.log(u"Message")
+        loggable.log("Message")
         self.assertEqual(len(loggable.logger), 1)
 
     def test_loggable_log_crit(self):
         loggable = Loggable()
-        loggable.log_crit(u"Message")
+        loggable.log_crit("Message")
         self.assertEqual(len(loggable.logger), 1)
 
     def test_loggable_log_warn(self):
         loggable = Loggable()
-        loggable.log_warn(u"Message")
+        loggable.log_warn("Message")
         self.assertEqual(len(loggable.logger), 1)
 
     def test_loggable_log_info(self):
         loggable = Loggable()
-        loggable.log_info(u"Message")
+        loggable.log_info("Message")
         self.assertEqual(len(loggable.logger), 1)
 
     def test_loggable_log_exc_warn(self):
         loggable = Loggable()
-        loggable.log_exc(u"Message", None, False, None)
+        loggable.log_exc("Message", None, False, None)
         self.assertEqual(len(loggable.logger), 1)
 
     def test_loggable_log_exc_crit_no_raise(self):
         loggable = Loggable()
-        loggable.log_exc(u"Message", None, True, None)
+        loggable.log_exc("Message", None, True, None)
         self.assertEqual(len(loggable.logger), 1)
 
     def test_loggable_log_exc_crit_raise(self):
         loggable = Loggable()
         with self.assertRaises(TypeError):
-            loggable.log_exc(u"Message", None, True, TypeError)
+            loggable.log_exc("Message", None, True, TypeError)
             self.assertEqual(len(loggable.logger), 1)
 
     def test_loggable_log_exc_obj(self):
         loggable = Loggable()
-        exc = TypeError(u"Message")
+        exc = TypeError("Message")
         with self.assertRaises(TypeError):
-            loggable.log_exc(u"Message", exc, True, TypeError)
+            loggable.log_exc("Message", exc, True, TypeError)
             self.assertEqual(len(loggable.logger), 1)
 
 

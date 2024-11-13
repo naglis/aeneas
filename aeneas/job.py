@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# coding=utf-8
 
 # aeneas is a Python/C library and a set of tools
 # to automagically synchronize audio and text (aka forced alignment)
@@ -28,8 +27,6 @@ This module contains the following classes:
 * :class:`~aeneas.job.JobConfiguration`, representing a job configuration.
 """
 
-from __future__ import absolute_import
-from __future__ import print_function
 
 from aeneas.configuration import Configuration
 from aeneas.logger import Loggable
@@ -51,10 +48,10 @@ class Job(Loggable):
                         not a Unicode string
     """
 
-    TAG = u"Job"
+    TAG = "Job"
 
     def __init__(self, config_string=None, rconf=None, logger=None):
-        super(Job, self).__init__(rconf=rconf, logger=logger)
+        super().__init__(rconf=rconf, logger=logger)
         self.tasks = []
         self.identifier = gf.uuid_string()
         self.configuration = None if config_string is None else JobConfiguration(config_string)
@@ -65,13 +62,13 @@ class Job(Loggable):
     def __unicode__(self):
         i = 0
         msg = []
-        msg.append(u"%s: '%s'" % (gc.RPN_JOB_IDENTIFIER, self.identifier))
-        msg.append(u"Configuration:\n%s" % self.configuration.__unicode__())
-        msg.append(u"Tasks:")
+        msg.append("{}: '{}'".format(gc.RPN_JOB_IDENTIFIER, self.identifier))
+        msg.append("Configuration:\n%s" % self.configuration.__unicode__())
+        msg.append("Tasks:")
         for task in self.tasks:
-            msg.append(u"Task %d %s" % (i, task.identifier))
+            msg.append("Task %d %s" % (i, task.identifier))
             i += 1
-        return u"\n".join(msg)
+        return "\n".join(msg)
 
     def __str__(self):
         return gf.safe_str(self.__unicode__())
@@ -133,22 +130,22 @@ class JobConfiguration(Configuration):
     """
 
     FIELDS = [
-        (gc.PPN_JOB_DESCRIPTION, (None, None, ["description"], u"description")),
-        (gc.PPN_JOB_LANGUAGE, (None, None, ["language"], u"language")),
-        (gc.PPN_JOB_IS_AUDIO_FILE_NAME_REGEX, (None, None, ["i_a_name_regex"], u"regex to find audio files")),
-        (gc.PPN_JOB_IS_AUDIO_FILE_RELATIVE_PATH, (None, None, ["i_a_relative_path"], u"relative path of audio files")),
-        (gc.PPN_JOB_IS_HIERARCHY_PREFIX, (None, None, ["i_hierarchy_prefix"], u"prefix inside the input container")),
-        (gc.PPN_JOB_IS_HIERARCHY_TYPE, (None, None, ["i_hierarchy_type"], u"type of input container hierarchy")),
-        (gc.PPN_JOB_IS_TASK_DIRECTORY_NAME_REGEX, (None, None, ["i_task_directory_name_regex"], u"regex to find task dirs")),
-        (gc.PPN_JOB_IS_TEXT_FILE_NAME_REGEX, (None, None, ["i_t_name_regex"], u"regex to find text files")),
-        (gc.PPN_JOB_IS_TEXT_FILE_RELATIVE_PATH, (None, None, ["i_t_relative_path"], u"relative path of text files")),
-        (gc.PPN_JOB_OS_CONTAINER_FORMAT, (None, None, ["o_container_format"], u"format of input container")),
-        (gc.PPN_JOB_OS_FILE_NAME, (None, None, ["o_name"], u"name of output container")),
-        (gc.PPN_JOB_OS_HIERARCHY_PREFIX, (None, None, ["o_hierarchy_prefix"], u"prefix inside the output container")),
-        (gc.PPN_JOB_OS_HIERARCHY_TYPE, (None, None, ["o_hierarchy_type"], u"type of output container hierarchy")),
+        (gc.PPN_JOB_DESCRIPTION, (None, None, ["description"], "description")),
+        (gc.PPN_JOB_LANGUAGE, (None, None, ["language"], "language")),
+        (gc.PPN_JOB_IS_AUDIO_FILE_NAME_REGEX, (None, None, ["i_a_name_regex"], "regex to find audio files")),
+        (gc.PPN_JOB_IS_AUDIO_FILE_RELATIVE_PATH, (None, None, ["i_a_relative_path"], "relative path of audio files")),
+        (gc.PPN_JOB_IS_HIERARCHY_PREFIX, (None, None, ["i_hierarchy_prefix"], "prefix inside the input container")),
+        (gc.PPN_JOB_IS_HIERARCHY_TYPE, (None, None, ["i_hierarchy_type"], "type of input container hierarchy")),
+        (gc.PPN_JOB_IS_TASK_DIRECTORY_NAME_REGEX, (None, None, ["i_task_directory_name_regex"], "regex to find task dirs")),
+        (gc.PPN_JOB_IS_TEXT_FILE_NAME_REGEX, (None, None, ["i_t_name_regex"], "regex to find text files")),
+        (gc.PPN_JOB_IS_TEXT_FILE_RELATIVE_PATH, (None, None, ["i_t_relative_path"], "relative path of text files")),
+        (gc.PPN_JOB_OS_CONTAINER_FORMAT, (None, None, ["o_container_format"], "format of input container")),
+        (gc.PPN_JOB_OS_FILE_NAME, (None, None, ["o_name"], "name of output container")),
+        (gc.PPN_JOB_OS_HIERARCHY_PREFIX, (None, None, ["o_hierarchy_prefix"], "prefix inside the output container")),
+        (gc.PPN_JOB_OS_HIERARCHY_TYPE, (None, None, ["o_hierarchy_type"], "type of output container hierarchy")),
     ]
 
-    TAG = u"JobConfiguration"
+    TAG = "JobConfiguration"
 
     def __init__(self, config_string=None):
-        super(JobConfiguration, self).__init__(config_string)
+        super().__init__(config_string)

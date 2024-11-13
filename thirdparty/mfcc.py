@@ -22,7 +22,7 @@ def mel(f):
 def melinv(m):
     return 700. * (numpy.power(10., m / 2595.) - 1.)
 
-class MFCC(object):
+class MFCC:
     def __init__(self, nfilt=40, ncep=13,
                  lowerf=133.3333, upperf=6855.4976, alpha=0.97,
                  samprate=16000, frate=100, wlen=0.0256,
@@ -49,7 +49,7 @@ class MFCC(object):
         dfreq = float(samprate) / nfft
         if upperf > samprate/2:
             raise(Exception,
-                   "Upper frequency %f exceeds Nyquist %f" % (upperf, samprate/2))
+                   "Upper frequency {:f} exceeds Nyquist {:f}".format(upperf, samprate/2))
         melmax = mel(upperf)
         melmin = mel(lowerf)
         dmelbw = (melmax - melmin) / (nfilt + 1)

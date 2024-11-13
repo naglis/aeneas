@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# coding=utf-8
 
 # aeneas is a Python/C library and a set of tools
 # to automagically synchronize audio and text (aka forced alignment)
@@ -25,8 +24,6 @@
 Extract MFCCs from a given audio file.
 """
 
-from __future__ import absolute_import
-from __future__ import print_function
 import io
 import sys
 import numpy
@@ -50,20 +47,20 @@ class ExtractMFCCCLI(AbstractCLIProgram):
     NAME = gf.file_name_without_extension(__file__)
 
     HELP = {
-        "description": u"Extract MFCCs from a given audio file as a fat matrix.",
+        "description": "Extract MFCCs from a given audio file as a fat matrix.",
         "synopsis": [
-            (u"AUDIO_FILE OUTPUT_FILE", True)
+            ("AUDIO_FILE OUTPUT_FILE", True)
         ],
         "examples": [
-            u"%s %s" % (INPUT_FILE, OUTPUT_FILE)
+            "{} {}".format(INPUT_FILE, OUTPUT_FILE)
         ],
         "options": [
-            u"-b, --binary : output MFCCs as a float64 binary file",
-            u"-d, --delete-first : do not output the 0th MFCC coefficient",
-            u"-n, --npy : output MFCCs as a NumPy .npy binary file",
-            u"-t, --transpose : transpose the MFCCs matrix, returning a tall matrix",
-            u"-z, --npz : output MFCCs as a NumPy compressed .npz binary file",
-            u"--format=FMT : output to text file using format FMT (default: '%.18e')"
+            "-b, --binary : output MFCCs as a float64 binary file",
+            "-d, --delete-first : do not output the 0th MFCC coefficient",
+            "-n, --npy : output MFCCs as a NumPy .npy binary file",
+            "-t, --transpose : transpose the MFCCs matrix, returning a tall matrix",
+            "-z, --npz : output MFCCs as a NumPy compressed .npz binary file",
+            "--format=FMT : output to text file using format FMT (default: '%.18e')"
         ]
     }
 
@@ -78,14 +75,14 @@ class ExtractMFCCCLI(AbstractCLIProgram):
         input_file_path = self.actual_arguments[0]
         output_file_path = self.actual_arguments[1]
 
-        output_text_format = self.has_option_with_value(u"--format")
+        output_text_format = self.has_option_with_value("--format")
         if output_text_format is None:
-            output_text_format = u"%.18e"
-        output_binary = self.has_option([u"-b", u"--binary"])
-        output_npz = self.has_option([u"-z", u"--npz"])
-        output_npy = self.has_option([u"-n", u"--npy"])
-        delete_first = self.has_option([u"-d", u"--delete-first"])
-        transpose = self.has_option([u"-t", u"--transpose"])
+            output_text_format = "%.18e"
+        output_binary = self.has_option(["-b", "--binary"])
+        output_npz = self.has_option(["-z", "--npz"])
+        output_npy = self.has_option(["-n", "--npy"])
+        delete_first = self.has_option(["-d", "--delete-first"])
+        transpose = self.has_option(["-t", "--transpose"])
 
         self.check_c_extensions("cmfcc")
         if not self.check_input_file(input_file_path):
@@ -107,28 +104,28 @@ class ExtractMFCCCLI(AbstractCLIProgram):
                 del mapped
             elif output_npz:
                 # save as a .npz compressed binary file
-                with io.open(output_file_path, "wb") as output_file:
+                with open(output_file_path, "wb") as output_file:
                     numpy.savez(output_file, mfccs)
             elif output_npy:
                 # save as a .npy binary file
-                with io.open(output_file_path, "wb") as output_file:
+                with open(output_file_path, "wb") as output_file:
                     numpy.save(output_file, mfccs)
             else:
                 # save as a text file
                 # NOTE: in Python 2, passing the fmt value a Unicode string crashes NumPy
                 #       hence, converting back to bytes, which works in Python 3 too
                 numpy.savetxt(output_file_path, mfccs, fmt=gf.safe_bytes(output_text_format))
-            self.print_info(u"MFCCs shape: %d %d" % (mfccs.shape))
-            self.print_success(u"MFCCs saved to '%s'" % (output_file_path))
+            self.print_info("MFCCs shape: %d %d" % (mfccs.shape))
+            self.print_success("MFCCs saved to '%s'" % (output_file_path))
             return self.NO_ERROR_EXIT_CODE
         except AudioFileConverterError:
-            self.print_error(u"Unable to call the ffmpeg executable '%s'" % (self.rconf[RuntimeConfiguration.FFMPEG_PATH]))
-            self.print_error(u"Make sure the path to ffmpeg is correct")
+            self.print_error("Unable to call the ffmpeg executable '%s'" % (self.rconf[RuntimeConfiguration.FFMPEG_PATH]))
+            self.print_error("Make sure the path to ffmpeg is correct")
         except (AudioFileUnsupportedFormatError, AudioFileNotInitializedError):
-            self.print_error(u"Cannot read file '%s'" % (input_file_path))
-            self.print_error(u"Check that its format is supported by ffmpeg")
+            self.print_error("Cannot read file '%s'" % (input_file_path))
+            self.print_error("Check that its format is supported by ffmpeg")
         except OSError:
-            self.print_error(u"Cannot write file '%s'" % (output_file_path))
+            self.print_error("Cannot write file '%s'" % (output_file_path))
 
         return self.ERROR_EXIT_CODE
 

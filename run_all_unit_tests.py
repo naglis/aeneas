@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# coding=utf-8
 
 # aeneas is a Python/C library and a set of tools
 # to automagically synchronize audio and text (aka forced alignment)
@@ -25,8 +24,6 @@
 Run all unit tests for the aeneas package.
 """
 
-from __future__ import absolute_import
-from __future__ import print_function
 import glob
 import os
 import sys
@@ -53,7 +50,7 @@ MAP = {
 }
 
 
-class NOPStream(object):
+class NOPStream:
     """ NOP stream """
     def __init__(self, verbose=False):
         self.verbose = verbose

@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# coding=utf-8
 
 # aeneas is a Python/C library and a set of tools
 # to automagically synchronize audio and text (aka forced alignment)
@@ -41,8 +40,6 @@ See the following discussions for details:
 .. versionadded:: 1.5.0
 """
 
-from __future__ import absolute_import
-from __future__ import print_function
 import io
 import subprocess
 import sys
@@ -66,7 +63,7 @@ class CEWSubprocess(Loggable):
     :type  logger: :class:`~aeneas.logger.Logger`
     """
 
-    TAG = u"CEWSubprocess"
+    TAG = "CEWSubprocess"
 
     def synthesize_multiple(self, audio_file_path, c_quit_after, c_backwards, u_text):
         """
@@ -80,20 +77,20 @@ class CEWSubprocess(Loggable):
         :param object u_text: a list of ``(voice_code, text)`` tuples
         :rtype: tuple ``(sample_rate, synthesized, intervals)``
         """
-        self.log([u"Audio file path: '%s'", audio_file_path])
-        self.log([u"c_quit_after: '%.3f'", c_quit_after])
-        self.log([u"c_backwards: '%d'", c_backwards])
+        self.log(["Audio file path: '%s'", audio_file_path])
+        self.log(["c_quit_after: '%.3f'", c_quit_after])
+        self.log(["c_backwards: '%d'", c_backwards])
 
         text_file_handler, text_file_path = gf.tmp_file()
         data_file_handler, data_file_path = gf.tmp_file()
-        self.log([u"Temporary text file path: '%s'", text_file_path])
-        self.log([u"Temporary data file path: '%s'", data_file_path])
+        self.log(["Temporary text file path: '%s'", text_file_path])
+        self.log(["Temporary data file path: '%s'", data_file_path])
 
-        self.log(u"Populating the text file...")
-        with io.open(text_file_path, "w", encoding="utf-8") as tmp_text_file:
+        self.log("Populating the text file...")
+        with open(text_file_path, "w", encoding="utf-8") as tmp_text_file:
             for f_voice_code, f_text in u_text:
-                tmp_text_file.write(u"%s %s\n" % (f_voice_code, f_text))
-        self.log(u"Populating the text file... done")
+                tmp_text_file.write("{} {}\n".format(f_voice_code, f_text))
+        self.log("Populating the text file... done")
 
         arguments = [
             self.rconf[RuntimeConfiguration.CEW_SUBPROCESS_PATH],
@@ -105,7 +102,7 @@ class CEWSubprocess(Loggable):
             audio_file_path,
             data_file_path
         ]
-        self.log([u"Calling with arguments '%s'", u" ".join(arguments)])
+        self.log(["Calling with arguments '%s'", " ".join(arguments)])
         proc = subprocess.Popen(
             arguments,
             stdout=subprocess.PIPE,
@@ -114,22 +111,22 @@ class CEWSubprocess(Loggable):
             universal_newlines=True)
         proc.communicate()
 
-        self.log(u"Reading output data...")
-        with io.open(data_file_path, "r", encoding="utf-8") as data_file:
+        self.log("Reading output data...")
+        with open(data_file_path, encoding="utf-8") as data_file:
             lines = data_file.read().splitlines()
             sr = int(lines[0])
             sf = int(lines[1])
             intervals = []
             for line in lines[2:]:
-                values = line.split(u" ")
+                values = line.split(" ")
                 if len(values) == 2:
                     intervals.append((TimeValue(values[0]), TimeValue(values[1])))
-        self.log(u"Reading output data... done")
+        self.log("Reading output data... done")
 
-        self.log(u"Deleting text and data files...")
+        self.log("Deleting text and data files...")
         gf.delete_file(text_file_handler, text_file_path)
         gf.delete_file(data_file_handler, data_file_path)
-        self.log(u"Deleting text and data files... done")
+        self.log("Deleting text and data files... done")
 
         return (sr, sf, intervals)
 
@@ -153,10 +150,10 @@ def main():
 
     # read (voice_code, text) from file
     s_text = []
-    with io.open(text_file_path, "r", encoding="utf-8") as text:
+    with open(text_file_path, encoding="utf-8") as text:
         for line in text.readlines():
             # NOTE: not using strip() to avoid removing trailing blank characters
-            line = line.replace(u"\n", u"").replace(u"\r", u"")
+            line = line.replace("\n", "").replace("\r", "")
             idx = line.find(" ")
             if idx > 0:
                 f_voice_code = line[:idx]
@@ -176,12 +173,12 @@ def main():
             c_backwards,
             c_text
         )
-        with io.open(data_file_path, "w", encoding="utf-8") as data:
-            data.write(u"%d\n" % (sr))
-            data.write(u"%d\n" % (sf))
-            data.write(u"\n".join([u"%.3f %.3f" % (i[0], i[1]) for i in intervals]))
+        with open(data_file_path, "w", encoding="utf-8") as data:
+            data.write("%d\n" % (sr))
+            data.write("%d\n" % (sf))
+            data.write("\n".join(["{:.3f} {:.3f}".format(i[0], i[1]) for i in intervals]))
     except Exception as exc:
-        print(u"Unexpected error: %s" % str(exc))
+        print("Unexpected error: %s" % str(exc))
 
 
 if __name__ == "__main__":

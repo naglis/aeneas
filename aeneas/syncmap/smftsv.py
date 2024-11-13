@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# coding=utf-8
 
 # aeneas is a Python/C library and a set of tools
 # to automagically synchronize audio and text (aka forced alignment)
@@ -21,8 +20,6 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from __future__ import absolute_import
-from __future__ import print_function
 
 from aeneas.syncmap.smfgtabular import SyncMapFormatGenericTabular
 
@@ -32,7 +29,7 @@ class SyncMapFormatTSV(SyncMapFormatGenericTabular):
     Handler for tab-separated plain text (TSV) I/O format.
     """
 
-    TAG = u"SyncMapFormatTSV"
+    TAG = "SyncMapFormatTSV"
 
     DEFAULT = "tsv"
 
@@ -44,7 +41,7 @@ class SyncMapFormatTSV(SyncMapFormatGenericTabular):
 
     MACHINE_ALIASES = [DEFAULT, MACHINE, TAB]
 
-    FIELD_DELIMITER = u"\t"
+    FIELD_DELIMITER = "\t"
 
     FIELDS = {
         "begin": 0,
