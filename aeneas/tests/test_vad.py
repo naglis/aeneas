@@ -77,7 +77,11 @@ class TestVAD(unittest.TestCase):
 
     def test_compute_vad(self):
         for f in self.FILES:
-            with self.subTest(path=f["path"], speech_length=f["speech_length"], nonspeech_length=f["nonspeech_length"]):
+            with self.subTest(
+                path=f["path"],
+                speech_length=f["speech_length"],
+                nonspeech_length=f["nonspeech_length"],
+            ):
                 self.perform(f["path"], f["speech_length"], f["nonspeech_length"])
 
     def test_not_existing(self):

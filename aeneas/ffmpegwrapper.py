@@ -219,9 +219,8 @@ class FFMPEGWrapper(Loggable):
         try:
             proc = subprocess.run(
                 arguments,
-                stdout=subprocess.PIPE,
+                capture_output=True,
                 stdin=subprocess.PIPE,
-                stderr=subprocess.PIPE,
                 check=True,
             )
         except OSError as exc:
@@ -233,7 +232,12 @@ class FFMPEGWrapper(Loggable):
                 FFMPEGPathError,
             )
         except subprocess.CalledProcessError as e:
-            self.log_exc("ffmpeg returned non-zero status %r: %s" % (e.returncode, e.stderr.decode("utf-8", "replace")), critical=True, raise_type=OSError)
+            self.log_exc(
+                "ffmpeg returned non-zero status %r: %s"
+                % (e.returncode, e.stderr.decode("utf-8", "replace")),
+                critical=True,
+                raise_type=OSError,
+            )
 
         self.log("Call completed")
 
