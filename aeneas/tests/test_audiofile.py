@@ -105,7 +105,7 @@ class TestAudioFile(unittest.TestCase):
         },
     ]
 
-    def load(self, path, *, read_properties: bool = False, read_samples=False):
+    def load(self, path, *, read_properties: bool = False, read_samples: bool = False):
         af = AudioFile(gf.absolute_path(path, __file__))
         if read_properties:
             af.read_properties()
