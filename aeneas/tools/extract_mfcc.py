@@ -114,9 +114,7 @@ class ExtractMFCCCLI(AbstractCLIProgram):
                 # save as a text file
                 # NOTE: in Python 2, passing the fmt value a Unicode string crashes NumPy
                 #       hence, converting back to bytes, which works in Python 3 too
-                numpy.savetxt(
-                    output_file_path, mfccs, fmt=gf.safe_bytes(output_text_format)
-                )
+                numpy.savetxt(output_file_path, mfccs, fmt=output_text_format)
             self.print_info("MFCCs shape: %d %d" % (mfccs.shape))
             self.print_success("MFCCs saved to '%s'" % (output_file_path))
             return self.NO_ERROR_EXIT_CODE
