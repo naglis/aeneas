@@ -2,6 +2,7 @@ import unittest
 import typing
 import os
 import tempfile
+import importlib.util
 
 from aeneas.tools.execute_task import ExecuteTaskCLI
 from aeneas.tools.execute_job import ExecuteJobCLI
@@ -25,6 +26,13 @@ bench_test = unittest.skipIf(
     not os.path.isdir(BENCH_DIR),
     f"bench tests are disabled (directory {BENCH_DIR!r} does not exist).",
 )
+
+
+def skipIfMissingImport(name: str):
+    return unittest.skipIf(
+        importlib.util.find_spec(name) is None,
+        f"{name!r} cannot be imported. A dependency might be missing",
+    )
 
 
 class ExecuteCLICase(unittest.TestCase):

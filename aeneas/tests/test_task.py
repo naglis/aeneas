@@ -27,14 +27,15 @@ from aeneas.exacttiming import TimeValue
 from aeneas.idsortingalgorithm import IDSortingAlgorithm
 from aeneas.language import Language
 from aeneas.logger import Logger
-from aeneas.syncmap import SyncMap
-from aeneas.syncmap import SyncMapFormat
-from aeneas.syncmap import SyncMapFragment
-from aeneas.syncmap import SyncMapHeadTailFormat
-from aeneas.task import Task
-from aeneas.task import TaskConfiguration
-from aeneas.textfile import TextFileFormat
-from aeneas.textfile import TextFragment
+from aeneas.syncmap import (
+    SyncMap,
+    SyncMapFormat,
+    SyncMapFragment,
+    SyncMapHeadTailFormat,
+)
+from aeneas.task import Task, TaskConfiguration
+from aeneas.textfile import TextFileFormat, TextFragment
+from aeneas.tests.common import skipIfMissingImport
 import aeneas.globalfunctions as gf
 
 
@@ -167,6 +168,7 @@ class TestTask(unittest.TestCase):
                 "not_existing.mp3", __file__
             )
 
+    @skipIfMissingImport("bs4")
     def test_set_text_file_unparsed_id(self):
         self.set_text_file(
             "res/inputtext/sonnet_unparsed_id.xhtml",
@@ -176,6 +178,7 @@ class TestTask(unittest.TestCase):
             id_sort=IDSortingAlgorithm.NUMERIC,
         )
 
+    @skipIfMissingImport("bs4")
     def test_set_text_file_unparsed_class(self):
         # NOTE this test fails because there are no id attributes in the html file
         self.set_text_file(
@@ -186,6 +189,7 @@ class TestTask(unittest.TestCase):
             id_sort=IDSortingAlgorithm.NUMERIC,
         )
 
+    @skipIfMissingImport("bs4")
     def test_set_text_file_unparsed_id_class(self):
         self.set_text_file(
             "res/inputtext/sonnet_unparsed_class_id.xhtml",
@@ -196,6 +200,7 @@ class TestTask(unittest.TestCase):
             id_sort=IDSortingAlgorithm.NUMERIC,
         )
 
+    @skipIfMissingImport("bs4")
     def test_set_text_file_unparsed_id_class_empty(self):
         # NOTE this test fails because there are no id attributes in the html file
         self.set_text_file(
@@ -211,11 +216,9 @@ class TestTask(unittest.TestCase):
         self.set_text_file("res/inputtext/sonnet_plain.txt", TextFileFormat.PLAIN, 15)
 
     def test_set_text_file_parsed(self):
-        return
         self.set_text_file("res/inputtext/sonnet_parsed.txt", TextFileFormat.PARSED, 15)
 
     def test_set_text_file_subtitles(self):
-        return
         self.set_text_file(
             "res/inputtext/sonnet_subtitles.txt", TextFileFormat.SUBTITLES, 15
         )
