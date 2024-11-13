@@ -28,6 +28,7 @@ This module contains the following classes:
 """
 
 import subprocess
+import os.path
 
 from aeneas.logger import Loggable
 from aeneas.runtimeconfiguration import RuntimeConfiguration
@@ -216,16 +217,13 @@ class FFMPEGWrapper(Loggable):
         arguments.append(output_file_path)
         self.log(["Calling with arguments '%s'", arguments])
         try:
-            proc = subprocess.Popen(
+            proc = subprocess.run(
                 arguments,
                 stdout=subprocess.PIPE,
                 stdin=subprocess.PIPE,
                 stderr=subprocess.PIPE,
+                check=True,
             )
-            proc.communicate()
-            proc.stdout.close()
-            proc.stdin.close()
-            proc.stderr.close()
         except OSError as exc:
             self.log_exc(
                 "Unable to call the '%s' ffmpeg executable"
@@ -234,12 +232,15 @@ class FFMPEGWrapper(Loggable):
                 True,
                 FFMPEGPathError,
             )
+        except subprocess.CalledProcessError as e:
+            self.log_exc("ffmpeg returned non-zero status %r: %s" % (e.returncode, e.stderr), critical=True, raise_type=OSError)
+
         self.log("Call completed")
 
         # check if the output file exists
-        if not gf.file_exists(output_file_path):
+        if not os.path.isfile(output_file_path):
             self.log_exc(
-                "Output file '%s' was not written" % (output_file_path),
+                f"Output file {output_file_path!r} was not written",
                 None,
                 True,
                 OSError,
