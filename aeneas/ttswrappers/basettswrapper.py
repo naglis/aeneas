@@ -29,7 +29,6 @@ This module contains the following classes:
   an abstract wrapper for a TTS engine.
 """
 
-import io
 import subprocess
 
 from aeneas.audiofile import AudioFile

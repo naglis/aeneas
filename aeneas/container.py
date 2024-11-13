@@ -32,7 +32,6 @@ This module contains the following classes:
   is an enumeration of the supported container formats.
 """
 
-import io
 import os
 import tarfile
 import zipfile

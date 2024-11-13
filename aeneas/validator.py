@@ -27,7 +27,6 @@ This module contains the following classes:
 * :class:`~aeneas.validator.ValidatorResult`, a record holding validation result and possibly messages.
 """
 
-import io
 
 from aeneas.analyzecontainer import AnalyzeContainer
 from aeneas.container import Container

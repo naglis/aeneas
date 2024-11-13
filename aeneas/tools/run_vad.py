@@ -25,7 +25,6 @@ Extract a list of speech intervals from the given audio file,
 using the MFCC energy-based VAD algorithm.
 """
 
-import io
 import sys
 
 from aeneas.audiofile import AudioFileConverterError

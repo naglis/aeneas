@@ -32,7 +32,6 @@ This module contains the following classes:
 * :class:`~aeneas.textfile.TransliterationMap`, a full transliteration map.
 """
 
-import io
 import re
 
 from aeneas.idsortingalgorithm import IDSortingAlgorithm

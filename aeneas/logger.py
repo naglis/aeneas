@@ -29,7 +29,6 @@ This module contains the following classes:
 """
 
 import datetime
-import io
 
 from aeneas.runtimeconfiguration import RuntimeConfiguration
 import aeneas.globalfunctions as gf

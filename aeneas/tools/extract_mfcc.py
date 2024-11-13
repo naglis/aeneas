@@ -24,7 +24,6 @@
 Extract MFCCs from a given audio file.
 """
 
-import io
 import sys
 import numpy
 

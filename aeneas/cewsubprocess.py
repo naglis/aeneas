@@ -40,7 +40,6 @@ See the following discussions for details:
 .. versionadded:: 1.5.0
 """
 
-import io
 import subprocess
 import sys
 
