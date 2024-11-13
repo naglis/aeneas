@@ -175,13 +175,13 @@ class AbstractCLIProgram(Loggable):
         header = [
             "",
             "NAME",
-            "  {} - {}".format(self.NAME, self.HELP["description"]),
+            f"  {self.NAME} - {self.HELP['description']}",
             "",
         ]
 
         synopsis = [
             "SYNOPSIS",
-            "  %s [-h|--help|--help-rconf|--version]" % (self.invoke),
+            f"  {self.invoke} [-h|--help|--help-rconf|--version]",
         ]
         if "synopsis" in self.HELP:
             for syn, opt in self.HELP["synopsis"]:
@@ -205,14 +205,14 @@ class AbstractCLIProgram(Loggable):
         ]
         if "options" in self.HELP:
             for opt in self.HELP["options"]:
-                options.append("  %s" % (opt))
+                options.append(f"  {opt}")
         options = ["OPTIONS"] + sorted(options) + [""]
 
         parameters = []
         if ("parameters" in self.HELP) and (len(self.HELP["parameters"]) > 0):
             parameters.append("PARAMETERS")
             for par in self.HELP["parameters"]:
-                parameters.append("  %s" % (par))
+                parameters.append(f"  {par}")
             parameters.append("")
 
         examples = []
@@ -224,24 +224,24 @@ class AbstractCLIProgram(Loggable):
 
         footer = [
             "EXIT CODES",
-            "  %d : no error" % (self.NO_ERROR_EXIT_CODE),
-            "  %d : error" % (self.ERROR_EXIT_CODE),
-            "  %d : help shown, no command run" % (self.HELP_EXIT_CODE),
+            f"  {self.NO_ERROR_EXIT_CODE:d} : no error",
+            f"  {self.ERROR_EXIT_CODE:d} : error",
+            f"  {self.HELP_EXIT_CODE:d} : help shown, no command run",
             "",
             "AUTHOR",
             "  Alberto Pettarin, http://www.albertopettarin.it/",
             "",
             "REPORTING BUGS",
-            "  Please use the GitHub Issues Web page : %s" % (self.ISSUES_URL),
+            f"  Please use the GitHub Issues Web page : {self.ISSUES_URL}",
             "",
             "COPYRIGHT",
             "  2012-2017, Alberto Pettarin and ReadBeyond Srl",
             "  This software is available under the terms of the GNU Affero General Public License Version 3",
             "",
             "SEE ALSO",
-            "  Code repository  : %s" % (self.GITHUB_URL),
-            "  Documentation    : %s" % (self.DOCS_URL),
-            "  Project Web page : %s" % (self.AENEAS_URL),
+            f"  Code repository  : {self.GITHUB_URL}",
+            f"  Documentation    : {self.DOCS_URL}",
+            f"  Project Web page : {self.AENEAS_URL}",
             "",
         ]
 

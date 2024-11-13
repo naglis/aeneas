@@ -176,9 +176,7 @@ def main():
         with open(data_file_path, "w", encoding="utf-8") as data:
             data.write("%d\n" % (sr))
             data.write("%d\n" % (sf))
-            data.write(
-                "\n".join([f"{i[0]:.3f} {i[1]:.3f}" for i in intervals])
-            )
+            data.write("\n".join([f"{i[0]:.3f} {i[1]:.3f}" for i in intervals]))
     except Exception as exc:
         print("Unexpected error: %s" % str(exc))
 

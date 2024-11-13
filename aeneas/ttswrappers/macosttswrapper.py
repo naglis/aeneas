@@ -180,9 +180,7 @@ class MacOSTTSWrapper(BaseTTSWrapper):
         ENG_GBR: "English (GB)",
     }
 
-    CODE_TO_HUMAN_LIST = sorted(
-        [f"{k}\t{v}" for k, v in CODE_TO_HUMAN.items()]
-    )
+    CODE_TO_HUMAN_LIST = sorted([f"{k}\t{v}" for k, v in CODE_TO_HUMAN.items()])
 
     LANGUAGE_TO_VOICE_CODE = {
         ARA: "Maged",

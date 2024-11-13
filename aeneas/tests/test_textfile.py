@@ -175,6 +175,7 @@ class TestTextFile(unittest.TestCase):
 
     def test_read_blank(self):
         for fmt in TextFileFormat.ALLOWED_VALUES:
+            print(fmt)
             expected = 0
             if fmt == TextFileFormat.PLAIN:
                 expected = 5

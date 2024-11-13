@@ -426,9 +426,7 @@ def config_dict_to_string(dictionary):
     """
     parameters = []
     for key in dictionary:
-        parameters.append(
-            f"{key}{gc.CONFIG_STRING_ASSIGNMENT_SYMBOL}{dictionary[key]}"
-        )
+        parameters.append(f"{key}{gc.CONFIG_STRING_ASSIGNMENT_SYMBOL}{dictionary[key]}")
     return gc.CONFIG_STRING_SEPARATOR_SYMBOL.join(parameters)
 
 

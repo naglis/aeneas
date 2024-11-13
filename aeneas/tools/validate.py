@@ -71,11 +71,11 @@ class ValidateCLI(AbstractCLIProgram):
             ("wizard CONFIG_STRING CONTAINER", True),
         ],
         "examples": [
-            "config %s" % (CONFIG_FILE_TXT),
-            "config %s" % (CONFIG_FILE_XML),
-            "container %s" % (CONTAINER_FILE),
-            'job "%s"' % (JOB_CONFIG_STRING),
-            'task "%s"' % (TASK_CONFIG_STRING),
+            f"config {CONFIG_FILE_TXT}",
+            f"config {CONFIG_FILE_XML}",
+            f"container {CONTAINER_FILE}",
+            f'job "{JOB_CONFIG_STRING}"',
+            f'task "{TASK_CONFIG_STRING}"',
             f'wizard "{GOOD_CONFIG_STRING}" {CONTAINER_FILE}',
         ],
     }
