@@ -31,6 +31,8 @@ import re
 import shutil
 import sys
 import tempfile
+import importlib.util
+import functools
 import uuid
 
 from aeneas.exacttiming import TimeValue
@@ -752,7 +754,7 @@ def fix_slash(path):
     return path
 
 
-def can_run_c_extension(name=None):
+def can_run_c_extension(name: str | None = None) -> bool:
     """
     Determine whether the given Python C extension loads correctly.
 
@@ -763,41 +765,20 @@ def can_run_c_extension(name=None):
     :rtype: bool
     """
 
-    def can_run_cdtw():
-        """Python C extension for computing DTW"""
-        try:
-            import aeneas.cdtw.cdtw
+    def can_import(name: str) -> bool:
+        return importlib.util.find_spec(name) is not None
 
-            return True
-        except ImportError:
-            return False
+    # Python C extension for computing DTW.
+    can_run_cdtw = functools.partial(can_import, "aeneas.cdtw.cdtw")
 
-    def can_run_cmfcc():
-        """Python C extension for computing MFCC"""
-        try:
-            import aeneas.cmfcc.cmfcc
+    # Python C extension for computing MFCC.
+    can_run_cmfcc = functools.partial(can_import, "aeneas.cmfcc.cmfcc")
 
-            return True
-        except ImportError:
-            return False
+    # Python C extension for synthesizing with eSpeak.
+    can_run_cew = functools.partial(can_import, "aeneas.cew.cew")
 
-    def can_run_cew():
-        """Python C extension for synthesizing with eSpeak"""
-        try:
-            import aeneas.cew.cew
-
-            return True
-        except ImportError:
-            return False
-
-    def can_run_cfw():
-        """Python C extension for synthesizing with Festival"""
-        try:
-            import aeneas.cfw.cfw
-
-            return True
-        except ImportError:
-            return False
+    # Python C extension for synthesizing with Festival.
+    can_run_cfw = functools.partial(can_import, "aeneas.cfw.cfw")
 
     if name == "cdtw":
         return can_run_cdtw()

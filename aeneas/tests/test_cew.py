@@ -22,8 +22,7 @@
 
 import unittest
 import importlib.util
-
-import aeneas.globalfunctions as gf
+import tempfile
 
 
 @unittest.skipIf(
@@ -32,7 +31,6 @@ import aeneas.globalfunctions as gf
 )
 class TestCEW(unittest.TestCase):
     def test_cew_synthesize_multiple(self):
-        handler, output_file_path = gf.tmp_file(suffix=".wav")
         c_quit_after = 0.0
         c_backwards = 0
         c_text = [
@@ -42,18 +40,16 @@ class TestCEW(unittest.TestCase):
         ]
         import aeneas.cew.cew
 
-        sr, sf, intervals = aeneas.cew.cew.synthesize_multiple(
-            output_file_path, c_quit_after, c_backwards, c_text
-        )
+        with tempfile.NamedTemporaryFile(suffix=".wav") as tmp_file:
+            sr, sf, intervals = aeneas.cew.cew.synthesize_multiple(
+                tmp_file.name, c_quit_after, c_backwards, c_text
+            )
+
         self.assertEqual(sr, 22050)
         self.assertEqual(sf, 3)
         self.assertEqual(len(intervals), 3)
 
-        gf.delete_file(handler, output_file_path)
-
     def test_cew_synthesize_multiple_lang(self):
-        handler, output_file_path = gf.tmp_file(suffix=".wav")
-
         c_quit_after = 0.0
         c_backwards = 0
         c_text = [
@@ -66,11 +62,11 @@ class TestCEW(unittest.TestCase):
         ]
         import aeneas.cew.cew
 
-        sr, sf, intervals = aeneas.cew.cew.synthesize_multiple(
-            output_file_path, c_quit_after, c_backwards, c_text
-        )
+        with tempfile.NamedTemporaryFile(suffix=".wav") as tmp_file:
+            sr, sf, intervals = aeneas.cew.cew.synthesize_multiple(
+                tmp_file.name, c_quit_after, c_backwards, c_text
+            )
+
         self.assertEqual(sr, 22050)
         self.assertEqual(sf, 3)
         self.assertEqual(len(intervals), 3)
-
-        gf.delete_file(handler, output_file_path)
