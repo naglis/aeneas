@@ -585,7 +585,7 @@ class BaseTTSWrapper(Loggable):
         :rtype: tuple (result, (duration, sample_rate, codec, data)) or (result, None)
         """
         # return zero if text is the empty string
-        if len(text) == 0:
+        if not text:
             #
             # NOTE sample_rate, codec, data do not matter
             #      if the duration is 0.000 => set them to None

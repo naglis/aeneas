@@ -37,6 +37,7 @@ This package contains the following classes:
 from copy import deepcopy
 import json
 import os
+import itertools
 
 from aeneas.logger import Loggable
 from aeneas.syncmap.format import SyncMapFormat
@@ -92,22 +93,22 @@ class SyncMap(Loggable):
 
     TAG = "SyncMap"
 
-    def __init__(self, tree=None, rconf=None, logger=None):
-        if (tree is not None) and (not isinstance(tree, Tree)):
+    def __init__(self, tree: Tree | None = None, rconf=None, logger=None):
+        if tree is not None and not isinstance(tree, Tree):
             raise TypeError("tree is not an instance of Tree")
         super().__init__(rconf=rconf, logger=logger)
         if tree is None:
             tree = Tree()
         self.fragments_tree = tree
 
-    def __len__(self):
+    def __len__(self) -> int:
         return len(self.fragments)
 
     def __str__(self):
         return "\n".join([f.__str__() for f in self.fragments])
 
     @property
-    def fragments_tree(self):
+    def fragments_tree(self) -> Tree:
         """
         Return the current tree of fragments.
 
@@ -116,11 +117,11 @@ class SyncMap(Loggable):
         return self.__fragments_tree
 
     @fragments_tree.setter
-    def fragments_tree(self, fragments_tree):
+    def fragments_tree(self, fragments_tree: Tree):
         self.__fragments_tree = fragments_tree
 
     @property
-    def is_single_level(self):
+    def is_single_level(self) -> bool:
         """
         Return ``True`` if the sync map
         has only one level, that is,
@@ -132,7 +133,7 @@ class SyncMap(Loggable):
         return self.fragments_tree.height <= 2
 
     @property
-    def fragments(self):
+    def fragments(self) -> list[SyncMapFragment]:
         """
         The current list of sync map fragments
         which are (the values of) the children of the root node
@@ -142,7 +143,7 @@ class SyncMap(Loggable):
         """
         return self.fragments_tree.vchildren_not_empty
 
-    def leaves(self, fragment_type=None):
+    def leaves(self, fragment_type=None) -> list[SyncMapFragment]:
         """
         The current list of sync map fragments
         which are (the values of) the leaves
@@ -158,7 +159,7 @@ class SyncMap(Loggable):
         return [leaf for leaf in leaves if leaf.fragment_type == fragment_type]
 
     @property
-    def has_adjacent_leaves_only(self):
+    def has_adjacent_leaves_only(self) -> bool:
         """
         Return ``True`` if the sync map fragments
         which are the leaves of the sync map tree
@@ -168,16 +169,13 @@ class SyncMap(Loggable):
 
         .. versionadded:: 1.7.0
         """
-        leaves = self.leaves()
-        for i in range(len(leaves) - 1):
-            current_interval = leaves[i].interval
-            next_interval = leaves[i + 1].interval
-            if not current_interval.is_adjacent_before(next_interval):
+        for cur, nxt in itertools.pairwise(self.leaves()):
+            if not cur.interval.is_adjacent_before(nxt.interval):
                 return False
         return True
 
     @property
-    def has_zero_length_leaves(self):
+    def has_zero_length_leaves(self) -> bool:
         """
         Return ``True`` if there is at least one sync map fragment
         which has zero length
@@ -193,7 +191,7 @@ class SyncMap(Loggable):
         return False
 
     @property
-    def leaves_are_consistent(self):
+    def leaves_are_consistent(self) -> bool:
         """
         Return ``True`` if the sync map fragments
         which are the leaves of the sync map tree
@@ -207,7 +205,7 @@ class SyncMap(Loggable):
         """
         self.log("Checking if leaves are consistent")
         leaves = self.leaves()
-        if len(leaves) < 1:
+        if not leaves:
             self.log("Empty leaves => return True")
             return True
         min_time = min(leaf.interval.begin for leaf in leaves)
@@ -234,7 +232,7 @@ class SyncMap(Loggable):
         return result
 
     @property
-    def json_string(self):
+    def json_string(self) -> str:
         """
         Return a JSON representation of the sync map.
 
@@ -262,11 +260,9 @@ class SyncMap(Loggable):
             return output_fragments
 
         output_fragments = visit_children(self.fragments_tree)
-        return gf.safe_unicode(
-            json.dumps({"fragments": output_fragments}, indent=1, sort_keys=True)
-        )
+        return json.dumps({"fragments": output_fragments}, indent=1, sort_keys=True)
 
-    def add_fragment(self, fragment, as_last=True):
+    def add_fragment(self, fragment: SyncMapFragment, *, as_last: bool = True):
         """
         Add the given sync map fragment,
         as the first or last child of the root node
@@ -302,7 +298,10 @@ class SyncMap(Loggable):
         return deepcopy(self)
 
     def output_html_for_tuning(
-        self, audio_file_path, output_file_path, parameters=None
+        self,
+        audio_file_path: str,
+        output_file_path: str,
+        parameters: dict | None = None,
     ):
         """
         Output an HTML file for fine tuning the sync map manually.
@@ -363,7 +362,12 @@ class SyncMap(Loggable):
         with open(output_file_path, "w", encoding="utf-8") as file_obj:
             file_obj.write(template)
 
-    def read(self, sync_map_format, input_file_path, parameters=None):
+    def read(
+        self,
+        sync_map_format: SyncMapFormat,
+        input_file_path: str,
+        parameters: dict | None = None,
+    ):
         """
         Read sync map fragments from the given file in the specified format,
         and add them the current (this) sync map.
@@ -421,7 +425,12 @@ class SyncMap(Loggable):
             for fragment in self.fragments:
                 fragment.text_fragment.language = language
 
-    def write(self, sync_map_format, output_file_path, parameters=None):
+    def write(
+        self,
+        sync_map_format: SyncMapFormat,
+        output_file_path: str,
+        parameters: dict | None = None,
+    ):
         """
         Write the current sync map to file in the requested format.
 
