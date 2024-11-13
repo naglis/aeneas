@@ -114,7 +114,7 @@ class TestBaseTTSWrapper(unittest.TestCase):
 
     def test_use_cache(self):
         if self.TTS == "":
-            return
+            self.skipTest("`self.TTS` is not set")
         rconf = RuntimeConfiguration()
         rconf[RuntimeConfiguration.TTS_CACHE] = True
         tts_engine = self.TTS_CLASS(rconf=rconf)
@@ -123,7 +123,7 @@ class TestBaseTTSWrapper(unittest.TestCase):
 
     def test_clear_cache(self):
         if self.TTS == "":
-            return
+            self.skipTest("`self.TTS` is not set")
         tts_engine = self.TTS_CLASS()
         tts_engine.clear_cache()
 
@@ -184,6 +184,8 @@ class TestBaseTTSWrapper(unittest.TestCase):
         self.synthesize(tfl, expected_exc=ValueError)
 
     def test_variation_language(self):
-        if self.TTS_LANGUAGE_VARIATION is not None:
-            tfl = self.tfl([(self.TTS_LANGUAGE_VARIATION, ["Word"])])
-            self.synthesize(tfl)
+        if self.TTS_LANGUAGE_VARIATION is None:
+            self.skipTest("`self.TTS_LANGUAGE_VARIATION` is not set")
+
+        tfl = self.tfl([(self.TTS_LANGUAGE_VARIATION, ["Word"])])
+        self.synthesize(tfl)
