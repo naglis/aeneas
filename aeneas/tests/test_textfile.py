@@ -167,19 +167,33 @@ class TestTextFile(unittest.TestCase):
             tfl.add_fragment("foo")
 
     def test_read_empty(self):
-        for fmt in TextFileFormat.ALLOWED_VALUES:
-            self.load(self.EMPTY_FILE_PATH, fmt, 0, self.UNPARSED_PARAMETERS)
+        test_cases = (
+            (TextFileFormat.MPLAIN, 0),
+            (TextFileFormat.MUNPARSED, 0),
+            (TextFileFormat.PARSED, 0),
+            (TextFileFormat.PLAIN, 0),
+            (TextFileFormat.SUBTITLES, 0),
+            (TextFileFormat.UNPARSED, 0),
+        )
+        for fmt, expected in test_cases:
+            with self.subTest(fmt=fmt, expected=expected):
+                self.load(self.EMPTY_FILE_PATH, fmt, expected, self.UNPARSED_PARAMETERS)
 
     def test_read_plain_with_empty_lines(self):
         self.load(self.PLAIN_WITH_EMPTY_LINES_FILE_PATH, TextFileFormat.PLAIN, 19, None)
 
     def test_read_blank(self):
-        for fmt in TextFileFormat.ALLOWED_VALUES:
-            print(fmt)
-            expected = 0
-            if fmt == TextFileFormat.PLAIN:
-                expected = 5
-            self.load(self.BLANK_FILE_PATH, fmt, expected, self.UNPARSED_PARAMETERS)
+        test_cases = (
+            (TextFileFormat.MPLAIN, 0),
+            (TextFileFormat.MUNPARSED, 0),
+            (TextFileFormat.PARSED, 0),
+            (TextFileFormat.PLAIN, 5),
+            (TextFileFormat.SUBTITLES, 0),
+            (TextFileFormat.UNPARSED, 0),
+        )
+        for fmt, expected in test_cases:
+            with self.subTest(fmt=fmt, expected=expected):
+                self.load(self.BLANK_FILE_PATH, fmt, expected, self.UNPARSED_PARAMETERS)
 
     def test_read_subtitles(self):
         for path in [
@@ -188,7 +202,8 @@ class TestTextFile(unittest.TestCase):
             "res/inputtext/sonnet_subtitles_multiple_blank.txt",
             "res/inputtext/sonnet_subtitles_multiple_rows.txt",
         ]:
-            self.load(path, TextFileFormat.SUBTITLES, 15)
+            with self.subTest(path=path):
+                self.load(path, TextFileFormat.SUBTITLES, 15)
 
     def test_read_subtitles_id_regex(self):
         for path in [
@@ -197,16 +212,17 @@ class TestTextFile(unittest.TestCase):
             "res/inputtext/sonnet_subtitles_multiple_blank.txt",
             "res/inputtext/sonnet_subtitles_multiple_rows.txt",
         ]:
-            self.load(path, TextFileFormat.SUBTITLES, 15, self.ID_REGEX_PARAMETERS)
+            with self.subTest(path=path):
+                self.load(path, TextFileFormat.SUBTITLES, 15, self.ID_REGEX_PARAMETERS)
 
     def test_read_subtitles_id_regex_bad(self):
-        with self.assertRaises(ValueError):
-            for path in [
-                "res/inputtext/sonnet_subtitles_with_end_newline.txt",
-                "res/inputtext/sonnet_subtitles_no_end_newline.txt",
-                "res/inputtext/sonnet_subtitles_multiple_blank.txt",
-                "res/inputtext/sonnet_subtitles_multiple_rows.txt",
-            ]:
+        for path in [
+            "res/inputtext/sonnet_subtitles_with_end_newline.txt",
+            "res/inputtext/sonnet_subtitles_no_end_newline.txt",
+            "res/inputtext/sonnet_subtitles_multiple_blank.txt",
+            "res/inputtext/sonnet_subtitles_multiple_rows.txt",
+        ]:
+            with self.subTest(path=path), self.assertRaises(ValueError):
                 self.load(
                     path, TextFileFormat.SUBTITLES, 15, self.ID_REGEX_PARAMETERS_BAD
                 )
@@ -220,7 +236,8 @@ class TestTextFile(unittest.TestCase):
             "res/inputtext/sonnet_mplain_no_end_newline.txt",
             "res/inputtext/sonnet_mplain_multiple_blank.txt",
         ]:
-            self.load(path, TextFileFormat.MPLAIN, 5)
+            with self.subTest(path=path):
+                self.load(path, TextFileFormat.MPLAIN, 5)
 
     def test_read_munparsed(self):
         tfl = self.load(
@@ -330,7 +347,8 @@ class TestTextFile(unittest.TestCase):
             "res/inputtext/badly_parsed_2.txt",
             "res/inputtext/badly_parsed_3.txt",
         ]:
-            self.load(path, TextFileFormat.PARSED, 0)
+            with self.subTest(path=path):
+                self.load(path, TextFileFormat.PARSED, 0)
 
     def test_read_unparsed(self):
         for case in [
@@ -354,7 +372,8 @@ class TestTextFile(unittest.TestCase):
                 "parameters": {gc.PPN_TASK_IS_TEXT_UNPARSED_ID_REGEX: "f[0-9]*"},
             },
         ]:
-            self.load(case["path"], TextFileFormat.UNPARSED, 15, case["parameters"])
+            with self.subTest(path=case["path"], parameters=case["parameters"]):
+                self.load(case["path"], TextFileFormat.UNPARSED, 15, case["parameters"])
 
     def test_read_unparsed_unsorted(self):
         self.load_and_sort_id(
