@@ -81,7 +81,7 @@ class Task(Loggable):
 
     def __str__(self):
         msg = [
-            "{}: '{}'".format(gc.RPN_TASK_IDENTIFIER, self.identifier),
+            f"{gc.RPN_TASK_IDENTIFIER}: '{self.identifier}'",
             "Configuration:\n%s" % self.configuration,
             "Audio file path: %s" % self.audio_file_path,
             "Audio file path (absolute): %s" % self.audio_file_path_absolute,

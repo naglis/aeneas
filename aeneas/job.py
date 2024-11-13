@@ -63,7 +63,7 @@ class Job(Loggable):
     def __str__(self):
         i = 0
         msg = []
-        msg.append("{}: '{}'".format(gc.RPN_JOB_IDENTIFIER, self.identifier))
+        msg.append(f"{gc.RPN_JOB_IDENTIFIER}: '{self.identifier}'")
         msg.append("Configuration:\n%s" % self.configuration)
         msg.append("Tasks:")
         for task in self.tasks:

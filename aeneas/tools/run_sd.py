@@ -60,9 +60,9 @@ class RunSDCLI(AbstractCLIProgram):
             ),
         ],
         "examples": [
-            "parsed {} eng {}".format(TEXT_FILE, AUDIO_FILE),
-            "parsed {} eng {} {}".format(TEXT_FILE, AUDIO_FILE, PARAMETERS_HEAD),
-            "parsed {} eng {} {}".format(TEXT_FILE, AUDIO_FILE, PARAMETERS_TAIL),
+            f"parsed {TEXT_FILE} eng {AUDIO_FILE}",
+            f"parsed {TEXT_FILE} eng {AUDIO_FILE} {PARAMETERS_HEAD}",
+            f"parsed {TEXT_FILE} eng {AUDIO_FILE} {PARAMETERS_TAIL}",
             "parsed {} eng {} {} {}".format(
                 TEXT_FILE, AUDIO_FILE, PARAMETERS_HEAD, PARAMETERS_TAIL
             ),
@@ -208,9 +208,9 @@ class RunSDCLI(AbstractCLIProgram):
         text_len = end - start
         tail_len = audio_len - end
         msg.append("")
-        msg.append("Head: {:.3f} {:.3f} ({:.3f})".format(zero, start, head_len))
-        msg.append("Text: {:.3f} {:.3f} ({:.3f})".format(start, end, text_len))
-        msg.append("Tail: {:.3f} {:.3f} ({:.3f})".format(end, audio_len, tail_len))
+        msg.append(f"Head: {zero:.3f} {start:.3f} ({head_len:.3f})")
+        msg.append(f"Text: {start:.3f} {end:.3f} ({text_len:.3f})")
+        msg.append(f"Tail: {end:.3f} {audio_len:.3f} ({tail_len:.3f})")
         msg.append("")
         zero_h = gf.time_to_hhmmssmmm(0)
         start_h = gf.time_to_hhmmssmmm(start)
@@ -219,9 +219,9 @@ class RunSDCLI(AbstractCLIProgram):
         head_len_h = gf.time_to_hhmmssmmm(head_len)
         text_len_h = gf.time_to_hhmmssmmm(text_len)
         tail_len_h = gf.time_to_hhmmssmmm(tail_len)
-        msg.append("Head: {} {} ({})".format(zero_h, start_h, head_len_h))
-        msg.append("Text: {} {} ({})".format(start_h, end_h, text_len_h))
-        msg.append("Tail: {} {} ({})".format(end_h, audio_len_h, tail_len_h))
+        msg.append(f"Head: {zero_h} {start_h} ({head_len_h})")
+        msg.append(f"Text: {start_h} {end_h} ({text_len_h})")
+        msg.append(f"Tail: {end_h} {audio_len_h} ({tail_len_h})")
         msg.append("")
         self.print_info("\n".join(msg))
 

@@ -265,7 +265,7 @@ class TextFragment:
         return len(self.lines)
 
     def __str__(self):
-        return "{} {}".format(self.identifier, self.text)
+        return f"{self.identifier} {self.text}"
 
     @property
     def identifier(self):
@@ -414,7 +414,7 @@ class TextFile(Loggable):
             for node in self.fragments_tree.pre:
                 if not node.is_empty:
                     indent = " " * 2 * (node.level - 1)
-                    msg.append("{}{}".format(indent, node.value))
+                    msg.append(f"{indent}{node.value}")
         return "\n".join(msg)
 
     @property

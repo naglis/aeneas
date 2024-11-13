@@ -67,7 +67,7 @@ class FFPROBEWrapperCLI(AbstractCLIProgram):
             prober = FFPROBEWrapper(rconf=self.rconf, logger=self.logger)
             dictionary = prober.read_properties(audio_file_path)
             for key in sorted(dictionary.keys()):
-                self.print_generic("{} {}".format(key, dictionary[key]))
+                self.print_generic(f"{key} {dictionary[key]}")
             return self.NO_ERROR_EXIT_CODE
         except FFPROBEPathError:
             self.print_error(

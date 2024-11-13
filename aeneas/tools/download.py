@@ -51,10 +51,10 @@ class DownloadCLI(AbstractCLIProgram):
         "synopsis": [("YOUTUBE_URL [OUTPUT_FILE]", True)],
         "examples": [
             "%s --list" % (URL_YOUTUBE),
-            "{} {}".format(URL_YOUTUBE, OUTPUT_FILE_M4A),
-            "{} {} --format=140".format(URL_YOUTUBE, OUTPUT_FILE_M4A),
-            "{} {} --smallest-audio".format(URL_YOUTUBE, OUTPUT_FILE_OGG),
-            "{} {} --largest-audio".format(URL_YOUTUBE, OUTPUT_FILE_M4A),
+            f"{URL_YOUTUBE} {OUTPUT_FILE_M4A}",
+            f"{URL_YOUTUBE} {OUTPUT_FILE_M4A} --format=140",
+            f"{URL_YOUTUBE} {OUTPUT_FILE_OGG} --smallest-audio",
+            f"{URL_YOUTUBE} {OUTPUT_FILE_M4A} --largest-audio",
         ],
         "options": [
             "--format=IDX : download audio stream with given format",

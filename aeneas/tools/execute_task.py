@@ -695,7 +695,7 @@ class ExecuteTaskCLI(AbstractCLIProgram):
             self.print_info("Fragments with rates:")
             for fragment in task.sync_map_leaves(SyncMapFragment.REGULAR):
                 self.print_generic(
-                    "  {}\t{:.3f}".format(fragment.pretty_print, fragment.rate or 0.0)
+                    f"  {fragment.pretty_print}\t{fragment.rate or 0.0:.3f}"
                 )
 
         if print_faster_rate:
@@ -732,7 +732,7 @@ class ExecuteTaskCLI(AbstractCLIProgram):
             example = self.DEMOS[key]
             if full or example["show"]:
                 msg.append("Example %d (%s)" % (i, example["description"]))
-                msg.append("  $ {} {}".format(self.invoke, key))
+                msg.append(f"  $ {self.invoke} {key}")
                 msg.append("")
                 i += 1
         self.print_generic("\n" + "\n".join(msg) + "\n")

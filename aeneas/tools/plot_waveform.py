@@ -49,7 +49,7 @@ class PlotWaveformCLI(AbstractCLIProgram):
         "synopsis": [
             ("AUDIO_FILE OUTPUT_FILE [-i LABEL_FILE [-i LABEL_FILE [...]]]", True)
         ],
-        "examples": ["{} {} -i {}".format(AUDIO_FILE, OUTPUT_FILE, VAD_FILE)],
+        "examples": [f"{AUDIO_FILE} {OUTPUT_FILE} -i {VAD_FILE}"],
         "options": [
             "--fast : enable fast waveform rendering (default: False)",
             "--hzoom=ZOOM : horizontal zoom (int, default: 5)",

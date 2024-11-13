@@ -140,7 +140,7 @@ class SyncMapFormatGenericTabular(SyncMapFormatBase):
             # get text
             text = fragment.text_fragment.text
             if self.TEXT_DELIMITER is not None:
-                text = "{}{}{}".format(self.TEXT_DELIMITER, text, self.TEXT_DELIMITER)
+                text = f"{self.TEXT_DELIMITER}{text}{self.TEXT_DELIMITER}"
             # format string
             msg.append(
                 self.write_template.format(

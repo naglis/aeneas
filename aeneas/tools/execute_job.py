@@ -59,8 +59,8 @@ class ExecuteJobCLI(AbstractCLIProgram):
             ("CONTAINER OUTPUT_DIR [CONFIG_STRING]", True),
         ],
         "examples": [
-            "{} {}".format(CONTAINER_FILE, OUTPUT_DIRECTORY),
-            "{} {} --cewsubprocess".format(CONTAINER_FILE, OUTPUT_DIRECTORY),
+            f"{CONTAINER_FILE} {OUTPUT_DIRECTORY}",
+            f"{CONTAINER_FILE} {OUTPUT_DIRECTORY} --cewsubprocess",
             '{} {} "{}"'.format(
                 CONTAINER_FILE_NO_CONFIG, OUTPUT_DIRECTORY, CONFIG_STRING
             ),

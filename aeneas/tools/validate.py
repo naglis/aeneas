@@ -76,7 +76,7 @@ class ValidateCLI(AbstractCLIProgram):
             "container %s" % (CONTAINER_FILE),
             'job "%s"' % (JOB_CONFIG_STRING),
             'task "%s"' % (TASK_CONFIG_STRING),
-            'wizard "{}" {}'.format(GOOD_CONFIG_STRING, CONTAINER_FILE),
+            f'wizard "{GOOD_CONFIG_STRING}" {CONTAINER_FILE}',
         ],
     }
 

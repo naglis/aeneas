@@ -189,7 +189,7 @@ class AbstractCLIProgram(Loggable):
                     opt = " [OPTIONS]"
                 else:
                     opt = ""
-                synopsis.append("  {} {}{}".format(self.invoke, syn, opt))
+                synopsis.append(f"  {self.invoke} {syn}{opt}")
 
         synopsis.append("")
 
@@ -219,7 +219,7 @@ class AbstractCLIProgram(Loggable):
         if ("examples" in self.HELP) and (len(self.HELP["examples"]) > 0):
             examples.append("EXAMPLES")
             for exa in self.HELP["examples"]:
-                examples.append("  {} {}".format(self.invoke, exa))
+                examples.append(f"  {self.invoke} {exa}")
             examples.append("")
 
         footer = [
@@ -259,7 +259,7 @@ class AbstractCLIProgram(Loggable):
         :rtype: int
         """
         if self.use_sys:
-            self.print_generic("{} v{}".format(self.NAME, aeneas_version))
+            self.print_generic(f"{self.NAME} v{aeneas_version}")
         return self.exit(self.HELP_EXIT_CODE)
 
     def print_rconf_parameters(self):
@@ -342,14 +342,14 @@ class AbstractCLIProgram(Loggable):
             rconf_string = self.has_option_with_value(flag, actual_arguments=False)
             if rconf_string is not None:
                 self.rconf = RuntimeConfiguration(rconf_string)
-                args.remove("{}={}".format(flag, rconf_string))
+                args.remove(f"{flag}={rconf_string}")
 
         # set log file path, if requested
         log_path = None
         for flag in ["-l", "--log"]:
             log_path = self.has_option_with_value(flag, actual_arguments=False)
             if log_path is not None:
-                args.remove("{}={}".format(flag, log_path))
+                args.remove(f"{flag}={log_path}")
             elif flag in set_args:
                 handler, log_path = gf.tmp_file(
                     suffix=".log", root=self.rconf[RuntimeConfiguration.TMP_PATH]

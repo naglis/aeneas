@@ -62,13 +62,13 @@ class SynthesizeTextCLI(AbstractCLIProgram):
         ],
         "examples": [
             "list 'From|fairest|creatures|we|desire|increase' eng %s" % (OUTPUT_FILE),
-            "mplain {} eng {}".format(TEXT_FILE_MPLAIN, OUTPUT_FILE),
+            f"mplain {TEXT_FILE_MPLAIN} eng {OUTPUT_FILE}",
             "munparsed {} eng {} --l1-id-regex=p[0-9]+ --l2-id-regex=s[0-9]+ --l3-id-regex=w[0-9]+".format(
                 TEXT_FILE_MUNPARSED, OUTPUT_FILE
             ),
-            "parsed {} eng {}".format(TEXT_FILE_PARSED, OUTPUT_FILE),
-            "plain {} eng {}".format(TEXT_FILE_PLAIN, OUTPUT_FILE),
-            "subtitles {} eng {}".format(TEXT_FILE_SUBTITLES, OUTPUT_FILE),
+            f"parsed {TEXT_FILE_PARSED} eng {OUTPUT_FILE}",
+            f"plain {TEXT_FILE_PLAIN} eng {OUTPUT_FILE}",
+            f"subtitles {TEXT_FILE_SUBTITLES} eng {OUTPUT_FILE}",
             "unparsed {} eng {} --id-regex=f[0-9]*".format(
                 TEXT_FILE_UNPARSED, OUTPUT_FILE
             ),
@@ -78,11 +78,11 @@ class SynthesizeTextCLI(AbstractCLIProgram):
             "unparsed {} eng {} --id-regex=f[0-9]* --sort=numeric".format(
                 TEXT_FILE_UNPARSED, OUTPUT_FILE
             ),
-            "plain {} eng {} --start=5".format(TEXT_FILE_PLAIN, OUTPUT_FILE),
-            "plain {} eng {} --end=10".format(TEXT_FILE_PLAIN, OUTPUT_FILE),
-            "plain {} eng {} --start=5 --end=10".format(TEXT_FILE_PLAIN, OUTPUT_FILE),
-            "plain {} eng {} --backwards".format(TEXT_FILE_PLAIN, OUTPUT_FILE),
-            "plain {} eng {} --quit-after=10.0".format(TEXT_FILE_PLAIN, OUTPUT_FILE),
+            f"plain {TEXT_FILE_PLAIN} eng {OUTPUT_FILE} --start=5",
+            f"plain {TEXT_FILE_PLAIN} eng {OUTPUT_FILE} --end=10",
+            f"plain {TEXT_FILE_PLAIN} eng {OUTPUT_FILE} --start=5 --end=10",
+            f"plain {TEXT_FILE_PLAIN} eng {OUTPUT_FILE} --backwards",
+            f"plain {TEXT_FILE_PLAIN} eng {OUTPUT_FILE} --quit-after=10.0",
         ],
         "options": [
             "--class-regex=REGEX : extract text from elements with class attribute matching REGEX (unparsed)",

@@ -89,7 +89,7 @@ def print_error(msg, color=True):
     :param bool color: if ``True``, print with POSIX color
     """
     if color and is_posix():
-        safe_print("{}[ERRO] {}{}".format(ANSI_ERROR, msg, ANSI_END))
+        safe_print(f"{ANSI_ERROR}[ERRO] {msg}{ANSI_END}")
     else:
         safe_print("[ERRO] %s" % (msg))
 
@@ -112,7 +112,7 @@ def print_success(msg, color=True):
     :param bool color: if ``True``, print with POSIX color
     """
     if color and is_posix():
-        safe_print("{}[INFO] {}{}".format(ANSI_OK, msg, ANSI_END))
+        safe_print(f"{ANSI_OK}[INFO] {msg}{ANSI_END}")
     else:
         safe_print("[INFO] %s" % (msg))
 
@@ -125,7 +125,7 @@ def print_warning(msg, color=True):
     :param bool color: if ``True``, print with POSIX color
     """
     if color and is_posix():
-        safe_print("{}[WARN] {}{}".format(ANSI_WARNING, msg, ANSI_END))
+        safe_print(f"{ANSI_WARNING}[WARN] {msg}{ANSI_END}")
     else:
         safe_print("[WARN] %s" % (msg))
 
@@ -427,7 +427,7 @@ def config_dict_to_string(dictionary):
     parameters = []
     for key in dictionary:
         parameters.append(
-            "{}{}{}".format(key, gc.CONFIG_STRING_ASSIGNMENT_SYMBOL, dictionary[key])
+            f"{key}{gc.CONFIG_STRING_ASSIGNMENT_SYMBOL}{dictionary[key]}"
         )
     return gc.CONFIG_STRING_SEPARATOR_SYMBOL.join(parameters)
 
@@ -1084,7 +1084,7 @@ def human_readable_number(number, suffix=""):
     """
     for unit in ["", "K", "M", "G", "T", "P", "E", "Z"]:
         if abs(number) < 1024.0:
-            return "{:3.1f}{}{}".format(number, unit, suffix)
+            return f"{number:3.1f}{unit}{suffix}"
         number /= 1024.0
     return "{:.1f}{}{}".format(number, "Y", suffix)
 

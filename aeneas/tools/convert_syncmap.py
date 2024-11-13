@@ -59,12 +59,12 @@ class ConvertSyncMapCLI(AbstractCLIProgram):
             ("INPUT_SYNCMAP OUTPUT_HTML AUDIO_FILE --output-html", True),
         ],
         "examples": [
-            "{} {}".format(SYNC_MAP_JSON, OUTPUT_MAP_SRT),
-            "{} {} --output-format=txt".format(SYNC_MAP_JSON, OUTPUT_MAP_DAT),
-            "{} {} --input-format=csv".format(SYNC_MAP_ZZZ, OUTPUT_MAP_TXT),
-            "{} {} --language=en".format(SYNC_MAP_CSV, OUTPUT_MAP_JSON),
-            "{} {} {}".format(SYNC_MAP_JSON, OUTPUT_MAP_SMIL, SMIL_PARAMETERS),
-            "{} {} {} --output-html".format(SYNC_MAP_JSON, OUTPUT_HTML, AUDIO),
+            f"{SYNC_MAP_JSON} {OUTPUT_MAP_SRT}",
+            f"{SYNC_MAP_JSON} {OUTPUT_MAP_DAT} --output-format=txt",
+            f"{SYNC_MAP_ZZZ} {OUTPUT_MAP_TXT} --input-format=csv",
+            f"{SYNC_MAP_CSV} {OUTPUT_MAP_JSON} --language=en",
+            f"{SYNC_MAP_JSON} {OUTPUT_MAP_SMIL} {SMIL_PARAMETERS}",
+            f"{SYNC_MAP_JSON} {OUTPUT_HTML} {AUDIO} --output-html",
         ],
         "options": [
             "--audio-ref=REF : use REF for the audio ref attribute (smil, smilh, smilm)",

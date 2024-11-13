@@ -140,7 +140,7 @@ class Configuration:
 
     def __str__(self):
         return "\n".join(
-            ["{}: '{}'".format(fn, self.data[fn]) for fn in sorted(self.data.keys())]
+            [f"{fn}: '{self.data[fn]}'" for fn in sorted(self.data.keys())]
         )
 
     def _cast(self, key, value):
@@ -171,7 +171,7 @@ class Configuration:
         """
         return (gc.CONFIG_STRING_SEPARATOR_SYMBOL).join(
             [
-                "{}{}{}".format(fn, gc.CONFIG_STRING_ASSIGNMENT_SYMBOL, self.data[fn])
+                f"{fn}{gc.CONFIG_STRING_ASSIGNMENT_SYMBOL}{self.data[fn]}"
                 for fn in sorted(self.data.keys())
                 if self.data[fn] is not None
             ]
@@ -205,7 +205,7 @@ class Configuration:
             else:
                 cftype = "unknown"
                 cfdefault = "%s" % fdefault if fdefault is not None else "None"
-            return " ({}, {})".format(cftype, cfdefault)
+            return f" ({cftype}, {cfdefault})"
 
         parameters = [
             (field, fdesc, ftype, fdefault)
@@ -216,7 +216,7 @@ class Configuration:
         if as_strings:
             max_length = max(len(t[0]) for t in parameters)
             parameters = [
-                "{} : {}{}".format(f.ljust(max_length), d, cft(t, df))
+                f"{f.ljust(max_length)} : {d}{cft(t, df)}"
                 for (f, d, t, df) in parameters
             ]
         return parameters

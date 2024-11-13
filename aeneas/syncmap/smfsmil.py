@@ -126,7 +126,7 @@ class SyncMapFormatSMIL(SyncMapFormatGenericXML):
                 par_elem = etree.SubElement(seq_elem, "{%s}par" % smil_ns)
                 par_elem.attrib["id"] = "par%06d" % (i)
                 text_elem = etree.SubElement(par_elem, "{%s}text" % smil_ns)
-                text_elem.attrib["src"] = "{}#{}".format(text_ref, text.identifier)
+                text_elem.attrib["src"] = f"{text_ref}#{text.identifier}"
                 audio_elem = etree.SubElement(par_elem, "{%s}audio" % smil_ns)
                 audio_elem.attrib["src"] = audio_ref
                 audio_elem.attrib["clipBegin"] = self.format_time_function(

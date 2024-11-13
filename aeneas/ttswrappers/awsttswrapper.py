@@ -213,7 +213,7 @@ class AWSTTSWrapper(BaseTTSWrapper):
     }
 
     CODE_TO_HUMAN_LIST = sorted(
-        ["{}\t{}".format(k, v) for k, v in CODE_TO_HUMAN.items()]
+        [f"{k}\t{v}" for k, v in CODE_TO_HUMAN.items()]
     )
 
     LANGUAGE_TO_VOICE_CODE = {

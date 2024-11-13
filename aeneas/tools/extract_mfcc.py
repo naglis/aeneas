@@ -49,7 +49,7 @@ class ExtractMFCCCLI(AbstractCLIProgram):
     HELP = {
         "description": "Extract MFCCs from a given audio file as a fat matrix.",
         "synopsis": [("AUDIO_FILE OUTPUT_FILE", True)],
-        "examples": ["{} {}".format(INPUT_FILE, OUTPUT_FILE)],
+        "examples": [f"{INPUT_FILE} {OUTPUT_FILE}"],
         "options": [
             "-b, --binary : output MFCCs as a float64 binary file",
             "-d, --delete-first : do not output the 0th MFCC coefficient",

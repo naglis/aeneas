@@ -155,7 +155,7 @@ class ExecuteJob(Loggable):
         except Exception as exc:
             self.clean()
             self.log_exc(
-                "Unable to decompress container '{}': {}".format(container_path, exc),
+                f"Unable to decompress container '{container_path}': {exc}",
                 None,
                 True,
                 ExecuteJobInputError,
@@ -172,7 +172,7 @@ class ExecuteJob(Loggable):
         except Exception as exc:
             self.clean()
             self.log_exc(
-                "Unable to analyze container '{}': {}".format(container_path, exc),
+                f"Unable to analyze container '{container_path}': {exc}",
                 None,
                 True,
                 ExecuteJobInputError,

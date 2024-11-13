@@ -88,7 +88,7 @@ class CEWSubprocess(Loggable):
         self.log("Populating the text file...")
         with open(text_file_path, "w", encoding="utf-8") as tmp_text_file:
             for f_voice_code, f_text in u_text:
-                tmp_text_file.write("{} {}\n".format(f_voice_code, f_text))
+                tmp_text_file.write(f"{f_voice_code} {f_text}\n")
         self.log("Populating the text file... done")
 
         arguments = [
@@ -177,7 +177,7 @@ def main():
             data.write("%d\n" % (sr))
             data.write("%d\n" % (sf))
             data.write(
-                "\n".join(["{:.3f} {:.3f}".format(i[0], i[1]) for i in intervals])
+                "\n".join([f"{i[0]:.3f} {i[1]:.3f}" for i in intervals])
             )
     except Exception as exc:
         print("Unexpected error: %s" % str(exc))

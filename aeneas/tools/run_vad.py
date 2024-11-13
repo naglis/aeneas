@@ -54,9 +54,9 @@ class RunVADCLI(AbstractCLIProgram):
         "description": "Extract a list of speech intervals using the MFCC energy-based VAD.",
         "synopsis": [("AUDIO_FILE [%s] [OUTPUT_FILE]" % ("|".join(MODES)), True)],
         "examples": [
-            "{} both {}".format(INPUT_FILE, OUTPUT_BOTH),
-            "{} nonspeech {}".format(INPUT_FILE, OUTPUT_NONSPEECH),
-            "{} speech {}".format(INPUT_FILE, OUTPUT_SPEECH),
+            f"{INPUT_FILE} both {OUTPUT_BOTH}",
+            f"{INPUT_FILE} nonspeech {OUTPUT_NONSPEECH}",
+            f"{INPUT_FILE} speech {OUTPUT_SPEECH}",
         ],
         "options": [
             "-i, --index : output intervals as indices instead of seconds",

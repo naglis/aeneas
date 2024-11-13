@@ -338,7 +338,7 @@ class Loggable:
         if raise_type is not None:
             raise_message = message
             if exc is not None:
-                raise_message = "{} : {}".format(message, exc)
+                raise_message = f"{message} : {exc}"
             raise raise_type(raise_message)
 
     def log(self, message):

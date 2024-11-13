@@ -46,7 +46,7 @@ class FFMPEGWrapperCLI(AbstractCLIProgram):
     HELP = {
         "description": "Convert audio files to mono WAV using the ffmpeg wrapper.",
         "synopsis": [("INPUT_FILE OUTPUT_FILE", True)],
-        "examples": ["{} {}".format(INPUT_FILE, OUTPUT_FILE)],
+        "examples": [f"{INPUT_FILE} {OUTPUT_FILE}"],
     }
 
     def perform_command(self):
@@ -69,7 +69,7 @@ class FFMPEGWrapperCLI(AbstractCLIProgram):
             converter = FFMPEGWrapper(rconf=self.rconf, logger=self.logger)
             converter.convert(input_file_path, output_file_path)
             self.print_success(
-                "Converted '{}' into '{}'".format(input_file_path, output_file_path)
+                f"Converted '{input_file_path}' into '{output_file_path}'"
             )
             return self.NO_ERROR_EXIT_CODE
         except FFMPEGPathError:

@@ -311,7 +311,7 @@ class TimeInterval:
         return (self < other) or (self == other)
 
     def __repr__(self):
-        return "[{}, {}]".format(self.begin, self.end)
+        return f"[{self.begin}, {self.end}]"
 
     @property
     def length(self):
