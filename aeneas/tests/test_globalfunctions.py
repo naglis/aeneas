@@ -560,10 +560,10 @@ class TestGlobalFunctions(unittest.TestCase):
         self.assertEqual(gf.file_size(path), -1)
 
     def test_delete_directory_existing(self):
-        tmp_dir = tempfile.TemporaryDirectory(delete=False)
-        self.assertTrue(gf.directory_exists(tmp_dir.name))
-        gf.delete_directory(tmp_dir.name)
-        self.assertFalse(gf.directory_exists(tmp_dir.name))
+        tmp_dir = tempfile.mkdtemp()
+        self.assertTrue(gf.directory_exists(tmp_dir))
+        gf.delete_directory(tmp_dir)
+        self.assertFalse(gf.directory_exists(tmp_dir))
 
     def test_delete_directory_not_existing(self):
         orig = "/foo/bar/baz"
