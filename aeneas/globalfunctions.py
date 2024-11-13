@@ -142,41 +142,6 @@ def uuid_string():
     return safe_unicode(str(uuid.uuid4())).lower()
 
 
-def custom_tmp_dir():
-    """
-    Return the path of the temporary directory to use.
-
-    On POSIX OSes (Linux and OS X), return the value of
-    :data:`~aeneas.globalconstants.TMP_PATH_DEFAULT_POSIX`
-    (e.g., ``/tmp/``).
-
-    On non-POSIX OSes, return the value of
-    :data:`~aeneas.globalconstants.TMP_PATH_DEFAULT_NONPOSIX`
-    (i.e., ``None``), so that ``tempfile``
-    will use the directory specified by the
-    environment/user ``TMP`` or ``TEMP`` variable.
-
-    :rtype: string
-    """
-    if is_posix():
-        return gc.TMP_PATH_DEFAULT_POSIX
-    return gc.TMP_PATH_DEFAULT_NONPOSIX
-
-
-def tmp_directory(root=None):
-    """
-    Return the path of a temporary directory created by ``tempfile``.
-
-    :param string root: path to the root temporary directory;
-                        if ``None``, the default temporary directory
-                        will be used instead
-    :rtype: string
-    """
-    if root is None:
-        root = custom_tmp_dir()
-    return tempfile.mkdtemp(dir=root)
-
-
 def tmp_file(suffix=u"", root=None):
     """
     Return a (handler, path) tuple
@@ -188,8 +153,6 @@ def tmp_file(suffix=u"", root=None):
                         will be used instead
     :rtype: tuple
     """
-    if root is None:
-        root = custom_tmp_dir()
     return tempfile.mkstemp(suffix=suffix, dir=root)
 
 

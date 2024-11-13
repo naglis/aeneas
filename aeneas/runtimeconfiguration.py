@@ -629,11 +629,7 @@ class RuntimeConfiguration(Configuration):
     """
     Path to the temporary directory to be used.
     Default: ``None``, meaning that the default temporary directory
-    will be set by
-    :data:`~aeneas.globalconstants.TMP_PATH_DEFAULT_POSIX`
-    or
-    :data:`~aeneas.globalconstants.TMP_PATH_DEFAULT_NONPOSIX`
-    depending on your OS.
+    will be used depending on your OS.
 
     .. versionadded:: 1.4.1
     """

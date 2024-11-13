@@ -24,6 +24,7 @@
 import multiprocessing
 import os
 import unittest
+import tempfile
 
 from aeneas.tools.execute_task import ExecuteTaskCLI
 import aeneas.globalfunctions as gf
@@ -51,17 +52,18 @@ class TestBenchmarkExecuteTaskCLI(unittest.TestCase):
             self.assertTrue(False)
 
     def execute(self, parameters, expected_exit_code):
-        output_path = gf.tmp_directory()
         params = ["placeholder"]
-        for p_type, p_value in parameters:
-            if p_type == "in":
-                params.append(os.path.join(BENCH_DIR, p_value))
-            elif p_type == "out":
-                params.append(os.path.join(output_path, p_value))
-            else:
-                params.append(p_value)
-        exit_code = ExecuteTaskCLI(use_sys=False).run(arguments=params)
-        gf.delete_directory(output_path)
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            for p_type, p_value in parameters:
+                if p_type == "in":
+                    params.append(os.path.join(BENCH_DIR, p_value))
+                elif p_type == "out":
+                    params.append(os.path.join(tmp_dir, p_value))
+                else:
+                    params.append(p_value)
+
+            exit_code = ExecuteTaskCLI(use_sys=False).run(arguments=params)
+
         self.assertEqual(exit_code, expected_exit_code)
 
     def test_001_mplain(self):

@@ -66,22 +66,6 @@ MIMETYPE_MAP = {
 }
 """ Map from audio file extension to mimetype """
 
-TMP_PATH_DEFAULT_NONPOSIX = None
-"""
-Default temporary directory path for non-POSIX OSes.
-Set to ``None`` so that ``tempfile`` will select
-the most approriate temporary directory root path.
-
-.. versionadded:: 1.4.1
-"""
-
-TMP_PATH_DEFAULT_POSIX = "/tmp/"
-"""
-Default temporary directory path for POSIX OSes.
-
-.. versionadded:: 1.4.1
-"""
-
 
 # PARAMETER NAMES
 

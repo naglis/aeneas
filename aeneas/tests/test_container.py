@@ -23,6 +23,7 @@
 
 import os
 import unittest
+import tempfile
 
 from aeneas.container import Container
 from aeneas.container import ContainerFormat
@@ -121,10 +122,9 @@ class TestContainer(unittest.TestCase):
             self.assertTrue(cont.exists())
 
     def test_exists_empty_directory(self):
-        output_path = gf.tmp_directory()
-        cont = Container(output_path)
-        self.assertTrue(cont.exists())
-        gf.delete_directory(output_path)
+        with tempfile.TemporaryDirectory() as output_path:
+            cont = Container(output_path)
+            self.assertTrue(cont.exists())
 
     def test_entries_file_not_existing(self):
         cont = Container(self.NOT_EXISTING)
@@ -138,10 +138,9 @@ class TestContainer(unittest.TestCase):
                 self.assertEqual(len(cont.entries), 0)
 
     def test_entries_empty_directory(self):
-        output_path = gf.tmp_directory()
-        cont = Container(output_path)
-        self.assertEqual(len(cont.entries), 0)
-        gf.delete_directory(output_path)
+        with tempfile.TemporaryDirectory() as output_path:
+            cont = Container(output_path)
+            self.assertEqual(len(cont.entries), 0)
 
     def test_entries(self):
         for key in self.FILES:
@@ -171,10 +170,9 @@ class TestContainer(unittest.TestCase):
                 self.assertTrue(cont.is_safe)
 
     def test_is_safe_empty_directory(self):
-        output_path = gf.tmp_directory()
-        cont = Container(output_path)
-        self.assertTrue(cont.is_safe)
-        gf.delete_directory(output_path)
+        with tempfile.TemporaryDirectory() as output_path:
+            cont = Container(output_path)
+            self.assertTrue(cont.is_safe)
 
     def test_is_safe(self):
         for key in self.FILES:
@@ -218,10 +216,9 @@ class TestContainer(unittest.TestCase):
                 self.assertIsNone(cont.read_entry(self.EXPECTED_ENTRIES[0]))
 
     def test_read_entry_empty_directory(self):
-        output_path = gf.tmp_directory()
-        cont = Container(output_path)
-        self.assertIsNone(cont.read_entry(self.EXPECTED_ENTRIES[0]))
-        gf.delete_directory(output_path)
+        with tempfile.TemporaryDirectory() as output_path:
+            cont = Container(output_path)
+            self.assertIsNone(cont.read_entry(self.EXPECTED_ENTRIES[0]))
 
     def test_read_entry_existing(self):
         entry = "config.txt"
@@ -244,10 +241,9 @@ class TestContainer(unittest.TestCase):
                 self.assertIsNone(cont.find_entry(self.EXPECTED_ENTRIES[0]))
 
     def test_find_entry_empty_directory(self):
-        output_path = gf.tmp_directory()
-        cont = Container(output_path)
-        self.assertIsNone(cont.find_entry(self.EXPECTED_ENTRIES[0]))
-        gf.delete_directory(output_path)
+        with tempfile.TemporaryDirectory() as output_path:
+            cont = Container(output_path)
+            self.assertIsNone(cont.find_entry(self.EXPECTED_ENTRIES[0]))
 
     def test_find_entry_existing(self):
         entry = "config.txt"
@@ -283,36 +279,35 @@ class TestContainer(unittest.TestCase):
 
     def test_decompress(self):
         for key in self.FILES:
-            output_path = gf.tmp_directory()
-            f = self.FILES[key]
-            cont = Container(f["path"])
-            cont.decompress(output_path)
-            copy = Container(output_path, ContainerFormat.UNPACKED)
-            self.assertEqual(copy.entries, self.EXPECTED_ENTRIES)
-            gf.delete_directory(output_path)
+            with tempfile.TemporaryDirectory() as output_path:
+                f = self.FILES[key]
+                cont = Container(f["path"])
+                cont.decompress(output_path)
+                copy = Container(output_path, ContainerFormat.UNPACKED)
+                self.assertEqual(copy.entries, self.EXPECTED_ENTRIES)
 
     def test_compress_unpacked(self):
         input_path = self.FILES["unpacked"]["path"]
-        output_path = gf.tmp_directory()
-        cont = Container(output_path, ContainerFormat.UNPACKED)
-        cont.compress(input_path)
-        self.assertFalse(os.path.isfile(output_path))
-        copy = Container(output_path, ContainerFormat.UNPACKED)
-        self.assertEqual(copy.entries, self.EXPECTED_ENTRIES)
-        gf.delete_directory(output_path)
+        with tempfile.TemporaryDirectory() as output_path:
+            cont = Container(output_path, ContainerFormat.UNPACKED)
+            cont.compress(input_path)
+            self.assertFalse(os.path.isfile(output_path))
+            copy = Container(output_path, ContainerFormat.UNPACKED)
+            self.assertEqual(copy.entries, self.EXPECTED_ENTRIES)
 
     def test_compress_file(self):
         input_path = self.FILES["unpacked"]["path"]
         for key in self.FILES:
             fmt = self.FILES[key]["format"]
-            if fmt != ContainerFormat.UNPACKED:
-                handler, output_path = gf.tmp_file(suffix="." + fmt)
-                cont = Container(output_path, fmt)
+            if fmt == ContainerFormat.UNPACKED:
+                continue
+
+            with tempfile.NamedTemporaryFile(suffix=f".{fmt}") as output_path:
+                cont = Container(output_path.name, fmt)
                 cont.compress(input_path)
-                self.assertTrue(os.path.isfile(output_path))
-                copy = Container(output_path, fmt)
+                self.assertTrue(os.path.isfile(output_path.name))
+                copy = Container(output_path.name, fmt)
                 self.assertEqual(copy.entries, self.EXPECTED_ENTRIES)
-                gf.delete_file(handler, output_path)
 
 
 if __name__ == "__main__":

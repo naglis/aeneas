@@ -23,6 +23,8 @@
 
 import os
 import unittest
+import tempfile
+import contextlib
 
 from aeneas.ffmpegwrapper import FFMPEGWrapper
 from aeneas.runtimeconfiguration import RuntimeConfiguration
@@ -63,25 +65,38 @@ class TestFFMPEGWrapper(unittest.TestCase):
     EMPTY_FILE_PATH = "res/audioformats/p001.empty"
 
     def convert(self, input_file_path, ofp=None, runtime_configuration=None):
+        exit_stack = contextlib.ExitStack()
         if ofp is None:
-            output_path = gf.tmp_directory()
+            tmp_dir = tempfile.TemporaryDirectory()
+            exit_stack.enter_context(tmp_dir)
+            output_path = tmp_dir.name
             output_file_path = os.path.join(output_path, "audio.wav")
         else:
+
+            @contextlib.contextmanager
+            def delete_file(path):
+                try:
+                    pass
+                finally:
+                    gf.delete_file(None, path)
+                
+            exit_stack.enter_context(delete_file(ofp))
             output_file_path = ofp
-        try:
-            converter = FFMPEGWrapper(rconf=runtime_configuration)
-            result = converter.convert(
-                gf.absolute_path(input_file_path, __file__),
-                output_file_path
-            )
-            self.assertEqual(result, output_file_path)
-            gf.delete_directory(output_path)
-        except OSError as exc:
-            if ofp is None:
-                gf.delete_directory(output_path)
-            else:
-                gf.delete_file(None, ofp)
-            raise exc
+
+        with exit_stack:
+            try:
+                converter = FFMPEGWrapper(rconf=runtime_configuration)
+                result = converter.convert(
+                    gf.absolute_path(input_file_path, __file__),
+                    output_file_path
+                )
+                self.assertEqual(result, output_file_path)
+            except OSError as exc:
+                if ofp is None:
+                    gf.delete_directory(output_path)
+                else:
+                    gf.delete_file(None, ofp)
+                raise exc
 
     def test_convert(self):
         for f in self.FILES:

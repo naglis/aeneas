@@ -22,6 +22,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import os
+import tempfile
 import unittest
 
 from aeneas.tests.common import ExecuteJobCLICase, slow_test
@@ -250,13 +251,12 @@ class TestExecuteJobCLI(ExecuteJobCLICase):
         ], 0)
 
     def test_exec_tmp_path(self):
-        tmp_path = gf.tmp_directory()
-        self.execute([
-            ("in", "../tools/res/job.zip"),
-            ("out", ""),
-            ("", "-r=\"tmp_path=%s\"" % tmp_path)
-        ], 0)
-        gf.delete_directory(tmp_path)
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            self.execute([
+                ("in", "../tools/res/job.zip"),
+                ("out", ""),
+                ("", "-r=\"tmp_path=%s\"" % tmp_dir)
+            ], 0)
 
     def test_exec_tts(self):
         if not EXTRA_TESTS:

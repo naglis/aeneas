@@ -25,6 +25,7 @@ import io
 import os
 import sys
 import unittest
+import tempfile
 
 from aeneas.exacttiming import TimeValue
 import aeneas.globalconstants as gc
@@ -36,18 +37,6 @@ class TestGlobalFunctions(unittest.TestCase):
     def test_uuid_string(self):
         uuid = gf.uuid_string()
         self.assertEqual(len(uuid), 36)
-
-    def test_custom_tmp_dir(self):
-        tmp_dir = gf.custom_tmp_dir()
-        if sys.platform in ["linux", "linux2", "darwin"]:
-            self.assertEqual(tmp_dir, gc.TMP_PATH_DEFAULT_POSIX)
-        else:
-            self.assertEqual(tmp_dir, gc.TMP_PATH_DEFAULT_NONPOSIX)
-
-    def test_tmp_directory(self):
-        tmp_dir = gf.tmp_directory()
-        self.assertTrue(gf.directory_exists(tmp_dir))
-        gf.delete_directory(tmp_dir)
 
     def test_tmp_file(self):
         tmp_handler, tmp_file = gf.tmp_file()
@@ -297,30 +286,28 @@ class TestGlobalFunctions(unittest.TestCase):
             self.assertEqual(gf.pairs_to_dict(test[0]), test[1])
 
     def test_copytree(self):
-        orig = gf.tmp_directory()
-        tmp_path = os.path.join(orig, "foo.bar")
-        with io.open(tmp_path, "w", encoding="utf-8") as tmp_file:
-            tmp_file.write(u"Foo bar")
-        dest = gf.tmp_directory()
-        gf.copytree(orig, dest)
-        self.assertTrue(gf.file_exists(os.path.join(dest, "foo.bar")))
-        gf.delete_directory(dest)
-        gf.delete_directory(orig)
+        with tempfile.TemporaryDirectory() as orig, tempfile.TemporaryDirectory() as dest:
+            tmp_path = os.path.join(orig, "foo.bar")
+            with io.open(tmp_path, "w", encoding="utf-8") as tmp_file:
+                tmp_file.write(u"Foo bar")
+
+            gf.copytree(orig, dest)
+
+            self.assertTrue(gf.file_exists(os.path.join(dest, "foo.bar")))
 
     def test_ensure_parent_directory(self):
-        orig = gf.tmp_directory()
-        tmp_path = os.path.join(orig, "foo.bar")
-        tmp_parent = orig
-        gf.ensure_parent_directory(tmp_path)
-        self.assertTrue(gf.directory_exists(tmp_parent))
-        tmp_path = os.path.join(orig, "foo/bar.baz")
-        tmp_parent = os.path.join(orig, "foo")
-        gf.ensure_parent_directory(tmp_path)
-        self.assertTrue(gf.directory_exists(tmp_parent))
-        tmp_path = os.path.join(orig, "bar")
-        gf.ensure_parent_directory(tmp_path, ensure_parent=False)
-        self.assertTrue(gf.directory_exists(tmp_path))
-        gf.delete_directory(orig)
+        with tempfile.TemporaryDirectory() as orig:
+            tmp_path = os.path.join(orig, "foo.bar")
+            tmp_parent = orig
+            gf.ensure_parent_directory(tmp_path)
+            self.assertTrue(gf.directory_exists(tmp_parent))
+            tmp_path = os.path.join(orig, "foo/bar.baz")
+            tmp_parent = os.path.join(orig, "foo")
+            gf.ensure_parent_directory(tmp_path)
+            self.assertTrue(gf.directory_exists(tmp_parent))
+            tmp_path = os.path.join(orig, "bar")
+            gf.ensure_parent_directory(tmp_path, ensure_parent=False)
+            self.assertTrue(gf.directory_exists(tmp_path))
 
     def test_ensure_parent_directory_parent_error(self):
         with self.assertRaises(OSError):
@@ -517,9 +504,8 @@ class TestGlobalFunctions(unittest.TestCase):
         self.assertFalse(gf.file_can_be_written(path))
 
     def test_directory_exists_true(self):
-        orig = gf.tmp_directory()
-        self.assertTrue(gf.directory_exists(orig))
-        gf.delete_directory(orig)
+        with tempfile.TemporaryDirectory() as orig:
+            self.assertTrue(gf.directory_exists(orig))
 
     def test_directory_exists_false(self):
         orig = "/foo/bar/baz"
@@ -551,10 +537,10 @@ class TestGlobalFunctions(unittest.TestCase):
         self.assertEqual(gf.file_size(path), -1)
 
     def test_delete_directory_existing(self):
-        orig = gf.tmp_directory()
-        self.assertTrue(gf.directory_exists(orig))
-        gf.delete_directory(orig)
-        self.assertFalse(gf.directory_exists(orig))
+        tmp_dir = tempfile.TemporaryDirectory(delete=False)
+        self.assertTrue(gf.directory_exists(tmp_dir.name))
+        gf.delete_directory(tmp_dir.name)
+        self.assertFalse(gf.directory_exists(tmp_dir.name))
 
     def test_delete_directory_not_existing(self):
         orig = "/foo/bar/baz"

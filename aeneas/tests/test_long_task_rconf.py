@@ -23,6 +23,7 @@
 
 import os
 import unittest
+import tempfile
 
 from aeneas.tests.common import ExecuteTaskCLICase, slow_test
 import aeneas.globalfunctions as gf
@@ -309,15 +310,14 @@ class TestExecuteTaskCLI(ExecuteTaskCLICase):
         ], 0)
 
     def test_exec_tmp_path(self):
-        tmp_path = gf.tmp_directory()
-        self.execute([
-            ("in", "../tools/res/audio.mp3"),
-            ("in", "../tools/res/subtitles.txt"),
-            ("", "task_language=eng|is_text_type=subtitles|os_task_file_format=srt"),
-            ("out", "sonnet.srt"),
-            ("", "-r=\"tmp_path=%s\"" % tmp_path)
-        ], 0)
-        gf.delete_directory(tmp_path)
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            self.execute([
+                ("in", "../tools/res/audio.mp3"),
+                ("in", "../tools/res/subtitles.txt"),
+                ("", "task_language=eng|is_text_type=subtitles|os_task_file_format=srt"),
+                ("out", "sonnet.srt"),
+                ("", "-r=\"tmp_path=%s\"" % tmp_dir)
+            ], 0)
 
     def test_exec_tts(self):
         if not EXTRA_TESTS:

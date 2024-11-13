@@ -34,6 +34,8 @@ This module contains the following classes:
 from __future__ import absolute_import
 from __future__ import print_function
 
+import tempfile
+
 from aeneas.analyzecontainer import AnalyzeContainer
 from aeneas.container import Container
 from aeneas.container import ContainerFormat
@@ -134,15 +136,18 @@ class ExecuteJob(Loggable):
         """
         self.log(u"Loading job from container...")
 
+        # FIXME: After switching to `tempfile`, it seems that `self.clean()` is
+        # not called always and the temporary directories are not explicitly clean up.
+
         # create working directory where the input container
         # will be decompressed
-        self.working_directory = gf.tmp_directory(root=self.rconf[RuntimeConfiguration.TMP_PATH])
-        self.log([u"Created working directory '%s'", self.working_directory])
+        self.working_directory = tempfile.TemporaryDirectory(dir=self.rconf[RuntimeConfiguration.TMP_PATH])
+        self.log([u"Created working directory '%s'", self.working_directory.name])
 
         try:
             self.log(u"Decompressing input container...")
             input_container = Container(container_path, logger=self.logger)
-            input_container.decompress(self.working_directory)
+            input_container.decompress(self.working_directory.name)
             self.log(u"Decompressing input container... done")
         except Exception as exc:
             self.clean()
@@ -151,7 +156,7 @@ class ExecuteJob(Loggable):
         try:
             self.log(u"Creating job from working directory...")
             working_container = Container(
-                self.working_directory,
+                self.working_directory.name,
                 logger=self.logger
             )
             analyzer = AnalyzeContainer(working_container, logger=self.logger)
@@ -170,11 +175,11 @@ class ExecuteJob(Loggable):
             self.log(u"Setting absolute paths for tasks...")
             for task in self.job.tasks:
                 task.text_file_path_absolute = gf.norm_join(
-                    self.working_directory,
+                    self.working_directory.path,
                     task.text_file_path
                 )
                 task.audio_file_path_absolute = gf.norm_join(
-                    self.working_directory,
+                    self.working_directory.name,
                     task.audio_file_path
                 )
             self.log(u"Setting absolute paths for tasks... done")
@@ -242,8 +247,8 @@ class ExecuteJob(Loggable):
         # will be created
         # this temporary directory will be compressed into
         # the output container
-        self.tmp_directory = gf.tmp_directory(root=self.rconf[RuntimeConfiguration.TMP_PATH])
-        self.log([u"Created temporary directory '%s'", self.tmp_directory])
+        self.tmp_directory = tempfile.TemporaryDirectory(dir=self.rconf[RuntimeConfiguration.TMP_PATH])
+        self.log([u"Created temporary directory '%s'", self.tmp_directory.name])
 
         for task in self.job.tasks:
             custom_id = task.configuration["custom_id"]
@@ -257,7 +262,7 @@ class ExecuteJob(Loggable):
             try:
                 # output sync map
                 self.log([u"Outputting sync map for task '%s'...", custom_id])
-                task.output_sync_map_file(self.tmp_directory)
+                task.output_sync_map_file(self.tmp_directory.name)
                 self.log([u"Outputting sync map for task '%s'... done", custom_id])
             except Exception as exc:
                 self.log_exc(u"Error while outputting sync map for task '%s'" % (custom_id), None, True, ExecuteJobOutputError)
@@ -284,16 +289,17 @@ class ExecuteJob(Loggable):
                 output_container_format,
                 logger=self.logger
             )
-            container.compress(self.tmp_directory)
+            container.compress(self.tmp_directory.name)
             self.log(u"Compressing... done")
             self.log([u"Created output file: '%s'", output_file_path])
             self.log(u"Writing output container for this job: succeeded")
-            self.clean(False)
             return output_file_path
         except Exception as exc:
-            self.clean(False)
             self.log_exc(u"Error while compressing", exc, True, ExecuteJobOutputError)
-            return None
+        finally:
+            self.clean(False)
+
+        return None
 
     def clean(self, remove_working_directory=True):
         """
@@ -307,10 +313,10 @@ class ExecuteJob(Loggable):
         """
         if remove_working_directory is not None:
             self.log(u"Removing working directory... ")
-            gf.delete_directory(self.working_directory)
-            self.working_directory = None
+            self.working_directory.cleanup()
             self.log(u"Removing working directory... done")
+
         self.log(u"Removing temporary directory... ")
-        gf.delete_directory(self.tmp_directory)
+        self.tmp_directory.cleanup()
         self.tmp_directory = None
         self.log(u"Removing temporary directory... done")
