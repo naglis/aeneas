@@ -28,7 +28,7 @@ import aeneas.globalfunctions as gf
 
 
 class TestVAD(unittest.TestCase):
-    FILES = [
+    FILES = (
         {
             "path": "res/vad/nsn.wav",
             "speech_length": 1,
@@ -64,7 +64,7 @@ class TestVAD(unittest.TestCase):
             "speech_length": 0,
             "nonspeech_length": 1,
         },
-    ]
+    )
 
     NOT_EXISTING_PATH = "this_file_does_not_exist.mp3"
     EMPTY_FILE_PATH = "res/audioformats/p001.empty"
@@ -77,7 +77,8 @@ class TestVAD(unittest.TestCase):
 
     def test_compute_vad(self):
         for f in self.FILES:
-            self.perform(f["path"], f["speech_length"], f["nonspeech_length"])
+            with self.subTest(path=f["path"], speech_length=f["speech_length"], nonspeech_length=f["nonspeech_length"]):
+                self.perform(f["path"], f["speech_length"], f["nonspeech_length"])
 
     def test_not_existing(self):
         with self.assertRaises(OSError):
