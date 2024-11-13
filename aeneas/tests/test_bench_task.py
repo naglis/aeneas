@@ -26,16 +26,12 @@ import unittest
 import tempfile
 
 from aeneas.tools.execute_task import ExecuteTaskCLI
+from aeneas.tests.common import BENCH_DIR, bench_test
 
 
-BENCH_DIR = os.path.join(os.path.expanduser("~"), ".aeneas", "benchmark_input")
-BENCH_TESTS = os.path.exists(BENCH_DIR)
-
-
+@bench_test
 class TestBenchmarkExecuteTaskCLI(unittest.TestCase):
     def bench_execute(self, parameters, expected_exit_code, timeout):
-        if not BENCH_TESTS:
-            return
         args = (parameters, expected_exit_code)
         p = multiprocessing.Process(target=self.execute, name="funcExecute", args=args)
         p.start()

@@ -13,10 +13,17 @@ slow_test = unittest.skipIf(
     (val := os.getenv("UNITTEST_RUN_SLOW_TESTS")) is None or val.strip() == "0",
     "slow tests are disabled. Set `UNITTEST_RUN_SLOW_TESTS=1` in the environment to enable them.",
 )
+
 EXTRA_TEST_PATH = os.path.join(os.path.expanduser("~"), ".aeneas.conf")
 extra_test = unittest.skipIf(
     not os.path.isfile(EXTRA_TEST_PATH),
     f"extra tests are disabled (path {EXTRA_TEST_PATH!r} does not exist).",
+)
+
+BENCH_DIR = os.path.join(os.path.expanduser("~"), ".aeneas", "benchmark_input")
+bench_test = unittest.skipIf(
+    not os.path.isdir(BENCH_DIR),
+    f"bench tests are disabled (directory {BENCH_DIR!r} does not exist).",
 )
 
 
