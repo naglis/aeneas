@@ -21,54 +21,56 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import unittest
+import importlib.util
 
 import aeneas.globalfunctions as gf
 
 
+@unittest.skipIf(
+    importlib.util.find_spec("aeneas.cew.cew") is None,
+    "CEW C extension is not available",
+)
 class TestCEW(unittest.TestCase):
     def test_cew_synthesize_multiple(self):
         handler, output_file_path = gf.tmp_file(suffix=".wav")
-        try:
-            c_quit_after = 0.0
-            c_backwards = 0
-            c_text = [
-                ("en", "Dummy 1"),  # NOTE cew requires the actual eSpeak voice code
-                ("en", "Dummy 2"),  # NOTE cew requires the actual eSpeak voice code
-                ("en", "Dummy 3"),  # NOTE cew requires the actual eSpeak voice code
-            ]
-            import aeneas.cew.cew
+        c_quit_after = 0.0
+        c_backwards = 0
+        c_text = [
+            ("en", "Dummy 1"),  # NOTE cew requires the actual eSpeak voice code
+            ("en", "Dummy 2"),  # NOTE cew requires the actual eSpeak voice code
+            ("en", "Dummy 3"),  # NOTE cew requires the actual eSpeak voice code
+        ]
+        import aeneas.cew.cew
 
-            sr, sf, intervals = aeneas.cew.cew.synthesize_multiple(
-                output_file_path, c_quit_after, c_backwards, c_text
-            )
-            self.assertEqual(sr, 22050)
-            self.assertEqual(sf, 3)
-            self.assertEqual(len(intervals), 3)
-        except ImportError:
-            pass
+        sr, sf, intervals = aeneas.cew.cew.synthesize_multiple(
+            output_file_path, c_quit_after, c_backwards, c_text
+        )
+        self.assertEqual(sr, 22050)
+        self.assertEqual(sf, 3)
+        self.assertEqual(len(intervals), 3)
+
         gf.delete_file(handler, output_file_path)
 
     def test_cew_synthesize_multiple_lang(self):
         handler, output_file_path = gf.tmp_file(suffix=".wav")
-        try:
-            c_quit_after = 0.0
-            c_backwards = 0
-            c_text = [
-                ("en", "Dummy 1"),  # NOTE cew requires the actual eSpeak voice code
-                (
-                    "it",
-                    "Segnaposto 2",
-                ),  # NOTE cew requires the actual eSpeak voice code
-                ("en", "Dummy 3"),  # NOTE cew requires the actual eSpeak voice code
-            ]
-            import aeneas.cew.cew
 
-            sr, sf, intervals = aeneas.cew.cew.synthesize_multiple(
-                output_file_path, c_quit_after, c_backwards, c_text
-            )
-            self.assertEqual(sr, 22050)
-            self.assertEqual(sf, 3)
-            self.assertEqual(len(intervals), 3)
-        except ImportError:
-            pass
+        c_quit_after = 0.0
+        c_backwards = 0
+        c_text = [
+            ("en", "Dummy 1"),  # NOTE cew requires the actual eSpeak voice code
+            (
+                "it",
+                "Segnaposto 2",
+            ),  # NOTE cew requires the actual eSpeak voice code
+            ("en", "Dummy 3"),  # NOTE cew requires the actual eSpeak voice code
+        ]
+        import aeneas.cew.cew
+
+        sr, sf, intervals = aeneas.cew.cew.synthesize_multiple(
+            output_file_path, c_quit_after, c_backwards, c_text
+        )
+        self.assertEqual(sr, 22050)
+        self.assertEqual(sf, 3)
+        self.assertEqual(len(intervals), 3)
+
         gf.delete_file(handler, output_file_path)
