@@ -99,62 +99,68 @@ class Synthesizer(Loggable):
         """
         self.log("Selecting TTS engine...")
         requested_tts_engine = self.rconf[RuntimeConfiguration.TTS]
-        if requested_tts_engine == self.CUSTOM:
-            self.log("TTS engine: custom")
-            tts_path = self.rconf[RuntimeConfiguration.TTS_PATH]
-            if tts_path is None:
-                self.log_exc(
-                    "You must specify a value for tts_path", None, True, ValueError
-                )
-            if not gf.file_can_be_read(tts_path):
-                self.log_exc("Cannot read tts_path", None, True, OSError)
-            try:
-                import imp
+        tts_cls = None
+        match requested_tts_engine:
+            case self.CUSTOM:
+                self.log("TTS engine: custom")
+                tts_path = self.rconf[RuntimeConfiguration.TTS_PATH]
+                if tts_path is None:
+                    self.log_exc(
+                        "You must specify a value for tts_path", None, True, ValueError
+                    )
+                if not gf.file_can_be_read(tts_path):
+                    self.log_exc("Cannot read tts_path", None, True, OSError)
+                try:
+                    import imp
 
-                self.log(["Loading CustomTTSWrapper module from '%s'...", tts_path])
-                imp.load_source("CustomTTSWrapperModule", tts_path)
-                self.log(
-                    ["Loading CustomTTSWrapper module from '%s'... done", tts_path]
-                )
-                self.log("Importing CustomTTSWrapper...")
-                from CustomTTSWrapperModule import CustomTTSWrapper
+                    self.log(["Loading CustomTTSWrapper module from '%s'...", tts_path])
+                    imp.load_source("CustomTTSWrapperModule", tts_path)
+                    self.log(
+                        ["Loading CustomTTSWrapper module from '%s'... done", tts_path]
+                    )
+                    self.log("Importing CustomTTSWrapper...")
+                    from CustomTTSWrapperModule import CustomTTSWrapper
 
-                self.log("Importing CustomTTSWrapper... done")
-                self.log("Creating CustomTTSWrapper instance...")
-                self.tts_engine = CustomTTSWrapper(rconf=self.rconf, logger=self.logger)
-                self.log("Creating CustomTTSWrapper instance... done")
-            except Exception as exc:
-                self.log_exc("Unable to load custom TTS wrapper", exc, True, OSError)
-        elif requested_tts_engine == self.AWS:
-            if importlib.util.find_spec("boto3") is None:
+                    self.log("Importing CustomTTSWrapper... done")
+                    tts_cls = CustomTTSWrapper
+                except Exception as exc:
+                    self.log_exc(
+                        "Unable to load custom TTS wrapper", exc, True, OSError
+                    )
+            case self.AWS:
+                if importlib.util.find_spec("boto3") is None:
+                    self.log_exc(
+                        "Unable to import boto3 for AWS Polly TTS API wrapper",
+                        critical=True,
+                        raise_type=ImportError,
+                    )
+                tts_cls = AWSTTSWrapper
+            case self.NUANCE:
+                if importlib.util.find_spec("requests") is None:
+                    self.log_exc(
+                        "Unable to import requests for Nuance TTS API wrapper",
+                        critical=True,
+                        raise_type=ImportError,
+                    )
+                tts_cls = NuanceTTSWrapper
+            case self.ESPEAK:
+                tts_cls = ESPEAKTTSWrapper
+            case self.ESPEAKNG:
+                tts_cls = ESPEAKNGTTSWrapper
+            case self.FESTIVAL:
+                tts_cls = FESTIVALTTSWrapper
+            case self.MACOS:
+                tts_cls = MacOSTTSWrapper
+            case _ as other:
                 self.log_exc(
-                    "Unable to import boto3 for AWS Polly TTS API wrapper",
+                    f"Invalid TTS engine type {other!r}",
                     critical=True,
-                    raise_type=ImportError,
+                    raise_type=ValueError,
                 )
-            self.log("TTS engine: AWS Polly TTS API")
-            self.tts_engine = AWSTTSWrapper(rconf=self.rconf, logger=self.logger)
-        elif requested_tts_engine == self.NUANCE:
-            if importlib.util.find_spec("requests") is None:
-                self.log_exc(
-                    "Unable to import requests for Nuance TTS API wrapper",
-                    critical=True,
-                    raise_type=ImportError,
-                )
-            self.log("TTS engine: Nuance TTS API")
-            self.tts_engine = NuanceTTSWrapper(rconf=self.rconf, logger=self.logger)
-        elif requested_tts_engine == self.ESPEAKNG:
-            self.log("TTS engine: eSpeak-ng")
-            self.tts_engine = ESPEAKNGTTSWrapper(rconf=self.rconf, logger=self.logger)
-        elif requested_tts_engine == self.FESTIVAL:
-            self.log("TTS engine: Festival")
-            self.tts_engine = FESTIVALTTSWrapper(rconf=self.rconf, logger=self.logger)
-        elif requested_tts_engine == self.MACOS:
-            self.log("TTS engine: macOS")
-            self.tts_engine = MacOSTTSWrapper(rconf=self.rconf, logger=self.logger)
-        else:
-            self.log("TTS engine: eSpeak")
-            self.tts_engine = ESPEAKTTSWrapper(rconf=self.rconf, logger=self.logger)
+
+        self.log(f"Creating {type(tts_cls)} instance...")
+        self.tts_engine = tts_cls(rconf=self.rconf, logger=self.logger)
+        self.log(f"Creating {type(tts_cls)} instance... done")
         self.log("Selecting TTS engine... done")
 
     @property
