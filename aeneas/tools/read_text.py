@@ -146,7 +146,7 @@ class ReadTextCLI(AbstractCLIProgram):
         elif len(text_file) == 0:
             self.print_error("No text fragments found")
         else:
-            self.print_generic(text_file.__unicode__())
+            self.print_generic(str(text_file))
             return self.NO_ERROR_EXIT_CODE
         return self.ERROR_EXIT_CODE
 

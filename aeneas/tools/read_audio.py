@@ -66,7 +66,7 @@ class ReadAudioCLI(AbstractCLIProgram):
             audiofile.read_properties()
             if self.has_option(["-f", "--full"]):
                 audiofile.read_samples_from_file()
-            self.print_generic(audiofile.__unicode__())
+            self.print_generic(str(audiofile))
             return self.NO_ERROR_EXIT_CODE
         except OSError:
             self.print_error("Cannot read file '%s'" % (audio_file_path))

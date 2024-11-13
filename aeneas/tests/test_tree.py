@@ -143,11 +143,7 @@ class TestTree(unittest.TestCase):
     def test_str(self):
         root = Tree(value="root")
         s = root.__str__()
-        self.assertIsNotNone(s)
-
-    def test_unicode(self):
-        root = Tree(value="root")
-        s = root.__unicode__()
+        # FIXME: Improve assertion
         self.assertIsNotNone(s)
 
     def test_add_child(self):

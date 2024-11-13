@@ -79,10 +79,10 @@ class Task(Loggable):
         if config_string is not None:
             self.configuration = TaskConfiguration(config_string)
 
-    def __unicode__(self):
+    def __str__(self):
         msg = [
             "{}: '{}'".format(gc.RPN_TASK_IDENTIFIER, self.identifier),
-            "Configuration:\n%s" % self.configuration.__unicode__(),
+            "Configuration:\n%s" % self.configuration,
             "Audio file path: %s" % self.audio_file_path,
             "Audio file path (absolute): %s" % self.audio_file_path_absolute,
             "Text file path: %s" % self.text_file_path,
@@ -91,9 +91,6 @@ class Task(Loggable):
             "Sync map file path (absolute): %s" % self.sync_map_file_path_absolute,
         ]
         return "\n".join(msg)
-
-    def __str__(self):
-        return gf.safe_str(self.__unicode__())
 
     @property
     def identifier(self):

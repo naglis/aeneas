@@ -117,7 +117,7 @@ class CustomTTSWrapper(BaseTTSWrapper):
         #      each time this function is invoked,
         #      achieving slightly faster synthesis
         #
-        voice_json_path = gf.safe_str(gf.absolute_path("voice.json", __file__))
+        voice_json_path = gf.absolute_path("voice.json", __file__).encode("utf-8")
         voice = speect.SVoice(voice_json_path)
         utt = voice.synth(text)
         audio = utt.features["audio"]
@@ -126,7 +126,7 @@ class CustomTTSWrapper(BaseTTSWrapper):
         else:
             self.log("output_file_path is not None => saving to file...")
             # NOTE apparently, save_riff needs the path to be a byte string
-            audio.save_riff(gf.safe_str(output_file_path))
+            audio.save_riff(output_file_path.encode("utf-8"))
             self.log("output_file_path is not None => saving to file... done")
 
         # return immediately if returning audio data is not needed

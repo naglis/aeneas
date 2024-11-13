@@ -249,7 +249,7 @@ class Validator(Loggable):
     def check_raw_string(self, string, is_bstring=True):
         """
         Check whether the given string
-        is properly UTF-8 encoded (if ``is_bytes`` is ``True``),
+        is properly UTF-8 encoded,
         it is not empty, and
         it does not contain reserved characters.
 
@@ -300,7 +300,7 @@ class Validator(Loggable):
             required_parameters = self.TASK_REQUIRED_PARAMETERS_EXTERNAL_NAME
         else:
             required_parameters = self.TASK_REQUIRED_PARAMETERS
-        is_bstring = gf.is_bytes(config_string)
+        is_bstring = isinstance(config_string, bytes)
         if is_bstring:
             self.log("Checking that config_string is well formed")
             self.check_raw_string(config_string, is_bstring=True)
@@ -328,7 +328,7 @@ class Validator(Loggable):
         self.result = ValidatorResult()
         if self._are_safety_checks_disabled("check_config_txt"):
             return self.result
-        is_bstring = gf.is_bytes(contents)
+        is_bstring = isinstance(contents, bytes)
         if is_bstring:
             self.log("Checking that contents is well formed")
             self.check_raw_string(contents, is_bstring=True)
@@ -471,7 +471,7 @@ class Validator(Loggable):
 
         :param bytes bstring: the byte string to be checked
         """
-        if not gf.is_bytes(bstring):
+        if not isinstance(bstring, bytes):
             self._failed("The given string is not a sequence of bytes")
             return
         if not gf.is_utf8_encoded(bstring):
@@ -640,12 +640,9 @@ class ValidatorResult:
         self.warnings = []
         self.errors = []
 
-    def __unicode__(self):
+    def __str__(self):
         msg = ["Passed: %s" % self.passed, self.pretty_print(warnings=True)]
         return "\n".join(msg)
-
-    def __str__(self):
-        return gf.safe_str(self.__unicode__())
 
     def pretty_print(self, warnings=False):
         """

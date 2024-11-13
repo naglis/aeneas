@@ -69,13 +69,10 @@ class Tree(Loggable):
         self.__parent = None
         self.__level = 0
 
-    def __unicode__(self):
+    def __str__(self):
         return "{} (l: {}, c: {})".format(
             self.value, gf.safe_int(self.level), gf.safe_int(len(self))
         )
-
-    def __str__(self):
-        return gf.safe_str(self.__unicode__())
 
     def __len__(self):
         return len(self.children)

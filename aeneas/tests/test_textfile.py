@@ -601,13 +601,9 @@ class TestTextFile(unittest.TestCase):
         self.filter_transliterate(["TUTTE"], ["wwwwE"])
 
     def test_filter_transliterate_replace_codepoint_length(self):
-        self.filter_transliterate(["x" + gf.safe_unichr(0x0008) + "z"], ["xaz"])
-        self.filter_transliterate(["x" + gf.safe_unichr(0x0088) + "z"], ["xaz"])
-        self.filter_transliterate(["x" + gf.safe_unichr(0x0888) + "z"], ["xaz"])
-        self.filter_transliterate(["x" + gf.safe_unichr(0x8888) + "z"], ["xaz"])
-        if gf.is_py2_narrow_build():
-            # NOTE Python 2 narrow builds cannot handle codepoints above 0x10000 correctly
-            pass
-        else:
-            self.filter_transliterate(["x" + gf.safe_unichr(0x88888) + "z"], ["xaz"])
-            self.filter_transliterate(["x" + gf.safe_unichr(0x108888) + "z"], ["xaz"])
+        self.filter_transliterate(["x" + chr(0x0008) + "z"], ["xaz"])
+        self.filter_transliterate(["x" + chr(0x0088) + "z"], ["xaz"])
+        self.filter_transliterate(["x" + chr(0x0888) + "z"], ["xaz"])
+        self.filter_transliterate(["x" + chr(0x8888) + "z"], ["xaz"])
+        self.filter_transliterate(["x" + chr(0x88888) + "z"], ["xaz"])
+        self.filter_transliterate(["x" + chr(0x108888) + "z"], ["xaz"])

@@ -421,9 +421,9 @@ class BaseTTSWrapper(Loggable):
                     )
         for fragment in text_file.fragments:
             for line in fragment.lines:
-                if not gf.is_unicode(line):
+                if not isinstance(line, str):
                     self.log_exc(
-                        "The text file contain a line which is not a Unicode string",
+                        "The text file contain a line which is not a string",
                         None,
                         True,
                         TypeError,

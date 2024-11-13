@@ -155,15 +155,12 @@ class AudioFileMFCC(Loggable):
         self.__middle_end = self.__mfcc.shape[1]
         self.log("Initializing MFCCs... done")
 
-    def __unicode__(self):
+    def __str__(self):
         msg = [
             "File path:        %s" % self.file_path,
             "Audio length (s): %s" % gf.safe_float(self.audio_length),
         ]
         return "\n".join(msg)
-
-    def __str__(self):
-        return gf.safe_str(self.__unicode__())
 
     @property
     def all_mfcc(self):

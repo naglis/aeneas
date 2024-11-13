@@ -70,11 +70,8 @@ class Logger:
     def __len__(self):
         return len(self.entries)
 
-    def __unicode__(self):
-        return self.pretty_print()
-
     def __str__(self):
-        return gf.safe_str(self.__unicode__())
+        return self.pretty_print()
 
     def __repr__(self):
         return "Logger(tee=%s, indentation=%d, tee_show_datetime=%s)" % (
@@ -195,8 +192,8 @@ class Logger:
                 sanitized = message[0] % tuple(message[1:])
         else:
             sanitized = message
-        if not gf.is_unicode(sanitized):
-            raise TypeError("The given log message is not a Unicode string")
+        if not isinstance(sanitized, str):
+            raise TypeError("The given log message is not a string")
         return sanitized
 
 
@@ -223,7 +220,7 @@ class _LogEntry:
         if show_datetime:
             return "[{}] {} {}{}: {}".format(
                 self.severity,
-                gf.object_to_unicode(self.time),
+                self.time,
                 " " * self.indentation,
                 self.tag,
                 self.message,

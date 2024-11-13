@@ -89,8 +89,8 @@ class Configuration:
     TAG = "Configuration"
 
     def __init__(self, config_string=None):
-        if (config_string is not None) and (not gf.is_unicode(config_string)):
-            raise TypeError("config_string is not a Unicode string")
+        if (config_string is not None) and (not isinstance(config_string, str)):
+            raise TypeError("config_string is not a string")
 
         # set dictionaries up to keep the config data
         self.data = {}
@@ -138,13 +138,10 @@ class Configuration:
         else:
             raise KeyError(key)
 
-    def __unicode__(self):
+    def __str__(self):
         return "\n".join(
             ["{}: '{}'".format(fn, self.data[fn]) for fn in sorted(self.data.keys())]
         )
-
-    def __str__(self):
-        return gf.safe_str(self.__unicode__())
 
     def _cast(self, key, value):
         if (value is not None) and (self.types[key] is not None):

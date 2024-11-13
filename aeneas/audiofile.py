@@ -208,7 +208,7 @@ class AudioFile(Loggable):
         self.__samples_length = 0
         self.__samples = None
 
-    def __unicode__(self):
+    def __str__(self):
         fmt = self.file_format
         if isinstance(fmt, tuple):
             fmt = "%s %d %d" % fmt
@@ -224,9 +224,6 @@ class AudioFile(Loggable):
             "Samples length:    %s" % gf.safe_int(self.__samples_length),
         ]
         return "\n".join(msg)
-
-    def __str__(self):
-        return gf.safe_str(self.__unicode__())
 
     @property
     def file_path(self):

@@ -264,11 +264,8 @@ class TextFragment:
             return 0
         return len(self.lines)
 
-    def __unicode__(self):
-        return "{} {}".format(self.identifier, self.text)
-
     def __str__(self):
-        return gf.safe_str(self.__unicode__())
+        return "{} {}".format(self.identifier, self.text)
 
     @property
     def identifier(self):
@@ -281,8 +278,8 @@ class TextFragment:
 
     @identifier.setter
     def identifier(self, identifier):
-        if (identifier is not None) and (not gf.is_unicode(identifier)):
-            raise TypeError("identifier is not a Unicode string")
+        if (identifier is not None) and (not isinstance(identifier, str)):
+            raise TypeError("identifier is not a string")
         self.__identifier = identifier
 
     @property
@@ -316,10 +313,8 @@ class TextFragment:
             if not isinstance(lines, list):
                 raise TypeError("lines is not an instance of list")
             for line in lines:
-                if not gf.is_unicode(line):
-                    raise TypeError(
-                        "lines contains an element which is not a Unicode string"
-                    )
+                if not isinstance(line, str):
+                    raise TypeError("lines contains an element which is not a string")
         self.__lines = lines
 
     @property
@@ -413,17 +408,14 @@ class TextFile(Loggable):
     def __len__(self):
         return len(self.fragments)
 
-    def __unicode__(self):
+    def __str__(self):
         msg = []
         if self.fragments_tree is not None:
             for node in self.fragments_tree.pre:
                 if not node.is_empty:
                     indent = " " * 2 * (node.level - 1)
-                    msg.append("{}{}".format(indent, node.value.__unicode__()))
+                    msg.append("{}{}".format(indent, node.value))
         return "\n".join(msg)
-
-    def __str__(self):
-        return gf.safe_str(self.__unicode__())
 
     @property
     def fragments_tree(self):
@@ -1222,17 +1214,6 @@ class TransliterationMap(Loggable):
 
     def transliterate(self, string):
         result = []
-        #
-        # NOTE on Python 2 narrow builds,
-        #      this iterator is not 100% correct
-        #      because an Unicode character above 0x10000
-        #      is "split" into two characters,
-        #      and hence it cannot be found as a key of the map
-        #
-        if gf.is_py2_narrow_build():
-            self.log_warn(
-                "Running on a Python 2 narrow build: be aware that Unicode chars above 0x10000 cannot be replaced correctly."
-            )
         for char in string:
             try:
                 result.append(self.trans_map[char])
@@ -1245,10 +1226,6 @@ class TransliterationMap(Loggable):
         """
         Read the map file at path.
         """
-        if gf.is_py2_narrow_build():
-            self.log_warn(
-                "Running on a Python 2 narrow build: be aware that Unicode chars above 0x10000 cannot be replaced correctly."
-            )
         self.trans_map = {}
         with open(self.file_path, encoding="utf-8") as file_obj:
             contents = file_obj.read().replace("\t", " ")
@@ -1295,7 +1272,7 @@ class TransliterationMap(Loggable):
         result = []
         if (start > -1) and (end >= start):
             for index in range(start, end + 1):
-                result.append(gf.safe_unichr(index))
+                result.append(chr(index))
         return result
 
     def _process_second_group(self, group):
@@ -1311,7 +1288,7 @@ class TransliterationMap(Loggable):
             result = self._match_to_int(match)
             if result == -1:
                 return ""
-            return gf.safe_unichr(result)
+            return chr(result)
 
         result = group
         try:
@@ -1329,7 +1306,7 @@ class TransliterationMap(Loggable):
             match = self.CODEPOINT_REGEX.match(string)
             return self._match_to_int(match)
         elif len(string) == 1:
-            return self._unichr_to_int(string)
+            return self._chr_to_int(string)
         return -1
 
     @classmethod
@@ -1346,7 +1323,7 @@ class TransliterationMap(Loggable):
         return -1
 
     @classmethod
-    def _unichr_to_int(cls, char):
+    def _chr_to_int(cls, char):
         """
         Convert to int the given character.
         """

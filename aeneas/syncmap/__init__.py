@@ -103,11 +103,8 @@ class SyncMap(Loggable):
     def __len__(self):
         return len(self.fragments)
 
-    def __unicode__(self):
-        return "\n".join([f.__unicode__() for f in self.fragments])
-
     def __str__(self):
-        return gf.safe_str(self.__unicode__())
+        return "\n".join([f.__str__() for f in self.fragments])
 
     @property
     def fragments_tree(self):

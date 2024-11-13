@@ -52,10 +52,6 @@ HHMMSS_MMM_PATTERN_COMMA = re.compile(r"([0-9]*):([0-9]*):([0-9]*),([0-9]*)")
 # True if running from a frozen binary (e.g., compiled with pyinstaller)
 FROZEN = getattr(sys, "frozen", False)
 
-# True if running under Python 2
-PY2 = sys.version_info[0] == 2
-
-
 # COMMON FUNCTIONS
 
 
@@ -741,15 +737,6 @@ def is_windows():
     return os.name == "nt"
 
 
-def is_py2_narrow_build():
-    """
-    Return ``True`` if running on a Python 2 narrow build.
-
-    :rtype: bool
-    """
-    return (PY2) and (sys.maxunicode == 65535)
-
-
 def fix_slash(path):
     """
     On non-POSIX OSes, change the slashes in ``path``
@@ -1102,30 +1089,6 @@ def human_readable_number(number, suffix=""):
     return "{:.1f}{}{}".format(number, "Y", suffix)
 
 
-def is_unicode(string):
-    """
-    Return ``True`` if the given string is a sequence of Unicode code points.
-
-    :param variant string: the string to test
-    :rtype: bool
-    """
-    if PY2:
-        return isinstance(string, unicode)
-    return isinstance(string, str)
-
-
-def is_bytes(string):
-    """
-    Return ``True`` if the given string is a sequence of bytes.
-
-    :param variant string: the string to test
-    :rtype: bool
-    """
-    if PY2:
-        return isinstance(string, str)
-    return isinstance(string, bytes)
-
-
 def is_utf8_encoded(bstring):
     """
     Return ``True`` if the given byte string can be decoded
@@ -1142,37 +1105,6 @@ def is_utf8_encoded(bstring):
     return False
 
 
-def safe_str(string):
-    """
-    Safely return the given Unicode string
-    from a ``__str__`` function: as a byte string
-    in Python 2, or as a Unicode string in Python 3.
-
-    :param string string: the string to return
-    :rtype: bytes or string
-    """
-    if string is None:
-        return None
-    if PY2:
-        return string.encode("utf-8")
-    return string
-
-
-def safe_unichr(codepoint):
-    """
-    Safely return a Unicode string of length one,
-    containing the Unicode character with given codepoint.
-
-    :param int codepoint: the codepoint
-    :rtype: string
-    """
-    if is_py2_narrow_build():
-        return ("\\U%08x" % codepoint).decode("unicode-escape")
-    elif PY2:
-        return unichr(codepoint)
-    return chr(codepoint)
-
-
 def safe_unicode(string):
     """
     Safely convert the given string to a Unicode string.
@@ -1182,7 +1114,7 @@ def safe_unicode(string):
     """
     if string is None:
         return None
-    if is_bytes(string):
+    if isinstance(string, bytes):
         return string.decode("utf-8")
     return string
 
@@ -1196,7 +1128,7 @@ def safe_bytes(string):
     """
     if string is None:
         return None
-    if is_unicode(string):
+    if isinstance(string, str):
         return string.encode("utf-8")
     return string
 
@@ -1213,7 +1145,7 @@ def safe_unicode_stdin(string):
     """
     if string is None:
         return None
-    if is_bytes(string):
+    if isinstance(string, bytes):
         if FROZEN:
             return string.decode("utf-8")
         try:
@@ -1223,30 +1155,6 @@ def safe_unicode_stdin(string):
         except Exception:
             return string.decode("utf-8")
     return string
-
-
-def object_to_unicode(obj):
-    """
-    Return a sequence of Unicode code points from the given object.
-
-    :param object obj: the object
-    :rtype: string
-    """
-    if PY2:
-        return unicode(obj)
-    return str(obj)
-
-
-def object_to_bytes(obj):
-    """
-    Return a sequence of bytes from the given object.
-
-    :param object obj: the object
-    :rtype: bytes
-    """
-    if PY2:
-        return str(obj)
-    return bytes(obj, encoding="utf-8")
 
 
 def bundle_directory():

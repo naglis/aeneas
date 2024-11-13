@@ -637,7 +637,7 @@ class TestGlobalFunctions(unittest.TestCase):
         with open(path, "w", encoding="utf-8") as tmp_file:
             tmp_file.write("Foo bar")
         contents = gf.read_file_bytes(path)
-        self.assertTrue(gf.is_bytes(contents))
+        self.assertIsInstance(contents, bytes)
         self.assertEqual(len(contents), 7)
         gf.delete_file(handler, path)
 
@@ -659,23 +659,6 @@ class TestGlobalFunctions(unittest.TestCase):
         for test in tests:
             self.assertEqual(gf.human_readable_number(test[0]), test[1])
 
-    def test_is_unicode(self):
-        tests = [
-            (None, False),
-            ("", True),
-            ("foo", True),
-            ("fox99", True),
-            (b"foo", False),
-            ([], False),
-            (["foo"], False),
-            ({"foo": "baz"}, False),
-            ("", True),
-            ("foo", True),
-            ("fox99", True),
-        ]
-        for test in tests:
-            self.assertEqual(gf.is_unicode(test[0]), test[1])
-
     def test_is_utf8_encoded(self):
         tests = [
             (b"foo", True),
@@ -690,45 +673,6 @@ class TestGlobalFunctions(unittest.TestCase):
         ]
         for test in tests:
             self.assertEqual(gf.is_utf8_encoded(test[0]), test[1])
-
-    def test_is_bytes(self):
-        tests = [
-            (None, False),
-            (b"", True),
-            (b"foo", True),
-            (b"fo\xff", True),
-            ("foo", False),
-            ([], False),
-            ([b"foo"], False),
-            ({b"foo": b"baz"}, False),
-            ("", False),
-            ("foo", False),
-            ("fox99", False),
-        ]
-        for test in tests:
-            self.assertEqual(gf.is_bytes(test[0]), test[1])
-
-    def test_safe_str(self):
-        tests = [
-            ("", ""),
-            ("foo", "foo"),
-            ("foà", "foà"),
-        ]
-        self.assertIsNone(gf.safe_str(None))
-        for test in tests:
-            self.assertEqual(gf.safe_str(test[0]), test[1])
-
-    def test_safe_unichr(self):
-        tests = [
-            (65, "A"),
-            (90, "Z"),
-            (0x20, "\u0020"),
-            (0x200, "\u0200"),
-            (0x2000, "\u2000"),
-            (0x20000, "\U00020000"),
-        ]
-        for test in tests:
-            self.assertEqual(gf.safe_unichr(test[0]), test[1])
 
     def test_safe_unicode(self):
         tests = [
@@ -760,14 +704,6 @@ class TestGlobalFunctions(unittest.TestCase):
         pass
 
     def test_safe_print(self):
-        # TODO
-        pass
-
-    def test_object_to_unicode(self):
-        # TODO
-        pass
-
-    def test_object_to_bytes(self):
         # TODO
         pass
 

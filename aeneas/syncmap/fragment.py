@@ -24,7 +24,6 @@
 from aeneas.exacttiming import Decimal
 from aeneas.exacttiming import TimeInterval
 from aeneas.exacttiming import TimeValue
-import aeneas.globalfunctions as gf
 
 
 class SyncMapFragment:
@@ -77,16 +76,13 @@ class SyncMapFragment:
         self.fragment_type = fragment_type
         self.confidence = confidence
 
-    def __unicode__(self):
+    def __str__(self):
         return "%s %d %.3f %.3f" % (
             self.text_fragment.identifier,
             self.fragment_type,
             self.begin,
             self.end,
         )
-
-    def __str__(self):
-        return gf.safe_str(self.__unicode__())
 
     def __eq__(self, other):
         if not isinstance(other, SyncMapFragment):
