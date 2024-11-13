@@ -26,7 +26,6 @@ from aeneas.configuration import Configuration
 
 
 class TestConfiguration(unittest.TestCase):
-
     def test_config_string(self):
         c = Configuration()
         c.config_string

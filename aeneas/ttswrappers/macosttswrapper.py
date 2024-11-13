@@ -31,7 +31,6 @@ https://developer.apple.com/library/content/documentation/UserExperience/Concept
 for further details.
 """
 
-
 from aeneas.language import Language
 from aeneas.ttswrappers.basettswrapper import BaseTTSWrapper
 
@@ -181,7 +180,9 @@ class MacOSTTSWrapper(BaseTTSWrapper):
         ENG_GBR: "English (GB)",
     }
 
-    CODE_TO_HUMAN_LIST = sorted(["{}\t{}".format(k, v) for k, v in CODE_TO_HUMAN.items()])
+    CODE_TO_HUMAN_LIST = sorted(
+        ["{}\t{}".format(k, v) for k, v in CODE_TO_HUMAN.items()]
+    )
 
     LANGUAGE_TO_VOICE_CODE = {
         ARA: "Maged",
@@ -211,7 +212,7 @@ class MacOSTTSWrapper(BaseTTSWrapper):
         THA: "Kanya",
         TUR: "Yelda",
         ZHO: "Ting-Ting",
-        ENG_GBR: "Daniel"
+        ENG_GBR: "Daniel",
     }
     DEFAULT_LANGUAGE = ENG
 
@@ -224,13 +225,15 @@ class MacOSTTSWrapper(BaseTTSWrapper):
     def __init__(self, rconf=None, logger=None):
         super().__init__(rconf=rconf, logger=logger)
 
-        self.set_subprocess_arguments([
-            "say",                                 # path to say
-            "-v",                                  # append "-v"
-            self.CLI_PARAMETER_VOICE_CODE_STRING,   # it will be replaced by the actual voice code
-            "-o",                                  # append "-o"
-            self.CLI_PARAMETER_WAVE_PATH,           # it will be replaced by the actual output file
-            self.CLI_PARAMETER_TEXT_STDIN,          # text is read from stdin,
-            "--data-format",                       # set output data format
-            "LEF32@22050"                          # data format string
-        ])
+        self.set_subprocess_arguments(
+            [
+                "say",  # path to say
+                "-v",  # append "-v"
+                self.CLI_PARAMETER_VOICE_CODE_STRING,  # it will be replaced by the actual voice code
+                "-o",  # append "-o"
+                self.CLI_PARAMETER_WAVE_PATH,  # it will be replaced by the actual output file
+                self.CLI_PARAMETER_TEXT_STDIN,  # text is read from stdin,
+                "--data-format",  # set output data format
+                "LEF32@22050",  # data format string
+            ]
+        )

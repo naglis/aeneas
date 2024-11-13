@@ -35,7 +35,6 @@ import aeneas.globalfunctions as gf
 
 
 class TestTextFile(unittest.TestCase):
-
     NOT_EXISTING_PATH = gf.absolute_path("not_existing.txt", __file__)
     NOT_WRITEABLE_PATH = gf.absolute_path("x/y/z/not_writeable.txt", __file__)
     EMPTY_FILE_PATH = "res/inputtext/empty.txt"
@@ -53,15 +52,19 @@ class TestTextFile(unittest.TestCase):
         gc.PPN_TASK_IS_TEXT_UNPARSED_CLASS_REGEX: "ra",
         gc.PPN_TASK_IS_TEXT_UNPARSED_ID_SORT: IDSortingAlgorithm.UNSORTED,
     }
-    ID_REGEX_PARAMETERS = {
-        gc.PPN_TASK_OS_FILE_ID_REGEX: "word%06d"
-    }
-    ID_REGEX_PARAMETERS_BAD = {
-        gc.PPN_TASK_OS_FILE_ID_REGEX: "word"
-    }
-    TRANSLITERATION_MAP_FILE_PATH = gf.absolute_path("res/transliteration/transliteration.map", __file__)
+    ID_REGEX_PARAMETERS = {gc.PPN_TASK_OS_FILE_ID_REGEX: "word%06d"}
+    ID_REGEX_PARAMETERS_BAD = {gc.PPN_TASK_OS_FILE_ID_REGEX: "word"}
+    TRANSLITERATION_MAP_FILE_PATH = gf.absolute_path(
+        "res/transliteration/transliteration.map", __file__
+    )
 
-    def load(self, input_file_path=PLAIN_FILE_PATH, fmt=TextFileFormat.PLAIN, expected_length=15, parameters=None):
+    def load(
+        self,
+        input_file_path=PLAIN_FILE_PATH,
+        fmt=TextFileFormat.PLAIN,
+        expected_length=15,
+        parameters=None,
+    ):
         tfl = TextFile(gf.absolute_path(input_file_path, __file__), fmt, parameters)
         self.assertEqual(len(tfl), expected_length)
         return tfl
@@ -87,7 +90,9 @@ class TestTextFile(unittest.TestCase):
         string_out = fil.apply_filter(string_in)
         self.assertEqual(string_out, expected_out)
 
-    def filter_transliterate(self, string_in, expected_out, map_file_path=TRANSLITERATION_MAP_FILE_PATH):
+    def filter_transliterate(
+        self, string_in, expected_out, map_file_path=TRANSLITERATION_MAP_FILE_PATH
+    ):
         fil = TextFilterTransliterate(map_file_path=map_file_path)
         string_out = fil.apply_filter(string_in)
         self.assertEqual(string_out, expected_out)
@@ -177,45 +182,52 @@ class TestTextFile(unittest.TestCase):
 
     def test_read_subtitles(self):
         for path in [
-                "res/inputtext/sonnet_subtitles_with_end_newline.txt",
-                "res/inputtext/sonnet_subtitles_no_end_newline.txt",
-                "res/inputtext/sonnet_subtitles_multiple_blank.txt",
-                "res/inputtext/sonnet_subtitles_multiple_rows.txt"
+            "res/inputtext/sonnet_subtitles_with_end_newline.txt",
+            "res/inputtext/sonnet_subtitles_no_end_newline.txt",
+            "res/inputtext/sonnet_subtitles_multiple_blank.txt",
+            "res/inputtext/sonnet_subtitles_multiple_rows.txt",
         ]:
             self.load(path, TextFileFormat.SUBTITLES, 15)
 
     def test_read_subtitles_id_regex(self):
         for path in [
-                "res/inputtext/sonnet_subtitles_with_end_newline.txt",
-                "res/inputtext/sonnet_subtitles_no_end_newline.txt",
-                "res/inputtext/sonnet_subtitles_multiple_blank.txt",
-                "res/inputtext/sonnet_subtitles_multiple_rows.txt"
+            "res/inputtext/sonnet_subtitles_with_end_newline.txt",
+            "res/inputtext/sonnet_subtitles_no_end_newline.txt",
+            "res/inputtext/sonnet_subtitles_multiple_blank.txt",
+            "res/inputtext/sonnet_subtitles_multiple_rows.txt",
         ]:
             self.load(path, TextFileFormat.SUBTITLES, 15, self.ID_REGEX_PARAMETERS)
 
     def test_read_subtitles_id_regex_bad(self):
         with self.assertRaises(ValueError):
             for path in [
-                    "res/inputtext/sonnet_subtitles_with_end_newline.txt",
-                    "res/inputtext/sonnet_subtitles_no_end_newline.txt",
-                    "res/inputtext/sonnet_subtitles_multiple_blank.txt",
-                    "res/inputtext/sonnet_subtitles_multiple_rows.txt"
+                "res/inputtext/sonnet_subtitles_with_end_newline.txt",
+                "res/inputtext/sonnet_subtitles_no_end_newline.txt",
+                "res/inputtext/sonnet_subtitles_multiple_blank.txt",
+                "res/inputtext/sonnet_subtitles_multiple_rows.txt",
             ]:
-                self.load(path, TextFileFormat.SUBTITLES, 15, self.ID_REGEX_PARAMETERS_BAD)
+                self.load(
+                    path, TextFileFormat.SUBTITLES, 15, self.ID_REGEX_PARAMETERS_BAD
+                )
 
     def test_read_mplain(self):
         self.load(self.MPLAIN_FILE_PATH, TextFileFormat.MPLAIN, 5)
 
     def test_read_mplain_variations(self):
         for path in [
-                "res/inputtext/sonnet_mplain_with_end_newline.txt",
-                "res/inputtext/sonnet_mplain_no_end_newline.txt",
-                "res/inputtext/sonnet_mplain_multiple_blank.txt"
+            "res/inputtext/sonnet_mplain_with_end_newline.txt",
+            "res/inputtext/sonnet_mplain_no_end_newline.txt",
+            "res/inputtext/sonnet_mplain_multiple_blank.txt",
         ]:
             self.load(path, TextFileFormat.MPLAIN, 5)
 
     def test_read_munparsed(self):
-        tfl = self.load(self.MUNPARSED_FILE_PATH, TextFileFormat.MUNPARSED, 5, self.UNPARSED_PARAMETERS)
+        tfl = self.load(
+            self.MUNPARSED_FILE_PATH,
+            TextFileFormat.MUNPARSED,
+            5,
+            self.UNPARSED_PARAMETERS,
+        )
         self.assertEqual(len(tfl.fragments_tree.vleaves), 107)
 
     def test_read_munparsed_diff_id(self):
@@ -224,7 +236,12 @@ class TestTextFile(unittest.TestCase):
             gc.PPN_TASK_IS_TEXT_MUNPARSED_L2_ID_REGEX: "s[0-9]+",
             gc.PPN_TASK_IS_TEXT_MUNPARSED_L3_ID_REGEX: "w[0-9]+",
         }
-        tfl = self.load("res/inputtext/sonnet_munparsed_diff_id.xhtml", TextFileFormat.MUNPARSED, 5, parameters)
+        tfl = self.load(
+            "res/inputtext/sonnet_munparsed_diff_id.xhtml",
+            TextFileFormat.MUNPARSED,
+            5,
+            parameters,
+        )
         self.assertEqual(len(tfl.fragments_tree.vleaves), 107)
 
     def test_read_munparsed_bad_param_l1(self):
@@ -233,7 +250,12 @@ class TestTextFile(unittest.TestCase):
             gc.PPN_TASK_IS_TEXT_MUNPARSED_L2_ID_REGEX: "s[0-9]+",
             gc.PPN_TASK_IS_TEXT_MUNPARSED_L3_ID_REGEX: "w[0-9]+",
         }
-        self.load("res/inputtext/sonnet_munparsed_diff_id.xhtml", TextFileFormat.MUNPARSED, 0, parameters)
+        self.load(
+            "res/inputtext/sonnet_munparsed_diff_id.xhtml",
+            TextFileFormat.MUNPARSED,
+            0,
+            parameters,
+        )
 
     def test_read_munparsed_bad_param_l2(self):
         parameters = {
@@ -241,7 +263,12 @@ class TestTextFile(unittest.TestCase):
             gc.PPN_TASK_IS_TEXT_MUNPARSED_L2_ID_REGEX: "k[0-9]+",
             gc.PPN_TASK_IS_TEXT_MUNPARSED_L3_ID_REGEX: "w[0-9]+",
         }
-        self.load("res/inputtext/sonnet_munparsed_diff_id.xhtml", TextFileFormat.MUNPARSED, 0, parameters)
+        self.load(
+            "res/inputtext/sonnet_munparsed_diff_id.xhtml",
+            TextFileFormat.MUNPARSED,
+            0,
+            parameters,
+        )
 
     def test_read_munparsed_bad_param_l3(self):
         parameters = {
@@ -249,66 +276,82 @@ class TestTextFile(unittest.TestCase):
             gc.PPN_TASK_IS_TEXT_MUNPARSED_L2_ID_REGEX: "s[0-9]+",
             gc.PPN_TASK_IS_TEXT_MUNPARSED_L3_ID_REGEX: "k[0-9]+",
         }
-        self.load("res/inputtext/sonnet_munparsed_diff_id.xhtml", TextFileFormat.MUNPARSED, 0, parameters)
+        self.load(
+            "res/inputtext/sonnet_munparsed_diff_id.xhtml",
+            TextFileFormat.MUNPARSED,
+            0,
+            parameters,
+        )
 
     def test_read_plain(self):
         self.load(self.PLAIN_FILE_PATH, TextFileFormat.PLAIN, 15)
 
     def test_read_plain_id_regex(self):
-        self.load(self.PLAIN_FILE_PATH, TextFileFormat.PLAIN, 15, self.ID_REGEX_PARAMETERS)
+        self.load(
+            self.PLAIN_FILE_PATH, TextFileFormat.PLAIN, 15, self.ID_REGEX_PARAMETERS
+        )
 
     def test_read_plain_id_regex_bad(self):
         with self.assertRaises(ValueError):
-            self.load(self.PLAIN_FILE_PATH, TextFileFormat.PLAIN, 15, self.ID_REGEX_PARAMETERS_BAD)
+            self.load(
+                self.PLAIN_FILE_PATH,
+                TextFileFormat.PLAIN,
+                15,
+                self.ID_REGEX_PARAMETERS_BAD,
+            )
 
     def test_read_plain_utf8(self):
         self.load("res/inputtext/sonnet_plain_utf8.txt", TextFileFormat.PLAIN, 15)
 
     def test_read_plain_utf8_id_regex(self):
-        self.load("res/inputtext/sonnet_plain_utf8.txt", TextFileFormat.PLAIN, 15, self.ID_REGEX_PARAMETERS)
+        self.load(
+            "res/inputtext/sonnet_plain_utf8.txt",
+            TextFileFormat.PLAIN,
+            15,
+            self.ID_REGEX_PARAMETERS,
+        )
 
     def test_read_plain_utf8_id_regex_bad(self):
         with self.assertRaises(ValueError):
-            self.load("res/inputtext/sonnet_plain_utf8.txt", TextFileFormat.PLAIN, 15, self.ID_REGEX_PARAMETERS_BAD)
+            self.load(
+                "res/inputtext/sonnet_plain_utf8.txt",
+                TextFileFormat.PLAIN,
+                15,
+                self.ID_REGEX_PARAMETERS_BAD,
+            )
 
     def test_read_parsed(self):
         self.load(self.PARSED_FILE_PATH, TextFileFormat.PARSED, 15)
 
     def test_read_parsed_bad(self):
         for path in [
-                "res/inputtext/badly_parsed_1.txt",
-                "res/inputtext/badly_parsed_2.txt",
-                "res/inputtext/badly_parsed_3.txt"
+            "res/inputtext/badly_parsed_1.txt",
+            "res/inputtext/badly_parsed_2.txt",
+            "res/inputtext/badly_parsed_3.txt",
         ]:
             self.load(path, TextFileFormat.PARSED, 0)
 
     def test_read_unparsed(self):
         for case in [
-                {
-                    "path": "res/inputtext/sonnet_unparsed_soup_1.txt",
-                    "parameters": {
-                        gc.PPN_TASK_IS_TEXT_UNPARSED_ID_REGEX: "f[0-9]*"
-                    }
+            {
+                "path": "res/inputtext/sonnet_unparsed_soup_1.txt",
+                "parameters": {gc.PPN_TASK_IS_TEXT_UNPARSED_ID_REGEX: "f[0-9]*"},
+            },
+            {
+                "path": "res/inputtext/sonnet_unparsed_soup_2.txt",
+                "parameters": {
+                    gc.PPN_TASK_IS_TEXT_UNPARSED_ID_REGEX: "f[0-9]*",
+                    gc.PPN_TASK_IS_TEXT_UNPARSED_CLASS_REGEX: "ra",
                 },
-                {
-                    "path": "res/inputtext/sonnet_unparsed_soup_2.txt",
-                    "parameters": {
-                        gc.PPN_TASK_IS_TEXT_UNPARSED_ID_REGEX: "f[0-9]*",
-                        gc.PPN_TASK_IS_TEXT_UNPARSED_CLASS_REGEX: "ra"
-                    }
-                },
-                {
-                    "path": "res/inputtext/sonnet_unparsed_soup_3.txt",
-                    "parameters": {
-                        gc.PPN_TASK_IS_TEXT_UNPARSED_CLASS_REGEX: "ra"
-                    }
-                },
-                {
-                    "path": "res/inputtext/sonnet_unparsed.xhtml",
-                    "parameters": {
-                        gc.PPN_TASK_IS_TEXT_UNPARSED_ID_REGEX: "f[0-9]*"
-                    }
-                },
+            },
+            {
+                "path": "res/inputtext/sonnet_unparsed_soup_3.txt",
+                "parameters": {gc.PPN_TASK_IS_TEXT_UNPARSED_CLASS_REGEX: "ra"},
+            },
+            {
+                "path": "res/inputtext/sonnet_unparsed.xhtml",
+                "parameters": {gc.PPN_TASK_IS_TEXT_UNPARSED_ID_REGEX: "f[0-9]*"},
+            },
         ]:
             self.load(case["path"], TextFileFormat.UNPARSED, 15, case["parameters"])
 
@@ -317,7 +360,7 @@ class TestTextFile(unittest.TestCase):
             "res/inputtext/sonnet_unparsed_order_1.txt",
             "f[0-9]*",
             IDSortingAlgorithm.UNSORTED,
-            ["f001", "f003", "f005", "f004", "f002"]
+            ["f001", "f003", "f005", "f004", "f002"],
         )
 
     def test_read_unparsed_numeric(self):
@@ -325,7 +368,7 @@ class TestTextFile(unittest.TestCase):
             "res/inputtext/sonnet_unparsed_order_2.txt",
             "f[0-9]*",
             IDSortingAlgorithm.NUMERIC,
-            ["f001", "f2", "f003", "f4", "f050"]
+            ["f001", "f2", "f003", "f4", "f050"],
         )
 
     def test_read_unparsed_numeric_2(self):
@@ -333,7 +376,7 @@ class TestTextFile(unittest.TestCase):
             "res/inputtext/sonnet_unparsed_order_3.txt",
             "f[0-9]*",
             IDSortingAlgorithm.NUMERIC,
-            ["f001", "f2", "f003", "f4", "f050"]
+            ["f001", "f2", "f003", "f4", "f050"],
         )
 
     def test_read_unparsed_lexicographic(self):
@@ -341,7 +384,7 @@ class TestTextFile(unittest.TestCase):
             "res/inputtext/sonnet_unparsed_order_4.txt",
             "[a-z][0-9]*",
             IDSortingAlgorithm.LEXICOGRAPHIC,
-            ["a005", "b002", "c004", "d001", "e003"]
+            ["a005", "b002", "c004", "d001", "e003"],
         )
 
     def test_read_unparsed_numeric_3(self):
@@ -349,7 +392,7 @@ class TestTextFile(unittest.TestCase):
             "res/inputtext/sonnet_unparsed_order_5.txt",
             "[a-z][0-9]*",
             IDSortingAlgorithm.NUMERIC,
-            ["d001", "b002", "e003", "c004", "a005"]
+            ["d001", "b002", "e003", "c004", "a005"],
         )
 
     def test_set_language(self):
@@ -375,7 +418,7 @@ class TestTextFile(unittest.TestCase):
             "fragment 2",
             "fragment 3",
             "fragment 4",
-            "fragment 5"
+            "fragment 5",
         ]
         tfl.read_from_list(text_list)
         self.assertEqual(len(tfl), 5)
@@ -388,7 +431,7 @@ class TestTextFile(unittest.TestCase):
             ("b2", "fragment 2"),
             ("c3", "fragment 3"),
             ("d4", "fragment 4"),
-            ("e5", "fragment 5")
+            ("e5", "fragment 5"),
         ]
         tfl.read_from_list_with_ids(text_list)
         self.assertEqual(len(tfl), 5)
@@ -422,7 +465,11 @@ class TestTextFile(unittest.TestCase):
             tfl.get_subtree(tfl.fragments[0])
 
     def test_get_subtree(self):
-        tfl = self.load(input_file_path=self.MPLAIN_FILE_PATH, fmt=TextFileFormat.MPLAIN, expected_length=5)
+        tfl = self.load(
+            input_file_path=self.MPLAIN_FILE_PATH,
+            fmt=TextFileFormat.MPLAIN,
+            expected_length=5,
+        )
         children = tfl.fragments_tree.children
         self.assertEqual(len(children), 5)
         sub = tfl.get_subtree(children[0])
@@ -437,7 +484,11 @@ class TestTextFile(unittest.TestCase):
         self.assertEqual(len(sub), 2)
 
     def test_children_not_empty(self):
-        tfl = self.load(input_file_path=self.MPLAIN_FILE_PATH, fmt=TextFileFormat.MPLAIN, expected_length=5)
+        tfl = self.load(
+            input_file_path=self.MPLAIN_FILE_PATH,
+            fmt=TextFileFormat.MPLAIN,
+            expected_length=5,
+        )
         children = tfl.children_not_empty
         self.assertEqual(len(children), 5)
 
@@ -499,7 +550,9 @@ class TestTextFile(unittest.TestCase):
         self.filter_ignore_regex("word", ["abc word abc"], ["abc abc"])
 
     def test_filter_ignore_regex_many_matches(self):
-        self.filter_ignore_regex("word", ["abc word word abc word abc"], ["abc abc abc"])
+        self.filter_ignore_regex(
+            "word", ["abc word word abc word abc"], ["abc abc abc"]
+        )
 
     def test_filter_ignore_regex_strip(self):
         self.filter_ignore_regex("word", ["word abc word"], ["abc"])

@@ -81,6 +81,7 @@ class IDSortingAlgorithm(Loggable):
         :param list ids: the list of identifiers to be sorted
         :rtype: list
         """
+
         def extract_int(string):
             """
             Extract an integer from the given string.
@@ -102,5 +103,10 @@ class IDSortingAlgorithm(Loggable):
             try:
                 tmp = sorted(tmp, key=extract_int)
             except (ValueError, TypeError) as exc:
-                self.log_exc("Not all id values contain a numeric part. Returning the id list unchanged.", exc, False, None)
+                self.log_exc(
+                    "Not all id values contain a numeric part. Returning the id list unchanged.",
+                    exc,
+                    False,
+                    None,
+                )
         return tmp

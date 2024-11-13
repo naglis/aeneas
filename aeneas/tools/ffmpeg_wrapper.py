@@ -37,6 +37,7 @@ class FFMPEGWrapperCLI(AbstractCLIProgram):
     """
     Convert audio files to mono WAV using the ``ffmpeg`` wrapper.
     """
+
     INPUT_FILE = gf.relative_path("res/audio.mp3", __file__)
     OUTPUT_FILE = "output/audio.wav"
 
@@ -44,12 +45,8 @@ class FFMPEGWrapperCLI(AbstractCLIProgram):
 
     HELP = {
         "description": "Convert audio files to mono WAV using the ffmpeg wrapper.",
-        "synopsis": [
-            ("INPUT_FILE OUTPUT_FILE", True)
-        ],
-        "examples": [
-            "{} {}".format(INPUT_FILE, OUTPUT_FILE)
-        ]
+        "synopsis": [("INPUT_FILE OUTPUT_FILE", True)],
+        "examples": ["{} {}".format(INPUT_FILE, OUTPUT_FILE)],
     }
 
     def perform_command(self):
@@ -71,14 +68,25 @@ class FFMPEGWrapperCLI(AbstractCLIProgram):
         try:
             converter = FFMPEGWrapper(rconf=self.rconf, logger=self.logger)
             converter.convert(input_file_path, output_file_path)
-            self.print_success("Converted '{}' into '{}'".format(input_file_path, output_file_path))
+            self.print_success(
+                "Converted '{}' into '{}'".format(input_file_path, output_file_path)
+            )
             return self.NO_ERROR_EXIT_CODE
         except FFMPEGPathError:
-            self.print_error("Unable to call the ffmpeg executable '%s'" % (self.rconf[RuntimeConfiguration.FFMPEG_PATH]))
+            self.print_error(
+                "Unable to call the ffmpeg executable '%s'"
+                % (self.rconf[RuntimeConfiguration.FFMPEG_PATH])
+            )
             self.print_error("Make sure the path to ffmpeg is correct")
         except OSError:
-            self.print_error("Cannot convert file '{}' into '{}'".format(input_file_path, output_file_path))
-            self.print_error("Make sure the input file has a format supported by ffmpeg")
+            self.print_error(
+                "Cannot convert file '{}' into '{}'".format(
+                    input_file_path, output_file_path
+                )
+            )
+            self.print_error(
+                "Make sure the input file has a format supported by ffmpeg"
+            )
 
         return self.ERROR_EXIT_CODE
 
@@ -89,5 +97,6 @@ def main():
     """
     FFMPEGWrapperCLI().run(arguments=sys.argv)
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     main()

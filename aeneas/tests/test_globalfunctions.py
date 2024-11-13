@@ -30,7 +30,6 @@ import aeneas.globalfunctions as gf
 
 
 class TestGlobalFunctions(unittest.TestCase):
-
     def test_uuid_string(self):
         uuid = gf.uuid_string()
         self.assertEqual(len(uuid), 36)
@@ -231,7 +230,9 @@ class TestGlobalFunctions(unittest.TestCase):
             ("<job><k1>v1</k1><k2>v2 </k2></job>", {"k1": "v1", "k2": "v2"}),
         ]
         for test in tests:
-            self.assertEqual(gf.config_xml_to_dict(test[0], result=None, parse_job=True), test[1])
+            self.assertEqual(
+                gf.config_xml_to_dict(test[0], result=None, parse_job=True), test[1]
+            )
 
     def test_config_xml_to_dict_task(self):
         tests = [
@@ -244,25 +245,48 @@ class TestGlobalFunctions(unittest.TestCase):
             ("<job><tasks><foo></foo></tasks></job>", []),
             ("<job><tasks><task></task></tasks></job>", [{}]),
             ("<job><tasks><task></task><foo></foo></tasks></job>", [{}]),
-            ("<job><tasks><task></task><foo></foo><task></task></tasks></job>", [{}, {}]),
+            (
+                "<job><tasks><task></task><foo></foo><task></task></tasks></job>",
+                [{}, {}],
+            ),
             ("<job><tasks><task><k1></k1></task><foo></foo></tasks></job>", [{}]),
             ("<job><tasks><task><k1>v1</k1></task></tasks></job>", [{"k1": "v1"}]),
-            ("<job><tasks><task><k1>v1</k1><k2>v2</k2></task></tasks></job>", [{"k1": "v1", "k2": "v2"}]),
-            ("<job><tasks><task><k1>v1</k1><k2> v2</k2></task></tasks></job>", [{"k1": "v1", "k2": "v2"}]),
-            ("<job><tasks><task><k1>v1</k1><k2> v2 </k2></task></tasks></job>", [{"k1": "v1", "k2": "v2"}]),
-            ("<job><tasks><task><k1>v1</k1><k2>v2 </k2></task></tasks></job>", [{"k1": "v1", "k2": "v2"}]),
-            ("<job><tasks><task><k1>v1</k1></task><task><k2>v2</k2></task></tasks></job>", [{"k1": "v1"}, {"k2": "v2"}]),
-            ("<job><tasks><task><k1>v1</k1></task><task><k2>v2</k2></task><task></task></tasks></job>", [{"k1": "v1"}, {"k2": "v2"}, {}]),
+            (
+                "<job><tasks><task><k1>v1</k1><k2>v2</k2></task></tasks></job>",
+                [{"k1": "v1", "k2": "v2"}],
+            ),
+            (
+                "<job><tasks><task><k1>v1</k1><k2> v2</k2></task></tasks></job>",
+                [{"k1": "v1", "k2": "v2"}],
+            ),
+            (
+                "<job><tasks><task><k1>v1</k1><k2> v2 </k2></task></tasks></job>",
+                [{"k1": "v1", "k2": "v2"}],
+            ),
+            (
+                "<job><tasks><task><k1>v1</k1><k2>v2 </k2></task></tasks></job>",
+                [{"k1": "v1", "k2": "v2"}],
+            ),
+            (
+                "<job><tasks><task><k1>v1</k1></task><task><k2>v2</k2></task></tasks></job>",
+                [{"k1": "v1"}, {"k2": "v2"}],
+            ),
+            (
+                "<job><tasks><task><k1>v1</k1></task><task><k2>v2</k2></task><task></task></tasks></job>",
+                [{"k1": "v1"}, {"k2": "v2"}, {}],
+            ),
         ]
         for test in tests:
-            self.assertEqual(gf.config_xml_to_dict(test[0], result=None, parse_job=False), test[1])
+            self.assertEqual(
+                gf.config_xml_to_dict(test[0], result=None, parse_job=False), test[1]
+            )
 
     def test_config_dict_to_string(self):
         self.assertTrue(gf.config_dict_to_string({}) == "")
         self.assertTrue(gf.config_dict_to_string({"k1": "v1"}) == "k1=v1")
         self.assertTrue(
-            (gf.config_dict_to_string({"k1": "v1", "k2": "v2"}) == "k1=v1|k2=v2") or
-            (gf.config_dict_to_string({"k1": "v1", "k2": "v2"}) == "k2=v2|k1=v1")
+            (gf.config_dict_to_string({"k1": "v1", "k2": "v2"}) == "k1=v1|k2=v2")
+            or (gf.config_dict_to_string({"k1": "v1", "k2": "v2"}) == "k2=v2|k1=v1")
         )
 
     def test_pairs_to_dict(self):
@@ -318,7 +342,9 @@ class TestGlobalFunctions(unittest.TestCase):
         self.assertEqual(type(gf.datetime_string()), str)
         self.assertEqual(len(gf.datetime_string()), len("2016-01-01T00:00:00"))
         self.assertEqual(type(gf.datetime_string(time_zone=True)), str)
-        self.assertEqual(len(gf.datetime_string(time_zone=True)), len("2016-01-01T00:00:00+00:00"))
+        self.assertEqual(
+            len(gf.datetime_string(time_zone=True)), len("2016-01-01T00:00:00+00:00")
+        )
 
     def test_time_from_ttml(self):
         tests = [
@@ -373,16 +399,16 @@ class TestGlobalFunctions(unittest.TestCase):
         tests = [
             (None, TimeValue("0.000")),
             ("", TimeValue("0.000")),
-            ("23:45.678", TimeValue("0.000")),          # no 2 ":"
-            ("3:45.678", TimeValue("0.000")),           # no 2 ":"
-            ("45.678", TimeValue("0.000")),             # no 2 ":"
-            ("5.678", TimeValue("0.000")),              # no 2 ":"
-            ("5", TimeValue("0.000")),                  # no 2 ":"
-            ("00:00:01", TimeValue("0.000")),           # no "."
-            ("1:23:45.678", TimeValue("5025.678")),     # tolerate this (?)
-            ("1:2:45.678", TimeValue("3765.678")),      # tolerate this (?)
-            ("1:23:4.678", TimeValue("4984.678")),      # tolerate this (?)
-            ("1:23:4.", TimeValue("4984.000")),         # tolerate this (?)
+            ("23:45.678", TimeValue("0.000")),  # no 2 ":"
+            ("3:45.678", TimeValue("0.000")),  # no 2 ":"
+            ("45.678", TimeValue("0.000")),  # no 2 ":"
+            ("5.678", TimeValue("0.000")),  # no 2 ":"
+            ("5", TimeValue("0.000")),  # no 2 ":"
+            ("00:00:01", TimeValue("0.000")),  # no "."
+            ("1:23:45.678", TimeValue("5025.678")),  # tolerate this (?)
+            ("1:2:45.678", TimeValue("3765.678")),  # tolerate this (?)
+            ("1:23:4.678", TimeValue("4984.678")),  # tolerate this (?)
+            ("1:23:4.", TimeValue("4984.000")),  # tolerate this (?)
             ("00:00:00.000", TimeValue("0.000")),
             ("00:00:12.000", TimeValue("12.000")),
             ("00:00:12.345", TimeValue("12.345")),
@@ -410,10 +436,10 @@ class TestGlobalFunctions(unittest.TestCase):
             (83.456, "00:01:23.456"),
             (3600.000, "01:00:00.000"),
             (3612.000, "01:00:12.000"),
-            (3612.340, "01:00:12.340"),     # numerical issues
+            (3612.340, "01:00:12.340"),  # numerical issues
             (4980.000, "01:23:00.000"),
             (5025.000, "01:23:45.000"),
-            (5025.670, "01:23:45.670"),     # numerical issues
+            (5025.670, "01:23:45.670"),  # numerical issues
         ]
         for test in tests:
             self.assertEqual(gf.time_to_hhmmssmmm(test[0]), test[1])
@@ -429,10 +455,10 @@ class TestGlobalFunctions(unittest.TestCase):
             (83.456, "00:01:23,456"),
             (3600.000, "01:00:00,000"),
             (3612.000, "01:00:12,000"),
-            (3612.340, "01:00:12,340"),     # numerical issues
+            (3612.340, "01:00:12,340"),  # numerical issues
             (4980.000, "01:23:00,000"),
             (5025.000, "01:23:45,000"),
-            (5025.670, "01:23:45,670"),     # numerical issues
+            (5025.670, "01:23:45,670"),  # numerical issues
         ]
         for test in tests:
             self.assertEqual(gf.time_to_srt(test[0]), test[1])
@@ -571,8 +597,16 @@ class TestGlobalFunctions(unittest.TestCase):
             ("res", "aeneas/tools/somefile.py", "aeneas/tools/res"),
             ("res/foo", "aeneas/tools/somefile.py", "aeneas/tools/res/foo"),
             ("res/bar.baz", "aeneas/tools/somefile.py", "aeneas/tools/res/bar.baz"),
-            ("res/bar/baz/foo", "aeneas/tools/somefile.py", "aeneas/tools/res/bar/baz/foo"),
-            ("res/bar/baz/foo.bar", "aeneas/tools/somefile.py", "aeneas/tools/res/bar/baz/foo.bar")
+            (
+                "res/bar/baz/foo",
+                "aeneas/tools/somefile.py",
+                "aeneas/tools/res/bar/baz/foo",
+            ),
+            (
+                "res/bar/baz/foo.bar",
+                "aeneas/tools/somefile.py",
+                "aeneas/tools/res/bar/baz/foo.bar",
+            ),
         ]
         for test in tests:
             self.assertEqual(gf.relative_path(test[0], test[1]), test[2])
@@ -581,8 +615,16 @@ class TestGlobalFunctions(unittest.TestCase):
         base = os.path.dirname(os.path.realpath(sys.argv[0]))
         tests = [
             ("res", "aeneas/tools/somefile.py", os.path.join(base, "aeneas/tools/res")),
-            ("res/foo", "aeneas/tools/somefile.py", os.path.join(base, "aeneas/tools/res/foo")),
-            ("res/bar.baz", "aeneas/tools/somefile.py", os.path.join(base, "aeneas/tools/res/bar.baz")),
+            (
+                "res/foo",
+                "aeneas/tools/somefile.py",
+                os.path.join(base, "aeneas/tools/res/foo"),
+            ),
+            (
+                "res/bar.baz",
+                "aeneas/tools/somefile.py",
+                os.path.join(base, "aeneas/tools/res/bar.baz"),
+            ),
             ("res", "/aeneas/tools/somefile.py", "/aeneas/tools/res"),
             ("res/foo", "/aeneas/tools/somefile.py", "/aeneas/tools/res/foo"),
             ("res/bar.baz", "/aeneas/tools/somefile.py", "/aeneas/tools/res/bar.baz"),

@@ -29,7 +29,6 @@ This module contains the following classes:
 .. versionadded:: 1.4.1
 """
 
-
 from aeneas.configuration import Configuration
 from aeneas.exacttiming import TimeValue
 
@@ -477,19 +476,19 @@ class RuntimeConfiguration(Configuration):
             DTW_MARGIN_L1,
             MFCC_MASK_NONSPEECH_L1,
             MFCC_WINDOW_LENGTH_L1,
-            MFCC_WINDOW_SHIFT_L1
+            MFCC_WINDOW_SHIFT_L1,
         ),
         2: (
             DTW_MARGIN_L2,
             MFCC_MASK_NONSPEECH_L2,
             MFCC_WINDOW_LENGTH_L2,
-            MFCC_WINDOW_SHIFT_L2
+            MFCC_WINDOW_SHIFT_L2,
         ),
         3: (
             DTW_MARGIN_L3,
             MFCC_MASK_NONSPEECH_L3,
             MFCC_WINDOW_LENGTH_L3,
-            MFCC_WINDOW_SHIFT_L3
+            MFCC_WINDOW_SHIFT_L3,
         ),
     }
     """
@@ -906,89 +905,186 @@ class RuntimeConfiguration(Configuration):
     #      about external (user rconf) and internal (lib code) key names
     #      although the functionality might be useful in the future
     FIELDS = [
-        (ABA_NONSPEECH_TOLERANCE, ("0.080", TimeValue, [], "adjust nonspeech tolerance, in s")),
-        (ABA_NO_ZERO_DURATION, ("0.001", TimeValue, [], "add this shift to zero length fragments, in s")),
-        (ALLOW_UNLISTED_LANGUAGES, (False, bool, [], "if True, allow languages not listed")),
-
+        (
+            ABA_NONSPEECH_TOLERANCE,
+            ("0.080", TimeValue, [], "adjust nonspeech tolerance, in s"),
+        ),
+        (
+            ABA_NO_ZERO_DURATION,
+            ("0.001", TimeValue, [], "add this shift to zero length fragments, in s"),
+        ),
+        (
+            ALLOW_UNLISTED_LANGUAGES,
+            (False, bool, [], "if True, allow languages not listed"),
+        ),
         (C_EXTENSIONS, (True, bool, [], "run C/C++ extensions")),
         (CDTW, (True, bool, [], "run C extension cdtw")),
         (CEW, (True, bool, [], "run C extension cew")),
         (CFW, (True, bool, [], "run C++ extension cfw")),
         (CMFCC, (True, bool, [], "run C extension cmfcc")),
-
         (CEW_SUBPROCESS_ENABLED, (False, bool, [], "run cew in separate subprocess")),
-        (CEW_SUBPROCESS_PATH, ("python", None, [], "path to python executable")),          # or a full path like "/usr/bin/python"
-
+        (
+            CEW_SUBPROCESS_PATH,
+            ("python", None, [], "path to python executable"),
+        ),  # or a full path like "/usr/bin/python"
         (DTW_ALGORITHM, ("stripe", None, [], "DTW algorithm (stripe, exact)")),
         (DTW_MARGIN, ("60.000", TimeValue, [], "DTW margin, in s")),
-
-        (DOWNLOADER_SLEEP, ("1.000", TimeValue, [], "sleep between Downloader calls, in s")),
-        (DOWNLOADER_RETRY_ATTEMPTS, (5, int, [], "number of retries for a failed Downloader call")),
-
-        (FFMPEG_PATH, ("ffmpeg", None, [], "path to ffmpeg executable")),                  # or a full path like "/usr/bin/ffmpeg"
+        (
+            DOWNLOADER_SLEEP,
+            ("1.000", TimeValue, [], "sleep between Downloader calls, in s"),
+        ),
+        (
+            DOWNLOADER_RETRY_ATTEMPTS,
+            (5, int, [], "number of retries for a failed Downloader call"),
+        ),
+        (
+            FFMPEG_PATH,
+            ("ffmpeg", None, [], "path to ffmpeg executable"),
+        ),  # or a full path like "/usr/bin/ffmpeg"
         (FFMPEG_SAMPLE_RATE, (16000, int, [], "ffmpeg sample rate")),
-
-        (FFPROBE_PATH, ("ffprobe", None, [], "path to ffprobe executable")),               # or a full path like "/usr/bin/ffprobe"
-
+        (
+            FFPROBE_PATH,
+            ("ffprobe", None, [], "path to ffprobe executable"),
+        ),  # or a full path like "/usr/bin/ffprobe"
         (JOB_MAX_TASKS, (0, int, [], "max number of tasks per job (0 to disable)")),
-
         (MFCC_FILTERS, (40, int, [], "number of MFCC filters")),
         (MFCC_SIZE, (13, int, [], "number of MFCC")),
         (MFCC_FFT_ORDER, (512, int, [], "FFT order for computing MFCC")),
-        (MFCC_LOWER_FREQUENCY, (133.3333, float, [], "MFCC lower frequency cutoff, in Hz")),
-        (MFCC_UPPER_FREQUENCY, (6855.4976, float, [], "MFCC upper frequency cutoff, in Hz")),
+        (
+            MFCC_LOWER_FREQUENCY,
+            (133.3333, float, [], "MFCC lower frequency cutoff, in Hz"),
+        ),
+        (
+            MFCC_UPPER_FREQUENCY,
+            (6855.4976, float, [], "MFCC upper frequency cutoff, in Hz"),
+        ),
         (MFCC_EMPHASIS_FACTOR, (0.970, float, [], "MFCC emphasis factor")),
-
         (MFCC_MASK_NONSPEECH, (False, bool, [], "if True, mask MFCC nonspeech frames")),
         (MFCC_WINDOW_LENGTH, ("0.100", TimeValue, [], "MFCC window length, in s")),
         (MFCC_WINDOW_SHIFT, ("0.040", TimeValue, [], "MFCC window shift, in s")),
-
-        (MFCC_MASK_EXTEND_SPEECH_INTERVAL_AFTER, (0, int, [], "when masking MFCC, extend speech interval after, in frames")),
-        (MFCC_MASK_EXTEND_SPEECH_INTERVAL_BEFORE, (0, int, [], "when masking MFCC, extend speech interval before, in frames")),
-        (MFCC_MASK_LOG_ENERGY_THRESHOLD, (0.699, float, [], "when masking MFCC, log energy threshold for speech")),
-        (MFCC_MASK_MIN_NONSPEECH_LENGTH, (1, int, [], "when masking MFCC, min nonspeech interval length, in frames")),
-
+        (
+            MFCC_MASK_EXTEND_SPEECH_INTERVAL_AFTER,
+            (0, int, [], "when masking MFCC, extend speech interval after, in frames"),
+        ),
+        (
+            MFCC_MASK_EXTEND_SPEECH_INTERVAL_BEFORE,
+            (0, int, [], "when masking MFCC, extend speech interval before, in frames"),
+        ),
+        (
+            MFCC_MASK_LOG_ENERGY_THRESHOLD,
+            (0.699, float, [], "when masking MFCC, log energy threshold for speech"),
+        ),
+        (
+            MFCC_MASK_MIN_NONSPEECH_LENGTH,
+            (1, int, [], "when masking MFCC, min nonspeech interval length, in frames"),
+        ),
         (DTW_MARGIN_L1, ("60.000", TimeValue, [], "level 1 (para) DTW margin, in s")),
-        (MFCC_MASK_NONSPEECH_L1, (False, bool, [], "if True, mask MFCC nonspeech frames on level 1 (para)")),
-        (MFCC_WINDOW_LENGTH_L1, ("0.100", TimeValue, [], "level 1 (para) MFCC window length, in s")),
-        (MFCC_WINDOW_SHIFT_L1, ("0.040", TimeValue, [], "level 1 (para) MFCC window shift, in s")),
+        (
+            MFCC_MASK_NONSPEECH_L1,
+            (False, bool, [], "if True, mask MFCC nonspeech frames on level 1 (para)"),
+        ),
+        (
+            MFCC_WINDOW_LENGTH_L1,
+            ("0.100", TimeValue, [], "level 1 (para) MFCC window length, in s"),
+        ),
+        (
+            MFCC_WINDOW_SHIFT_L1,
+            ("0.040", TimeValue, [], "level 1 (para) MFCC window shift, in s"),
+        ),
         (DTW_MARGIN_L2, ("30.000", TimeValue, [], "level 2 (sent) DTW margin, in s")),
-        (MFCC_MASK_NONSPEECH_L2, (False, bool, [], "if True, mask MFCC nonspeech frames on level 2 (sent)")),
-        (MFCC_WINDOW_LENGTH_L2, ("0.050", TimeValue, [], "level 2 (sent) MFCC window length, in s")),
-        (MFCC_WINDOW_SHIFT_L2, ("0.020", TimeValue, [], "level 2 (sent) MFCC window shift, in s")),
+        (
+            MFCC_MASK_NONSPEECH_L2,
+            (False, bool, [], "if True, mask MFCC nonspeech frames on level 2 (sent)"),
+        ),
+        (
+            MFCC_WINDOW_LENGTH_L2,
+            ("0.050", TimeValue, [], "level 2 (sent) MFCC window length, in s"),
+        ),
+        (
+            MFCC_WINDOW_SHIFT_L2,
+            ("0.020", TimeValue, [], "level 2 (sent) MFCC window shift, in s"),
+        ),
         (DTW_MARGIN_L3, ("10.000", TimeValue, [], "level 3 (word) DTW margin, in s")),
-        (MFCC_MASK_NONSPEECH_L3, (False, bool, [], "if True, mask MFCC nonspeech frames on level 3 (word)")),
-        (MFCC_WINDOW_LENGTH_L3, ("0.020", TimeValue, [], "level 3 (word) MFCC window length, in s")),
-        (MFCC_WINDOW_SHIFT_L3, ("0.005", TimeValue, [], "level 3 (word) MFCC window shift, in s")),
-
+        (
+            MFCC_MASK_NONSPEECH_L3,
+            (False, bool, [], "if True, mask MFCC nonspeech frames on level 3 (word)"),
+        ),
+        (
+            MFCC_WINDOW_LENGTH_L3,
+            ("0.020", TimeValue, [], "level 3 (word) MFCC window length, in s"),
+        ),
+        (
+            MFCC_WINDOW_SHIFT_L3,
+            ("0.005", TimeValue, [], "level 3 (word) MFCC window shift, in s"),
+        ),
         (NUANCE_TTS_API_ID, (None, None, [], "Nuance Developer API ID")),
         (NUANCE_TTS_API_KEY, (None, None, [], "Nuance Developer API Key")),
-
         (SAFETY_CHECKS, (True, bool, [], "if True, always perform safety checks")),
-
-        (TASK_MAX_AUDIO_LENGTH, ("0", TimeValue, [], "max length of single audio file, in s (0 to disable)")),
-        (TASK_MAX_TEXT_LENGTH, (0, int, [], "max length of single text file, in fragments (0 to disable)")),
-
+        (
+            TASK_MAX_AUDIO_LENGTH,
+            (
+                "0",
+                TimeValue,
+                [],
+                "max length of single audio file, in s (0 to disable)",
+            ),
+        ),
+        (
+            TASK_MAX_TEXT_LENGTH,
+            (0, int, [], "max length of single text file, in fragments (0 to disable)"),
+        ),
         (TMP_PATH, (None, None, [], "path to the temporary dir")),
-
         (TTS, ("espeak", None, [], "TTS wrapper to use")),
-        (TTS_PATH, (None, None, [], "path of the TTS executable/wrapper")),                # None (= default) or "espeak" or "/usr/bin/espeak"
-        (TTS_VOICE_CODE, (None, None, [], "overrides TTS voice code selected by language with this value")),
+        (
+            TTS_PATH,
+            (None, None, [], "path of the TTS executable/wrapper"),
+        ),  # None (= default) or "espeak" or "/usr/bin/espeak"
+        (
+            TTS_VOICE_CODE,
+            (
+                None,
+                None,
+                [],
+                "overrides TTS voice code selected by language with this value",
+            ),
+        ),
         (TTS_CACHE, (False, bool, [], "if True, cache synthesized audio files")),
         (TTS_API_SLEEP, ("1.000", TimeValue, [], "sleep between TTS API calls, in s")),
-        (TTS_API_RETRY_ATTEMPTS, (5, int, [], "number of retries for a failed TTS API call")),
-
+        (
+            TTS_API_RETRY_ATTEMPTS,
+            (5, int, [], "number of retries for a failed TTS API call"),
+        ),
         (TTS_L1, ("espeak", None, [], "TTS wrapper to use at level 1 (para)")),
-        (TTS_PATH_L1, (None, None, [], "path to level 1 (para) TTS executable/wrapper")),  # None (= default) or "espeak" or "/usr/bin/espeak"
+        (
+            TTS_PATH_L1,
+            (None, None, [], "path to level 1 (para) TTS executable/wrapper"),
+        ),  # None (= default) or "espeak" or "/usr/bin/espeak"
         (TTS_L2, ("espeak", None, [], "TTS wrapper to use at level 2 (sent)")),
-        (TTS_PATH_L2, (None, None, [], "path to level 2 (sent) TTS executable/wrapper")),  # None (= default) or "espeak" or "/usr/bin/espeak"
+        (
+            TTS_PATH_L2,
+            (None, None, [], "path to level 2 (sent) TTS executable/wrapper"),
+        ),  # None (= default) or "espeak" or "/usr/bin/espeak"
         (TTS_L3, ("espeak", None, [], "TTS wrapper to use at level 3 (word)")),
-        (TTS_PATH_L3, (None, None, [], "path to level 3 (word) TTS executable/wrapper")),  # None (= default) or "espeak" or "/usr/bin/espeak"
-
-        (VAD_EXTEND_SPEECH_INTERVAL_AFTER, ("0.000", TimeValue, [], "extend speech interval after, in s")),
-        (VAD_EXTEND_SPEECH_INTERVAL_BEFORE, ("0.000", TimeValue, [], "extend speech interval before, in s")),
-        (VAD_LOG_ENERGY_THRESHOLD, (0.699, float, [], "log energy threshold for speech")),
-        (VAD_MIN_NONSPEECH_LENGTH, ("0.200", TimeValue, [], "min nonspeech interval length, in s")),
+        (
+            TTS_PATH_L3,
+            (None, None, [], "path to level 3 (word) TTS executable/wrapper"),
+        ),  # None (= default) or "espeak" or "/usr/bin/espeak"
+        (
+            VAD_EXTEND_SPEECH_INTERVAL_AFTER,
+            ("0.000", TimeValue, [], "extend speech interval after, in s"),
+        ),
+        (
+            VAD_EXTEND_SPEECH_INTERVAL_BEFORE,
+            ("0.000", TimeValue, [], "extend speech interval before, in s"),
+        ),
+        (
+            VAD_LOG_ENERGY_THRESHOLD,
+            (0.699, float, [], "log energy threshold for speech"),
+        ),
+        (
+            VAD_MIN_NONSPEECH_LENGTH,
+            ("0.200", TimeValue, [], "min nonspeech interval length, in s"),
+        ),
     ]
 
     TAG = "RuntimeConfiguration"
@@ -1103,7 +1199,9 @@ class RuntimeConfiguration(Configuration):
         :param int level: the desired granularity level
         """
         if level in self.MFCC_GRANULARITY_MAP.keys():
-            margin_key, mask_key, length_key, shift_key = self.MFCC_GRANULARITY_MAP[level]
+            margin_key, mask_key, length_key, shift_key = self.MFCC_GRANULARITY_MAP[
+                level
+            ]
             self[self.DTW_MARGIN] = self[margin_key]
             self[self.MFCC_MASK_NONSPEECH] = self[mask_key]
             self[self.MFCC_WINDOW_LENGTH] = self[length_key]

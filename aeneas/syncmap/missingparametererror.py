@@ -21,10 +21,10 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-
 class SyncMapMissingParameterError(Exception):
     """
     Error raised when a parameter which is implied
     by the actual SyncMapFormat value is missing.
     """
+
     pass

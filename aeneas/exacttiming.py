@@ -373,7 +373,9 @@ class TimeInterval:
         percent = Decimal(max(min(percent, 100), 0) / 100)
         return self.begin + self.length * percent
 
-    def offset(self, offset, allow_negative=False, min_begin_value=None, max_end_value=None):
+    def offset(
+        self, offset, allow_negative=False, min_begin_value=None, max_end_value=None
+    ):
         """
         Move this interval by the given shift ``offset``.
 
@@ -596,7 +598,11 @@ class TimeInterval:
         :raises TypeError: if ``other`` is not an instance of ``TimeInterval``
         :rtype: bool
         """
-        return self.is_adjacent_before(other) and (not self.has_zero_length) and (not other.has_zero_length)
+        return (
+            self.is_adjacent_before(other)
+            and (not self.has_zero_length)
+            and (not other.has_zero_length)
+        )
 
     def is_non_zero_after_non_zero(self, other):
         """
@@ -623,7 +629,7 @@ class TimeInterval:
         """
         if not isinstance(other, TimeInterval):
             raise TypeError("other is not an instance of TimeInterval")
-        return (self.end == other.begin)
+        return self.end == other.begin
 
     def is_adjacent_after(self, other):
         """

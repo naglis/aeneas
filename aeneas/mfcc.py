@@ -105,7 +105,9 @@ class MFCC(Loggable):
         self.s2dct = numpy.zeros((self.mfcc_size, self.filter_bank_size))
         for i in range(0, self.mfcc_size):
             freq = numpy.pi * float(i) / self.filter_bank_size
-            self.s2dct[i] = numpy.cos(freq * numpy.arange(0.5, 0.5 + self.filter_bank_size, 1.0, 'float64'))
+            self.s2dct[i] = numpy.cos(
+                freq * numpy.arange(0.5, 0.5 + self.filter_bank_size, 1.0, "float64")
+            )
         self.s2dct[:, 0] *= 0.5
         self.s2dct = self.s2dct.transpose()
 
@@ -118,15 +120,26 @@ class MFCC(Loggable):
         so it cannot be created in the class initializer,
         but only later in :func:`aeneas.mfcc.MFCC.compute_from_data`.
         """
-        self.filters = numpy.zeros((1 + (self.fft_order // 2), self.filter_bank_size), 'd')
+        self.filters = numpy.zeros(
+            (1 + (self.fft_order // 2), self.filter_bank_size), "d"
+        )
         dfreq = float(self.sample_rate) / self.fft_order
         nyquist_frequency = self.sample_rate / 2
         if self.upper_frequency > nyquist_frequency:
-            self.log_exc("Upper frequency {:f} exceeds Nyquist frequency {:f}".format(self.upper_frequency, nyquist_frequency), None, True, ValueError)
+            self.log_exc(
+                "Upper frequency {:f} exceeds Nyquist frequency {:f}".format(
+                    self.upper_frequency, nyquist_frequency
+                ),
+                None,
+                True,
+                ValueError,
+            )
         melmax = MFCC._hz2mel(self.upper_frequency)
         melmin = MFCC._hz2mel(self.lower_frequency)
         dmelbw = (melmax - melmin) / (self.filter_bank_size + 1)
-        filt_edge = MFCC._mel2hz(melmin + dmelbw * numpy.arange(self.filter_bank_size + 2, dtype='d'))
+        filt_edge = MFCC._mel2hz(
+            melmin + dmelbw * numpy.arange(self.filter_bank_size + 2, dtype="d")
+        )
 
         # TODO can this code be written more numpy-style?
         #      (the performance loss is negligible, it is just ugly to see)
@@ -160,7 +173,9 @@ class MFCC(Loggable):
         Pre-emphasize the entire signal at once by self.emphasis_factor,
         overwriting ``self.data``.
         """
-        self.data = numpy.append(self.data[0], self.data[1:] - self.emphasis_factor * self.data[:-1])
+        self.data = numpy.append(
+            self.data[0], self.data[1:] - self.emphasis_factor * self.data[:-1]
+        )
 
     def compute_from_data(self, data, sample_rate):
         """
@@ -178,6 +193,7 @@ class MFCC(Loggable):
         :raises: ValueError: if the upper frequency defined in the ``rconf`` is
                              larger than the Nyquist frequenct (i.e., half of ``sample_rate``)
         """
+
         def _process_frame(self, frame):
             """
             Process each frame, returning the log(power()) of it.
@@ -194,10 +210,17 @@ class MFCC(Loggable):
             # COMMENTED logspec = numpy.log(numpy.dot(power, self.filters).clip(self.CUTOFF, numpy.inf))
             # COMMENTED return numpy.dot(logspec, self.s2dct) / self.filter_bank_size
             # v2
-            return numpy.log(numpy.dot(power, self.filters).clip(self.CUTOFF, numpy.inf))
+            return numpy.log(
+                numpy.dot(power, self.filters).clip(self.CUTOFF, numpy.inf)
+            )
 
         if len(data.shape) != 1:
-            self.log_exc("The audio data must be a 1D numpy array (mono).", None, True, ValueError)
+            self.log_exc(
+                "The audio data must be a 1D numpy array (mono).",
+                None,
+                True,
+                ValueError,
+            )
         if len(data) < 1:
             self.log_exc("The audio data must not be empty.", None, True, ValueError)
 
@@ -235,7 +258,7 @@ class MFCC(Loggable):
         # v1
         # COMMENTED mfcc = numpy.zeros((number_of_frames, self.mfcc_size), 'float64')
         # v2
-        mfcc = numpy.zeros((number_of_frames, self.filter_bank_size), 'float64')
+        mfcc = numpy.zeros((number_of_frames, self.filter_bank_size), "float64")
 
         # compute MFCCs one frame at a time
         for frame_index in range(number_of_frames):
@@ -249,7 +272,7 @@ class MFCC(Loggable):
             # frame is zero-padded if the remaining samples
             # are less than its length
             frame = numpy.zeros(frame_length_padded)
-            frame[0:(frame_end - frame_start)] = self.data[frame_start:frame_end]
+            frame[0 : (frame_end - frame_start)] = self.data[frame_start:frame_end]
 
             # process the frame
             mfcc[frame_index] = _process_frame(self, frame)

@@ -29,7 +29,6 @@ from aeneas.syncmap.fragmentlist import SyncMapFragmentList
 
 
 class TestSyncMapFragmentList(unittest.TestCase):
-
     def test_time_interval_list_bad(self):
         params = [
             (None, None, TypeError),
@@ -65,9 +64,11 @@ class TestSyncMapFragmentList(unittest.TestCase):
             None,
             (0.000, 5.000),
             (TimeValue("0.000"), TimeValue("5.000")),
-            TimeInterval(begin=TimeValue("0.000"), end=TimeValue("5.000"))
+            TimeInterval(begin=TimeValue("0.000"), end=TimeValue("5.000")),
         ]
-        fragment_list = SyncMapFragmentList(begin=TimeValue("0.000"), end=TimeValue("10.000"))
+        fragment_list = SyncMapFragmentList(
+            begin=TimeValue("0.000"), end=TimeValue("10.000")
+        )
         for p in params:
             with self.assertRaises(TypeError):
                 fragment_list.add(p)
@@ -130,7 +131,9 @@ class TestSyncMapFragmentList(unittest.TestCase):
             ],
         ]
         for seq in params:
-            fragment_list = SyncMapFragmentList(begin=TimeValue("0.000"), end=TimeValue("10.000"))
+            fragment_list = SyncMapFragmentList(
+                begin=TimeValue("0.000"), end=TimeValue("10.000")
+            )
             with self.assertRaises(ValueError):
                 for b, e in seq:
                     i = TimeInterval(begin=TimeValue(b), end=TimeValue(e))
@@ -165,7 +168,9 @@ class TestSyncMapFragmentList(unittest.TestCase):
             ],
         ]
         for seq in params:
-            fragment_list = SyncMapFragmentList(begin=TimeValue("0.000"), end=TimeValue("10.000"))
+            fragment_list = SyncMapFragmentList(
+                begin=TimeValue("0.000"), end=TimeValue("10.000")
+            )
             for b, e in seq:
                 i = TimeInterval(begin=TimeValue(b), end=TimeValue(e))
                 s = SyncMapFragment(interval=i)
@@ -174,7 +179,9 @@ class TestSyncMapFragmentList(unittest.TestCase):
                 fragment_list.sort()
 
     def test_time_interval_list_add_sorted_bad(self):
-        fragment_list = SyncMapFragmentList(begin=TimeValue("0.000"), end=TimeValue("10.000"))
+        fragment_list = SyncMapFragmentList(
+            begin=TimeValue("0.000"), end=TimeValue("10.000")
+        )
         i = TimeInterval(begin=TimeValue("0.000"), end=TimeValue("0.000"))
         s = SyncMapFragment(interval=i)
         fragment_list.add(s, sort=False)
@@ -198,7 +205,7 @@ class TestSyncMapFragmentList(unittest.TestCase):
                     ("0.500", "0.500"),
                     ("1.000", "1.000"),
                     ("1.000", "1.000"),
-                ]
+                ],
             ),
             (
                 [
@@ -208,7 +215,7 @@ class TestSyncMapFragmentList(unittest.TestCase):
                 [
                     ("0.500", "0.500"),
                     ("1.000", "1.000"),
-                ]
+                ],
             ),
             (
                 [
@@ -220,7 +227,7 @@ class TestSyncMapFragmentList(unittest.TestCase):
                     ("0.500", "0.500"),
                     ("1.000", "2.000"),
                     ("2.000", "2.000"),
-                ]
+                ],
             ),
             (
                 [
@@ -236,11 +243,13 @@ class TestSyncMapFragmentList(unittest.TestCase):
                     ("1.000", "2.000"),
                     ("2.000", "2.000"),
                     ("2.000", "3.000"),
-                ]
+                ],
             ),
         ]
         for ins, exp in params:
-            fragment_list = SyncMapFragmentList(begin=TimeValue("0.000"), end=TimeValue("10.000"))
+            fragment_list = SyncMapFragmentList(
+                begin=TimeValue("0.000"), end=TimeValue("10.000")
+            )
             for b, e in ins:
                 i = TimeInterval(begin=TimeValue(b), end=TimeValue(e))
                 s = SyncMapFragment(interval=i)
@@ -263,7 +272,7 @@ class TestSyncMapFragmentList(unittest.TestCase):
                     ("0.500", "0.500"),
                     ("1.000", "1.000"),
                     ("1.000", "1.000"),
-                ]
+                ],
             ),
             (
                 [
@@ -273,7 +282,7 @@ class TestSyncMapFragmentList(unittest.TestCase):
                 [
                     ("0.500", "0.500"),
                     ("1.000", "1.000"),
-                ]
+                ],
             ),
             (
                 [
@@ -285,7 +294,7 @@ class TestSyncMapFragmentList(unittest.TestCase):
                     ("0.500", "0.500"),
                     ("1.000", "2.000"),
                     ("2.000", "2.000"),
-                ]
+                ],
             ),
             (
                 [
@@ -301,11 +310,13 @@ class TestSyncMapFragmentList(unittest.TestCase):
                     ("1.000", "2.000"),
                     ("2.000", "2.000"),
                     ("2.000", "3.000"),
-                ]
+                ],
             ),
         ]
         for ins, exp in params:
-            fragment_list = SyncMapFragmentList(begin=TimeValue("0.000"), end=TimeValue("10.000"))
+            fragment_list = SyncMapFragmentList(
+                begin=TimeValue("0.000"), end=TimeValue("10.000")
+            )
             for b, e in ins:
                 i = TimeInterval(begin=TimeValue(b), end=TimeValue(e))
                 s = SyncMapFragment(interval=i)
@@ -342,7 +353,9 @@ class TestSyncMapFragmentList(unittest.TestCase):
             ],
         ]
         for ins in params:
-            fragment_list = SyncMapFragmentList(begin=TimeValue("0.000"), end=TimeValue("10.000"))
+            fragment_list = SyncMapFragmentList(
+                begin=TimeValue("0.000"), end=TimeValue("10.000")
+            )
             for b, e in ins:
                 i = TimeInterval(begin=TimeValue(b), end=TimeValue(e))
                 s = SyncMapFragment(interval=i)
@@ -355,7 +368,9 @@ class TestSyncMapFragmentList(unittest.TestCase):
                 self.assertEqual(fragment_list[j], c[j])
                 fragment.fragment_type = SyncMapFragment.NONSPEECH
                 self.assertNotEqual(fragment_list[j].fragment_type, c[j].fragment_type)
-                self.assertEqual(fragment_list[j].fragment_type, SyncMapFragment.NONSPEECH)
+                self.assertEqual(
+                    fragment_list[j].fragment_type, SyncMapFragment.NONSPEECH
+                )
                 self.assertEqual(c[j].fragment_type, SyncMapFragment.REGULAR)
 
     def test_time_interval_list_has_zero_length_fragments(self):
@@ -367,7 +382,7 @@ class TestSyncMapFragmentList(unittest.TestCase):
                     ("0.000", "0.000"),
                 ],
                 True,
-                True
+                True,
             ),
             (
                 [
@@ -376,7 +391,7 @@ class TestSyncMapFragmentList(unittest.TestCase):
                     ("1.000", "1.000"),
                 ],
                 True,
-                True
+                True,
             ),
             (
                 [
@@ -385,7 +400,7 @@ class TestSyncMapFragmentList(unittest.TestCase):
                     ("0.000", "1.000"),
                 ],
                 True,
-                True
+                True,
             ),
             (
                 [
@@ -394,7 +409,7 @@ class TestSyncMapFragmentList(unittest.TestCase):
                     ("1.000", "1.000"),
                 ],
                 True,
-                False
+                False,
             ),
             (
                 [
@@ -403,7 +418,7 @@ class TestSyncMapFragmentList(unittest.TestCase):
                     ("2.000", "3.000"),
                 ],
                 False,
-                False
+                False,
             ),
             (
                 [
@@ -414,7 +429,7 @@ class TestSyncMapFragmentList(unittest.TestCase):
                     ("2.000", "2.000"),
                 ],
                 True,
-                True
+                True,
             ),
             (
                 [
@@ -429,13 +444,20 @@ class TestSyncMapFragmentList(unittest.TestCase):
             ),
         ]
         for frags, exp, exp_inside in params:
-            fragment_list = SyncMapFragmentList(begin=TimeValue("0.000"), end=TimeValue("10.000"))
+            fragment_list = SyncMapFragmentList(
+                begin=TimeValue("0.000"), end=TimeValue("10.000")
+            )
             for b, e in frags:
                 i = TimeInterval(begin=TimeValue(b), end=TimeValue(e))
                 s = SyncMapFragment(interval=i)
                 fragment_list.add(s)
             self.assertEqual(fragment_list.has_zero_length_fragments(), exp)
-            self.assertEqual(fragment_list.has_zero_length_fragments(min_index=1, max_index=len(fragment_list) - 1), exp_inside)
+            self.assertEqual(
+                fragment_list.has_zero_length_fragments(
+                    min_index=1, max_index=len(fragment_list) - 1
+                ),
+                exp_inside,
+            )
 
     def test_time_interval_list_has_adjacent_fragments_only(self):
         params = [
@@ -446,7 +468,7 @@ class TestSyncMapFragmentList(unittest.TestCase):
                     ("0.000", "0.000"),
                 ],
                 True,
-                True
+                True,
             ),
             (
                 [
@@ -455,7 +477,7 @@ class TestSyncMapFragmentList(unittest.TestCase):
                     ("1.000", "1.000"),
                 ],
                 True,
-                True
+                True,
             ),
             (
                 [
@@ -464,7 +486,7 @@ class TestSyncMapFragmentList(unittest.TestCase):
                     ("0.000", "1.000"),
                 ],
                 True,
-                True
+                True,
             ),
             (
                 [
@@ -473,7 +495,7 @@ class TestSyncMapFragmentList(unittest.TestCase):
                     ("1.000", "1.000"),
                 ],
                 True,
-                True
+                True,
             ),
             (
                 [
@@ -482,7 +504,7 @@ class TestSyncMapFragmentList(unittest.TestCase):
                     ("2.000", "3.000"),
                 ],
                 True,
-                True
+                True,
             ),
             (
                 [
@@ -493,7 +515,7 @@ class TestSyncMapFragmentList(unittest.TestCase):
                     ("2.000", "2.000"),
                 ],
                 True,
-                True
+                True,
             ),
             (
                 [
@@ -508,13 +530,20 @@ class TestSyncMapFragmentList(unittest.TestCase):
             ),
         ]
         for frags, exp, exp_inside in params:
-            fragment_list = SyncMapFragmentList(begin=TimeValue("0.000"), end=TimeValue("10.000"))
+            fragment_list = SyncMapFragmentList(
+                begin=TimeValue("0.000"), end=TimeValue("10.000")
+            )
             for b, e in frags:
                 i = TimeInterval(begin=TimeValue(b), end=TimeValue(e))
                 s = SyncMapFragment(interval=i)
                 fragment_list.add(s)
             self.assertEqual(fragment_list.has_adjacent_fragments_only(), exp)
-            self.assertEqual(fragment_list.has_adjacent_fragments_only(min_index=1, max_index=len(fragment_list) - 1), exp_inside)
+            self.assertEqual(
+                fragment_list.has_adjacent_fragments_only(
+                    min_index=1, max_index=len(fragment_list) - 1
+                ),
+                exp_inside,
+            )
 
     def test_time_interval_list_offset(self):
         params = [
@@ -637,7 +666,9 @@ class TestSyncMapFragmentList(unittest.TestCase):
             ),
         ]
         for ins, off, exp in params:
-            fragment_list = SyncMapFragmentList(begin=TimeValue("0.000"), end=TimeValue("10.000"))
+            fragment_list = SyncMapFragmentList(
+                begin=TimeValue("0.000"), end=TimeValue("10.000")
+            )
             for b, e in ins:
                 i = TimeInterval(begin=TimeValue(b), end=TimeValue(e))
                 s = SyncMapFragment(interval=i)
@@ -799,7 +830,9 @@ class TestSyncMapFragmentList(unittest.TestCase):
             ),
         ]
         for ins, exp in params:
-            fragment_list = SyncMapFragmentList(begin=TimeValue("0.000"), end=TimeValue("10.000"))
+            fragment_list = SyncMapFragmentList(
+                begin=TimeValue("0.000"), end=TimeValue("10.000")
+            )
             for b, e in ins:
                 i = TimeInterval(begin=TimeValue(b), end=TimeValue(e))
                 s = SyncMapFragment(interval=i)
@@ -993,12 +1026,18 @@ class TestSyncMapFragmentList(unittest.TestCase):
             ),
         ]
         for ins, exp in params:
-            fragment_list = SyncMapFragmentList(begin=TimeValue("0.000"), end=TimeValue("10.000"))
+            fragment_list = SyncMapFragmentList(
+                begin=TimeValue("0.000"), end=TimeValue("10.000")
+            )
             for b, e in ins:
                 i = TimeInterval(begin=TimeValue(b), end=TimeValue(e))
                 s = SyncMapFragment(interval=i)
                 fragment_list.add(s)
-            fragment_list.fix_zero_length_fragments(duration=TimeValue("0.001"), min_index=1, max_index=(len(fragment_list) - 1))
+            fragment_list.fix_zero_length_fragments(
+                duration=TimeValue("0.001"),
+                min_index=1,
+                max_index=(len(fragment_list) - 1),
+            )
             for j, fragment in enumerate(fragment_list.fragments):
                 b, e = exp[j]
                 exp_i = TimeInterval(begin=TimeValue(b), end=TimeValue(e))

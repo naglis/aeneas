@@ -46,30 +46,34 @@ MAP = {
     "bench": ("bench_test_*.py", "bench_test_"),
     "long": ("long_test_*.py", "long_test_"),
     "net": ("net_test_*.py", "net_test_"),
-    "tool": ("tool_test_*.py", "tool_test_")
+    "tool": ("tool_test_*.py", "tool_test_"),
 }
 
 
 class NOPStream:
-    """ NOP stream """
+    """NOP stream"""
+
     def __init__(self, verbose=False):
         self.verbose = verbose
 
     def flush(self):
-        """ NOP """
+        """NOP"""
         pass
 
     def write(self, msg):
-        """ NOP """
+        """NOP"""
         if self.verbose:
             print(msg)
 
 
 def main():
-    """ Perform tests """
+    """Perform tests"""
     if ("--help" in sys.argv) or ("-h" in sys.argv):
         print("")
-        print("Usage: python %s [--bench-tests|--long-tests|--net-tests|--tool-tests] [--sort] [--verbose]" % sys.argv[0])
+        print(
+            "Usage: python %s [--bench-tests|--long-tests|--net-tests|--tool-tests] [--sort] [--verbose]"
+            % sys.argv[0]
+        )
         print("")
         sys.exit(0)
 
@@ -88,7 +92,9 @@ def main():
         test_type = "fast"
 
     pattern, prefix = MAP[test_type]
-    all_files = [os.path.basename(f) for f in glob.glob(os.path.join(TEST_DIRECTORY, pattern))]
+    all_files = [
+        os.path.basename(f) for f in glob.glob(os.path.join(TEST_DIRECTORY, pattern))
+    ]
     cli_files = [arg for arg in sys.argv[1:] if not arg.startswith("-")]
     selected_files = []
     for cli_file in cli_files:
@@ -111,12 +117,16 @@ def main():
     nop_stream = NOPStream(verbose=verbose)
     for test_file in selected_files:
         print("Running", test_file, "...")
-        testsuite = unittest.TestLoader().discover(start_dir=TEST_DIRECTORY, pattern=test_file)
-        result = unittest.TextTestRunner(stream=nop_stream, verbosity=verbosity).run(testsuite)
+        testsuite = unittest.TestLoader().discover(
+            start_dir=TEST_DIRECTORY, pattern=test_file
+        )
+        result = unittest.TextTestRunner(stream=nop_stream, verbosity=verbosity).run(
+            testsuite
+        )
         results[test_file] = {
             "tests": result.testsRun,
             "errors": len(result.errors),
-            "failures": len(result.failures)
+            "failures": len(result.failures),
         }
     total_tests = sum([results[k]["tests"] for k in results])
     total_errors = sum([results[k]["errors"] for k in results])
@@ -135,7 +145,9 @@ def main():
     if total_failures > 0:
         print("")
         print("Failures in the following tests:")
-        print("\n".join([key for key in results.keys() if results[key]["failures"] > 0]))
+        print(
+            "\n".join([key for key in results.keys() if results[key]["failures"] > 0])
+        )
         print("")
 
     print("")
@@ -149,5 +161,5 @@ def main():
         sys.exit(1)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

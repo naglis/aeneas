@@ -26,7 +26,6 @@ from aeneas.tests.common import ExecuteJobCLICase
 
 
 class TestExecuteJobCLI(ExecuteJobCLICase):
-
     def test_help(self):
         self.execute([], 2)
         self.execute([("", "-h")], 2)
@@ -35,52 +34,38 @@ class TestExecuteJobCLI(ExecuteJobCLICase):
         self.execute([("", "--version")], 2)
 
     def test_exec_container_too_many_jobs(self):
-        self.execute([
-            ("in", "../tools/res/job.zip"),
-            ("out", ""),
-            ("", "-r=\"job_max_tasks=1\"")
-        ], 1)
+        self.execute(
+            [("in", "../tools/res/job.zip"), ("out", ""), ("", '-r="job_max_tasks=1"')],
+            1,
+        )
 
     def test_exec_container_bad_1(self):
-        self.execute([
-            ("in", "../tools/res/job_no_config.zip"),
-            ("out", "")
-        ], 1)
+        self.execute([("in", "../tools/res/job_no_config.zip"), ("out", "")], 1)
 
     def test_exec_container_bad_2(self):
-        self.execute([
-            ("in", "../tools/res/job.bad.zip"),
-            ("out", "")
-        ], 1)
+        self.execute([("in", "../tools/res/job.bad.zip"), ("out", "")], 1)
 
     def test_exec_container_skip_validator_2(self):
-        self.execute([
-            ("in", "../tools/res/job_no_config.zip"),
-            ("out", ""),
-            ("", "--skip-validator")
-        ], 1)
+        self.execute(
+            [
+                ("in", "../tools/res/job_no_config.zip"),
+                ("out", ""),
+                ("", "--skip-validator"),
+            ],
+            1,
+        )
 
     def test_exec_missing_1(self):
-        self.execute([
-            ("in", "../tools/res/job.zip")
-        ], 2)
+        self.execute([("in", "../tools/res/job.zip")], 2)
 
     def test_exec_missing_2(self):
-        self.execute([
-            ("out", "")
-        ], 2)
+        self.execute([("out", "")], 2)
 
     def test_exec_cannot_read(self):
-        self.execute([
-            ("in", "/foo/bar/baz"),
-            ("out", "")
-        ], 1)
+        self.execute([("in", "/foo/bar/baz"), ("out", "")], 1)
 
     def test_exec_cannot_write(self):
-        self.execute([
-            ("in", "../tools/res/job.zip"),
-            ("", "/foo/bar/baz.txt")
-        ], 1)
+        self.execute([("in", "../tools/res/job.zip"), ("", "/foo/bar/baz.txt")], 1)
 
 
 if __name__ == "__main__":

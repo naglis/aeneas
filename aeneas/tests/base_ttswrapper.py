@@ -31,7 +31,6 @@ import aeneas.globalfunctions as gf
 
 
 class TestBaseTTSWrapper(unittest.TestCase):
-
     TTS = ""
     TTS_PATH = ""
 
@@ -39,8 +38,20 @@ class TestBaseTTSWrapper(unittest.TestCase):
     TTS_LANGUAGE = "eng"
     TTS_LANGUAGE_VARIATION = None
 
-    def synthesize(self, text_file, ofp=None, quit_after=None, backwards=False, zero_length=False, expected_exc=None):
-        if (self.TTS == "") or (self.TTS_PATH == "") or (not os.path.exists(self.TTS_PATH)):
+    def synthesize(
+        self,
+        text_file,
+        ofp=None,
+        quit_after=None,
+        backwards=False,
+        zero_length=False,
+        expected_exc=None,
+    ):
+        if (
+            (self.TTS == "")
+            or (self.TTS_PATH == "")
+            or (not os.path.exists(self.TTS_PATH))
+        ):
             return
 
         def inner(c_ext, cew_subprocess, cache):
@@ -58,10 +69,7 @@ class TestBaseTTSWrapper(unittest.TestCase):
                 rconf[RuntimeConfiguration.TTS_CACHE] = cache
                 tts_engine = self.TTS_CLASS(rconf=rconf)
                 anchors, total_time, num_chars = tts_engine.synthesize_multiple(
-                    text_file,
-                    output_file_path,
-                    quit_after,
-                    backwards
+                    text_file, output_file_path, quit_after, backwards
                 )
                 gf.delete_file(handler, output_file_path)
                 if cache:
@@ -76,6 +84,7 @@ class TestBaseTTSWrapper(unittest.TestCase):
                     tts_engine.clear_cache()
                 with self.assertRaises(expected_exc):
                     raise exc
+
         if self.TTS == "espeak":
             for c_ext in [True, False]:
                 for cew_subprocess in [True, False]:
@@ -92,7 +101,9 @@ class TestBaseTTSWrapper(unittest.TestCase):
     def tfl(self, frags):
         tfl = TextFile()
         for language, lines in frags:
-            tfl.add_fragment(TextFragment(language=language, lines=lines, filtered_lines=lines))
+            tfl.add_fragment(
+                TextFragment(language=language, lines=lines, filtered_lines=lines)
+            )
         return tfl
 
     def test_not_implemented(self):
@@ -143,11 +154,13 @@ class TestBaseTTSWrapper(unittest.TestCase):
         self.synthesize(tfl, expected_exc=ValueError)
 
     def test_empty_fragments(self):
-        tfl = self.tfl([
-            (self.TTS_LANGUAGE, [""]),
-            (self.TTS_LANGUAGE, [""]),
-            (self.TTS_LANGUAGE, [""]),
-        ])
+        tfl = self.tfl(
+            [
+                (self.TTS_LANGUAGE, [""]),
+                (self.TTS_LANGUAGE, [""]),
+                (self.TTS_LANGUAGE, [""]),
+            ]
+        )
         self.synthesize(tfl, expected_exc=ValueError)
 
     def test_empty_mixed(self):
@@ -155,11 +168,13 @@ class TestBaseTTSWrapper(unittest.TestCase):
         self.synthesize(tfl)
 
     def test_empty_mixed_fragments(self):
-        tfl = self.tfl([
-            (self.TTS_LANGUAGE, ["Word"]),
-            (self.TTS_LANGUAGE, [""]),
-            (self.TTS_LANGUAGE, ["Word"]),
-        ])
+        tfl = self.tfl(
+            [
+                (self.TTS_LANGUAGE, ["Word"]),
+                (self.TTS_LANGUAGE, [""]),
+                (self.TTS_LANGUAGE, ["Word"]),
+            ]
+        )
         self.synthesize(tfl)
 
     def test_invalid_language(self):

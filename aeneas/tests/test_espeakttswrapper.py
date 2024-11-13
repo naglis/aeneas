@@ -27,7 +27,6 @@ from aeneas.ttswrappers.espeakttswrapper import ESPEAKTTSWrapper
 
 
 class TestESPEAKTTSWrapper(TestBaseTTSWrapper):
-
     TTS = "espeak"
     TTS_PATH = "/usr/bin/espeak"
     TTS_CLASS = ESPEAKTTSWrapper
@@ -35,23 +34,35 @@ class TestESPEAKTTSWrapper(TestBaseTTSWrapper):
     TTS_LANGUAGE_VARIATION = ESPEAKTTSWrapper.ENG_GBR
 
     def test_multiple_replace_language(self):
-        tfl = self.tfl([(ESPEAKTTSWrapper.UKR, ["Временами Сашке хотелось перестать делать то"])])
+        tfl = self.tfl(
+            [(ESPEAKTTSWrapper.UKR, ["Временами Сашке хотелось перестать делать то"])]
+        )
         self.synthesize(tfl)
 
     def test_multiple_replace_language_mixed(self):
-        tfl = self.tfl([
-            (ESPEAKTTSWrapper.UKR, ["Word"]),
-            (ESPEAKTTSWrapper.UKR, ["Временами Сашке хотелось перестать делать то"]),
-            (ESPEAKTTSWrapper.UKR, ["Word"])
-        ])
+        tfl = self.tfl(
+            [
+                (ESPEAKTTSWrapper.UKR, ["Word"]),
+                (
+                    ESPEAKTTSWrapper.UKR,
+                    ["Временами Сашке хотелось перестать делать то"],
+                ),
+                (ESPEAKTTSWrapper.UKR, ["Word"]),
+            ]
+        )
         self.synthesize(tfl)
 
     def test_multiple_replace_language_mixed_fragments(self):
-        tfl = self.tfl([
-            (ESPEAKTTSWrapper.ENG, ["Word"]),
-            (ESPEAKTTSWrapper.UKR, ["Временами Сашке хотелось перестать делать то"]),
-            (ESPEAKTTSWrapper.ENG, ["Word"])
-        ])
+        tfl = self.tfl(
+            [
+                (ESPEAKTTSWrapper.ENG, ["Word"]),
+                (
+                    ESPEAKTTSWrapper.UKR,
+                    ["Временами Сашке хотелось перестать делать то"],
+                ),
+                (ESPEAKTTSWrapper.ENG, ["Word"]),
+            ]
+        )
         self.synthesize(tfl)
 
 

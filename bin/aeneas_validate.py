@@ -61,5 +61,5 @@ def main():
     ValidateCLI(invoke="aeneas_validate").run(arguments=sys.argv)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

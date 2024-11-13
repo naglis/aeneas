@@ -31,7 +31,6 @@ import aeneas.globalfunctions as gf
 
 
 class TestAudioFile(unittest.TestCase):
-
     AUDIO_FILE_WAVE = "res/audioformats/mono.16000.wav"
     AUDIO_FILE_EMPTY = "res/audioformats/p001.empty"
     AUDIO_FILE_NOT_WAVE = "res/audioformats/p001.mp3"
@@ -44,7 +43,7 @@ class TestAudioFile(unittest.TestCase):
             "rate": 44100,
             "channels": 2,
             "format": "aac",
-            "length": TimeValue("9.4"),     # 9.403429
+            "length": TimeValue("9.4"),  # 9.403429
         },
         {
             "path": "res/audioformats/p001.aiff",
@@ -52,7 +51,7 @@ class TestAudioFile(unittest.TestCase):
             "rate": 44100,
             "channels": 2,
             "format": "pcm_s16be",
-            "length": TimeValue("9.0"),     # 8.994989
+            "length": TimeValue("9.0"),  # 8.994989
         },
         {
             "path": "res/audioformats/p001.flac",
@@ -60,7 +59,7 @@ class TestAudioFile(unittest.TestCase):
             "rate": 44100,
             "channels": 2,
             "format": "flac",
-            "length": TimeValue("9.0"),     # 8.994989
+            "length": TimeValue("9.0"),  # 8.994989
         },
         {
             "path": "res/audioformats/p001.mp3",
@@ -68,7 +67,7 @@ class TestAudioFile(unittest.TestCase):
             "rate": 44100,
             "channels": 2,
             "format": "mp3",
-            "length": TimeValue("9.0"),     # 9.038367
+            "length": TimeValue("9.0"),  # 9.038367
         },
         {
             "path": "res/audioformats/p001.mp4",
@@ -76,7 +75,7 @@ class TestAudioFile(unittest.TestCase):
             "rate": 44100,
             "channels": 2,
             "format": "aac",
-            "length": TimeValue("9.0"),     # 9.018209
+            "length": TimeValue("9.0"),  # 9.018209
         },
         {
             "path": "res/audioformats/p001.ogg",
@@ -84,7 +83,7 @@ class TestAudioFile(unittest.TestCase):
             "rate": 44100,
             "channels": 2,
             "format": "vorbis",
-            "length": TimeValue("9.0"),     # 8.994989
+            "length": TimeValue("9.0"),  # 8.994989
         },
         {
             "path": "res/audioformats/p001.wav",
@@ -92,7 +91,7 @@ class TestAudioFile(unittest.TestCase):
             "rate": 44100,
             "channels": 2,
             "format": "pcm_s16le",
-            "length": TimeValue("9.0"),     # 8.994989
+            "length": TimeValue("9.0"),  # 8.994989
         },
         {
             "path": "res/audioformats/p001.webm",
@@ -100,7 +99,7 @@ class TestAudioFile(unittest.TestCase):
             "rate": 44100,
             "channels": 2,
             "format": "vorbis",
-            "length": TimeValue("9.0"),     # 9.0
+            "length": TimeValue("9.0"),  # 9.0
         },
     ]
 
@@ -165,12 +164,16 @@ class TestAudioFile(unittest.TestCase):
     def test_length(self):
         audiofile = self.load(self.AUDIO_FILE_WAVE, rs=True)
         audiofile.clear_data()
-        self.assertAlmostEqual(audiofile.audio_length, TimeValue("53.3"), places=1)     # 53.266
+        self.assertAlmostEqual(
+            audiofile.audio_length, TimeValue("53.3"), places=1
+        )  # 53.266
 
     def test_length_exact(self):
         audiofile = self.load(self.AUDIO_FILE_EXACT, rs=True)
         audiofile.clear_data()
-        self.assertAlmostEqual(audiofile.audio_length, TimeValue("5.600"), places=3)     # 5.600
+        self.assertAlmostEqual(
+            audiofile.audio_length, TimeValue("5.600"), places=3
+        )  # 5.600
 
     def test_add_samples_file(self):
         audiofile = self.load(self.AUDIO_FILE_WAVE, rs=True)
@@ -209,13 +212,15 @@ class TestAudioFile(unittest.TestCase):
             [None, TimeValue("60.0"), TimeValue("53.3")],
             [TimeValue("-1.0"), None, TimeValue("53.3")],
             [TimeValue("0.0"), TimeValue("-60.0"), TimeValue("0.0")],
-            [TimeValue("10.0"), TimeValue("50.0"), TimeValue("43.3")]
+            [TimeValue("10.0"), TimeValue("50.0"), TimeValue("43.3")],
         ]
 
         for interval in intervals:
             audiofile = self.load(self.AUDIO_FILE_WAVE, rs=True)
             audiofile.trim(interval[0], interval[1])
-            self.assertAlmostEqual(audiofile.audio_length, interval[2], places=1)   # 53.315918
+            self.assertAlmostEqual(
+                audiofile.audio_length, interval[2], places=1
+            )  # 53.315918
             audiofile.clear_data()
 
     def test_write_not_existing_path(self):

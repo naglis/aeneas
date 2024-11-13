@@ -50,15 +50,13 @@ class HydraCLI(AbstractCLIProgram):
     This "hydra" tool invokes another aeneas.tool,
     according to the specified tool switch.
     """
+
     NAME = gf.file_name_without_extension(__file__)
 
     HELP = {
         "description": "Invoke the specified aeneas tool",
-        "synopsis": [
-            ("TOOL_PARAMETER TOOL_ARGUMENTS", True)
-        ],
-        "options": [
-        ],
+        "synopsis": [("TOOL_PARAMETER TOOL_ARGUMENTS", True)],
+        "options": [],
         "parameters": [
             "--convert-syncmap: call aeneas.tools.convert_syncmap",
             "--download: call aeneas.tools.download",
@@ -80,7 +78,7 @@ class HydraCLI(AbstractCLIProgram):
             "--execute-task --examples",
             "--execute-task --example-json",
             "--execute-job --help",
-        ]
+        ],
     }
 
     TOOLS = [
@@ -114,7 +112,9 @@ class HydraCLI(AbstractCLIProgram):
         for cls, switches in self.TOOLS:
             if self.has_option(switches):
                 arguments = [a for a in sys.argv if a not in switches]
-                return cls(invoke=(self.invoke + " %s" % switches[0])).run(arguments=arguments)
+                return cls(invoke=(self.invoke + " %s" % switches[0])).run(
+                    arguments=arguments
+                )
 
         # check if we have -h, --help, or --version
         if "-h" in self.actual_arguments:
@@ -134,5 +134,6 @@ def main():
     """
     HydraCLI().run(arguments=sys.argv, show_help=False)
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     main()

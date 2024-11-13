@@ -61,10 +61,13 @@ class SyncMap(Loggable):
     FINETUNEAS_REPLACEMENTS = [
         ["<!-- AENEAS_REPLACE_COMMENT_BEGIN -->", "<!-- AENEAS_REPLACE_COMMENT_BEGIN"],
         ["<!-- AENEAS_REPLACE_COMMENT_END -->", "AENEAS_REPLACE_COMMENT_END -->"],
-        ["<!-- AENEAS_REPLACE_UNCOMMENT_BEGIN", "<!-- AENEAS_REPLACE_UNCOMMENT_BEGIN -->"],
+        [
+            "<!-- AENEAS_REPLACE_UNCOMMENT_BEGIN",
+            "<!-- AENEAS_REPLACE_UNCOMMENT_BEGIN -->",
+        ],
         ["AENEAS_REPLACE_UNCOMMENT_END -->", "<!-- AENEAS_REPLACE_UNCOMMENT_END -->"],
         ["// AENEAS_REPLACE_SHOW_ID", "showID = true;"],
-        ["// AENEAS_REPLACE_ALIGN_TEXT", "alignText = \"left\""],
+        ["// AENEAS_REPLACE_ALIGN_TEXT", 'alignText = "left"'],
         ["// AENEAS_REPLACE_CONTINUOUS_PLAY", "continuousPlay = true;"],
         ["// AENEAS_REPLACE_TIME_FORMAT", "timeFormatHHMMSSmmm = true;"],
     ]
@@ -83,7 +86,7 @@ class SyncMap(Loggable):
         "tsv",
         "txt",
         "vtt",
-        "xml"
+        "xml",
     ]
     FINETUNEAS_PATH = "../res/finetuneas.html"
 
@@ -216,10 +219,7 @@ class SyncMap(Loggable):
         self.log(["  Max time: %.3f", max_time])
         self.log("  Creating SyncMapFragmentList...")
         smf = SyncMapFragmentList(
-            begin=min_time,
-            end=max_time,
-            rconf=self.rconf,
-            logger=self.logger
+            begin=min_time, end=max_time, rconf=self.rconf, logger=self.logger
         )
         self.log("  Creating SyncMapFragmentList... done")
         self.log("  Sorting SyncMapFragmentList...")
@@ -245,21 +245,25 @@ class SyncMap(Loggable):
 
         .. versionadded:: 1.3.1
         """
+
         def visit_children(node):
-            """ Recursively visit the fragments_tree """
+            """Recursively visit the fragments_tree"""
             output_fragments = []
             for child in node.children_not_empty:
                 fragment = child.value
                 text = fragment.text_fragment
-                output_fragments.append({
-                    "id": text.identifier,
-                    "language": text.language,
-                    "lines": text.lines,
-                    "begin": gf.time_to_ssmmm(fragment.begin),
-                    "end": gf.time_to_ssmmm(fragment.end),
-                    "children": visit_children(child)
-                })
+                output_fragments.append(
+                    {
+                        "id": text.identifier,
+                        "language": text.language,
+                        "lines": text.lines,
+                        "begin": gf.time_to_ssmmm(fragment.begin),
+                        "end": gf.time_to_ssmmm(fragment.end),
+                        "children": visit_children(child),
+                    }
+                )
             return output_fragments
+
         output_fragments = visit_children(self.fragments_tree)
         return gf.safe_unicode(
             json.dumps({"fragments": output_fragments}, indent=1, sort_keys=True)
@@ -278,7 +282,9 @@ class SyncMap(Loggable):
                             it is not an instance of :class:`~aeneas.syncmap.fragment.SyncMapFragment`
         """
         if not isinstance(fragment, SyncMapFragment):
-            self.log_exc("fragment is not an instance of SyncMapFragment", None, True, TypeError)
+            self.log_exc(
+                "fragment is not an instance of SyncMapFragment", None, True, TypeError
+            )
         self.fragments_tree.add_child(Tree(value=fragment), as_last=as_last)
 
     def clear(self):
@@ -299,10 +305,7 @@ class SyncMap(Loggable):
         return deepcopy(self)
 
     def output_html_for_tuning(
-            self,
-            audio_file_path,
-            output_file_path,
-            parameters=None
+        self, audio_file_path, output_file_path, parameters=None
     ):
         """
         Output an HTML file for fine tuning the sync map manually.
@@ -314,7 +317,12 @@ class SyncMap(Loggable):
         .. versionadded:: 1.3.1
         """
         if not gf.file_can_be_written(output_file_path):
-            self.log_exc("Cannot output HTML file '%s'. Wrong permissions?" % (output_file_path), None, True, OSError)
+            self.log_exc(
+                "Cannot output HTML file '%s'. Wrong permissions?" % (output_file_path),
+                None,
+                True,
+                OSError,
+            )
         if parameters is None:
             parameters = {}
         audio_file_path_absolute = gf.fix_slash(os.path.abspath(audio_file_path))
@@ -325,36 +333,35 @@ class SyncMap(Loggable):
             template = template.replace(repl[0], repl[1])
         template = template.replace(
             self.FINETUNEAS_REPLACE_AUDIOFILEPATH,
-            "audioFilePath = \"file://%s\";" % audio_file_path_absolute
+            'audioFilePath = "file://%s";' % audio_file_path_absolute,
         )
         template = template.replace(
             self.FINETUNEAS_REPLACE_FRAGMENTS,
-            "fragments = (%s).fragments;" % self.json_string
+            "fragments = (%s).fragments;" % self.json_string,
         )
         if gc.PPN_TASK_OS_FILE_FORMAT in parameters:
             output_format = parameters[gc.PPN_TASK_OS_FILE_FORMAT]
             if output_format in self.FINETUNEAS_ALLOWED_FORMATS:
                 template = template.replace(
                     self.FINETUNEAS_REPLACE_OUTPUT_FORMAT,
-                    "outputFormat = \"%s\";" % output_format
+                    'outputFormat = "%s";' % output_format,
                 )
                 if output_format == "smil":
                     for key, placeholder, replacement in [
-                            (
-                                gc.PPN_TASK_OS_FILE_SMIL_AUDIO_REF,
-                                self.FINETUNEAS_REPLACE_SMIL_AUDIOREF,
-                                "audioref = \"%s\";"
-                            ),
-                            (
-                                gc.PPN_TASK_OS_FILE_SMIL_PAGE_REF,
-                                self.FINETUNEAS_REPLACE_SMIL_PAGEREF,
-                                "pageref = \"%s\";"
-                            ),
+                        (
+                            gc.PPN_TASK_OS_FILE_SMIL_AUDIO_REF,
+                            self.FINETUNEAS_REPLACE_SMIL_AUDIOREF,
+                            'audioref = "%s";',
+                        ),
+                        (
+                            gc.PPN_TASK_OS_FILE_SMIL_PAGE_REF,
+                            self.FINETUNEAS_REPLACE_SMIL_PAGEREF,
+                            'pageref = "%s";',
+                        ),
                     ]:
                         if key in parameters:
                             template = template.replace(
-                                placeholder,
-                                replacement % parameters[key]
+                                placeholder, replacement % parameters[key]
                             )
         with open(output_file_path, "w", encoding="utf-8") as file_obj:
             file_obj.write(template)
@@ -377,9 +384,20 @@ class SyncMap(Loggable):
         if sync_map_format is None:
             self.log_exc("Sync map format is None", None, True, ValueError)
         if sync_map_format not in SyncMapFormat.CODE_TO_CLASS:
-            self.log_exc("Sync map format '%s' is not allowed" % (sync_map_format), None, True, ValueError)
+            self.log_exc(
+                "Sync map format '%s' is not allowed" % (sync_map_format),
+                None,
+                True,
+                ValueError,
+            )
         if not gf.file_can_be_read(input_file_path):
-            self.log_exc("Cannot read sync map file '%s'. Wrong permissions?" % (input_file_path), None, True, OSError)
+            self.log_exc(
+                "Cannot read sync map file '%s'. Wrong permissions?"
+                % (input_file_path),
+                None,
+                True,
+                OSError,
+            )
 
         self.log(["Input format:     '%s'", sync_map_format])
         self.log(["Input path:       '%s'", input_file_path])
@@ -389,7 +407,7 @@ class SyncMap(Loggable):
             variant=sync_map_format,
             parameters=parameters,
             rconf=self.rconf,
-            logger=self.logger
+            logger=self.logger,
         )
 
         # open file for reading
@@ -421,6 +439,7 @@ class SyncMap(Loggable):
         :raises: TypeError: if a required parameter is missing
         :raises: OSError: if ``output_file_path`` cannot be written
         """
+
         def select_levels(syncmap, levels):
             """
             Select the given levels of the fragments tree,
@@ -434,7 +453,9 @@ class SyncMap(Loggable):
                 syncmap.fragments_tree.keep_levels(levels)
                 self.log(["Selected levels: %s", levels])
             except ValueError:
-                self.log_warn("Cannot convert levels to list of int, returning unchanged")
+                self.log_warn(
+                    "Cannot convert levels to list of int, returning unchanged"
+                )
 
         def set_head_tail_format(syncmap, head_tail_format=None):
             """
@@ -453,8 +474,20 @@ class SyncMap(Loggable):
                 self.log("Marked HEAD as REGULAR")
             # stretch first and last fragment timings if needed
             if head_tail_format == SyncMapHeadTailFormat.STRETCH:
-                self.log(["Stretched first.begin: %.3f => %.3f (head)", first.value.begin, head.value.begin])
-                self.log(["Stretched last.end:    %.3f => %.3f (tail)", last.value.end, tail.value.end])
+                self.log(
+                    [
+                        "Stretched first.begin: %.3f => %.3f (head)",
+                        first.value.begin,
+                        head.value.begin,
+                    ]
+                )
+                self.log(
+                    [
+                        "Stretched last.end:    %.3f => %.3f (tail)",
+                        last.value.end,
+                        tail.value.end,
+                    ]
+                )
                 first.value.begin = head.value.begin
                 last.value.end = tail.value.end
             # mark TAIL as REGULAR if needed
@@ -463,15 +496,28 @@ class SyncMap(Loggable):
                 self.log("Marked TAIL as REGULAR")
             # remove all fragments that are not REGULAR
             for node in list(tree.dfs):
-                if (node.value is not None) and (node.value.fragment_type != SyncMapFragment.REGULAR):
+                if (node.value is not None) and (
+                    node.value.fragment_type != SyncMapFragment.REGULAR
+                ):
                     node.remove()
 
         if sync_map_format is None:
             self.log_exc("Sync map format is None", None, True, ValueError)
         if sync_map_format not in SyncMapFormat.CODE_TO_CLASS:
-            self.log_exc("Sync map format '%s' is not allowed" % (sync_map_format), None, True, ValueError)
+            self.log_exc(
+                "Sync map format '%s' is not allowed" % (sync_map_format),
+                None,
+                True,
+                ValueError,
+            )
         if not gf.file_can_be_written(output_file_path):
-            self.log_exc("Cannot write sync map file '%s'. Wrong permissions?" % (output_file_path), None, True, OSError)
+            self.log_exc(
+                "Cannot write sync map file '%s'. Wrong permissions?"
+                % (output_file_path),
+                None,
+                True,
+                OSError,
+            )
 
         self.log(["Output format:     '%s'", sync_map_format])
         self.log(["Output path:       '%s'", output_file_path])
@@ -484,9 +530,13 @@ class SyncMap(Loggable):
         except Exception:
             self.log_warn(["No %s parameter specified", gc.PPN_TASK_OS_FILE_LEVELS])
         try:
-            set_head_tail_format(pruned_syncmap, parameters[gc.PPN_TASK_OS_FILE_HEAD_TAIL_FORMAT])
+            set_head_tail_format(
+                pruned_syncmap, parameters[gc.PPN_TASK_OS_FILE_HEAD_TAIL_FORMAT]
+            )
         except Exception:
-            self.log_warn(["No %s parameter specified", gc.PPN_TASK_OS_FILE_HEAD_TAIL_FORMAT])
+            self.log_warn(
+                ["No %s parameter specified", gc.PPN_TASK_OS_FILE_HEAD_TAIL_FORMAT]
+            )
 
         # create writer
         # the constructor will check for required parameters, if any
@@ -495,7 +545,7 @@ class SyncMap(Loggable):
             variant=sync_map_format,
             parameters=parameters,
             rconf=self.rconf,
-            logger=self.logger
+            logger=self.logger,
         )
 
         # create dir hierarchy, if needed

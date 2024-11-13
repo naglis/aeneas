@@ -48,16 +48,14 @@ class SyncMapFormatTextGrid(SyncMapFormatBase):
         # from https://github.com/hbuschme/TextGridTools/blob/master/tgt/io.py
         # get all non-empty lines
         lines = [line.strip() for line in input_text.splitlines()]
-        lines = [line for line in lines if line not in ["", "\""]]
+        lines = [line for line in lines if line not in ["", '"']]
         # long format => has "xmin = 0.0" in its 3rd line
         if lines[2].startswith("xmin"):
             read_function = tgt.io.read_long_textgrid
         else:
             read_function = tgt.io.read_short_textgrid
         textgrid = read_function(
-            filename="Dummy TextGrid file",
-            stg=lines,
-            include_empty_intervals=True
+            filename="Dummy TextGrid file", stg=lines, include_empty_intervals=True
         )
         if len(textgrid.tiers) == 0:
             # no tiers => nothing to read => empty sync map
@@ -69,7 +67,7 @@ class SyncMapFormatTextGrid(SyncMapFormatBase):
                 identifier="f%06d" % i,
                 lines=[interval.text],
                 begin=TimeValue(interval.start_time.real),
-                end=TimeValue(interval.end_time.real)
+                end=TimeValue(interval.end_time.real),
             )
 
     def format(self, syncmap):

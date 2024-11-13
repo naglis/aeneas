@@ -40,6 +40,7 @@ class ExtractMFCCCLI(AbstractCLIProgram):
     """
     Extract MFCCs from a given audio file.
     """
+
     INPUT_FILE = gf.relative_path("res/audio.wav", __file__)
     OUTPUT_FILE = "output/audio.wav.mfcc.txt"
 
@@ -47,20 +48,16 @@ class ExtractMFCCCLI(AbstractCLIProgram):
 
     HELP = {
         "description": "Extract MFCCs from a given audio file as a fat matrix.",
-        "synopsis": [
-            ("AUDIO_FILE OUTPUT_FILE", True)
-        ],
-        "examples": [
-            "{} {}".format(INPUT_FILE, OUTPUT_FILE)
-        ],
+        "synopsis": [("AUDIO_FILE OUTPUT_FILE", True)],
+        "examples": ["{} {}".format(INPUT_FILE, OUTPUT_FILE)],
         "options": [
             "-b, --binary : output MFCCs as a float64 binary file",
             "-d, --delete-first : do not output the 0th MFCC coefficient",
             "-n, --npy : output MFCCs as a NumPy .npy binary file",
             "-t, --transpose : transpose the MFCCs matrix, returning a tall matrix",
             "-z, --npz : output MFCCs as a NumPy compressed .npz binary file",
-            "--format=FMT : output to text file using format FMT (default: '%.18e')"
-        ]
+            "--format=FMT : output to text file using format FMT (default: '%.18e')",
+        ],
     }
 
     def perform_command(self):
@@ -90,14 +87,18 @@ class ExtractMFCCCLI(AbstractCLIProgram):
             return self.ERROR_EXIT_CODE
 
         try:
-            mfccs = AudioFileMFCC(input_file_path, rconf=self.rconf, logger=self.logger).all_mfcc
+            mfccs = AudioFileMFCC(
+                input_file_path, rconf=self.rconf, logger=self.logger
+            ).all_mfcc
             if delete_first:
                 mfccs = mfccs[1:, :]
             if transpose:
                 mfccs = mfccs.transpose()
             if output_binary:
                 # save as a raw C float64 binary file
-                mapped = numpy.memmap(output_file_path, dtype="float64", mode="w+", shape=mfccs.shape)
+                mapped = numpy.memmap(
+                    output_file_path, dtype="float64", mode="w+", shape=mfccs.shape
+                )
                 mapped[:] = mfccs[:]
                 mapped.flush()
                 del mapped
@@ -113,12 +114,17 @@ class ExtractMFCCCLI(AbstractCLIProgram):
                 # save as a text file
                 # NOTE: in Python 2, passing the fmt value a Unicode string crashes NumPy
                 #       hence, converting back to bytes, which works in Python 3 too
-                numpy.savetxt(output_file_path, mfccs, fmt=gf.safe_bytes(output_text_format))
+                numpy.savetxt(
+                    output_file_path, mfccs, fmt=gf.safe_bytes(output_text_format)
+                )
             self.print_info("MFCCs shape: %d %d" % (mfccs.shape))
             self.print_success("MFCCs saved to '%s'" % (output_file_path))
             return self.NO_ERROR_EXIT_CODE
         except AudioFileConverterError:
-            self.print_error("Unable to call the ffmpeg executable '%s'" % (self.rconf[RuntimeConfiguration.FFMPEG_PATH]))
+            self.print_error(
+                "Unable to call the ffmpeg executable '%s'"
+                % (self.rconf[RuntimeConfiguration.FFMPEG_PATH])
+            )
             self.print_error("Make sure the path to ffmpeg is correct")
         except (AudioFileUnsupportedFormatError, AudioFileNotInitializedError):
             self.print_error("Cannot read file '%s'" % (input_file_path))
@@ -135,5 +141,6 @@ def main():
     """
     ExtractMFCCCLI().run(arguments=sys.argv)
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     main()

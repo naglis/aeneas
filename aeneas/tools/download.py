@@ -39,6 +39,7 @@ class DownloadCLI(AbstractCLIProgram):
 
     Currently, it downloads an audio file from a YouTube video.
     """
+
     OUTPUT_FILE_M4A = "output/sonnet.m4a"
     OUTPUT_FILE_OGG = "output/sonnet.ogg"
     URL_YOUTUBE = "https://www.youtube.com/watch?v=rU4a7AA8wM0"
@@ -47,9 +48,7 @@ class DownloadCLI(AbstractCLIProgram):
 
     HELP = {
         "description": "Download an audio file from a YouTube video.",
-        "synopsis": [
-            ("YOUTUBE_URL [OUTPUT_FILE]", True)
-        ],
+        "synopsis": [("YOUTUBE_URL [OUTPUT_FILE]", True)],
         "examples": [
             "%s --list" % (URL_YOUTUBE),
             "{} {}".format(URL_YOUTUBE, OUTPUT_FILE_M4A),
@@ -62,7 +61,7 @@ class DownloadCLI(AbstractCLIProgram):
             "--largest-audio : download largest audio stream (default)",
             "--list : list all available audio streams but do not download",
             "--smallest-audio : download smallest audio stream",
-        ]
+        ],
     }
 
     def perform_command(self):
@@ -95,28 +94,37 @@ class DownloadCLI(AbstractCLIProgram):
                     download_format=download_format,
                     largest_audio=largest_audio,
                 )
-                self.print_info("Downloading audio stream from '%s' ... done" % source_url)
+                self.print_info(
+                    "Downloading audio stream from '%s' ... done" % source_url
+                )
                 self.print_success("Downloaded file '%s'" % result)
             else:
                 self.print_info("Downloading stream info from '%s' ..." % source_url)
                 downloader = Downloader(logger=self.logger)
-                result = downloader.audio_from_youtube(
-                    source_url,
-                    download=False
+                result = downloader.audio_from_youtube(source_url, download=False)
+                self.print_info(
+                    "Downloading stream info from '%s' ... done" % source_url
                 )
-                self.print_info("Downloading stream info from '%s' ... done" % source_url)
                 msg = []
-                msg.append("{}\t{}\t{}\t{}".format("Format", "Extension", "Bitrate", "Size"))
+                msg.append(
+                    "{}\t{}\t{}\t{}".format("Format", "Extension", "Bitrate", "Size")
+                )
                 for r in result:
                     filesize = gf.human_readable_number(r["filesize"])
-                    msg.append("{}\t{}\t{}\t{}".format(r["format"], r["ext"], r["abr"], filesize))
+                    msg.append(
+                        "{}\t{}\t{}\t{}".format(
+                            r["format"], r["ext"], r["abr"], filesize
+                        )
+                    )
                 self.print_generic("Available audio streams:")
                 self.print_generic("\n".join(msg))
             return self.NO_ERROR_EXIT_CODE
         except ImportError:
             self.print_no_dependency_error()
         except Exception as exc:
-            self.print_error("An unexpected error occurred while downloading audio from YouTube:")
+            self.print_error(
+                "An unexpected error occurred while downloading audio from YouTube:"
+            )
             self.print_error("%s" % exc)
 
         return self.ERROR_EXIT_CODE
@@ -128,5 +136,6 @@ def main():
     """
     DownloadCLI().run(arguments=sys.argv)
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     main()

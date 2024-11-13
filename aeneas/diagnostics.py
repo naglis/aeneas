@@ -42,6 +42,7 @@ class Diagnostics:
     """
     Check whether the setup of ``aeneas`` was successful.
     """
+
     @classmethod
     def check_shell_encoding(cls):
         """
@@ -62,14 +63,22 @@ class Diagnostics:
         else:
             gf.print_warning("shell encoding WARNING")
             if not is_in_utf8:
-                gf.print_warning("  The default input encoding of your shell is not UTF-8")
+                gf.print_warning(
+                    "  The default input encoding of your shell is not UTF-8"
+                )
             if not is_out_utf8:
-                gf.print_warning("  The default output encoding of your shell is not UTF-8")
+                gf.print_warning(
+                    "  The default output encoding of your shell is not UTF-8"
+                )
             gf.print_info("  If you plan to use aeneas on the command line,")
             if gf.is_posix():
-                gf.print_info("  you might want to 'export PYTHONIOENCODING=UTF-8' in your shell")
+                gf.print_info(
+                    "  you might want to 'export PYTHONIOENCODING=UTF-8' in your shell"
+                )
             else:
-                gf.print_info("  you might want to 'set PYTHONIOENCODING=UTF-8' in your shell")
+                gf.print_info(
+                    "  you might want to 'set PYTHONIOENCODING=UTF-8' in your shell"
+                )
             return True
         return False
 
@@ -84,6 +93,7 @@ class Diagnostics:
         """
         try:
             from aeneas.ffprobewrapper import FFPROBEWrapper
+
             file_path = gf.absolute_path("tools/res/audio.mp3", __file__)
             prober = FFPROBEWrapper()
             prober.read_properties(file_path)
@@ -108,6 +118,7 @@ class Diagnostics:
         """
         try:
             from aeneas.ffmpegwrapper import FFMPEGWrapper
+
             input_file_path = gf.absolute_path("tools/res/audio.mp3", __file__)
             handler, output_file_path = gf.tmp_file(suffix=".wav")
             converter = FFMPEGWrapper()
@@ -136,9 +147,12 @@ class Diagnostics:
             from aeneas.textfile import TextFile
             from aeneas.textfile import TextFragment
             from aeneas.ttswrappers.espeakttswrapper import ESPEAKTTSWrapper
+
             text = "From fairest creatures we desire increase,"
             text_file = TextFile()
-            text_file.add_fragment(TextFragment(language="eng", lines=[text], filtered_lines=[text]))
+            text_file.add_fragment(
+                TextFragment(language="eng", lines=[text], filtered_lines=[text])
+            )
             handler, output_file_path = gf.tmp_file(suffix=".wav")
             ESPEAKTTSWrapper().synthesize_multiple(text_file, output_file_path)
             gf.delete_file(handler, output_file_path)
@@ -147,8 +161,12 @@ class Diagnostics:
             gf.print_error("espeak         ERROR")
             gf.print_info("  Please make sure you have espeak installed correctly")
             gf.print_info("  and that its path is in your PATH environment variable")
-            gf.print_info("  You might also want to check that the espeak-data directory")
-            gf.print_info("  is set up correctly, for example, it has the correct permissions")
+            gf.print_info(
+                "  You might also want to check that the espeak-data directory"
+            )
+            gf.print_info(
+                "  is set up correctly, for example, it has the correct permissions"
+            )
             return True
         else:
             return False
@@ -267,12 +285,16 @@ def main():
     if errors:
         sys.exit(1)
     if c_ext_warnings:
-        gf.print_warning("All required dependencies are met but at least one Python C extension is not available")
+        gf.print_warning(
+            "All required dependencies are met but at least one Python C extension is not available"
+        )
         sys.exit(2)
     else:
-        gf.print_success("All required dependencies are met and all available Python C extensions are working")
+        gf.print_success(
+            "All required dependencies are met and all available Python C extensions are working"
+        )
         sys.exit(0)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

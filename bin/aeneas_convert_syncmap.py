@@ -47,5 +47,5 @@ def main():
     ConvertSyncMapCLI(invoke="aeneas_convert_syncmap").run(arguments=sys.argv)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

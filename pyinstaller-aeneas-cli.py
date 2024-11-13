@@ -48,15 +48,12 @@ def main():
     to be compiled by pyinstaller.
     """
     if FROZEN:
-        HydraCLI(invoke="aeneas-cli").run(
-            arguments=sys.argv,
-            show_help=False
-        )
+        HydraCLI(invoke="aeneas-cli").run(arguments=sys.argv, show_help=False)
     else:
         HydraCLI(invoke="pyinstaller-aeneas-cli.py").run(
-            arguments=sys.argv,
-            show_help=False
+            arguments=sys.argv, show_help=False
         )
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     main()

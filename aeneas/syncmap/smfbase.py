@@ -67,12 +67,10 @@ class SyncMapFormatBase(Loggable):
         syncmap.add_fragment(
             SyncMapFragment(
                 text_fragment=TextFragment(
-                    identifier=identifier,
-                    lines=lines,
-                    language=language
+                    identifier=identifier, lines=lines, language=language
                 ),
                 begin=begin,
-                end=end
+                end=end,
             )
         )
 
@@ -86,7 +84,12 @@ class SyncMapFormatBase(Loggable):
         :param syncmap: the syncmap to append to
         :type syncmap: :class:`~aeneas.syncmap.SyncMap`
         """
-        self.log_exc("%s is abstract and cannot be called directly" % (self.TAG), None, True, NotImplementedError)
+        self.log_exc(
+            "%s is abstract and cannot be called directly" % (self.TAG),
+            None,
+            True,
+            NotImplementedError,
+        )
 
     def format(self, syncmap):
         """
@@ -96,4 +99,9 @@ class SyncMapFormatBase(Loggable):
         :type syncmap: :class:`~aeneas.syncmap.SyncMap`
         :rtype: string
         """
-        self.log_exc("%s is abstract and cannot be called directly" % (self.TAG), None, True, NotImplementedError)
+        self.log_exc(
+            "%s is abstract and cannot be called directly" % (self.TAG),
+            None,
+            True,
+            NotImplementedError,
+        )

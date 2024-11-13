@@ -101,7 +101,9 @@ class Plotter(Loggable):
         :raises: TypeError: if ``waveform`` is not an instance of :class:`~aeneas.plotter.PlotWaveform`
         """
         if not isinstance(waveform, PlotWaveform):
-            self.log_exc("waveform must be an instance of PlotWaveform", None, True, TypeError)
+            self.log_exc(
+                "waveform must be an instance of PlotWaveform", None, True, TypeError
+            )
         self.waveform = waveform
         self.log("Added waveform")
 
@@ -114,7 +116,9 @@ class Plotter(Loggable):
         :raises: TypeError: if ``timescale`` is not an instance of :class:`~aeneas.plotter.PlotTimeScale`
         """
         if not isinstance(timescale, PlotTimeScale):
-            self.log_exc("timescale must be an instance of PlotTimeScale", None, True, TypeError)
+            self.log_exc(
+                "timescale must be an instance of PlotTimeScale", None, True, TypeError
+            )
         self.timescale = timescale
         self.log("Added timescale")
 
@@ -127,7 +131,9 @@ class Plotter(Loggable):
         :raises: TypeError: if ``labelset`` is not an instance of :class:`~aeneas.plotter.PlotLabelset`
         """
         if not isinstance(labelset, PlotLabelset):
-            self.log_exc("labelset must be an instance of PlotLabelset", None, True, TypeError)
+            self.log_exc(
+                "labelset must be an instance of PlotLabelset", None, True, TypeError
+            )
         self.labelsets.append(labelset)
         self.log("Added labelset")
 
@@ -143,7 +149,12 @@ class Plotter(Loggable):
         """
         # check that output_file_path can be written
         if not gf.file_can_be_written(output_file_path):
-            self.log_exc("Cannot write to output file '%s'" % (output_file_path), None, True, OSError)
+            self.log_exc(
+                "Cannot write to output file '%s'" % (output_file_path),
+                None,
+                True,
+                OSError,
+            )
 
         # get widths and cumulative height, in modules
         widths = [ls.width for ls in self.labelsets]
@@ -161,9 +172,21 @@ class Plotter(Loggable):
         image_height_px = image_height * v_zoom
 
         # build image object
-        self.log(["Building image with size (modules): %d %d", image_width, image_height])
-        self.log(["Building image with size (px):      %d %d", image_width_px, image_height_px])
-        image_obj = Image.new("RGB", (image_width_px, image_height_px), color=PlotterColors.AUDACITY_BACKGROUND_GREY)
+        self.log(
+            ["Building image with size (modules): %d %d", image_width, image_height]
+        )
+        self.log(
+            [
+                "Building image with size (px):      %d %d",
+                image_width_px,
+                image_height_px,
+            ]
+        )
+        image_obj = Image.new(
+            "RGB",
+            (image_width_px, image_height_px),
+            color=PlotterColors.AUDACITY_BACKGROUND_GREY,
+        )
         current_y = 0
         if self.waveform is not None:
             self.log("Drawing waveform")
@@ -244,7 +267,10 @@ class PlotElement(Loggable):
         elif size_pt == 18:
             mult = {"h": 14, "w_digit": 9, "w_space": 2}
         num_chars = len(text)
-        return (num_chars * mult["w_digit"] + (num_chars - 1) * mult["w_space"] + 1, mult["h"])
+        return (
+            num_chars * mult["w_digit"] + (num_chars - 1) * mult["w_space"] + 1,
+            mult["h"],
+        )
 
 
 class PlotTimeScale(PlotElement):
@@ -294,7 +320,7 @@ class PlotTimeScale(PlotElement):
             return "%02d:%02d" % (mm, ss)
         hh = value // 3600
         mm = (value - hh * 3600) // 60
-        ss = (value - hh * 3600 - mm * 60)
+        ss = value - hh * 3600 - mm * 60
         return "%02d:%02d:%02d" % (hh, mm, ss)
 
     def draw_png(self, image, h_zoom, v_zoom, current_y):
@@ -327,12 +353,17 @@ class PlotTimeScale(PlotElement):
             right_px = begin_px + self.TICK_WIDTH
             top_px = current_y_px
             bottom_px = current_y_px + v_zoom
-            draw.rectangle((left_px, top_px, right_px, bottom_px), fill=PlotterColors.BLACK)
+            draw.rectangle(
+                (left_px, top_px, right_px, bottom_px), fill=PlotterColors.BLACK
+            )
 
             # text
             time_text = self._time_string(i)
             left_px = begin_px + self.TICK_WIDTH + self.TEXT_MARGIN
-            top_px = current_y_px + (v_zoom - self.text_bounding_box(font_height_pt, time_text)[1]) // 2
+            top_px = (
+                current_y_px
+                + (v_zoom - self.text_bounding_box(font_height_pt, time_text)[1]) // 2
+            )
             draw.text((left_px, top_px), time_text, PlotterColors.BLACK, font=font)
 
 
@@ -356,7 +387,7 @@ class PlotLabelset(PlotElement):
         "end_time": False,
         "begin_guide": False,
         "end_guide": False,
-        "color": PlotterColors.BLACK
+        "color": PlotterColors.BLACK,
     }
 
     TAG = "PlotLabelset"
@@ -364,7 +395,9 @@ class PlotLabelset(PlotElement):
     def __init__(self, labelset, label=None, parameters=None, rconf=None, logger=None):
         super().__init__(label=label, rconf=rconf, logger=logger)
         self.labelset = labelset
-        self.parameters = dict(self.DEFAULT_PARAMETERS) if parameters is None else parameters
+        self.parameters = (
+            dict(self.DEFAULT_PARAMETERS) if parameters is None else parameters
+        )
         self.log("Created label set with")
         self.log(["  label:            %s", self.label])
         self.log(["  number of labels: %d", len(self.labelset)])
@@ -405,7 +438,7 @@ class PlotLabelset(PlotElement):
         label_font = ImageFont.truetype(self.FONT_PATH, label_font_height_pt)
 
         current_y_px = current_y * v_zoom + 0.25 * v_zoom
-        for (begin, end, label) in self.labelset:
+        for begin, end, label in self.labelset:
             # base x position
             begin_px = int(begin * pixels_per_second)
             end_px = int(end * pixels_per_second)
@@ -423,7 +456,9 @@ class PlotLabelset(PlotElement):
             bar_bottom_px = bar_top_px + 2 * self.TICK_WIDTH
             bar_left_px = begin_px
             bar_right_px = end_px
-            draw.rectangle((bar_left_px, bar_top_px, bar_right_px, bar_bottom_px), fill=color)
+            draw.rectangle(
+                (bar_left_px, bar_top_px, bar_right_px, bar_bottom_px), fill=color
+            )
 
             # left guide
             if self.parameters["begin_guide"]:
@@ -437,7 +472,9 @@ class PlotLabelset(PlotElement):
             bottom_px = current_y_px + v_zoom
             left_px = begin_px
             right_px = begin_px + self.TICK_WIDTH
-            draw.rectangle((left_px, top_px, right_px, bottom_px), fill=PlotterColors.BLACK)
+            draw.rectangle(
+                (left_px, top_px, right_px, bottom_px), fill=PlotterColors.BLACK
+            )
 
             # right guide
             if self.parameters["end_guide"]:
@@ -451,7 +488,9 @@ class PlotLabelset(PlotElement):
             bottom_px = current_y_px + v_zoom
             left_px = end_px - self.TICK_WIDTH
             right_px = end_px
-            draw.rectangle((left_px, top_px, right_px, bottom_px), fill=PlotterColors.BLACK)
+            draw.rectangle(
+                (left_px, top_px, right_px, bottom_px), fill=PlotterColors.BLACK
+            )
 
             # begin time
             if self.parameters["begin_time"]:
@@ -463,21 +502,42 @@ class PlotLabelset(PlotElement):
             # end time
             if self.parameters["end_time"]:
                 se = ("%.03f" % (end - int(end)))[2:]
-                left_px = end_px - self.TEXT_MARGIN - self.TICK_WIDTH - self.text_bounding_box(time_font_height_pt, se)[0]
-                top_px = current_y_px + v_zoom - self.text_bounding_box(time_font_height_pt, sb)[1]
+                left_px = (
+                    end_px
+                    - self.TEXT_MARGIN
+                    - self.TICK_WIDTH
+                    - self.text_bounding_box(time_font_height_pt, se)[0]
+                )
+                top_px = (
+                    current_y_px
+                    + v_zoom
+                    - self.text_bounding_box(time_font_height_pt, sb)[1]
+                )
                 draw.text((left_px, top_px), se, PlotterColors.BLACK, font=time_font)
 
             # interval label
             if self.parameters["labels"]:
-                left_px = begin_px + (end_px - begin_px - self.text_bounding_box(label_font_height_pt, label)[0]) // 2
+                left_px = (
+                    begin_px
+                    + (
+                        end_px
+                        - begin_px
+                        - self.text_bounding_box(label_font_height_pt, label)[0]
+                    )
+                    // 2
+                )
                 top_px = current_y_px + v_zoom
-                draw.text((left_px, top_px), label, PlotterColors.BLACK, font=label_font)
+                draw.text(
+                    (left_px, top_px), label, PlotterColors.BLACK, font=label_font
+                )
 
         # label
         left_px = 0
         top_px = current_y_px + v_zoom
         if self.label is not None:
-            draw.text((left_px, top_px), self.label, PlotterColors.BLACK, font=label_font)
+            draw.text(
+                (left_px, top_px), self.label, PlotterColors.BLACK, font=label_font
+            )
 
 
 class PlotWaveform(PlotElement):
@@ -545,16 +605,28 @@ class PlotWaveform(PlotElement):
 
         for i in range(windows):
             x = i * samples_per_pixel
-            pos = numpy.clip(samples[x:(x + samples_per_pixel)], 0.0, 1.0)
+            pos = numpy.clip(samples[x : (x + samples_per_pixel)], 0.0, 1.0)
             mpos = numpy.max(pos) * half_waveform_px
             if self.fast:
                 # just draw a simple version, mirroring max positive samples
-                draw.line((i, zero_y_px + mpos, i, zero_y_px - mpos), fill=PlotterColors.AUDACITY_DARK_BLUE, width=1)
+                draw.line(
+                    (i, zero_y_px + mpos, i, zero_y_px - mpos),
+                    fill=PlotterColors.AUDACITY_DARK_BLUE,
+                    width=1,
+                )
             else:
                 # draw a better version, taking min and std of positive and negative samples
-                neg = numpy.clip(samples[x:(x + samples_per_pixel)], -1.0, 0.0)
+                neg = numpy.clip(samples[x : (x + samples_per_pixel)], -1.0, 0.0)
                 spos = numpy.std(pos) * half_waveform_px
                 sneg = numpy.std(neg) * half_waveform_px
                 mneg = numpy.min(neg) * half_waveform_px
-                draw.line((i, zero_y_px - mneg, i, zero_y_px - mpos), fill=PlotterColors.AUDACITY_DARK_BLUE, width=1)
-                draw.line((i, zero_y_px + sneg, i, zero_y_px - spos), fill=PlotterColors.AUDACITY_LIGHT_BLUE, width=1)
+                draw.line(
+                    (i, zero_y_px - mneg, i, zero_y_px - mpos),
+                    fill=PlotterColors.AUDACITY_DARK_BLUE,
+                    width=1,
+                )
+                draw.line(
+                    (i, zero_y_px + sneg, i, zero_y_px - spos),
+                    fill=PlotterColors.AUDACITY_LIGHT_BLUE,
+                    width=1,
+                )

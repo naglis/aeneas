@@ -71,7 +71,7 @@ class ExecuteTaskCLI(AbstractCLIProgram):
             "config": "task_language=eng|is_text_type=plain|os_task_file_format=aud|task_adjust_boundary_algorithm=aftercurrent|task_adjust_boundary_aftercurrent_value=0.200",
             "syncmap": "output/sonnet.aftercurrent0200.aud",
             "options": "",
-            "show": False
+            "show": False,
         },
         "--example-beforenext": {
             "description": "input: plain text (plain), output: AUD, aba beforenext 0.200",
@@ -80,7 +80,7 @@ class ExecuteTaskCLI(AbstractCLIProgram):
             "config": "task_language=eng|is_text_type=plain|os_task_file_format=aud|task_adjust_boundary_algorithm=beforenext|task_adjust_boundary_beforenext_value=0.200",
             "syncmap": "output/sonnet.beforenext0200.aud",
             "options": "",
-            "show": False
+            "show": False,
         },
         "--example-cewsubprocess": {
             "description": "input: plain text, output: TSV, run via cewsubprocess",
@@ -88,8 +88,8 @@ class ExecuteTaskCLI(AbstractCLIProgram):
             "text": gf.relative_path("res/plain.txt", __file__),
             "config": "task_language=eng|is_text_type=plain|os_task_file_format=tsv",
             "syncmap": "output/sonnet.cewsubprocess.tsv",
-            "options": "-r=\"cew_subprocess_enabled=True\"",
-            "show": False
+            "options": '-r="cew_subprocess_enabled=True"',
+            "show": False,
         },
         "--example-ctw-espeak": {
             "description": "input: plain text, output: TSV, tts engine: ctw espeak",
@@ -97,8 +97,8 @@ class ExecuteTaskCLI(AbstractCLIProgram):
             "text": gf.relative_path("res/plain.txt", __file__),
             "config": "task_language=eng|is_text_type=plain|os_task_file_format=tsv",
             "syncmap": "output/sonnet.ctw_espeak.tsv",
-            "options": "-r=\"tts=custom|tts_path=%s\"" % CTW_ESPEAK,
-            "show": False
+            "options": '-r="tts=custom|tts_path=%s"' % CTW_ESPEAK,
+            "show": False,
         },
         "--example-ctw-speect": {
             "description": "input: plain text, output: TSV, tts engine: ctw speect",
@@ -106,8 +106,8 @@ class ExecuteTaskCLI(AbstractCLIProgram):
             "text": gf.relative_path("res/plain.txt", __file__),
             "config": "task_language=eng|is_text_type=plain|os_task_file_format=tsv",
             "syncmap": "output/sonnet.ctw_speect.tsv",
-            "options": "-r=\"tts=custom|tts_path=%s\"" % CTW_SPEECT,
-            "show": False
+            "options": '-r="tts=custom|tts_path=%s"' % CTW_SPEECT,
+            "show": False,
         },
         "--example-eaf": {
             "description": "input: plain text, output: EAF",
@@ -116,7 +116,7 @@ class ExecuteTaskCLI(AbstractCLIProgram):
             "config": "task_language=eng|is_text_type=plain|os_task_file_format=eaf",
             "syncmap": "output/sonnet.eaf",
             "options": "",
-            "show": True
+            "show": True,
         },
         "--example-faster-rate": {
             "description": "input: plain text (plain), output: SRT, print faster than 12.0 chars/s",
@@ -125,7 +125,7 @@ class ExecuteTaskCLI(AbstractCLIProgram):
             "config": "task_language=eng|is_text_type=plain|os_task_file_format=srt|task_adjust_boundary_algorithm=rate|task_adjust_boundary_rate_value=12.000",
             "syncmap": "output/sonnet.faster.srt",
             "options": "--faster-rate",
-            "show": False
+            "show": False,
         },
         "--example-festival": {
             "description": "input: plain text, output: TSV, tts engine: Festival",
@@ -133,8 +133,8 @@ class ExecuteTaskCLI(AbstractCLIProgram):
             "text": gf.relative_path("res/plain.txt", __file__),
             "config": "task_language=eng-USA|is_text_type=plain|os_task_file_format=tsv",
             "syncmap": "output/sonnet.festival.tsv",
-            "options": "-r=\"tts=festival\"",
-            "show": False
+            "options": '-r="tts=festival"',
+            "show": False,
         },
         "--example-flatten-12": {
             "description": "input: mplain text (multilevel), output: JSON, levels to output: 1 and 2",
@@ -143,7 +143,7 @@ class ExecuteTaskCLI(AbstractCLIProgram):
             "config": "task_language=eng|is_text_type=mplain|os_task_file_format=json|os_task_file_levels=12",
             "syncmap": "output/sonnet.flatten12.json",
             "options": "",
-            "show": False
+            "show": False,
         },
         "--example-flatten-2": {
             "description": "input: mplain text (multilevel), output: JSON, levels to output: 2",
@@ -152,7 +152,7 @@ class ExecuteTaskCLI(AbstractCLIProgram):
             "config": "task_language=eng|is_text_type=mplain|os_task_file_format=json|os_task_file_levels=2",
             "syncmap": "output/sonnet.flatten2.json",
             "options": "",
-            "show": False
+            "show": False,
         },
         "--example-flatten-3": {
             "description": "input: mplain text (multilevel), output: JSON, levels to output: 3",
@@ -161,7 +161,7 @@ class ExecuteTaskCLI(AbstractCLIProgram):
             "config": "task_language=eng|is_text_type=mplain|os_task_file_format=json|os_task_file_levels=3",
             "syncmap": "output/sonnet.flatten3.json",
             "options": "",
-            "show": False
+            "show": False,
         },
         "--example-head-tail": {
             "description": "input: plain text, output: TSV, explicit head and tail",
@@ -170,7 +170,7 @@ class ExecuteTaskCLI(AbstractCLIProgram):
             "config": "task_language=eng|is_text_type=plain|os_task_file_format=tsv|is_audio_file_head_length=0.400|is_audio_file_tail_length=0.500|os_task_file_head_tail_format=stretch",
             "syncmap": "output/sonnet.headtail.tsv",
             "options": "",
-            "show": False
+            "show": False,
         },
         "--example-json": {
             "description": "input: plain text, output: JSON",
@@ -179,7 +179,7 @@ class ExecuteTaskCLI(AbstractCLIProgram):
             "config": "task_language=eng|is_text_type=plain|os_task_file_format=json",
             "syncmap": "output/sonnet.json",
             "options": "",
-            "show": True
+            "show": True,
         },
         "--example-mplain-json": {
             "description": "input: multilevel plain text (mplain), output: JSON",
@@ -188,7 +188,7 @@ class ExecuteTaskCLI(AbstractCLIProgram):
             "config": "task_language=eng|is_text_type=mplain|os_task_file_format=json",
             "syncmap": "output/sonnet.mplain.json",
             "options": "",
-            "show": False
+            "show": False,
         },
         "--example-mplain-smil": {
             "description": "input: multilevel plain text (mplain), output: SMIL",
@@ -197,7 +197,7 @@ class ExecuteTaskCLI(AbstractCLIProgram):
             "config": "task_language=eng|is_text_type=mplain|os_task_file_format=smil|os_task_file_smil_audio_ref=p001.mp3|os_task_file_smil_page_ref=p001.xhtml",
             "syncmap": "output/sonnet.mplain.smil",
             "options": "",
-            "show": True
+            "show": True,
         },
         "--example-multilevel-tts": {
             "description": "input: multilevel plain text (mplain), different TTS engines, output: JSON",
@@ -205,8 +205,8 @@ class ExecuteTaskCLI(AbstractCLIProgram):
             "text": gf.relative_path("res/mplain.txt", __file__),
             "config": "task_language=eng-USA|is_text_type=mplain|os_task_file_format=json",
             "syncmap": "output/sonnet.mplain.json",
-            "options": "-r=\"tts_l1=festival|tts_l2=festival|tts_l3=espeak\"",
-            "show": False
+            "options": '-r="tts_l1=festival|tts_l2=festival|tts_l3=espeak"',
+            "show": False,
         },
         "--example-munparsed-json": {
             "description": "input: multilevel unparsed text (munparsed), output: JSON",
@@ -215,7 +215,7 @@ class ExecuteTaskCLI(AbstractCLIProgram):
             "config": "task_language=eng|is_text_type=munparsed|is_text_munparsed_l1_id_regex=p[0-9]+|is_text_munparsed_l2_id_regex=s[0-9]+|is_text_munparsed_l3_id_regex=w[0-9]+|os_task_file_format=json",
             "syncmap": "output/sonnet.munparsed.json",
             "options": "",
-            "show": False
+            "show": False,
         },
         "--example-munparsed-smil": {
             "description": "input: multilevel unparsed text (munparsed), output: SMIL",
@@ -224,7 +224,7 @@ class ExecuteTaskCLI(AbstractCLIProgram):
             "config": "task_language=eng|is_text_type=munparsed|is_text_munparsed_l1_id_regex=p[0-9]+|is_text_munparsed_l2_id_regex=p[0-9]+s[0-9]+|is_text_munparsed_l3_id_regex=p[0-9]+s[0-9]+w[0-9]+|os_task_file_format=smil|os_task_file_smil_audio_ref=p001.mp3|os_task_file_smil_page_ref=p001.xhtml",
             "syncmap": "output/sonnet.munparsed.smil",
             "options": "",
-            "show": True
+            "show": True,
         },
         "--example-mws": {
             "description": "input: plain text, output: JSON, resolution: 0.500 s",
@@ -232,8 +232,8 @@ class ExecuteTaskCLI(AbstractCLIProgram):
             "text": gf.relative_path("res/plain.txt", __file__),
             "config": "task_language=eng|is_text_type=plain|os_task_file_format=json",
             "syncmap": "output/sonnet.mws.json",
-            "options": "-r=\"mfcc_window_length=1.500|mfcc_window_shift=0.500\"",
-            "show": False
+            "options": '-r="mfcc_window_length=1.500|mfcc_window_shift=0.500"',
+            "show": False,
         },
         "--example-no-zero": {
             "description": "input: multilevel plain text (mplain), output: JSON, no zero duration",
@@ -242,7 +242,7 @@ class ExecuteTaskCLI(AbstractCLIProgram):
             "config": "task_language=eng|is_text_type=mplain|os_task_file_format=json|task_adjust_boundary_no_zero=True",
             "syncmap": "output/sonnet.nozero.json",
             "options": "--zero",
-            "show": False
+            "show": False,
         },
         "--example-offset": {
             "description": "input: plain text (plain), output: AUD, aba offset 0.200",
@@ -251,7 +251,7 @@ class ExecuteTaskCLI(AbstractCLIProgram):
             "config": "task_language=eng|is_text_type=plain|os_task_file_format=aud|task_adjust_boundary_algorithm=offset|task_adjust_boundary_offset_value=0.200",
             "syncmap": "output/sonnet.offset0200.aud",
             "options": "",
-            "show": False
+            "show": False,
         },
         "--example-percent": {
             "description": "input: plain text (plain), output: AUD, aba percent 50",
@@ -260,7 +260,7 @@ class ExecuteTaskCLI(AbstractCLIProgram):
             "config": "task_language=eng|is_text_type=plain|os_task_file_format=aud|task_adjust_boundary_algorithm=percent|task_adjust_boundary_percent_value=50",
             "syncmap": "output/sonnet.percent50.aud",
             "options": "",
-            "show": False
+            "show": False,
         },
         "--example-py": {
             "description": "input: plain text, output: JSON, pure python",
@@ -268,8 +268,8 @@ class ExecuteTaskCLI(AbstractCLIProgram):
             "text": gf.relative_path("res/plain.txt", __file__),
             "config": "task_language=eng|is_text_type=plain|os_task_file_format=json",
             "syncmap": "output/sonnet.cext.json",
-            "options": "-r=\"c_extensions=False\"",
-            "show": False
+            "options": '-r="c_extensions=False"',
+            "show": False,
         },
         "--example-rate": {
             "description": "input: plain text (plain), output: SRT, max rate 14.0 chars/s, print rates",
@@ -278,7 +278,7 @@ class ExecuteTaskCLI(AbstractCLIProgram):
             "config": "task_language=eng|is_text_type=plain|os_task_file_format=srt|task_adjust_boundary_algorithm=rate|task_adjust_boundary_rate_value=14.000",
             "syncmap": "output/sonnet.rates.srt",
             "options": "--rate",
-            "show": False
+            "show": False,
         },
         "--example-remove-nonspeech": {
             "description": "input: plain text (plain), output: SRT, remove nonspeech >=0.500 s",
@@ -287,7 +287,7 @@ class ExecuteTaskCLI(AbstractCLIProgram):
             "config": "task_language=eng|is_text_type=plain|os_task_file_format=srt|task_adjust_boundary_nonspeech_min=0.500|task_adjust_boundary_nonspeech_string=REMOVE",
             "syncmap": "output/sonnet.remove.nonspeech.srt",
             "options": "",
-            "show": False
+            "show": False,
         },
         "--example-remove-nonspeech-rateaggressive": {
             "description": "input: plain text (plain), output: SRT, remove nonspeech >=0.500 s, max rate 14.0 chars/s, print rates",
@@ -296,7 +296,7 @@ class ExecuteTaskCLI(AbstractCLIProgram):
             "config": "task_language=eng|is_text_type=plain|os_task_file_format=srt|task_adjust_boundary_nonspeech_min=0.500|task_adjust_boundary_nonspeech_string=REMOVE|task_adjust_boundary_algorithm=rateaggressive|task_adjust_boundary_rate_value=14.000",
             "syncmap": "output/sonnet.remove.nonspeech.rateaggressive.srt",
             "options": "--rate",
-            "show": False
+            "show": False,
         },
         "--example-replace-nonspeech": {
             "description": "input: plain text (plain), output: AUD, replace nonspeech >=0.500 s with (sil)",
@@ -305,7 +305,7 @@ class ExecuteTaskCLI(AbstractCLIProgram):
             "config": "task_language=eng|is_text_type=plain|os_task_file_format=aud|task_adjust_boundary_nonspeech_min=0.500|task_adjust_boundary_nonspeech_string=(sil)",
             "syncmap": "output/sonnet.sil.aud",
             "options": "",
-            "show": False
+            "show": False,
         },
         "--example-sd": {
             "description": "input: plain text, output: TSV, head/tail detection",
@@ -314,7 +314,7 @@ class ExecuteTaskCLI(AbstractCLIProgram):
             "config": "task_language=eng|is_text_type=plain|os_task_file_format=tsv|is_audio_file_detect_head_max=10.000|is_audio_file_detect_tail_max=10.000",
             "syncmap": "output/sonnet.sd.tsv",
             "options": "",
-            "show": False
+            "show": False,
         },
         "--example-srt": {
             "description": "input: subtitles text, output: SRT",
@@ -323,7 +323,7 @@ class ExecuteTaskCLI(AbstractCLIProgram):
             "config": "task_language=eng|is_text_type=subtitles|os_task_file_format=srt",
             "syncmap": "output/sonnet.srt",
             "options": "",
-            "show": True
+            "show": True,
         },
         "--example-smil": {
             "description": "input: unparsed text, output: SMIL",
@@ -332,7 +332,7 @@ class ExecuteTaskCLI(AbstractCLIProgram):
             "config": "task_language=eng|is_text_type=unparsed|is_text_unparsed_id_regex=f[0-9]+|is_text_unparsed_id_sort=numeric|os_task_file_format=smil|os_task_file_smil_audio_ref=p001.mp3|os_task_file_smil_page_ref=p001.xhtml",
             "syncmap": "output/sonnet.smil",
             "options": "",
-            "show": True
+            "show": True,
         },
         "--example-textgrid": {
             "description": "input: parsed text, output: TextGrid",
@@ -341,7 +341,7 @@ class ExecuteTaskCLI(AbstractCLIProgram):
             "config": "task_language=eng|is_text_type=parsed|os_task_file_format=textgrid",
             "syncmap": "output/sonnet.textgrid",
             "options": "",
-            "show": True
+            "show": True,
         },
         "--example-tsv": {
             "description": "input: parsed text, output: TSV",
@@ -350,7 +350,7 @@ class ExecuteTaskCLI(AbstractCLIProgram):
             "config": "task_language=eng|is_text_type=parsed|os_task_file_format=tsv",
             "syncmap": "output/sonnet.tsv",
             "options": "",
-            "show": True
+            "show": True,
         },
         "--example-words": {
             "description": "input: single word granularity plain text, output: AUD",
@@ -359,7 +359,7 @@ class ExecuteTaskCLI(AbstractCLIProgram):
             "config": "task_language=eng|is_text_type=plain|os_task_file_format=aud",
             "syncmap": "output/sonnet.words.aud",
             "options": "",
-            "show": True
+            "show": True,
         },
         "--example-words-multilevel": {
             "description": "input: mplain text (multilevel), output: AUD, levels to output: 3",
@@ -368,7 +368,7 @@ class ExecuteTaskCLI(AbstractCLIProgram):
             "config": "task_language=eng|is_text_type=mplain|os_task_file_format=aud|os_task_file_levels=3",
             "syncmap": "output/sonnet.words.multilevel.aud",
             "options": "",
-            "show": False
+            "show": False,
         },
         "--example-words-festival-cache": {
             "description": "input: single word granularity plain text, output: AUD, tts engine: Festival, TTS cache on",
@@ -376,8 +376,8 @@ class ExecuteTaskCLI(AbstractCLIProgram):
             "text": gf.relative_path("res/words.txt", __file__),
             "config": "task_language=eng-USA|is_text_type=plain|os_task_file_format=aud",
             "syncmap": "output/sonnet.words.aud",
-            "options": "-r=\"tts=festival|tts_cache=True\"",
-            "show": False
+            "options": '-r="tts=festival|tts_cache=True"',
+            "show": False,
         },
         "--example-youtube": {
             "description": "input: audio from YouTube, output: TXT",
@@ -386,8 +386,8 @@ class ExecuteTaskCLI(AbstractCLIProgram):
             "config": "task_language=eng|is_text_type=plain|os_task_file_format=txt",
             "syncmap": "output/sonnet.txt",
             "options": "-y",
-            "show": True
-        }
+            "show": True,
+        },
     }
 
     PARAMETERS = TaskConfiguration.parameters(sort=True, as_strings=True)
@@ -417,10 +417,7 @@ class ExecuteTaskCLI(AbstractCLIProgram):
             ("AUDIO_FILE  TEXT_FILE CONFIG_STRING OUTPUT_FILE", True),
             ("YOUTUBE_URL TEXT_FILE CONFIG_STRING OUTPUT_FILE -y", True),
         ],
-        "examples": [
-            "--examples",
-            "--examples-all"
-        ],
+        "examples": ["--examples", "--examples-all"],
         "options": [
             "--faster-rate : print fragments with rate > task_adjust_boundary_rate_value",
             "--keep-audio : do not delete the audio file downloaded from YouTube (-y only)",
@@ -434,7 +431,7 @@ class ExecuteTaskCLI(AbstractCLIProgram):
             "--skip-validator : do not validate the given config string",
             "--zero : print fragments with zero duration",
             "-y, --youtube : download audio from YouTube video",
-        ]
+        ],
     }
 
     def perform_command(self):
@@ -544,7 +541,9 @@ class ExecuteTaskCLI(AbstractCLIProgram):
             return self.ERROR_EXIT_CODE
         if not self.check_output_file(sync_map_file_path):
             return self.ERROR_EXIT_CODE
-        if (html_file_path is not None) and (not self.check_output_file(html_file_path)):
+        if (html_file_path is not None) and (
+            not self.check_output_file(html_file_path)
+        ):
             return self.ERROR_EXIT_CODE
 
         self.check_c_extensions()
@@ -564,9 +563,13 @@ class ExecuteTaskCLI(AbstractCLIProgram):
             self.print_info("\n".join(msg))
 
         if validate:
-            self.print_info("Validating config string (specify --skip-validator to bypass)...")
+            self.print_info(
+                "Validating config string (specify --skip-validator to bypass)..."
+            )
             validator = Validator(logger=self.logger)
-            result = validator.check_configuration_string(config_string, is_job=False, external_name=True)
+            result = validator.check_configuration_string(
+                config_string, is_job=False, external_name=True
+            )
             if not result.passed:
                 self.print_error("The given config string is not valid:")
                 self.print_generic(result.pretty_print())
@@ -581,23 +584,32 @@ class ExecuteTaskCLI(AbstractCLIProgram):
                     youtube_url,
                     download=True,
                     output_file_path=None,
-                    largest_audio=largest_audio
+                    largest_audio=largest_audio,
                 )
                 self.print_info("Downloading audio from '%s' ... done" % youtube_url)
             except ImportError:
                 self.print_no_dependency_error()
                 return self.ERROR_EXIT_CODE
             except Exception as exc:
-                self.print_error("An unexpected error occurred while downloading audio from YouTube:")
+                self.print_error(
+                    "An unexpected error occurred while downloading audio from YouTube:"
+                )
                 self.print_error("%s" % exc)
                 return self.ERROR_EXIT_CODE
         else:
             audio_extension = gf.file_extension(audio_file_path)
             if audio_extension.lower() not in AudioFile.FILE_EXTENSIONS:
-                self.print_warning("Your audio file path has extension '%s', which is uncommon for an audio file." % audio_extension)
+                self.print_warning(
+                    "Your audio file path has extension '%s', which is uncommon for an audio file."
+                    % audio_extension
+                )
                 self.print_warning("Attempting at executing your Task anyway.")
-                self.print_warning("If it fails, you might have swapped the first two arguments.")
-                self.print_warning("The audio file path should be the first argument, the text file path the second.")
+                self.print_warning(
+                    "If it fails, you might have swapped the first two arguments."
+                )
+                self.print_warning(
+                    "The audio file path should be the first argument, the text file path the second."
+                )
 
         try:
             self.print_info("Creating task...")
@@ -627,7 +639,9 @@ class ExecuteTaskCLI(AbstractCLIProgram):
             self.print_info("Creating output sync map file... done")
             self.print_success("Created file '%s'" % path)
         except Exception as exc:
-            self.print_error("An unexpected error occurred while writing the sync map file:")
+            self.print_error(
+                "An unexpected error occurred while writing the sync map file:"
+            )
             self.print_error("%s" % exc)
             return self.ERROR_EXIT_CODE
 
@@ -635,26 +649,43 @@ class ExecuteTaskCLI(AbstractCLIProgram):
             try:
                 parameters = {}
                 parameters[gc.PPN_TASK_OS_FILE_FORMAT] = task.configuration["o_format"]
-                parameters[gc.PPN_TASK_OS_FILE_EAF_AUDIO_REF] = task.configuration["o_eaf_audio_ref"]
-                parameters[gc.PPN_TASK_OS_FILE_SMIL_AUDIO_REF] = task.configuration["o_smil_audio_ref"]
-                parameters[gc.PPN_TASK_OS_FILE_SMIL_PAGE_REF] = task.configuration["o_smil_page_ref"]
+                parameters[gc.PPN_TASK_OS_FILE_EAF_AUDIO_REF] = task.configuration[
+                    "o_eaf_audio_ref"
+                ]
+                parameters[gc.PPN_TASK_OS_FILE_SMIL_AUDIO_REF] = task.configuration[
+                    "o_smil_audio_ref"
+                ]
+                parameters[gc.PPN_TASK_OS_FILE_SMIL_PAGE_REF] = task.configuration[
+                    "o_smil_page_ref"
+                ]
                 self.print_info("Creating output HTML file...")
-                task.sync_map.output_html_for_tuning(audio_file_path, html_file_path, parameters)
+                task.sync_map.output_html_for_tuning(
+                    audio_file_path, html_file_path, parameters
+                )
                 self.print_info("Creating output HTML file... done")
                 self.print_success("Created file '%s'" % html_file_path)
             except Exception as exc:
-                self.print_error("An unexpected error occurred while writing the HTML file:")
+                self.print_error(
+                    "An unexpected error occurred while writing the HTML file:"
+                )
                 self.print_error("%s" % exc)
                 return self.ERROR_EXIT_CODE
 
         if download_from_youtube:
             if keep_audio:
-                self.print_info("Option --keep-audio set: keeping downloaded file '%s'" % audio_file_path)
+                self.print_info(
+                    "Option --keep-audio set: keeping downloaded file '%s'"
+                    % audio_file_path
+                )
             else:
                 gf.delete_file(None, audio_file_path)
 
         if print_zero:
-            zero_duration = [leaf for leaf in task.sync_map_leaves(SyncMapFragment.REGULAR) if leaf.begin == leaf.end]
+            zero_duration = [
+                leaf
+                for leaf in task.sync_map_leaves(SyncMapFragment.REGULAR)
+                if leaf.begin == leaf.end
+            ]
             if len(zero_duration) > 0:
                 self.print_warning("Fragments with zero duration:")
                 for fragment in zero_duration:
@@ -663,16 +694,28 @@ class ExecuteTaskCLI(AbstractCLIProgram):
         if print_rates:
             self.print_info("Fragments with rates:")
             for fragment in task.sync_map_leaves(SyncMapFragment.REGULAR):
-                self.print_generic("  {}\t{:.3f}".format(fragment.pretty_print, fragment.rate or 0.0))
+                self.print_generic(
+                    "  {}\t{:.3f}".format(fragment.pretty_print, fragment.rate or 0.0)
+                )
 
         if print_faster_rate:
             max_rate = task.configuration["aba_rate_value"]
             if max_rate is not None:
-                faster = [leaf for leaf in task.sync_map_leaves(SyncMapFragment.REGULAR) if leaf.rate >= max_rate + Decimal("0.001")]
+                faster = [
+                    leaf
+                    for leaf in task.sync_map_leaves(SyncMapFragment.REGULAR)
+                    if leaf.rate >= max_rate + Decimal("0.001")
+                ]
                 if len(faster) > 0:
-                    self.print_warning("Fragments with rate greater than %.3f:" % max_rate)
+                    self.print_warning(
+                        "Fragments with rate greater than %.3f:" % max_rate
+                    )
                     for fragment in faster:
-                        self.print_generic("  {}\t{:.3f}".format(fragment.pretty_print, fragment.rate or 0.0))
+                        self.print_generic(
+                            "  {}\t{:.3f}".format(
+                                fragment.pretty_print, fragment.rate or 0.0
+                            )
+                        )
 
         return self.NO_ERROR_EXIT_CODE
 
@@ -732,5 +775,6 @@ def main():
     """
     ExecuteTaskCLI().run(arguments=sys.argv)
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     main()

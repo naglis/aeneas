@@ -33,10 +33,17 @@ import aeneas.globalfunctions as gf
 
 
 class TestSynthesizer(unittest.TestCase):
-
     PATH_NOT_WRITEABLE = gf.absolute_path("x/y/z/not_writeable.wav", __file__)
 
-    def perform(self, path, expected, expected2=None, logger=None, quit_after=None, backwards=False):
+    def perform(
+        self,
+        path,
+        expected,
+        expected2=None,
+        logger=None,
+        quit_after=None,
+        backwards=False,
+    ):
         def inner(c_ext, cew_subprocess, tts_cache):
             handler, output_file_path = gf.tmp_file(suffix=".wav")
             tfl = TextFile(gf.absolute_path(path, __file__), TextFileFormat.PLAIN)
@@ -45,11 +52,14 @@ class TestSynthesizer(unittest.TestCase):
             synth.rconf[RuntimeConfiguration.C_EXTENSIONS] = c_ext
             synth.rconf[RuntimeConfiguration.CEW_SUBPROCESS_ENABLED] = cew_subprocess
             synth.rconf[RuntimeConfiguration.TTS_CACHE] = tts_cache
-            result = synth.synthesize(tfl, output_file_path, quit_after=quit_after, backwards=backwards)
+            result = synth.synthesize(
+                tfl, output_file_path, quit_after=quit_after, backwards=backwards
+            )
             gf.delete_file(handler, output_file_path)
             self.assertEqual(len(result[0]), expected)
             if expected2 is not None:
                 self.assertAlmostEqual(result[1], expected2, places=0)
+
         for c_ext in [True, False]:
             for cew_subprocess in [True, False]:
                 for tts_cache in [True, False]:
@@ -86,13 +96,24 @@ class TestSynthesizer(unittest.TestCase):
         self.perform("res/inputtext/sonnet_plain_utf8.txt", 15)
 
     def test_synthesize_quit_after(self):
-        self.perform("res/inputtext/sonnet_plain.txt", 6, TimeValue("12.000"), quit_after=TimeValue("10.000"))
+        self.perform(
+            "res/inputtext/sonnet_plain.txt",
+            6,
+            TimeValue("12.000"),
+            quit_after=TimeValue("10.000"),
+        )
 
     def test_synthesize_backwards(self):
         self.perform("res/inputtext/sonnet_plain.txt", 15, backwards=True)
 
     def test_synthesize_quit_after_backwards(self):
-        self.perform("res/inputtext/sonnet_plain.txt", 4, TimeValue("10.000"), quit_after=TimeValue("10.000"), backwards=True)
+        self.perform(
+            "res/inputtext/sonnet_plain.txt",
+            4,
+            TimeValue("10.000"),
+            quit_after=TimeValue("10.000"),
+            backwards=True,
+        )
 
     def test_synthesize_plain_with_empty_lines(self):
         self.perform("res/inputtext/plain_with_empty_lines.txt", 19)

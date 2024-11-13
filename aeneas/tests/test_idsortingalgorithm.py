@@ -26,7 +26,6 @@ from aeneas.idsortingalgorithm import IDSortingAlgorithm
 
 
 class TestIDSortingAlgorithm(unittest.TestCase):
-
     IDS = ["b001", "c03", "d4", "a2"]
 
     def test_invalid_algorithm(self):

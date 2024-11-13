@@ -403,5 +403,7 @@ class Language:
     ALLOWED_VALUES = sorted(CODE_TO_HUMAN.keys())
     """ List of all the allowed values """
 
-    CODE_TO_HUMAN_LIST = sorted(["{}\t{}".format(k, v) for k, v in CODE_TO_HUMAN.items()])
+    CODE_TO_HUMAN_LIST = sorted(
+        ["{}\t{}".format(k, v) for k, v in CODE_TO_HUMAN.items()]
+    )
     """ List of all language codes with their human-readable names """

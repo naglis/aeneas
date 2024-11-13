@@ -93,6 +93,7 @@ class DTWAlignerNotInitialized(Exception):
     using an DTWAligner object whose real and/or synt waves
     are not initialized yet.
     """
+
     pass
 
 
@@ -130,7 +131,7 @@ class DTWAligner(Loggable):
         real_wave_path=None,
         synt_wave_path=None,
         rconf=None,
-        logger=None
+        logger=None,
     ):
         if (real_wave_mfcc is not None) and (type(real_wave_mfcc) is not AudioFileMFCC):
             raise ValueError("Real wave mfcc must be None or of type AudioFileMFCC")
@@ -140,7 +141,9 @@ class DTWAligner(Loggable):
             raise ValueError("Real wave cannot be read")
         if (synt_wave_path is not None) and (not gf.file_can_be_read(synt_wave_path)):
             raise ValueError("Synt wave cannot be read")
-        if (rconf is not None) and (rconf[RuntimeConfiguration.DTW_ALGORITHM] not in DTWAlgorithm.ALLOWED_VALUES):
+        if (rconf is not None) and (
+            rconf[RuntimeConfiguration.DTW_ALGORITHM] not in DTWAlgorithm.ALLOWED_VALUES
+        ):
             raise ValueError("Algorithm value not allowed")
         super().__init__(rconf=rconf, logger=logger)
         self.real_wave_mfcc = real_wave_mfcc
@@ -148,9 +151,13 @@ class DTWAligner(Loggable):
         self.real_wave_path = real_wave_path
         self.synt_wave_path = synt_wave_path
         if (self.real_wave_mfcc is None) and (self.real_wave_path is not None):
-            self.real_wave_mfcc = AudioFileMFCC(self.real_wave_path, rconf=self.rconf, logger=self.logger)
+            self.real_wave_mfcc = AudioFileMFCC(
+                self.real_wave_path, rconf=self.rconf, logger=self.logger
+            )
         if (self.synt_wave_mfcc is None) and (self.synt_wave_path is not None):
-            self.synt_wave_mfcc = AudioFileMFCC(self.synt_wave_path, rconf=self.rconf, logger=self.logger)
+            self.synt_wave_mfcc = AudioFileMFCC(
+                self.synt_wave_path, rconf=self.rconf, logger=self.logger
+            )
         self.dtw = None
 
     def compute_accumulated_cost_matrix(self):
@@ -268,8 +275,12 @@ class DTWAligner(Loggable):
             #
             # NOTE this is not elegant, but it saves the day for the user
             #
-            self.log_warn("The number of samples in each window shift is not an integer, time drift might occur.")
-            anchor_indices = numpy.array([(int(a[0] * sample_rate / mws) / sample_rate) for a in synt_anchors])
+            self.log_warn(
+                "The number of samples in each window shift is not an integer, time drift might occur."
+            )
+            anchor_indices = numpy.array(
+                [(int(a[0] * sample_rate / mws) / sample_rate) for a in synt_anchors]
+            )
         #
         # right side sets the split point at the very beginning of "next" fragment
         #
@@ -277,7 +288,11 @@ class DTWAligner(Loggable):
         #      an index == len(synt_indices) == len(real_indices)
         #      when the insertion point is past the last element of synt_indices
         #      causing the fancy indexing real_indices[...] below might fail
-        begin_indices = numpy.clip(numpy.searchsorted(synt_indices, anchor_indices, side="right"), 0, len(synt_indices) - 1)
+        begin_indices = numpy.clip(
+            numpy.searchsorted(synt_indices, anchor_indices, side="right"),
+            0,
+            len(synt_indices) - 1,
+        )
         # first split must occur at zero
         begin_indices[0] = 0
         #
@@ -286,7 +301,9 @@ class DTWAligner(Loggable):
         # NOTE since len(synt_indices) == len(real_indices)
         #      and because the numpy.clip() above, the fancy indexing is always valid
         #
-        boundary_indices = numpy.append(real_indices[begin_indices], self.real_wave_mfcc.tail_begin)
+        boundary_indices = numpy.append(
+            real_indices[begin_indices], self.real_wave_mfcc.tail_begin
+        )
         self.log(["Boundary indices: %d", len(boundary_indices)])
         self.log("Computing boundary indices... done")
         return boundary_indices
@@ -301,13 +318,27 @@ class DTWAligner(Loggable):
 
         # check we have the AudioFileMFCC objects
         if (self.real_wave_mfcc is None) or (self.real_wave_mfcc.middle_mfcc is None):
-            self.log_exc("The real wave MFCCs are not initialized", None, True, DTWAlignerNotInitialized)
+            self.log_exc(
+                "The real wave MFCCs are not initialized",
+                None,
+                True,
+                DTWAlignerNotInitialized,
+            )
         if (self.synt_wave_mfcc is None) or (self.synt_wave_mfcc.middle_mfcc is None):
-            self.log_exc("The synt wave MFCCs are not initialized", None, True, DTWAlignerNotInitialized)
+            self.log_exc(
+                "The synt wave MFCCs are not initialized",
+                None,
+                True,
+                DTWAlignerNotInitialized,
+            )
 
         # setup
         algorithm = self.rconf[RuntimeConfiguration.DTW_ALGORITHM]
-        delta = int(2 * self.rconf.dtw_margin / self.rconf[RuntimeConfiguration.MFCC_WINDOW_SHIFT])
+        delta = int(
+            2
+            * self.rconf.dtw_margin
+            / self.rconf[RuntimeConfiguration.MFCC_WINDOW_SHIFT]
+        )
         mfcc2_length = self.synt_wave_mfcc.middle_length
         self.log(["Requested algorithm: '%s'", algorithm])
         self.log(["delta = %d", delta])
@@ -315,9 +346,13 @@ class DTWAligner(Loggable):
         # check if delta is >= length of synt wave
         if mfcc2_length <= delta:
             self.log("We have mfcc2_length <= delta")
-            if (self.rconf[RuntimeConfiguration.C_EXTENSIONS]) and (gf.can_run_c_extension()):
+            if (self.rconf[RuntimeConfiguration.C_EXTENSIONS]) and (
+                gf.can_run_c_extension()
+            ):
                 # the C code can be run: since it is still faster, do not run EXACT
-                self.log("C extensions enabled and loaded: not selecting EXACT algorithm")
+                self.log(
+                    "C extensions enabled and loaded: not selecting EXACT algorithm"
+                )
             else:
                 self.log("Selecting EXACT algorithm")
                 algorithm = DTWAlgorithm.EXACT
@@ -343,10 +378,7 @@ class DTWAligner(Loggable):
             if algorithm == DTWAlgorithm.EXACT:
                 self.log("Computing with EXACT algo")
                 self.dtw = DTWExact(
-                    m1=real_mfcc,
-                    m2=synt_mfcc,
-                    rconf=self.rconf,
-                    logger=self.logger
+                    m1=real_mfcc, m2=synt_mfcc, rconf=self.rconf, logger=self.logger
                 )
             else:
                 self.log("Computing with STRIPE algo")
@@ -355,12 +387,11 @@ class DTWAligner(Loggable):
                     m2=synt_mfcc,
                     delta=delta,
                     rconf=self.rconf,
-                    logger=self.logger
+                    logger=self.logger,
                 )
 
 
 class DTWStripe(Loggable):
-
     TAG = "DTWStripe"
 
     def __init__(self, m1, m2, delta, rconf=None, logger=None):
@@ -376,7 +407,7 @@ class DTWStripe(Loggable):
             self._compute_acm_c_extension,
             self._compute_acm_pure_python,
             (),
-            rconf=self.rconf
+            rconf=self.rconf,
         )
 
     def _compute_acm_c_extension(self):
@@ -384,6 +415,7 @@ class DTWStripe(Loggable):
         try:
             self.log("Importing cdtw...")
             import aeneas.cdtw.cdtw
+
             self.log("Importing cdtw... done")
             # discard first MFCC component
             mfcc1 = self.m1[1:, :]
@@ -395,23 +427,38 @@ class DTWStripe(Loggable):
             if delta > m:
                 self.log("Limiting delta to m")
                 delta = m
-            cost_matrix, centers = aeneas.cdtw.cdtw.compute_cost_matrix_step(mfcc1, mfcc2, delta)
-            accumulated_cost_matrix = aeneas.cdtw.cdtw.compute_accumulated_cost_matrix_step(cost_matrix, centers)
+            cost_matrix, centers = aeneas.cdtw.cdtw.compute_cost_matrix_step(
+                mfcc1, mfcc2, delta
+            )
+            accumulated_cost_matrix = (
+                aeneas.cdtw.cdtw.compute_accumulated_cost_matrix_step(
+                    cost_matrix, centers
+                )
+            )
             self.log("Computing acm using C extension... done")
             return (True, accumulated_cost_matrix)
         except Exception as exc:
-            self.log_exc("An unexpected error occurred while running cdtw", exc, False, None)
+            self.log_exc(
+                "An unexpected error occurred while running cdtw", exc, False, None
+            )
         return (False, None)
 
     def _compute_acm_pure_python(self):
         self.log("Computing acm using pure Python code...")
         try:
             cost_matrix, centers = self._compute_cost_matrix()
-            accumulated_cost_matrix = self._compute_accumulated_cost_matrix(cost_matrix, centers)
+            accumulated_cost_matrix = self._compute_accumulated_cost_matrix(
+                cost_matrix, centers
+            )
             self.log("Computing acm using pure Python code... done")
             return (True, accumulated_cost_matrix)
         except Exception as exc:
-            self.log_exc("An unexpected error occurred while running pure Python code", exc, False, None)
+            self.log_exc(
+                "An unexpected error occurred while running pure Python code",
+                exc,
+                False,
+                None,
+            )
         return (False, None)
 
     def compute_path(self):
@@ -421,7 +468,7 @@ class DTWStripe(Loggable):
             self._compute_path_c_extension,
             self._compute_path_pure_python,
             (),
-            rconf=self.rconf
+            rconf=self.rconf,
         )
 
     def _compute_path_c_extension(self):
@@ -429,6 +476,7 @@ class DTWStripe(Loggable):
         try:
             self.log("Importing cdtw...")
             import aeneas.cdtw.cdtw
+
             self.log("Importing cdtw... done")
             # discard first MFCC component
             mfcc1 = self.m1[1:, :]
@@ -440,27 +488,32 @@ class DTWStripe(Loggable):
             if delta > m:
                 self.log("Limiting delta to m")
                 delta = m
-            best_path = aeneas.cdtw.cdtw.compute_best_path(
-                mfcc1,
-                mfcc2,
-                delta
-            )
+            best_path = aeneas.cdtw.cdtw.compute_best_path(mfcc1, mfcc2, delta)
             self.log("Computing path using C extension... done")
             return (True, best_path)
         except Exception as exc:
-            self.log_exc("An unexpected error occurred while running cdtw", exc, False, None)
+            self.log_exc(
+                "An unexpected error occurred while running cdtw", exc, False, None
+            )
         return (False, None)
 
     def _compute_path_pure_python(self):
         self.log("Computing path using pure Python code...")
         try:
             cost_matrix, centers = self._compute_cost_matrix()
-            accumulated_cost_matrix = self._compute_accumulated_cost_matrix(cost_matrix, centers)
+            accumulated_cost_matrix = self._compute_accumulated_cost_matrix(
+                cost_matrix, centers
+            )
             best_path = self._compute_best_path(accumulated_cost_matrix, centers)
             self.log("Computing path using pure Python code... done")
             return (True, best_path)
         except Exception as exc:
-            self.log_exc("An unexpected error occurred while running pure Python code", exc, False, None)
+            self.log_exc(
+                "An unexpected error occurred while running pure Python code",
+                exc,
+                False,
+                None,
+            )
         return (False, None)
 
     def _compute_cost_matrix(self):
@@ -468,8 +521,8 @@ class DTWStripe(Loggable):
         # discard first MFCC component
         mfcc1 = self.m1[1:, :]
         mfcc2 = self.m2[1:, :]
-        norm2_1 = numpy.sqrt(numpy.sum(mfcc1 ** 2, 0))
-        norm2_2 = numpy.sqrt(numpy.sum(mfcc2 ** 2, 0))
+        norm2_1 = numpy.sqrt(numpy.sum(mfcc1**2, 0))
+        norm2_2 = numpy.sqrt(numpy.sum(mfcc2**2, 0))
         n = mfcc1.shape[1]
         m = mfcc2.shape[1]
         delta = self.delta
@@ -583,18 +636,14 @@ class DTWStripe(Loggable):
                 if r_j > 0:
                     cost1 = acc_matrix[i][r_j - 1]
                 cost2 = numpy.inf
-                if (r_j > 0) and ((r_j + offset - 1) < delta) and ((r_j + offset - 1) >= 0):
+                if (
+                    (r_j > 0)
+                    and ((r_j + offset - 1) < delta)
+                    and ((r_j + offset - 1) >= 0)
+                ):
                     cost2 = acc_matrix[i - 1][r_j + offset - 1]
-                costs = [
-                    cost0,
-                    cost1,
-                    cost2
-                ]
-                moves = [
-                    (i - 1, j),
-                    (i, j - 1),
-                    (i - 1, j - 1)
-                ]
+                costs = [cost0, cost1, cost2]
+                moves = [(i - 1, j), (i, j - 1), (i - 1, j - 1)]
                 min_cost = numpy.argmin(costs)
                 # COMMENTED self.log([u"Selected min cost move %d", min_cost])
                 min_move = moves[min_cost]
@@ -607,7 +656,6 @@ class DTWStripe(Loggable):
 
 
 class DTWExact(Loggable):
-
     TAG = "DTWExact"
 
     def __init__(self, m1, m2, rconf=None, logger=None):
@@ -634,8 +682,8 @@ class DTWExact(Loggable):
         # discard first MFCC component
         mfcc1 = self.m1[1:, :]
         mfcc2 = self.m2[1:, :]
-        norm2_1 = numpy.sqrt(numpy.sum(mfcc1 ** 2, 0))
-        norm2_2 = numpy.sqrt(numpy.sum(mfcc2 ** 2, 0))
+        norm2_1 = numpy.sqrt(numpy.sum(mfcc1**2, 0))
+        norm2_2 = numpy.sqrt(numpy.sum(mfcc2**2, 0))
         # compute dot product
         self.log("Computing matrix with transpose+dot...")
         cost_matrix = mfcc1.transpose().dot(mfcc2)
@@ -670,7 +718,7 @@ class DTWExact(Loggable):
                 cost_matrix[i][j] = current_row[j] + min(
                     cost_matrix[i - 1][j],
                     cost_matrix[i][j - 1],
-                    cost_matrix[i - 1][j - 1]
+                    cost_matrix[i - 1][j - 1],
                 )
         self.log("Computing the acm with the in-place algorithm... done")
         return cost_matrix
@@ -716,13 +764,9 @@ class DTWExact(Loggable):
                 costs = [
                     acc_matrix[i - 1][j],
                     acc_matrix[i][j - 1],
-                    acc_matrix[i - 1][j - 1]
+                    acc_matrix[i - 1][j - 1],
                 ]
-                moves = [
-                    (i - 1, j),
-                    (i, j - 1),
-                    (i - 1, j - 1)
-                ]
+                moves = [(i - 1, j), (i, j - 1), (i - 1, j - 1)]
                 min_cost = numpy.argmin(costs)
                 # COMMENTED self.log([u"Selected min cost move %d", min_cost])
                 min_move = moves[min_cost]

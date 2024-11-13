@@ -31,7 +31,6 @@ https://github.com/espeak-ng/espeak-ng/
 for further details.
 """
 
-
 from aeneas.language import Language
 from aeneas.ttswrappers.basettswrapper import BaseTTSWrapper
 
@@ -808,7 +807,9 @@ class ESPEAKNGTTSWrapper(BaseTTSWrapper):
         ZH_YUE: "Yue Chinese (not tested)",
     }
 
-    CODE_TO_HUMAN_LIST = sorted(["{}\t{}".format(k, v) for k, v in CODE_TO_HUMAN.items()])
+    CODE_TO_HUMAN_LIST = sorted(
+        ["{}\t{}".format(k, v) for k, v in CODE_TO_HUMAN.items()]
+    )
 
     LANGUAGE_TO_VOICE_CODE = {
         AF: "af",
@@ -900,7 +901,7 @@ class ESPEAKNGTTSWrapper(BaseTTSWrapper):
         TN: "tn",
         TR: "tr",
         TT: "tt",
-        UK: "ru",   # NOTE mocking support for Ukrainian with Russian voice
+        UK: "ru",  # NOTE mocking support for Ukrainian with Russian voice
         UR: "ur",
         VI: "vi",
         VI_VN_X_CENTRAL: "vi-vn-x-central",
@@ -994,7 +995,7 @@ class ESPEAKNGTTSWrapper(BaseTTSWrapper):
         FRA_BEL: "fr-be",
         FRA_FRA: "fr-fr",
         POR_BRA: "pt-br",
-        POR_PRT: "pt-pt"
+        POR_PRT: "pt-pt",
     }
     DEFAULT_LANGUAGE = ENG
 
@@ -1008,11 +1009,13 @@ class ESPEAKNGTTSWrapper(BaseTTSWrapper):
 
     def __init__(self, rconf=None, logger=None):
         super().__init__(rconf=rconf, logger=logger)
-        self.set_subprocess_arguments([
-            self.tts_path,
-            "-v",
-            self.CLI_PARAMETER_VOICE_CODE_STRING,
-            "-w",
-            self.CLI_PARAMETER_WAVE_PATH,
-            self.CLI_PARAMETER_TEXT_STDIN
-        ])
+        self.set_subprocess_arguments(
+            [
+                self.tts_path,
+                "-v",
+                self.CLI_PARAMETER_VOICE_CODE_STRING,
+                "-w",
+                self.CLI_PARAMETER_WAVE_PATH,
+                self.CLI_PARAMETER_TEXT_STDIN,
+            ]
+        )

@@ -61,14 +61,20 @@ class Task(Loggable):
         super().__init__(rconf=rconf, logger=logger)
         self.identifier = gf.uuid_string()
         self.configuration = None
-        self.audio_file_path = None                 # relative to input container root
-        self.audio_file_path_absolute = None        # concrete path, file will be read from this!
+        self.audio_file_path = None  # relative to input container root
+        self.audio_file_path_absolute = (
+            None  # concrete path, file will be read from this!
+        )
         self.audio_file = None
-        self.text_file_path = None                  # relative to input container root
-        self.text_file_path_absolute = None         # concrete path, file will be read from this!
+        self.text_file_path = None  # relative to input container root
+        self.text_file_path_absolute = (
+            None  # concrete path, file will be read from this!
+        )
         self.text_file = None
-        self.sync_map_file_path = None              # relative to output container root
-        self.sync_map_file_path_absolute = None     # concrete path, file will be written to this!
+        self.sync_map_file_path = None  # relative to output container root
+        self.sync_map_file_path_absolute = (
+            None  # concrete path, file will be written to this!
+        )
         self.sync_map = None
         if config_string is not None:
             self.configuration = TaskConfiguration(config_string)
@@ -82,7 +88,7 @@ class Task(Loggable):
             "Text file path: %s" % self.text_file_path,
             "Text file path (absolute): %s" % self.text_file_path_absolute,
             "Sync map file path: %s" % self.sync_map_file_path,
-            "Sync map file path (absolute): %s" % self.sync_map_file_path_absolute
+            "Sync map file path (absolute): %s" % self.sync_map_file_path_absolute,
         ]
         return "\n".join(msg)
 
@@ -184,11 +190,18 @@ class Task(Loggable):
             self.log_exc("The sync_map object has not been set", None, True, TypeError)
 
         if (container_root_path is not None) and (self.sync_map_file_path is None):
-            self.log_exc("The (internal) path of the sync map has been set", None, True, TypeError)
+            self.log_exc(
+                "The (internal) path of the sync map has been set",
+                None,
+                True,
+                TypeError,
+            )
 
         self.log(["container_root_path is %s", container_root_path])
         self.log(["self.sync_map_file_path is %s", self.sync_map_file_path])
-        self.log(["self.sync_map_file_path_absolute is %s", self.sync_map_file_path_absolute])
+        self.log(
+            ["self.sync_map_file_path_absolute is %s", self.sync_map_file_path_absolute]
+        )
 
         if (container_root_path is not None) and (self.sync_map_file_path is not None):
             path = os.path.join(container_root_path, self.sync_map_file_path)
@@ -230,10 +243,11 @@ class Task(Loggable):
         """
         self.log("Populate audio file...")
         if self.audio_file_path_absolute is not None:
-            self.log(["audio_file_path_absolute is '%s'", self.audio_file_path_absolute])
+            self.log(
+                ["audio_file_path_absolute is '%s'", self.audio_file_path_absolute]
+            )
             self.audio_file = AudioFile(
-                file_path=self.audio_file_path_absolute,
-                logger=self.logger
+                file_path=self.audio_file_path_absolute, logger=self.logger
             )
             self.audio_file.read_properties()
         else:
@@ -246,28 +260,45 @@ class Task(Loggable):
         the text file at ``self.text_file_path_absolute``.
         """
         self.log("Populate text file...")
-        if (
-                (self.text_file_path_absolute is not None) and
-                (self.configuration["language"] is not None)
+        if (self.text_file_path_absolute is not None) and (
+            self.configuration["language"] is not None
         ):
             # the following values might be None
             parameters = {
-                gc.PPN_TASK_IS_TEXT_FILE_IGNORE_REGEX: self.configuration["i_t_ignore_regex"],
-                gc.PPN_TASK_IS_TEXT_FILE_TRANSLITERATE_MAP: self.configuration["i_t_transliterate_map"],
-                gc.PPN_TASK_IS_TEXT_MPLAIN_WORD_SEPARATOR: self.configuration["i_t_mplain_word_separator"],
-                gc.PPN_TASK_IS_TEXT_MUNPARSED_L1_ID_REGEX: self.configuration["i_t_munparsed_l1_id_regex"],
-                gc.PPN_TASK_IS_TEXT_MUNPARSED_L2_ID_REGEX: self.configuration["i_t_munparsed_l2_id_regex"],
-                gc.PPN_TASK_IS_TEXT_MUNPARSED_L3_ID_REGEX: self.configuration["i_t_munparsed_l3_id_regex"],
-                gc.PPN_TASK_IS_TEXT_UNPARSED_CLASS_REGEX: self.configuration["i_t_unparsed_class_regex"],
-                gc.PPN_TASK_IS_TEXT_UNPARSED_ID_REGEX: self.configuration["i_t_unparsed_id_regex"],
-                gc.PPN_TASK_IS_TEXT_UNPARSED_ID_SORT: self.configuration["i_t_unparsed_id_sort"],
-                gc.PPN_TASK_OS_FILE_ID_REGEX: self.configuration["o_id_regex"]
+                gc.PPN_TASK_IS_TEXT_FILE_IGNORE_REGEX: self.configuration[
+                    "i_t_ignore_regex"
+                ],
+                gc.PPN_TASK_IS_TEXT_FILE_TRANSLITERATE_MAP: self.configuration[
+                    "i_t_transliterate_map"
+                ],
+                gc.PPN_TASK_IS_TEXT_MPLAIN_WORD_SEPARATOR: self.configuration[
+                    "i_t_mplain_word_separator"
+                ],
+                gc.PPN_TASK_IS_TEXT_MUNPARSED_L1_ID_REGEX: self.configuration[
+                    "i_t_munparsed_l1_id_regex"
+                ],
+                gc.PPN_TASK_IS_TEXT_MUNPARSED_L2_ID_REGEX: self.configuration[
+                    "i_t_munparsed_l2_id_regex"
+                ],
+                gc.PPN_TASK_IS_TEXT_MUNPARSED_L3_ID_REGEX: self.configuration[
+                    "i_t_munparsed_l3_id_regex"
+                ],
+                gc.PPN_TASK_IS_TEXT_UNPARSED_CLASS_REGEX: self.configuration[
+                    "i_t_unparsed_class_regex"
+                ],
+                gc.PPN_TASK_IS_TEXT_UNPARSED_ID_REGEX: self.configuration[
+                    "i_t_unparsed_id_regex"
+                ],
+                gc.PPN_TASK_IS_TEXT_UNPARSED_ID_SORT: self.configuration[
+                    "i_t_unparsed_id_sort"
+                ],
+                gc.PPN_TASK_OS_FILE_ID_REGEX: self.configuration["o_id_regex"],
             }
             self.text_file = TextFile(
                 file_path=self.text_file_path_absolute,
                 file_format=self.configuration["i_t_format"],
                 parameters=parameters,
-                logger=self.logger
+                logger=self.logger,
             )
             self.text_file.set_language(self.configuration["language"])
         else:
@@ -330,40 +361,247 @@ class TaskConfiguration(Configuration):
         (gc.PPN_TASK_CUSTOM_ID, (None, None, ["custom_id"], "custom ID")),
         (gc.PPN_TASK_DESCRIPTION, (None, None, ["description"], "description")),
         (gc.PPN_TASK_LANGUAGE, (None, None, ["language"], "language (REQ, *)")),
-        (gc.PPN_TASK_ADJUST_BOUNDARY_AFTERCURRENT_VALUE, (None, TimeValue, ["aba_aftercurrent_value"], "offset value, in s (aftercurrent)")),
-        (gc.PPN_TASK_ADJUST_BOUNDARY_ALGORITHM, (None, None, ["aba_algorithm"], "algorithm to adjust sync map values (*)")),
-        (gc.PPN_TASK_ADJUST_BOUNDARY_BEFORENEXT_VALUE, (None, TimeValue, ["aba_beforenext_value"], "offset value, in s (beforenext)")),
-        (gc.PPN_TASK_ADJUST_BOUNDARY_OFFSET_VALUE, (None, TimeValue, ["aba_offset_value"], "offset value, in s (offset)")),
-        (gc.PPN_TASK_ADJUST_BOUNDARY_NO_ZERO, (None, bool, ["aba_no_zero"], "if True, do not allow zero-length fragments")),
-        (gc.PPN_TASK_ADJUST_BOUNDARY_PERCENT_VALUE, (None, int, ["aba_percent_value"], "percent value in [0..100] (percent)")),
-        (gc.PPN_TASK_ADJUST_BOUNDARY_RATE_VALUE, (None, Decimal, ["aba_rate_value"], "max rate, in chars/s (rate, rateaggressive)")),
-        (gc.PPN_TASK_ADJUST_BOUNDARY_NONSPEECH_MIN, (None, TimeValue, ["aba_nonspeech_min"], "minimum long nonspeech duration, in s")),
-        (gc.PPN_TASK_ADJUST_BOUNDARY_NONSPEECH_STRING, (None, None, ["aba_nonspeech_string"], "replace long nonspeech with this string or specify REMOVE")),
-        (gc.PPN_TASK_IS_AUDIO_FILE_DETECT_HEAD_MAX, (None, TimeValue, ["i_a_head_max"], "detect audio head, at most this many seconds")),
-        (gc.PPN_TASK_IS_AUDIO_FILE_DETECT_HEAD_MIN, (None, TimeValue, ["i_a_head_min"], "detect audio head, at least this many seconds")),
-        (gc.PPN_TASK_IS_AUDIO_FILE_DETECT_TAIL_MAX, (None, TimeValue, ["i_a_tail_max"], "detect audio tail, at most this many seconds")),
-        (gc.PPN_TASK_IS_AUDIO_FILE_DETECT_TAIL_MIN, (None, TimeValue, ["i_a_tail_min"], "detect audio tail, at least this many seconds")),
-        (gc.PPN_TASK_IS_AUDIO_FILE_HEAD_LENGTH, (None, TimeValue, ["i_a_head"], "ignore this many seconds at begin of audio")),
-        (gc.PPN_TASK_IS_AUDIO_FILE_PROCESS_LENGTH, (None, TimeValue, ["i_a_process"], "process this many seconds of audio")),
-        (gc.PPN_TASK_IS_AUDIO_FILE_TAIL_LENGTH, (None, TimeValue, ["i_a_tail"], "ignore this many seconds at end of audio")),
-        (gc.PPN_TASK_IS_TEXT_FILE_FORMAT, (None, None, ["i_t_format"], "text format (REQ, *)")),
-        (gc.PPN_TASK_IS_TEXT_FILE_IGNORE_REGEX, (None, None, ["i_t_ignore_regex"], "for the alignment, ignore text matched by regex")),
-        (gc.PPN_TASK_IS_TEXT_FILE_TRANSLITERATE_MAP, (None, None, ["i_t_transliterate_map"], "for the alignment, apply this transliteration map to text")),
-        (gc.PPN_TASK_IS_TEXT_MPLAIN_WORD_SEPARATOR, (None, None, ["i_t_mplain_word_separator"], "word separator (mplain)")),
-        (gc.PPN_TASK_IS_TEXT_MUNPARSED_L1_ID_REGEX, (None, None, ["i_t_munparsed_l1_id_regex"], "regex matching level 1 id attributes (munparsed)")),
-        (gc.PPN_TASK_IS_TEXT_MUNPARSED_L2_ID_REGEX, (None, None, ["i_t_munparsed_l2_id_regex"], "regex matching level 2 id attributes (munparsed)")),
-        (gc.PPN_TASK_IS_TEXT_MUNPARSED_L3_ID_REGEX, (None, None, ["i_t_munparsed_l3_id_regex"], "regex matching level 3 id attributes (munparsed)")),
-        (gc.PPN_TASK_IS_TEXT_UNPARSED_CLASS_REGEX, (None, None, ["i_t_unparsed_class_regex"], "regex matching class attributes (unparsed)")),
-        (gc.PPN_TASK_IS_TEXT_UNPARSED_ID_REGEX, (None, None, ["i_t_unparsed_id_regex"], "regex matching id attributes (unparsed)")),
-        (gc.PPN_TASK_IS_TEXT_UNPARSED_ID_SORT, (None, None, ["i_t_unparsed_id_sort"], "algorithm to sort matched element (unparsed) (*)")),
-        (gc.PPN_TASK_OS_FILE_EAF_AUDIO_REF, (None, None, ["o_eaf_audio_ref"], "audio ref value (eaf)")),
-        (gc.PPN_TASK_OS_FILE_FORMAT, (None, None, ["o_format"], "sync map format (REQ, *)")),
-        (gc.PPN_TASK_OS_FILE_HEAD_TAIL_FORMAT, (None, None, ["o_h_t_format"], "audio head/tail format (*)")),
-        (gc.PPN_TASK_OS_FILE_ID_REGEX, (None, None, ["o_id_regex"], "regex to build sync map id's (subtitles, plain)")),
-        (gc.PPN_TASK_OS_FILE_LEVELS, (None, None, ["o_levels"], "output the specified levels only (mplain, munparserd)")),
-        (gc.PPN_TASK_OS_FILE_NAME, (None, None, ["o_name"], "sync map file name (ignored)")),
-        (gc.PPN_TASK_OS_FILE_SMIL_AUDIO_REF, (None, None, ["o_smil_audio_ref"], "audio ref value (smil, smilh, smilm)")),
-        (gc.PPN_TASK_OS_FILE_SMIL_PAGE_REF, (None, None, ["o_smil_page_ref"], "text ref value (smil, smilh, smilm)")),
+        (
+            gc.PPN_TASK_ADJUST_BOUNDARY_AFTERCURRENT_VALUE,
+            (
+                None,
+                TimeValue,
+                ["aba_aftercurrent_value"],
+                "offset value, in s (aftercurrent)",
+            ),
+        ),
+        (
+            gc.PPN_TASK_ADJUST_BOUNDARY_ALGORITHM,
+            (None, None, ["aba_algorithm"], "algorithm to adjust sync map values (*)"),
+        ),
+        (
+            gc.PPN_TASK_ADJUST_BOUNDARY_BEFORENEXT_VALUE,
+            (
+                None,
+                TimeValue,
+                ["aba_beforenext_value"],
+                "offset value, in s (beforenext)",
+            ),
+        ),
+        (
+            gc.PPN_TASK_ADJUST_BOUNDARY_OFFSET_VALUE,
+            (None, TimeValue, ["aba_offset_value"], "offset value, in s (offset)"),
+        ),
+        (
+            gc.PPN_TASK_ADJUST_BOUNDARY_NO_ZERO,
+            (
+                None,
+                bool,
+                ["aba_no_zero"],
+                "if True, do not allow zero-length fragments",
+            ),
+        ),
+        (
+            gc.PPN_TASK_ADJUST_BOUNDARY_PERCENT_VALUE,
+            (None, int, ["aba_percent_value"], "percent value in [0..100] (percent)"),
+        ),
+        (
+            gc.PPN_TASK_ADJUST_BOUNDARY_RATE_VALUE,
+            (
+                None,
+                Decimal,
+                ["aba_rate_value"],
+                "max rate, in chars/s (rate, rateaggressive)",
+            ),
+        ),
+        (
+            gc.PPN_TASK_ADJUST_BOUNDARY_NONSPEECH_MIN,
+            (
+                None,
+                TimeValue,
+                ["aba_nonspeech_min"],
+                "minimum long nonspeech duration, in s",
+            ),
+        ),
+        (
+            gc.PPN_TASK_ADJUST_BOUNDARY_NONSPEECH_STRING,
+            (
+                None,
+                None,
+                ["aba_nonspeech_string"],
+                "replace long nonspeech with this string or specify REMOVE",
+            ),
+        ),
+        (
+            gc.PPN_TASK_IS_AUDIO_FILE_DETECT_HEAD_MAX,
+            (
+                None,
+                TimeValue,
+                ["i_a_head_max"],
+                "detect audio head, at most this many seconds",
+            ),
+        ),
+        (
+            gc.PPN_TASK_IS_AUDIO_FILE_DETECT_HEAD_MIN,
+            (
+                None,
+                TimeValue,
+                ["i_a_head_min"],
+                "detect audio head, at least this many seconds",
+            ),
+        ),
+        (
+            gc.PPN_TASK_IS_AUDIO_FILE_DETECT_TAIL_MAX,
+            (
+                None,
+                TimeValue,
+                ["i_a_tail_max"],
+                "detect audio tail, at most this many seconds",
+            ),
+        ),
+        (
+            gc.PPN_TASK_IS_AUDIO_FILE_DETECT_TAIL_MIN,
+            (
+                None,
+                TimeValue,
+                ["i_a_tail_min"],
+                "detect audio tail, at least this many seconds",
+            ),
+        ),
+        (
+            gc.PPN_TASK_IS_AUDIO_FILE_HEAD_LENGTH,
+            (
+                None,
+                TimeValue,
+                ["i_a_head"],
+                "ignore this many seconds at begin of audio",
+            ),
+        ),
+        (
+            gc.PPN_TASK_IS_AUDIO_FILE_PROCESS_LENGTH,
+            (None, TimeValue, ["i_a_process"], "process this many seconds of audio"),
+        ),
+        (
+            gc.PPN_TASK_IS_AUDIO_FILE_TAIL_LENGTH,
+            (None, TimeValue, ["i_a_tail"], "ignore this many seconds at end of audio"),
+        ),
+        (
+            gc.PPN_TASK_IS_TEXT_FILE_FORMAT,
+            (None, None, ["i_t_format"], "text format (REQ, *)"),
+        ),
+        (
+            gc.PPN_TASK_IS_TEXT_FILE_IGNORE_REGEX,
+            (
+                None,
+                None,
+                ["i_t_ignore_regex"],
+                "for the alignment, ignore text matched by regex",
+            ),
+        ),
+        (
+            gc.PPN_TASK_IS_TEXT_FILE_TRANSLITERATE_MAP,
+            (
+                None,
+                None,
+                ["i_t_transliterate_map"],
+                "for the alignment, apply this transliteration map to text",
+            ),
+        ),
+        (
+            gc.PPN_TASK_IS_TEXT_MPLAIN_WORD_SEPARATOR,
+            (None, None, ["i_t_mplain_word_separator"], "word separator (mplain)"),
+        ),
+        (
+            gc.PPN_TASK_IS_TEXT_MUNPARSED_L1_ID_REGEX,
+            (
+                None,
+                None,
+                ["i_t_munparsed_l1_id_regex"],
+                "regex matching level 1 id attributes (munparsed)",
+            ),
+        ),
+        (
+            gc.PPN_TASK_IS_TEXT_MUNPARSED_L2_ID_REGEX,
+            (
+                None,
+                None,
+                ["i_t_munparsed_l2_id_regex"],
+                "regex matching level 2 id attributes (munparsed)",
+            ),
+        ),
+        (
+            gc.PPN_TASK_IS_TEXT_MUNPARSED_L3_ID_REGEX,
+            (
+                None,
+                None,
+                ["i_t_munparsed_l3_id_regex"],
+                "regex matching level 3 id attributes (munparsed)",
+            ),
+        ),
+        (
+            gc.PPN_TASK_IS_TEXT_UNPARSED_CLASS_REGEX,
+            (
+                None,
+                None,
+                ["i_t_unparsed_class_regex"],
+                "regex matching class attributes (unparsed)",
+            ),
+        ),
+        (
+            gc.PPN_TASK_IS_TEXT_UNPARSED_ID_REGEX,
+            (
+                None,
+                None,
+                ["i_t_unparsed_id_regex"],
+                "regex matching id attributes (unparsed)",
+            ),
+        ),
+        (
+            gc.PPN_TASK_IS_TEXT_UNPARSED_ID_SORT,
+            (
+                None,
+                None,
+                ["i_t_unparsed_id_sort"],
+                "algorithm to sort matched element (unparsed) (*)",
+            ),
+        ),
+        (
+            gc.PPN_TASK_OS_FILE_EAF_AUDIO_REF,
+            (None, None, ["o_eaf_audio_ref"], "audio ref value (eaf)"),
+        ),
+        (
+            gc.PPN_TASK_OS_FILE_FORMAT,
+            (None, None, ["o_format"], "sync map format (REQ, *)"),
+        ),
+        (
+            gc.PPN_TASK_OS_FILE_HEAD_TAIL_FORMAT,
+            (None, None, ["o_h_t_format"], "audio head/tail format (*)"),
+        ),
+        (
+            gc.PPN_TASK_OS_FILE_ID_REGEX,
+            (
+                None,
+                None,
+                ["o_id_regex"],
+                "regex to build sync map id's (subtitles, plain)",
+            ),
+        ),
+        (
+            gc.PPN_TASK_OS_FILE_LEVELS,
+            (
+                None,
+                None,
+                ["o_levels"],
+                "output the specified levels only (mplain, munparserd)",
+            ),
+        ),
+        (
+            gc.PPN_TASK_OS_FILE_NAME,
+            (None, None, ["o_name"], "sync map file name (ignored)"),
+        ),
+        (
+            gc.PPN_TASK_OS_FILE_SMIL_AUDIO_REF,
+            (None, None, ["o_smil_audio_ref"], "audio ref value (smil, smilh, smilm)"),
+        ),
+        (
+            gc.PPN_TASK_OS_FILE_SMIL_PAGE_REF,
+            (None, None, ["o_smil_page_ref"], "text ref value (smil, smilh, smilm)"),
+        ),
     ]
 
     TAG = "TaskConfiguration"
@@ -386,20 +624,34 @@ class TaskConfiguration(Configuration):
         :rtype: dict
         """
         ABA_MAP = {
-            AdjustBoundaryAlgorithm.AFTERCURRENT: [self[gc.PPN_TASK_ADJUST_BOUNDARY_AFTERCURRENT_VALUE]],
+            AdjustBoundaryAlgorithm.AFTERCURRENT: [
+                self[gc.PPN_TASK_ADJUST_BOUNDARY_AFTERCURRENT_VALUE]
+            ],
             AdjustBoundaryAlgorithm.AUTO: [],
-            AdjustBoundaryAlgorithm.BEFORENEXT: [self[gc.PPN_TASK_ADJUST_BOUNDARY_BEFORENEXT_VALUE]],
-            AdjustBoundaryAlgorithm.OFFSET: [self[gc.PPN_TASK_ADJUST_BOUNDARY_OFFSET_VALUE]],
-            AdjustBoundaryAlgorithm.PERCENT: [self[gc.PPN_TASK_ADJUST_BOUNDARY_PERCENT_VALUE]],
-            AdjustBoundaryAlgorithm.RATE: [self[gc.PPN_TASK_ADJUST_BOUNDARY_RATE_VALUE]],
-            AdjustBoundaryAlgorithm.RATEAGGRESSIVE: [self[gc.PPN_TASK_ADJUST_BOUNDARY_RATE_VALUE]]
+            AdjustBoundaryAlgorithm.BEFORENEXT: [
+                self[gc.PPN_TASK_ADJUST_BOUNDARY_BEFORENEXT_VALUE]
+            ],
+            AdjustBoundaryAlgorithm.OFFSET: [
+                self[gc.PPN_TASK_ADJUST_BOUNDARY_OFFSET_VALUE]
+            ],
+            AdjustBoundaryAlgorithm.PERCENT: [
+                self[gc.PPN_TASK_ADJUST_BOUNDARY_PERCENT_VALUE]
+            ],
+            AdjustBoundaryAlgorithm.RATE: [
+                self[gc.PPN_TASK_ADJUST_BOUNDARY_RATE_VALUE]
+            ],
+            AdjustBoundaryAlgorithm.RATEAGGRESSIVE: [
+                self[gc.PPN_TASK_ADJUST_BOUNDARY_RATE_VALUE]
+            ],
         }
-        aba_algorithm = self[gc.PPN_TASK_ADJUST_BOUNDARY_ALGORITHM] or AdjustBoundaryAlgorithm.AUTO
+        aba_algorithm = (
+            self[gc.PPN_TASK_ADJUST_BOUNDARY_ALGORITHM] or AdjustBoundaryAlgorithm.AUTO
+        )
         ns_min = self[gc.PPN_TASK_ADJUST_BOUNDARY_NONSPEECH_MIN]
         ns_string = self[gc.PPN_TASK_ADJUST_BOUNDARY_NONSPEECH_STRING]
         nozero = self[gc.PPN_TASK_ADJUST_BOUNDARY_NO_ZERO] or False
         return {
             "algorithm": (aba_algorithm, ABA_MAP[aba_algorithm]),
             "nonspeech": (ns_min, ns_string),
-            "nozero": nozero
+            "nozero": nozero,
         }

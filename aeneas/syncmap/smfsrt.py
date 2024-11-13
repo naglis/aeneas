@@ -40,7 +40,9 @@ class SyncMapFormatSRT(SyncMapFormatGenericSubtitles):
     #      but for clarity we repeat them here
     #
     def __init__(self, variant=DEFAULT, parameters=None, rconf=None, logger=None):
-        super().__init__(variant=variant, parameters=parameters, rconf=rconf, logger=logger)
+        super().__init__(
+            variant=variant, parameters=parameters, rconf=rconf, logger=logger
+        )
         self.header_string = None
         self.header_might_not_have_trailing_blank_line = False
         self.footer_string = None

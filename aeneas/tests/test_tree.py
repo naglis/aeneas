@@ -26,7 +26,6 @@ from aeneas.tree import Tree
 
 
 class TestTree(unittest.TestCase):
-
     def create_tree1(self, soon=True):
         root = Tree(value="root")
         c1 = Tree(value="c1")
@@ -88,7 +87,23 @@ class TestTree(unittest.TestCase):
 
         c23.add_child(c231)
         c23.add_child(c232)
-        return (root, c1, c11, c12, c13, c2, c21, c22, c23, c231, c232, c24, c25, c3, c4)
+        return (
+            root,
+            c1,
+            c11,
+            c12,
+            c13,
+            c2,
+            c21,
+            c22,
+            c23,
+            c231,
+            c232,
+            c24,
+            c25,
+            c3,
+            c4,
+        )
 
     def test_empty(self):
         root = Tree()
@@ -201,7 +216,9 @@ class TestTree(unittest.TestCase):
         self.assertEqual(c111.levels, [[c111], [c1111, c1112, c1113]])
         self.assertEqual(c11.levels, [[c11], [c111], [c1111, c1112, c1113]])
         self.assertEqual(c1.levels, [[c1], [c11], [c111], [c1111, c1112, c1113]])
-        self.assertEqual(root.levels, [[root], [c1], [c11], [c111], [c1111, c1112, c1113]])
+        self.assertEqual(
+            root.levels, [[root], [c1], [c11], [c111], [c1111, c1112, c1113]]
+        )
 
     def test_vlevels(self):
         (root, c1, c11, c111, c1111, c1112, c1113) = self.create_tree1()
@@ -210,17 +227,26 @@ class TestTree(unittest.TestCase):
         self.assertEqual(c1113.vlevels, [["c1113"]])
         self.assertEqual(c111.vlevels, [["c111"], ["c1111", "c1112", "c1113"]])
         self.assertEqual(c11.vlevels, [["c11"], ["c111"], ["c1111", "c1112", "c1113"]])
-        self.assertEqual(c1.vlevels, [["c1"], ["c11"], ["c111"], ["c1111", "c1112", "c1113"]])
-        self.assertEqual(root.vlevels, [["root"], ["c1"], ["c11"], ["c111"], ["c1111", "c1112", "c1113"]])
+        self.assertEqual(
+            c1.vlevels, [["c1"], ["c11"], ["c111"], ["c1111", "c1112", "c1113"]]
+        )
+        self.assertEqual(
+            root.vlevels,
+            [["root"], ["c1"], ["c11"], ["c111"], ["c1111", "c1112", "c1113"]],
+        )
 
     def test_is_pleasant(self):
         (root, c1, c11, c111, c1111, c1112, c1113) = self.create_tree1()
         self.assertTrue(root.is_pleasant)
-        (root, c1, c11, c12, c13, c2, c21, c22, c23, c231, c232, c24, c25, c3, c4) = self.create_tree2()
+        (root, c1, c11, c12, c13, c2, c21, c22, c23, c231, c232, c24, c25, c3, c4) = (
+            self.create_tree2()
+        )
         self.assertFalse(root.is_pleasant)
 
     def test_level_one_vs_children(self):
-        (root, c1, c11, c12, c13, c2, c21, c22, c23, c231, c232, c24, c25, c3, c4) = self.create_tree2()
+        (root, c1, c11, c12, c13, c2, c21, c22, c23, c231, c232, c24, c25, c3, c4) = (
+            self.create_tree2()
+        )
         for node in [root, c1, c23]:
             self.assertEqual(node.children, node.levels[1])
             self.assertEqual(node.children, node.level_at_index(1))
@@ -298,24 +324,30 @@ class TestTree(unittest.TestCase):
             [2, 4],
             [3],
             [3, 4],
-            [4]
+            [4],
         ]:
             (root, c1, c11, c111, c1111, c1112, c1113) = self.create_tree1()
             self.keep(root, levels)
 
     def test_keep_levels_2(self):
-        for levels in [
-            [],
-            [0],
-            [1],
-            [1, 2],
-            [1, 2, 3],
-            [1, 3],
-            [2],
-            [2, 3],
-            [3]
-        ]:
-            (root, c1, c11, c12, c13, c2, c21, c22, c23, c231, c232, c24, c25, c3, c4) = self.create_tree2()
+        for levels in [[], [0], [1], [1, 2], [1, 2, 3], [1, 3], [2], [2, 3], [3]]:
+            (
+                root,
+                c1,
+                c11,
+                c12,
+                c13,
+                c2,
+                c21,
+                c22,
+                c23,
+                c231,
+                c232,
+                c24,
+                c25,
+                c3,
+                c4,
+            ) = self.create_tree2()
             self.keep(root, levels)
 
     def test_clone(self):

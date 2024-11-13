@@ -51,11 +51,7 @@ PKG_VERSION = "1.7.3.0"
 # required packages to install
 # NOTE: always use exact version numbers
 # NOTE: this list should be the same as requirements.txt
-PKG_INSTALL_REQUIRES = [
-    "BeautifulSoup4>=4.5.1",
-    "lxml>=3.6.0",
-    "numpy>=1.9"
-]
+PKG_INSTALL_REQUIRES = ["BeautifulSoup4>=4.5.1", "lxml>=3.6.0", "numpy>=1.9"]
 
 # required packages to install extra tools
 PKG_EXTRAS_REQUIRE = {
@@ -83,7 +79,7 @@ PKG_EXTRAS_REQUIRE = {
     ],
     "tgt": [
         "tgt>=1.4.2",
-    ]
+    ],
 }
 
 # packages to be distributed
@@ -98,55 +94,22 @@ PKG_PACKAGES = [
     "aeneas.extra",
     "aeneas.syncmap",
     "aeneas.tools",
-    "aeneas.ttswrappers"
+    "aeneas.ttswrappers",
 ]
 
 # data files to be distributed
 # NOTE: .py files will be added automatically
 PKG_PACKAGE_DATA = {
-    "aeneas": [
-        "res/*",
-        "*.md"
-    ],
-    "aeneas.cdtw": [
-        "*.c",
-        "*.h",
-        "*.md"
-    ],
-    "aeneas.cew": [
-        "*.c",
-        "*.h",
-        "*.md",
-        "*.dll"
-    ],
-    "aeneas.cew": [
-        "*.cc",
-        "*.h",
-        "*.md"
-    ],
-    "aeneas.cmfcc": [
-        "*.c",
-        "*.h",
-        "*.md"
-    ],
-    "aeneas.cwave": [
-        "*.c",
-        "*.h",
-        "*.md"
-    ],
-    "aeneas.extra": [
-        "*.md"
-    ],
-    "aeneas.syncmap": [
-        "*.md"
-    ],
-    "aeneas.tools": [
-        "res/*",
-        "*.md"
-    ],
-    "aeneas.ttswrappers": [
-        "*.md"
-    ]
+    "aeneas": ["res/*", "*.md"],
+    "aeneas.cdtw": ["*.c", "*.h", "*.md"],
+    "aeneas.cew": ["*.c", "*.h", "*.md", "*.dll"],
+    "aeneas.cew": ["*.cc", "*.h", "*.md"],
+    "aeneas.cmfcc": ["*.c", "*.h", "*.md"],
+    "aeneas.cwave": ["*.c", "*.h", "*.md"],
+    "aeneas.extra": ["*.md"],
+    "aeneas.syncmap": ["*.md"],
+    "aeneas.tools": ["res/*", "*.md"],
+    "aeneas.ttswrappers": ["*.md"],
 }
 
 # scripts to be installed globally
@@ -277,5 +240,5 @@ PKG_CLASSIFIERS = [
     "Topic :: Text Processing :: Markup",
     "Topic :: Text Processing :: Markup :: HTML",
     "Topic :: Text Processing :: Markup :: XML",
-    "Topic :: Utilities"
+    "Topic :: Utilities",
 ]

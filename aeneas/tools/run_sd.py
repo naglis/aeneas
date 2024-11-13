@@ -42,6 +42,7 @@ class RunSDCLI(AbstractCLIProgram):
     """
     Detect the audio head and/or tail of the given audio file.
     """
+
     AUDIO_FILE = gf.relative_path("res/audio.mp3", __file__)
     PARAMETERS_HEAD = "--min-head=0.0 --max-head=5.0"
     PARAMETERS_TAIL = "--min-tail=1.0 --max-tail=5.0"
@@ -53,13 +54,18 @@ class RunSDCLI(AbstractCLIProgram):
         "description": "Detect the audio head and/or tail of the given audio file.",
         "synopsis": [
             ("list 'fragment 1|fragment 2|...|fragment N' LANGUAGE AUDIO_FILE", True),
-            ("[mplain|munparsed|parsed|plain|subtitles|unparsed] TEXT_FILE LANGUAGE AUDIO_FILE", True)
+            (
+                "[mplain|munparsed|parsed|plain|subtitles|unparsed] TEXT_FILE LANGUAGE AUDIO_FILE",
+                True,
+            ),
         ],
         "examples": [
             "parsed {} eng {}".format(TEXT_FILE, AUDIO_FILE),
             "parsed {} eng {} {}".format(TEXT_FILE, AUDIO_FILE, PARAMETERS_HEAD),
             "parsed {} eng {} {}".format(TEXT_FILE, AUDIO_FILE, PARAMETERS_TAIL),
-            "parsed {} eng {} {} {}".format(TEXT_FILE, AUDIO_FILE, PARAMETERS_HEAD, PARAMETERS_TAIL),
+            "parsed {} eng {} {} {}".format(
+                TEXT_FILE, AUDIO_FILE, PARAMETERS_HEAD, PARAMETERS_TAIL
+            ),
         ],
         "options": [
             "--class-regex=REGEX : extract text from elements with class attribute matching REGEX (unparsed)",
@@ -71,8 +77,8 @@ class RunSDCLI(AbstractCLIProgram):
             "--max-tail=DUR : audio tail has at most DUR seconds",
             "--min-head=DUR : audio head has at least DUR seconds",
             "--min-tail=DUR : audio tail has at least DUR seconds",
-            "--sort=ALGORITHM : sort the matched element id attributes using ALGORITHM (lexicographic, numeric, unsorted)"
-        ]
+            "--sort=ALGORITHM : sort the matched element id attributes using ALGORITHM (lexicographic, numeric, unsorted)",
+        ],
     }
 
     def perform_command(self):
@@ -107,11 +113,21 @@ class RunSDCLI(AbstractCLIProgram):
             gc.PPN_TASK_IS_TEXT_UNPARSED_ID_REGEX: id_regex,
             gc.PPN_TASK_IS_TEXT_UNPARSED_ID_SORT: sort,
         }
-        if (text_format == TextFileFormat.MUNPARSED) and ((l1_id_regex is None) or (l2_id_regex is None) or (l3_id_regex is None)):
-            self.print_error("You must specify --l1-id-regex and --l2-id-regex and --l3-id-regex for munparsed format")
+        if (text_format == TextFileFormat.MUNPARSED) and (
+            (l1_id_regex is None) or (l2_id_regex is None) or (l3_id_regex is None)
+        ):
+            self.print_error(
+                "You must specify --l1-id-regex and --l2-id-regex and --l3-id-regex for munparsed format"
+            )
             return self.ERROR_EXIT_CODE
-        if (text_format == TextFileFormat.UNPARSED) and (id_regex is None) and (class_regex is None):
-            self.print_error("You must specify --id-regex and/or --class-regex for unparsed format")
+        if (
+            (text_format == TextFileFormat.UNPARSED)
+            and (id_regex is None)
+            and (class_regex is None)
+        ):
+            self.print_error(
+                "You must specify --id-regex and/or --class-regex for unparsed format"
+            )
             return self.ERROR_EXIT_CODE
 
         language = gf.safe_unicode(self.actual_arguments[2])
@@ -132,9 +148,14 @@ class RunSDCLI(AbstractCLIProgram):
 
         self.print_info("Reading audio...")
         try:
-            audio_file_mfcc = AudioFileMFCC(audio_file_path, rconf=self.rconf, logger=self.logger)
+            audio_file_mfcc = AudioFileMFCC(
+                audio_file_path, rconf=self.rconf, logger=self.logger
+            )
         except AudioFileConverterError:
-            self.print_error("Unable to call the ffmpeg executable '%s'" % (self.rconf[RuntimeConfiguration.FFMPEG_PATH]))
+            self.print_error(
+                "Unable to call the ffmpeg executable '%s'"
+                % (self.rconf[RuntimeConfiguration.FFMPEG_PATH])
+            )
             self.print_error("Make sure the path to ffmpeg is correct")
             return self.ERROR_EXIT_CODE
         except (AudioFileUnsupportedFormatError, AudioFileNotInitializedError):
@@ -142,7 +163,9 @@ class RunSDCLI(AbstractCLIProgram):
             self.print_error("Check that its format is supported by ffmpeg")
             return self.ERROR_EXIT_CODE
         except Exception as exc:
-            self.print_error("An unexpected error occurred while reading the audio file:")
+            self.print_error(
+                "An unexpected error occurred while reading the audio file:"
+            )
             self.print_error("%s" % exc)
             return self.ERROR_EXIT_CODE
         self.print_info("Reading audio... done")
@@ -157,8 +180,12 @@ class RunSDCLI(AbstractCLIProgram):
         max_tail = gf.safe_float(self.has_option_with_value("--max-tail"), None)
 
         self.print_info("Detecting audio interval...")
-        start_detector = SD(audio_file_mfcc, text_file, rconf=self.rconf, logger=self.logger)
-        start, end = start_detector.detect_interval(min_head, max_head, min_tail, max_tail)
+        start_detector = SD(
+            audio_file_mfcc, text_file, rconf=self.rconf, logger=self.logger
+        )
+        start, end = start_detector.detect_interval(
+            min_head, max_head, min_tail, max_tail
+        )
         self.print_info("Detecting audio interval... done")
 
         self.print_result(audio_file_mfcc.audio_length, start, end)
@@ -205,5 +232,6 @@ def main():
     """
     RunSDCLI().run(arguments=sys.argv)
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     main()

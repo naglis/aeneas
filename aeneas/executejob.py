@@ -30,7 +30,6 @@ This module contains the following classes:
   representing errors generated while processing jobs.
 """
 
-
 import tempfile
 
 from aeneas.analyzecontainer import AnalyzeContainer
@@ -47,6 +46,7 @@ class ExecuteJobExecutionError(Exception):
     """
     Error raised when the execution of the job fails for internal reasons.
     """
+
     pass
 
 
@@ -54,6 +54,7 @@ class ExecuteJobInputError(Exception):
     """
     Error raised when the input parameters of the job are invalid or missing.
     """
+
     pass
 
 
@@ -61,6 +62,7 @@ class ExecuteJobOutputError(Exception):
     """
     Error raised when the creation of the output container failed.
     """
+
     pass
 
 
@@ -115,7 +117,9 @@ class ExecuteJob(Loggable):
         :raises: :class:`~aeneas.executejob.ExecuteJobInputError`: if ``job`` is not an instance of :class:`~aeneas.job.Job`
         """
         if not isinstance(job, Job):
-            self.log_exc("job is not an instance of Job", None, True, ExecuteJobInputError)
+            self.log_exc(
+                "job is not an instance of Job", None, True, ExecuteJobInputError
+            )
         self.job = job
 
     def load_job_from_container(self, container_path, config_string=None):
@@ -138,7 +142,9 @@ class ExecuteJob(Loggable):
 
         # create working directory where the input container
         # will be decompressed
-        self.working_directory = tempfile.TemporaryDirectory(dir=self.rconf[RuntimeConfiguration.TMP_PATH])
+        self.working_directory = tempfile.TemporaryDirectory(
+            dir=self.rconf[RuntimeConfiguration.TMP_PATH]
+        )
         self.log(["Created working directory '%s'", self.working_directory.name])
 
         try:
@@ -148,23 +154,37 @@ class ExecuteJob(Loggable):
             self.log("Decompressing input container... done")
         except Exception as exc:
             self.clean()
-            self.log_exc("Unable to decompress container '{}': {}".format(container_path, exc), None, True, ExecuteJobInputError)
+            self.log_exc(
+                "Unable to decompress container '{}': {}".format(container_path, exc),
+                None,
+                True,
+                ExecuteJobInputError,
+            )
 
         try:
             self.log("Creating job from working directory...")
             working_container = Container(
-                self.working_directory.name,
-                logger=self.logger
+                self.working_directory.name, logger=self.logger
             )
             analyzer = AnalyzeContainer(working_container, logger=self.logger)
             self.job = analyzer.analyze(config_string=config_string)
             self.log("Creating job from working directory... done")
         except Exception as exc:
             self.clean()
-            self.log_exc("Unable to analyze container '{}': {}".format(container_path, exc), None, True, ExecuteJobInputError)
+            self.log_exc(
+                "Unable to analyze container '{}': {}".format(container_path, exc),
+                None,
+                True,
+                ExecuteJobInputError,
+            )
 
         if self.job is None:
-            self.log_exc("The container '%s' does not contain a valid Job" % (container_path), None, True, ExecuteJobInputError)
+            self.log_exc(
+                "The container '%s' does not contain a valid Job" % (container_path),
+                None,
+                True,
+                ExecuteJobInputError,
+            )
 
         try:
             # set absolute path for text file and audio file
@@ -172,19 +192,22 @@ class ExecuteJob(Loggable):
             self.log("Setting absolute paths for tasks...")
             for task in self.job.tasks:
                 task.text_file_path_absolute = gf.norm_join(
-                    self.working_directory.path,
-                    task.text_file_path
+                    self.working_directory.path, task.text_file_path
                 )
                 task.audio_file_path_absolute = gf.norm_join(
-                    self.working_directory.name,
-                    task.audio_file_path
+                    self.working_directory.name, task.audio_file_path
                 )
             self.log("Setting absolute paths for tasks... done")
 
             self.log("Loading job from container: succeeded")
         except Exception as exc:
             self.clean()
-            self.log_exc("Error while setting absolute paths for tasks", exc, True, ExecuteJobInputError)
+            self.log_exc(
+                "Error while setting absolute paths for tasks",
+                exc,
+                True,
+                ExecuteJobInputError,
+            )
 
     def execute(self):
         """
@@ -203,7 +226,13 @@ class ExecuteJob(Loggable):
             self.log_exc("The job has no tasks", None, True, ExecuteJobExecutionError)
         job_max_tasks = self.rconf[RuntimeConfiguration.JOB_MAX_TASKS]
         if (job_max_tasks > 0) and (len(self.job) > job_max_tasks):
-            self.log_exc("The Job has %d Tasks, more than the maximum allowed (%d)." % (len(self.job), job_max_tasks), None, True, ExecuteJobExecutionError)
+            self.log_exc(
+                "The Job has %d Tasks, more than the maximum allowed (%d)."
+                % (len(self.job), job_max_tasks),
+                None,
+                True,
+                ExecuteJobExecutionError,
+            )
         self.log(["Number of tasks: '%d'", len(self.job)])
 
         for task in self.job.tasks:
@@ -214,7 +243,12 @@ class ExecuteJob(Loggable):
                 executor.execute()
                 self.log(["Executing task '%s'... done", custom_id])
             except Exception as exc:
-                self.log_exc("Error while executing task '%s'" % (custom_id), exc, True, ExecuteJobExecutionError)
+                self.log_exc(
+                    "Error while executing task '%s'" % (custom_id),
+                    exc,
+                    True,
+                    ExecuteJobExecutionError,
+                )
             self.log("Executing task: succeeded")
 
         self.log("Executing job: succeeded")
@@ -244,7 +278,9 @@ class ExecuteJob(Loggable):
         # will be created
         # this temporary directory will be compressed into
         # the output container
-        self.tmp_directory = tempfile.TemporaryDirectory(dir=self.rconf[RuntimeConfiguration.TMP_PATH])
+        self.tmp_directory = tempfile.TemporaryDirectory(
+            dir=self.rconf[RuntimeConfiguration.TMP_PATH]
+        )
         self.log(["Created temporary directory '%s'", self.tmp_directory.name])
 
         for task in self.job.tasks:
@@ -252,9 +288,19 @@ class ExecuteJob(Loggable):
 
             # check if the task has sync map and sync map file path
             if task.sync_map_file_path is None:
-                self.log_exc("Task '%s' has sync_map_file_path not set" % (custom_id), None, True, ExecuteJobOutputError)
+                self.log_exc(
+                    "Task '%s' has sync_map_file_path not set" % (custom_id),
+                    None,
+                    True,
+                    ExecuteJobOutputError,
+                )
             if task.sync_map is None:
-                self.log_exc("Task '%s' has sync_map not set" % (custom_id), None, True, ExecuteJobOutputError)
+                self.log_exc(
+                    "Task '%s' has sync_map not set" % (custom_id),
+                    None,
+                    True,
+                    ExecuteJobOutputError,
+                )
 
             try:
                 # output sync map
@@ -262,29 +308,30 @@ class ExecuteJob(Loggable):
                 task.output_sync_map_file(self.tmp_directory.name)
                 self.log(["Outputting sync map for task '%s'... done", custom_id])
             except Exception:
-                self.log_exc("Error while outputting sync map for task '%s'" % (custom_id), None, True, ExecuteJobOutputError)
+                self.log_exc(
+                    "Error while outputting sync map for task '%s'" % (custom_id),
+                    None,
+                    True,
+                    ExecuteJobOutputError,
+                )
 
         # get output container info
         output_container_format = self.job.configuration["o_container_format"]
         self.log(["Output container format: '%s'", output_container_format])
         output_file_name = self.job.configuration["o_name"]
-        if ((output_container_format != ContainerFormat.UNPACKED) and
-                (not output_file_name.endswith(output_container_format))):
+        if (output_container_format != ContainerFormat.UNPACKED) and (
+            not output_file_name.endswith(output_container_format)
+        ):
             self.log("Adding extension to output_file_name")
             output_file_name += "." + output_container_format
         self.log(["Output file name: '%s'", output_file_name])
-        output_file_path = gf.norm_join(
-            output_directory_path,
-            output_file_name
-        )
+        output_file_path = gf.norm_join(output_directory_path, output_file_name)
         self.log(["Output file path: '%s'", output_file_path])
 
         try:
             self.log("Compressing...")
             container = Container(
-                output_file_path,
-                output_container_format,
-                logger=self.logger
+                output_file_path, output_container_format, logger=self.logger
             )
             container.compress(self.tmp_directory.name)
             self.log("Compressing... done")

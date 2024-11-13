@@ -26,7 +26,6 @@ from aeneas.tests.common import ExecuteTaskCLICase
 
 
 class TestExecuteTaskCLI(ExecuteTaskCLICase):
-
     def test_help(self):
         self.execute([], 2)
         self.execute([("", "-h")], 2)
@@ -85,74 +84,125 @@ class TestExecuteTaskCLI(ExecuteTaskCLICase):
         self.execute([("", "--list-values=task_adjust_boundary_algorithm")], 2)
 
     def test_exec_srt_max_audio_length(self):
-        self.execute([
-            ("in", "../tools/res/audio.mp3"),
-            ("in", "../tools/res/subtitles.txt"),
-            ("", "task_language=eng|is_text_type=subtitles|os_task_file_format=srt"),
-            ("out", "sonnet.srt"),
-            ("", "-r=\"task_max_audio_length=5.0\"")
-        ], 1)
+        self.execute(
+            [
+                ("in", "../tools/res/audio.mp3"),
+                ("in", "../tools/res/subtitles.txt"),
+                (
+                    "",
+                    "task_language=eng|is_text_type=subtitles|os_task_file_format=srt",
+                ),
+                ("out", "sonnet.srt"),
+                ("", '-r="task_max_audio_length=5.0"'),
+            ],
+            1,
+        )
 
     def test_exec_srt_max_text_length(self):
-        self.execute([
-            ("in", "../tools/res/audio.mp3"),
-            ("in", "../tools/res/subtitles.txt"),
-            ("", "task_language=eng|is_text_type=subtitles|os_task_file_format=srt"),
-            ("out", "sonnet.srt"),
-            ("", "-r=\"task_max_text_length=5\"")
-        ], 1)
+        self.execute(
+            [
+                ("in", "../tools/res/audio.mp3"),
+                ("in", "../tools/res/subtitles.txt"),
+                (
+                    "",
+                    "task_language=eng|is_text_type=subtitles|os_task_file_format=srt",
+                ),
+                ("out", "sonnet.srt"),
+                ("", '-r="task_max_text_length=5"'),
+            ],
+            1,
+        )
 
     def test_exec_cannot_read_1(self):
-        self.execute([
-            ("", "/foo/bar/baz.mp3"),
-            ("in", "../tools/res/subtitles.txt"),
-            ("", "task_language=eng|is_text_type=subtitles|os_task_file_format=srt"),
-            ("out", "sonnet.srt")
-        ], 1)
+        self.execute(
+            [
+                ("", "/foo/bar/baz.mp3"),
+                ("in", "../tools/res/subtitles.txt"),
+                (
+                    "",
+                    "task_language=eng|is_text_type=subtitles|os_task_file_format=srt",
+                ),
+                ("out", "sonnet.srt"),
+            ],
+            1,
+        )
 
     def test_exec_cannot_read_2(self):
-        self.execute([
-            ("in", "../tools/res/audio.mp3"),
-            ("", "/foo/bar/baz.txt"),
-            ("", "task_language=eng|is_text_type=subtitles|os_task_file_format=srt"),
-            ("out", "sonnet.srt")
-        ], 1)
+        self.execute(
+            [
+                ("in", "../tools/res/audio.mp3"),
+                ("", "/foo/bar/baz.txt"),
+                (
+                    "",
+                    "task_language=eng|is_text_type=subtitles|os_task_file_format=srt",
+                ),
+                ("out", "sonnet.srt"),
+            ],
+            1,
+        )
 
     def test_exec_cannot_write(self):
-        self.execute([
-            ("in", "../tools/res/audio.mp3"),
-            ("in", "../tools/res/subtitles.txt"),
-            ("", "task_language=eng|is_text_type=subtitles|os_task_file_format=srt"),
-            ("", "/foo/bar/baz.srt")
-        ], 1)
+        self.execute(
+            [
+                ("in", "../tools/res/audio.mp3"),
+                ("in", "../tools/res/subtitles.txt"),
+                (
+                    "",
+                    "task_language=eng|is_text_type=subtitles|os_task_file_format=srt",
+                ),
+                ("", "/foo/bar/baz.srt"),
+            ],
+            1,
+        )
 
     def test_exec_missing_1(self):
-        self.execute([
-            ("in", "../tools/res/subtitles.txt"),
-            ("", "task_language=eng|is_text_type=subtitles|os_task_file_format=srt"),
-            ("out", "sonnet.srt")
-        ], 2)
+        self.execute(
+            [
+                ("in", "../tools/res/subtitles.txt"),
+                (
+                    "",
+                    "task_language=eng|is_text_type=subtitles|os_task_file_format=srt",
+                ),
+                ("out", "sonnet.srt"),
+            ],
+            2,
+        )
 
     def test_exec_missing_2(self):
-        self.execute([
-            ("in", "../tools/res/audio.mp3"),
-            ("", "task_language=eng|is_text_type=subtitles|os_task_file_format=srt"),
-            ("out", "sonnet.srt")
-        ], 2)
+        self.execute(
+            [
+                ("in", "../tools/res/audio.mp3"),
+                (
+                    "",
+                    "task_language=eng|is_text_type=subtitles|os_task_file_format=srt",
+                ),
+                ("out", "sonnet.srt"),
+            ],
+            2,
+        )
 
     def test_exec_missing_3(self):
-        self.execute([
-            ("in", "../tools/res/audio.mp3"),
-            ("in", "../tools/res/subtitles.txt"),
-            ("out", "sonnet.srt")
-        ], 2)
+        self.execute(
+            [
+                ("in", "../tools/res/audio.mp3"),
+                ("in", "../tools/res/subtitles.txt"),
+                ("out", "sonnet.srt"),
+            ],
+            2,
+        )
 
     def test_exec_missing_4(self):
-        self.execute([
-            ("in", "../tools/res/audio.mp3"),
-            ("in", "../tools/res/subtitles.txt"),
-            ("", "task_language=eng|is_text_type=subtitles|os_task_file_format=srt")
-        ], 2)
+        self.execute(
+            [
+                ("in", "../tools/res/audio.mp3"),
+                ("in", "../tools/res/subtitles.txt"),
+                (
+                    "",
+                    "task_language=eng|is_text_type=subtitles|os_task_file_format=srt",
+                ),
+            ],
+            2,
+        )
 
 
 if __name__ == "__main__":

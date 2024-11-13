@@ -48,11 +48,11 @@ ANSI_OK = "\033[92m"
 ANSI_WARNING = "\033[93m"
 ANSI_END = "\033[0m"
 
-IS_POSIX = (os.name == "posix")
+IS_POSIX = os.name == "posix"
 
 
 def print_error(msg):
-    """ Print an error message """
+    """Print an error message"""
     if IS_POSIX:
         print("{}[ERRO] {}{}".format(ANSI_ERROR, msg, ANSI_END))
     else:
@@ -60,12 +60,12 @@ def print_error(msg):
 
 
 def print_info(msg):
-    """ Print an info message """
+    """Print an info message"""
     print("[INFO] %s" % (msg))
 
 
 def print_success(msg):
-    """ Print a warning message """
+    """Print a warning message"""
     if IS_POSIX:
         print("{}[INFO] {}{}".format(ANSI_OK, msg, ANSI_END))
     else:
@@ -73,7 +73,7 @@ def print_success(msg):
 
 
 def print_warning(msg):
-    """ Print a warning message """
+    """Print a warning message"""
     if IS_POSIX:
         print("{}[WARN] {}{}".format(ANSI_WARNING, msg, ANSI_END))
     else:
@@ -86,13 +86,16 @@ def check_import():
     """
     try:
         import aeneas
+
         print_success("aeneas         OK")
         return False
     except ImportError:
         print_error("aeneas         ERROR")
         print_info("  Unable to load the aeneas Python package")
         print_info("  This error is probably caused by:")
-        print_info("    A. you did not download/git-clone the aeneas package properly; or")
+        print_info(
+            "    A. you did not download/git-clone the aeneas package properly; or"
+        )
         print_info("    B. you did not install the required Python packages:")
         print_info("      1. BeautifulSoup4")
         print_info("      2. lxml")
@@ -103,26 +106,31 @@ def check_import():
 
 
 def main():
-    """ The entry point for this module """
+    """The entry point for this module"""
     # first, check we can import aeneas package, exiting on failure
     if check_import():
         sys.exit(1)
 
     # import and run the built-in diagnostics
     from aeneas.diagnostics import Diagnostics
+
     errors, warnings, c_ext_warnings = Diagnostics.check_all()
     if errors:
         sys.exit(1)
     if c_ext_warnings:
-        print_warning("All required dependencies are met but at least one Python C extension is not available")
+        print_warning(
+            "All required dependencies are met but at least one Python C extension is not available"
+        )
         print_warning("You can still run aeneas but it will be slower")
         print_warning("Enjoy running aeneas!")
         sys.exit(2)
     else:
-        print_success("All required dependencies are met and all available Python C extensions are working")
+        print_success(
+            "All required dependencies are met and all available Python C extensions are working"
+        )
         print_success("Enjoy running aeneas!")
         sys.exit(0)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

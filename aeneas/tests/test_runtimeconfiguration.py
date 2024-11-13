@@ -27,7 +27,6 @@ from aeneas.runtimeconfiguration import RuntimeConfiguration
 
 
 class TestRuntimeConfiguration(unittest.TestCase):
-
     def test_config_string(self):
         rconf = RuntimeConfiguration()
         rconf.config_string
@@ -99,7 +98,11 @@ class TestRuntimeConfiguration(unittest.TestCase):
 
     def test_set_rconf_string(self):
         params = [
-            ("aba_nonspeech_tolerance=0.040", "aba_nonspeech_tolerance", TimeValue("0.040")),
+            (
+                "aba_nonspeech_tolerance=0.040",
+                "aba_nonspeech_tolerance",
+                TimeValue("0.040"),
+            ),
             ("aba_no_zero_duration=0.040", "aba_no_zero_duration", TimeValue("0.040")),
             ("allow_unlisted_languages=True", "allow_unlisted_languages", True),
             ("c_extensions=False", "c_extensions", False),
@@ -107,7 +110,11 @@ class TestRuntimeConfiguration(unittest.TestCase):
             ("cew=False", "cew", False),
             ("cmfcc=False", "cmfcc", False),
             ("cew_subprocess_enabled=True", "cew_subprocess_enabled", True),
-            ("cew_subprocess_path=/foo/bar/python", "cew_subprocess_path", "/foo/bar/python"),
+            (
+                "cew_subprocess_path=/foo/bar/python",
+                "cew_subprocess_path",
+                "/foo/bar/python",
+            ),
             ("downloader_sleep=5.000", "downloader_sleep", TimeValue("5.000")),
             ("downloader_retry_attempts=5", "downloader_retry_attempts", 5),
             ("dtw_algorithm=exact", "dtw_algorithm", "exact"),
@@ -127,19 +134,35 @@ class TestRuntimeConfiguration(unittest.TestCase):
             ("mfcc_window_shift=0.160", "mfcc_window_shift", TimeValue("0.160")),
             ("dtw_margin_l1=100", "dtw_margin_l1", TimeValue("100")),
             ("mfcc_mask_nonspeech_l1=True", "mfcc_mask_nonspeech_l1", True),
-            ("mfcc_window_length_l1=0.360", "mfcc_window_length_l1", TimeValue("0.360")),
+            (
+                "mfcc_window_length_l1=0.360",
+                "mfcc_window_length_l1",
+                TimeValue("0.360"),
+            ),
             ("mfcc_window_shift_l1=0.160", "mfcc_window_shift_l1", TimeValue("0.160")),
             ("dtw_margin_l2=30", "dtw_margin_l2", TimeValue("30")),
             ("mfcc_mask_nonspeech_l2=True", "mfcc_mask_nonspeech_l2", True),
-            ("mfcc_window_length_l2=0.360", "mfcc_window_length_l2", TimeValue("0.360")),
+            (
+                "mfcc_window_length_l2=0.360",
+                "mfcc_window_length_l2",
+                TimeValue("0.360"),
+            ),
             ("mfcc_window_shift_l2=0.160", "mfcc_window_shift_l2", TimeValue("0.160")),
             ("dtw_margin_l3=10", "dtw_margin_l3", TimeValue("10")),
             ("mfcc_mask_nonspeech_l3=True", "mfcc_mask_nonspeech_l3", True),
-            ("mfcc_window_length_l3=0.360", "mfcc_window_length_l3", TimeValue("0.360")),
+            (
+                "mfcc_window_length_l3=0.360",
+                "mfcc_window_length_l3",
+                TimeValue("0.360"),
+            ),
             ("mfcc_window_shift_l3=0.160", "mfcc_window_shift_l3", TimeValue("0.160")),
             ("mfcc_mask_extend_speech_after=1", "mfcc_mask_extend_speech_after", 1),
             ("mfcc_mask_extend_speech_before=1", "mfcc_mask_extend_speech_before", 1),
-            ("mfcc_mask_log_energy_threshold=0.750", "mfcc_mask_log_energy_threshold", 0.750),
+            (
+                "mfcc_mask_log_energy_threshold=0.750",
+                "mfcc_mask_log_energy_threshold",
+                0.750,
+            ),
             ("mfcc_mask_min_nonspeech_length=5", "mfcc_mask_min_nonspeech_length", 5),
             ("nuance_tts_api_id=foo", "nuance_tts_api_id", "foo"),
             ("nuance_tts_api_key=bar", "nuance_tts_api_key", "bar"),
@@ -159,10 +182,22 @@ class TestRuntimeConfiguration(unittest.TestCase):
             ("tts_path_l2=/foo/bar/festival", "tts_path_l2", "/foo/bar/festival"),
             ("tts_l3=festival", "tts_l3", "festival"),
             ("tts_path_l3=/foo/bar/festival", "tts_path_l3", "/foo/bar/festival"),
-            ("vad_extend_speech_after=1.000", "vad_extend_speech_after", TimeValue("1.000")),
-            ("vad_extend_speech_before=1.000", "vad_extend_speech_before", TimeValue("1.000")),
+            (
+                "vad_extend_speech_after=1.000",
+                "vad_extend_speech_after",
+                TimeValue("1.000"),
+            ),
+            (
+                "vad_extend_speech_before=1.000",
+                "vad_extend_speech_before",
+                TimeValue("1.000"),
+            ),
             ("vad_log_energy_threshold=0.750", "vad_log_energy_threshold", 0.750),
-            ("vad_min_nonspeech_length=0.500", "vad_min_nonspeech_length", TimeValue("0.500")),
+            (
+                "vad_min_nonspeech_length=0.500",
+                "vad_min_nonspeech_length",
+                TimeValue("0.500"),
+            ),
         ]
         for string, key, value in params:
             rconf = RuntimeConfiguration(string)

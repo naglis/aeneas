@@ -48,4 +48,4 @@ class SyncMapFormatTXT(SyncMapFormatGenericTabular):
         "text": 3,
     }
 
-    TEXT_DELIMITER = "\""
+    TEXT_DELIMITER = '"'

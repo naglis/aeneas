@@ -40,6 +40,7 @@ class SyncMapFormatTTML(SyncMapFormatGenericXML):
 
     def parse(self, input_text, syncmap):
         from lxml import etree
+
         ttml_ns = "{http://www.w3.org/ns/ttml}"
         xml_ns = "{http://www.w3.org/XML/1998/namespace}"
         root = etree.fromstring(gf.safe_bytes(input_text))
@@ -55,11 +56,12 @@ class SyncMapFormatTTML(SyncMapFormatGenericXML):
                 language=language,
                 lines=fragment_lines,
                 begin=begin,
-                end=end
+                end=end,
             )
 
     def format(self, syncmap):
         from lxml import etree
+
         # get language
         language = None
         if (self.parameters is not None) and ("language" in self.parameters):
@@ -86,11 +88,11 @@ class SyncMapFormatTTML(SyncMapFormatGenericXML):
             # single level
             for fragment in syncmap.fragments:
                 text = fragment.text_fragment
-                p_string = "<p xml:id=\"{}\" begin=\"{}\" end=\"{}\">{}</p>".format(
+                p_string = '<p xml:id="{}" begin="{}" end="{}">{}</p>'.format(
                     text.identifier,
                     gf.time_to_ttml(fragment.begin),
                     gf.time_to_ttml(fragment.end),
-                    "<br/>".join(text.lines)
+                    "<br/>".join(text.lines),
                 )
                 p_elem = etree.fromstring(p_string)
                 div_elem.append(p_elem)
@@ -107,7 +109,9 @@ class SyncMapFormatTTML(SyncMapFormatGenericXML):
                     sen_span_elem.attrib["id"] = text.identifier
                     for wor_child in sen_child.children_not_empty:
                         fragment = wor_child.value
-                        wor_span_elem = etree.SubElement(sen_span_elem, "{%s}span" % ttml_ns)
+                        wor_span_elem = etree.SubElement(
+                            sen_span_elem, "{%s}span" % ttml_ns
+                        )
                         wor_span_elem.attrib["id"] = fragment.text_fragment.identifier
                         wor_span_elem.attrib["begin"] = gf.time_to_ttml(fragment.begin)
                         wor_span_elem.attrib["end"] = gf.time_to_ttml(fragment.end)

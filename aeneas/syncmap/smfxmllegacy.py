@@ -36,6 +36,7 @@ class SyncMapFormatXMLLegacy(SyncMapFormatGenericXML):
 
     def parse(self, input_text, syncmap):
         from lxml import etree
+
         root = etree.fromstring(gf.safe_bytes(input_text))
         for frag in root:
             for child in frag:
@@ -47,20 +48,18 @@ class SyncMapFormatXMLLegacy(SyncMapFormatGenericXML):
                     end = gf.time_from_ssmmm(child.text)
             # TODO read text from additional text_file?
             self._add_fragment(
-                syncmap=syncmap,
-                identifier=identifier,
-                lines=[""],
-                begin=begin,
-                end=end
+                syncmap=syncmap, identifier=identifier, lines=[""], begin=begin, end=end
             )
 
     def format(self, syncmap):
         msg = []
-        msg.append("<?xml version=\"1.0\" encoding=\"UTF-8\" ?>")
+        msg.append('<?xml version="1.0" encoding="UTF-8" ?>')
         msg.append("<map>")
         for fragment in syncmap.fragments:
             msg.append(" <fragment>")
-            msg.append("  <identifier>%s</identifier>" % fragment.text_fragment.identifier)
+            msg.append(
+                "  <identifier>%s</identifier>" % fragment.text_fragment.identifier
+            )
             msg.append("  <start>%s</start>" % gf.time_to_ssmmm(fragment.begin))
             msg.append("  <end>%s</end>" % gf.time_to_ssmmm(fragment.end))
             msg.append(" </fragment>")

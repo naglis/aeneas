@@ -27,7 +27,6 @@ This module contains the following classes:
 * :class:`~aeneas.validator.ValidatorResult`, a record holding validation result and possibly messages.
 """
 
-
 from aeneas.analyzecontainer import AnalyzeContainer
 from aeneas.container import Container
 from aeneas.container import ContainerFormat
@@ -65,38 +64,14 @@ class Validator(Loggable):
         # COMMENTED     Language.ALLOWED_VALUES
         # COMMENTED ),
         #
-        (
-            gc.PPN_JOB_IS_HIERARCHY_TYPE,
-            HierarchyType.ALLOWED_VALUES
-        ),
-        (
-            gc.PPN_JOB_OS_CONTAINER_FORMAT,
-            ContainerFormat.ALLOWED_VALUES
-        ),
-        (
-            gc.PPN_JOB_OS_HIERARCHY_TYPE,
-            HierarchyType.ALLOWED_VALUES
-        ),
-        (
-            gc.PPN_TASK_IS_TEXT_FILE_FORMAT,
-            TextFileFormat.ALLOWED_VALUES
-        ),
-        (
-            gc.PPN_TASK_OS_FILE_FORMAT,
-            SyncMapFormat.ALLOWED_VALUES
-        ),
-        (
-            gc.PPN_TASK_IS_TEXT_UNPARSED_ID_SORT,
-            IDSortingAlgorithm.ALLOWED_VALUES
-        ),
-        (
-            gc.PPN_TASK_ADJUST_BOUNDARY_ALGORITHM,
-            AdjustBoundaryAlgorithm.ALLOWED_VALUES
-        ),
-        (
-            gc.PPN_TASK_OS_FILE_HEAD_TAIL_FORMAT,
-            SyncMapHeadTailFormat.ALLOWED_VALUES
-        )
+        (gc.PPN_JOB_IS_HIERARCHY_TYPE, HierarchyType.ALLOWED_VALUES),
+        (gc.PPN_JOB_OS_CONTAINER_FORMAT, ContainerFormat.ALLOWED_VALUES),
+        (gc.PPN_JOB_OS_HIERARCHY_TYPE, HierarchyType.ALLOWED_VALUES),
+        (gc.PPN_TASK_IS_TEXT_FILE_FORMAT, TextFileFormat.ALLOWED_VALUES),
+        (gc.PPN_TASK_OS_FILE_FORMAT, SyncMapFormat.ALLOWED_VALUES),
+        (gc.PPN_TASK_IS_TEXT_UNPARSED_ID_SORT, IDSortingAlgorithm.ALLOWED_VALUES),
+        (gc.PPN_TASK_ADJUST_BOUNDARY_ALGORITHM, AdjustBoundaryAlgorithm.ALLOWED_VALUES),
+        (gc.PPN_TASK_OS_FILE_HEAD_TAIL_FORMAT, SyncMapHeadTailFormat.ALLOWED_VALUES),
     ]
 
     IMPLIED_PARAMETERS = [
@@ -104,31 +79,31 @@ class Validator(Loggable):
             # is_hierarchy_type=paged => is_task_dir_name_regex
             gc.PPN_JOB_IS_HIERARCHY_TYPE,
             [HierarchyType.PAGED],
-            [gc.PPN_JOB_IS_TASK_DIRECTORY_NAME_REGEX]
+            [gc.PPN_JOB_IS_TASK_DIRECTORY_NAME_REGEX],
         ),
         (
             # is_text_type=unparsed => is_text_unparsed_id_sort
             gc.PPN_TASK_IS_TEXT_FILE_FORMAT,
             [TextFileFormat.UNPARSED],
-            [gc.PPN_TASK_IS_TEXT_UNPARSED_ID_SORT]
+            [gc.PPN_TASK_IS_TEXT_UNPARSED_ID_SORT],
         ),
         (
             # is_text_type=munparsed => is_text_munparsed_l1_id_regex
             gc.PPN_TASK_IS_TEXT_FILE_FORMAT,
             [TextFileFormat.MUNPARSED],
-            [gc.PPN_TASK_IS_TEXT_MUNPARSED_L1_ID_REGEX]
+            [gc.PPN_TASK_IS_TEXT_MUNPARSED_L1_ID_REGEX],
         ),
         (
             # is_text_type=munparsed => is_text_munparsed_l2_id_regex
             gc.PPN_TASK_IS_TEXT_FILE_FORMAT,
             [TextFileFormat.MUNPARSED],
-            [gc.PPN_TASK_IS_TEXT_MUNPARSED_L2_ID_REGEX]
+            [gc.PPN_TASK_IS_TEXT_MUNPARSED_L2_ID_REGEX],
         ),
         (
             # is_text_type=munparsed => is_text_munparsed_l3_id_regex
             gc.PPN_TASK_IS_TEXT_FILE_FORMAT,
             [TextFileFormat.MUNPARSED],
-            [gc.PPN_TASK_IS_TEXT_MUNPARSED_L3_ID_REGEX]
+            [gc.PPN_TASK_IS_TEXT_MUNPARSED_L3_ID_REGEX],
         ),
         (
             # is_text_type=unparsed => is_text_unparsed_class_regex or
@@ -137,8 +112,8 @@ class Validator(Loggable):
             [TextFileFormat.UNPARSED],
             [
                 gc.PPN_TASK_IS_TEXT_UNPARSED_CLASS_REGEX,
-                gc.PPN_TASK_IS_TEXT_UNPARSED_ID_REGEX
-            ]
+                gc.PPN_TASK_IS_TEXT_UNPARSED_ID_REGEX,
+            ],
         ),
         (
             # os_task_file_format=smil  => os_task_file_smil_audio_ref
@@ -146,7 +121,7 @@ class Validator(Loggable):
             # os_task_file_format=smilm => os_task_file_smil_audio_ref
             gc.PPN_TASK_OS_FILE_FORMAT,
             [SyncMapFormat.SMIL, SyncMapFormat.SMILH, SyncMapFormat.SMILM],
-            [gc.PPN_TASK_OS_FILE_SMIL_AUDIO_REF]
+            [gc.PPN_TASK_OS_FILE_SMIL_AUDIO_REF],
         ),
         (
             # os_task_file_format=smil  => os_task_file_smil_page_ref
@@ -154,44 +129,44 @@ class Validator(Loggable):
             # os_task_file_format=smilm => os_task_file_smil_page_ref
             gc.PPN_TASK_OS_FILE_FORMAT,
             [SyncMapFormat.SMIL, SyncMapFormat.SMILH, SyncMapFormat.SMILM],
-            [gc.PPN_TASK_OS_FILE_SMIL_PAGE_REF]
+            [gc.PPN_TASK_OS_FILE_SMIL_PAGE_REF],
         ),
         (
             # task_adjust_boundary_algorithm=percent => task_adjust_boundary_percent_value
             gc.PPN_TASK_ADJUST_BOUNDARY_ALGORITHM,
             [AdjustBoundaryAlgorithm.PERCENT],
-            [gc.PPN_TASK_ADJUST_BOUNDARY_PERCENT_VALUE]
+            [gc.PPN_TASK_ADJUST_BOUNDARY_PERCENT_VALUE],
         ),
         (
             # task_adjust_boundary_algorithm=rate => task_adjust_boundary_rate_value
             gc.PPN_TASK_ADJUST_BOUNDARY_ALGORITHM,
             [AdjustBoundaryAlgorithm.RATE],
-            [gc.PPN_TASK_ADJUST_BOUNDARY_RATE_VALUE]
+            [gc.PPN_TASK_ADJUST_BOUNDARY_RATE_VALUE],
         ),
         (
             # task_adjust_boundary_algorithm=rate_aggressive => task_adjust_boundary_rate_value
             gc.PPN_TASK_ADJUST_BOUNDARY_ALGORITHM,
             [AdjustBoundaryAlgorithm.RATEAGGRESSIVE],
-            [gc.PPN_TASK_ADJUST_BOUNDARY_RATE_VALUE]
+            [gc.PPN_TASK_ADJUST_BOUNDARY_RATE_VALUE],
         ),
         (
             # task_adjust_boundary_algorithm=currentend => task_adjust_boundary_currentend_value
             gc.PPN_TASK_ADJUST_BOUNDARY_ALGORITHM,
             [AdjustBoundaryAlgorithm.AFTERCURRENT],
-            [gc.PPN_TASK_ADJUST_BOUNDARY_AFTERCURRENT_VALUE]
+            [gc.PPN_TASK_ADJUST_BOUNDARY_AFTERCURRENT_VALUE],
         ),
         (
             # task_adjust_boundary_algorithm=rate => task_adjust_boundary_nextstart_value
             gc.PPN_TASK_ADJUST_BOUNDARY_ALGORITHM,
             [AdjustBoundaryAlgorithm.BEFORENEXT],
-            [gc.PPN_TASK_ADJUST_BOUNDARY_BEFORENEXT_VALUE]
+            [gc.PPN_TASK_ADJUST_BOUNDARY_BEFORENEXT_VALUE],
         ),
         (
             # task_adjust_boundary_algorithm=offset => task_adjust_boundary_offset_value
             gc.PPN_TASK_ADJUST_BOUNDARY_ALGORITHM,
             [AdjustBoundaryAlgorithm.OFFSET],
-            [gc.PPN_TASK_ADJUST_BOUNDARY_OFFSET_VALUE]
-        )
+            [gc.PPN_TASK_ADJUST_BOUNDARY_OFFSET_VALUE],
+        ),
     ]
 
     JOB_REQUIRED_PARAMETERS = [
@@ -298,10 +273,7 @@ class Validator(Loggable):
         return self.result
 
     def check_configuration_string(
-            self,
-            config_string,
-            is_job=True,
-            external_name=False
+        self, config_string, is_job=True, external_name=False
     ):
         """
         Check whether the given job or task configuration string
@@ -393,19 +365,25 @@ class Validator(Loggable):
             return self.result
         self.log("Checking required parameters for job")
         job_parameters = gf.config_xml_to_dict(contents, self.result, parse_job=True)
-        self._check_required_parameters(self.XML_JOB_REQUIRED_PARAMETERS, job_parameters)
+        self._check_required_parameters(
+            self.XML_JOB_REQUIRED_PARAMETERS, job_parameters
+        )
         if not self.result.passed:
             return self.result
         self.log("Checking required parameters for task")
         tasks_parameters = gf.config_xml_to_dict(contents, self.result, parse_job=False)
         for parameters in tasks_parameters:
             self.log(["Checking required parameters for task: '%s'", parameters])
-            self._check_required_parameters(self.XML_TASK_REQUIRED_PARAMETERS, parameters)
+            self._check_required_parameters(
+                self.XML_TASK_REQUIRED_PARAMETERS, parameters
+            )
             if not self.result.passed:
                 return self.result
         return self.result
 
-    def check_container(self, container_path, container_format=None, config_string=None):
+    def check_container(
+        self, container_path, container_format=None, config_string=None
+    ):
         """
         Check whether the given container is well-formed.
 
@@ -516,7 +494,10 @@ class Validator(Loggable):
         """
         forbidden = [c for c in gc.CONFIG_RESERVED_CHARACTERS if c in ustring]
         if len(forbidden) > 0:
-            self._failed("The given string contains the reserved characters '%s'." % " ".join(forbidden))
+            self._failed(
+                "The given string contains the reserved characters '%s'."
+                % " ".join(forbidden)
+            )
 
     def _check_allowed_values(self, parameters):
         """
@@ -530,7 +511,11 @@ class Validator(Loggable):
             if key in parameters:
                 value = parameters[key]
                 if value not in allowed_values:
-                    self._failed("Parameter '{}' has value '{}' which is not allowed.".format(key, value))
+                    self._failed(
+                        "Parameter '{}' has value '{}' which is not allowed.".format(
+                            key, value
+                        )
+                    )
                     return
         self.log("Passed")
 
@@ -553,18 +538,18 @@ class Validator(Loggable):
                         found = True
                 if not found:
                     if len(implied_keys) == 1:
-                        msg = "Parameter '{}' is required when '{}'='{}'.".format(implied_keys[0], key, parameters[key])
+                        msg = "Parameter '{}' is required when '{}'='{}'.".format(
+                            implied_keys[0], key, parameters[key]
+                        )
                     else:
-                        msg = "At least one of [{}] is required when '{}'='{}'.".format(",".join(implied_keys), key, parameters[key])
+                        msg = "At least one of [{}] is required when '{}'='{}'.".format(
+                            ",".join(implied_keys), key, parameters[key]
+                        )
                     self._failed(msg)
                     return
         self.log("Passed")
 
-    def _check_required_parameters(
-            self,
-            required_parameters,
-            parameters
-    ):
+    def _check_required_parameters(self, required_parameters, parameters):
         """
         Check whether the given parameter dictionary contains
         all the required paramenters.
@@ -616,10 +601,10 @@ class Validator(Loggable):
         if self.rconf[RuntimeConfiguration.JOB_MAX_TASKS] > 0:
             self.log("Checking that the Job does not have too many Tasks")
             if len(job) > self.rconf[RuntimeConfiguration.JOB_MAX_TASKS]:
-                self._failed("The Job has %d Tasks, more than the maximum allowed (%d)." % (
-                    len(job),
-                    self.rconf[RuntimeConfiguration.JOB_MAX_TASKS]
-                ))
+                self._failed(
+                    "The Job has %d Tasks, more than the maximum allowed (%d)."
+                    % (len(job), self.rconf[RuntimeConfiguration.JOB_MAX_TASKS])
+                )
                 return
 
         self.log("Checking that each Task text file is well formed")
@@ -631,7 +616,9 @@ class Validator(Loggable):
                 return
             self._check_utf8_encoding(text_file_bstring)
             if not self.result.passed:
-                self._failed("Text file '%s' is not encoded in UTF-8" % task.text_file_path)
+                self._failed(
+                    "Text file '%s' is not encoded in UTF-8" % task.text_file_path
+                )
                 return
             self._check_not_empty(text_file_bstring)
             if not self.result.passed:
@@ -654,10 +641,7 @@ class ValidatorResult:
         self.errors = []
 
     def __unicode__(self):
-        msg = [
-            "Passed: %s" % self.passed,
-            self.pretty_print(warnings=True)
-        ]
+        msg = ["Passed: %s" % self.passed, self.pretty_print(warnings=True)]
         return "\n".join(msg)
 
     def __str__(self):

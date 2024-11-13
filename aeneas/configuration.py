@@ -97,7 +97,7 @@ class Configuration:
         self.types = {}
         self.aliases = {}
         self.desc = {}
-        for (field, info) in self.FIELDS:
+        for field, info in self.FIELDS:
             (fdefault, ftype, faliases, fdesc) = info
             self.data[field] = fdefault
             self.types[field] = ftype
@@ -108,9 +108,9 @@ class Configuration:
         if config_string is not None:
             # strip leading/trailing " or ' characters
             if (
-                (len(config_string) > 0) and
-                (config_string[0] == config_string[-1]) and
-                (config_string[0] in ["\"", "'"])
+                (len(config_string) > 0)
+                and (config_string[0] == config_string[-1])
+                and (config_string[0] in ['"', "'"])
             ):
                 config_string = config_string[1:-1]
             # populate values from config_string,
@@ -139,7 +139,9 @@ class Configuration:
             raise KeyError(key)
 
     def __unicode__(self):
-        return "\n".join(["{}: '{}'".format(fn, self.data[fn]) for fn in sorted(self.data.keys())])
+        return "\n".join(
+            ["{}: '{}'".format(fn, self.data[fn]) for fn in sorted(self.data.keys())]
+        )
 
     def __str__(self):
         return gf.safe_str(self.__unicode__())
@@ -171,7 +173,11 @@ class Configuration:
         :rtype: string
         """
         return (gc.CONFIG_STRING_SEPARATOR_SYMBOL).join(
-            ["{}{}{}".format(fn, gc.CONFIG_STRING_ASSIGNMENT_SYMBOL, self.data[fn]) for fn in sorted(self.data.keys()) if self.data[fn] is not None]
+            [
+                "{}{}{}".format(fn, gc.CONFIG_STRING_ASSIGNMENT_SYMBOL, self.data[fn])
+                for fn in sorted(self.data.keys())
+                if self.data[fn] is not None
+            ]
         )
 
     @classmethod
@@ -184,8 +190,9 @@ class Configuration:
         :param bool as_strings: if ``True``, return formatted strings instead
         :rtype: list
         """
+
         def cft(ftype, fdefault):
-            """ Convert field type and default value to string """
+            """Convert field type and default value to string"""
             if ftype is None:
                 return ""
 
@@ -203,10 +210,16 @@ class Configuration:
                 cfdefault = "%s" % fdefault if fdefault is not None else "None"
             return " ({}, {})".format(cftype, cfdefault)
 
-        parameters = [(field, fdesc, ftype, fdefault) for (field, (fdefault, ftype, faliases, fdesc)) in cls.FIELDS]
+        parameters = [
+            (field, fdesc, ftype, fdefault)
+            for (field, (fdefault, ftype, faliases, fdesc)) in cls.FIELDS
+        ]
         if sort:
             parameters = sorted(parameters)
         if as_strings:
             max_length = max(len(t[0]) for t in parameters)
-            parameters = ["{} : {}{}".format(f.ljust(max_length), d, cft(t, df)) for (f, d, t, df) in parameters]
+            parameters = [
+                "{} : {}{}".format(f.ljust(max_length), d, cft(t, df))
+                for (f, d, t, df) in parameters
+            ]
         return parameters

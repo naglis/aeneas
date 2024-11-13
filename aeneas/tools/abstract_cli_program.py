@@ -69,14 +69,10 @@ class AbstractCLIProgram(Loggable):
 
     HELP = {
         "description": "An abstract CLI program",
-        "synopsis": [
-        ],
-        "options": [
-        ],
-        "parameters": [
-        ],
-        "examples": [
-        ]
+        "synopsis": [],
+        "options": [],
+        "parameters": [],
+        "examples": [],
     }
 
     RCONF_PARAMETERS = RuntimeConfiguration.parameters(sort=True, as_strings=True)
@@ -85,7 +81,9 @@ class AbstractCLIProgram(Loggable):
 
     def __init__(self, use_sys=True, invoke=None, rconf=None, logger=None):
         super().__init__(rconf=rconf, logger=logger)
-        self.invoke = "python -m aeneas.tools.%s" % (self.NAME) if (invoke is None) else invoke
+        self.invoke = (
+            "python -m aeneas.tools.%s" % (self.NAME) if (invoke is None) else invoke
+        )
         self.use_sys = use_sys
         self.formal_arguments_raw = []
         self.formal_arguments = []
@@ -100,7 +98,7 @@ class AbstractCLIProgram(Loggable):
         Logger.ERROR: gf.print_error,
         Logger.INFO: gf.print_info,
         Logger.SUCCESS: gf.print_success,
-        Logger.WARNING: gf.print_warning
+        Logger.WARNING: gf.print_warning,
     }
 
     def print_generic(self, msg, prefix=None):
@@ -294,10 +292,14 @@ class AbstractCLIProgram(Loggable):
             if not gf.FROZEN:
                 if sys.stdin.encoding not in ["UTF-8", "UTF8", "utf-8", "utf8"]:
                     self.print_warning("The default input encoding is not UTF-8.")
-                    self.print_warning("You might want to set 'PYTHONIOENCODING=UTF-8' in your shell.")
+                    self.print_warning(
+                        "You might want to set 'PYTHONIOENCODING=UTF-8' in your shell."
+                    )
                 if sys.stdout.encoding not in ["UTF-8", "UTF8", "utf-8", "utf8"]:
                     self.print_warning("The default output encoding is not UTF-8.")
-                    self.print_warning("You might want to set 'PYTHONIOENCODING=UTF-8' in your shell.")
+                    self.print_warning(
+                        "You might want to set 'PYTHONIOENCODING=UTF-8' in your shell."
+                    )
             # decode using sys.stdin.encoding
             args = [gf.safe_unicode_stdin(arg) for arg in arguments]
         else:
@@ -349,7 +351,9 @@ class AbstractCLIProgram(Loggable):
             if log_path is not None:
                 args.remove("{}={}".format(flag, log_path))
             elif flag in set_args:
-                handler, log_path = gf.tmp_file(suffix=".log", root=self.rconf[RuntimeConfiguration.TMP_PATH])
+                handler, log_path = gf.tmp_file(
+                    suffix=".log", root=self.rconf[RuntimeConfiguration.TMP_PATH]
+                )
                 args.remove(flag)
             if log_path is not None:
                 self.log_file_path = log_path
@@ -415,7 +419,9 @@ class AbstractCLIProgram(Loggable):
             args = self.actual_arguments
         else:
             args = self.formal_arguments
-        for arg in [arg for arg in args if (arg is not None) and (arg.startswith(prefix + "="))]:
+        for arg in [
+            arg for arg in args if (arg is not None) and (arg.startswith(prefix + "="))
+        ]:
             lis = arg.split("=")
             if len(lis) >= 2:
                 return "=".join(lis[1:])
@@ -448,7 +454,9 @@ class AbstractCLIProgram(Loggable):
             else:
                 self.print_warning("Unable to load Python C Extension %s" % (name))
             self.print_warning("Running the slower pure Python code")
-            self.print_warning("See the documentation for directions to compile the Python C Extensions")
+            self.print_warning(
+                "See the documentation for directions to compile the Python C Extensions"
+            )
             return False
         return True
 
@@ -463,7 +471,9 @@ class AbstractCLIProgram(Loggable):
         """
         if (not gf.file_can_be_read(path)) and (not os.path.isdir(path)):
             self.print_error("Unable to read file or directory '%s'" % (path))
-            self.print_error("Make sure the path is written/escaped correctly and that you have read permission on it")
+            self.print_error(
+                "Make sure the path is written/escaped correctly and that you have read permission on it"
+            )
             return False
         return True
 
@@ -478,7 +488,9 @@ class AbstractCLIProgram(Loggable):
         """
         if not gf.file_can_be_read(path):
             self.print_error("Unable to read file '%s'" % (path))
-            self.print_error("Make sure the file path is written/escaped correctly and that you have read permission on it")
+            self.print_error(
+                "Make sure the file path is written/escaped correctly and that you have read permission on it"
+            )
             return False
         return True
 
@@ -493,7 +505,9 @@ class AbstractCLIProgram(Loggable):
         """
         if not gf.file_can_be_written(path):
             self.print_error("Unable to create file '%s'" % (path))
-            self.print_error("Make sure the file path is written/escaped correctly and that you have write permission on it")
+            self.print_error(
+                "Make sure the file path is written/escaped correctly and that you have write permission on it"
+            )
             return False
         return True
 
@@ -512,7 +526,9 @@ class AbstractCLIProgram(Loggable):
         test_file = os.path.join(path, "file.test")
         if not gf.file_can_be_written(test_file):
             self.print_error("Unable to write inside directory '%s'" % (path))
-            self.print_error("Make sure the directory path is written/escaped correctly and that you have write permission on it")
+            self.print_error(
+                "Make sure the directory path is written/escaped correctly and that you have write permission on it"
+            )
             return False
         return True
 
@@ -524,7 +540,10 @@ class AbstractCLIProgram(Loggable):
         else:
             if text_format not in TextFileFormat.ALLOWED_VALUES:
                 self.print_error("File format '%s' is not allowed" % (text_format))
-                self.print_error("Allowed text file formats: %s" % (" ".join(TextFileFormat.ALLOWED_VALUES)))
+                self.print_error(
+                    "Allowed text file formats: %s"
+                    % (" ".join(TextFileFormat.ALLOWED_VALUES))
+                )
                 return None
             try:
                 return TextFile(text, text_format, parameters, logger=self.logger)
@@ -533,7 +552,9 @@ class AbstractCLIProgram(Loggable):
             return None
 
     def print_no_dependency_error(self):
-        self.print_error("You need to install Python module youtube-dl to download audio from YouTube. Run:")
+        self.print_error(
+            "You need to install Python module youtube-dl to download audio from YouTube. Run:"
+        )
         self.print_error("$ pip install youtube-dl")
         self.print_error("or, to install for all users:")
         self.print_error("$ sudo pip install youtube-dl")
@@ -545,5 +566,6 @@ def main():
     """
     AbstractCLIProgram().run(arguments=sys.argv)
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     main()

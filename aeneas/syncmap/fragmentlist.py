@@ -145,8 +145,16 @@ class SyncMapFragmentList(Loggable):
         #      over the begin and end lists separately
         #
         for existing_fragment in self.fragments:
-            if existing_fragment.interval.relative_position_of(fragment.interval) not in self.ALLOWED_POSITIONS:
-                self.log_exc("interval overlaps another already present interval", None, True, ValueError)
+            if (
+                existing_fragment.interval.relative_position_of(fragment.interval)
+                not in self.ALLOWED_POSITIONS
+            ):
+                self.log_exc(
+                    "interval overlaps another already present interval",
+                    None,
+                    True,
+                    ValueError,
+                )
 
     def _check_min_max_indices(self, min_index=None, max_index=None):
         """
@@ -159,7 +167,12 @@ class SyncMapFragmentList(Loggable):
         if min_index < 0:
             self.log_exc("min_index is negative", None, True, ValueError)
         if max_index > len(self):
-            self.log_exc("max_index is bigger than the number of intervals in the list", None, True, ValueError)
+            self.log_exc(
+                "max_index is bigger than the number of intervals in the list",
+                None,
+                True,
+                ValueError,
+            )
         return min_index, max_index
 
     def clone(self):
@@ -225,7 +238,9 @@ class SyncMapFragmentList(Loggable):
         :raises ValueError: if one of the indices is not valid
         """
         if not self._is_valid_index(indices):
-            self.log_exc("The given list of indices is not valid", None, True, ValueError)
+            self.log_exc(
+                "The given list of indices is not valid", None, True, ValueError
+            )
         new_fragments = []
         sorted_indices = sorted(indices)
         i = 0
@@ -258,11 +273,19 @@ class SyncMapFragmentList(Loggable):
         for i in range(len(self) - 1):
             current_interval = self[i].interval
             next_interval = self[i + 1].interval
-            if current_interval.relative_position_of(next_interval) not in self.ALLOWED_POSITIONS:
+            if (
+                current_interval.relative_position_of(next_interval)
+                not in self.ALLOWED_POSITIONS
+            ):
                 self.log("Found overlapping fragments:")
                 self.log(["  Index %d => %s", i, current_interval])
                 self.log(["  Index %d => %s", i + 1, next_interval])
-                self.log_exc("The list contains two fragments overlapping in a forbidden way", None, True, ValueError)
+                self.log_exc(
+                    "The list contains two fragments overlapping in a forbidden way",
+                    None,
+                    True,
+                    ValueError,
+                )
         self.log("Checking relative positions... done")
         self.__sorted = True
 
@@ -302,7 +325,7 @@ class SyncMapFragmentList(Loggable):
         min_index, max_index = self._check_min_max_indices(min_index, max_index)
         zero = [i for i in range(min_index, max_index) if self[i].has_zero_length]
         self.log(["Fragments with zero length: %s", zero])
-        return (len(zero) > 0)
+        return len(zero) > 0
 
     def has_adjacent_fragments_only(self, min_index=None, max_index=None):
         """
@@ -344,7 +367,12 @@ class SyncMapFragmentList(Loggable):
         self._check_boundaries(fragment)
         if sort:
             if not self.is_guaranteed_sorted:
-                self.log_exc("Unable to add with sort=True if the list is not guaranteed sorted", None, True, ValueError)
+                self.log_exc(
+                    "Unable to add with sort=True if the list is not guaranteed sorted",
+                    None,
+                    True,
+                    ValueError,
+                )
             self._check_overlap(fragment)
             insort(self.__fragments, fragment)
             # self.log(u"Inserted and kept sorted flag true")
@@ -368,7 +396,7 @@ class SyncMapFragmentList(Loggable):
                 offset=offset,
                 allow_negative=False,
                 min_begin_value=self.begin,
-                max_end_value=self.end
+                max_end_value=self.end,
             )
         self.log("Applying offset to all fragments... done")
 
@@ -412,9 +440,7 @@ class SyncMapFragmentList(Loggable):
         self.log("Moved transition point")
 
     def fragments_ending_inside_nonspeech_intervals(
-        self,
-        nonspeech_intervals,
-        tolerance
+        self, nonspeech_intervals, tolerance
     ):
         """
         Determine a list of pairs (nonspeech interval, fragment index),
@@ -466,7 +492,9 @@ class SyncMapFragmentList(Loggable):
                         nsi_counter[nsi_index] = (None, [])
                         nsi_index += 1
                         frag_index += 1
-                        self.log("    nsi_shadow entirely contains frag => invalidate nsi, and skip to next fragment, nsi")
+                        self.log(
+                            "    nsi_shadow entirely contains frag => invalidate nsi, and skip to next fragment, nsi"
+                        )
                     else:
                         #
                         #      *************** nsi shadow
@@ -475,7 +503,9 @@ class SyncMapFragmentList(Loggable):
                         #
                         nsi_counter[nsi_index][1].append(frag_index)
                         frag_index += 1
-                        self.log("    nsi_shadow contains frag end only => save it and go to next fragment")
+                        self.log(
+                            "    nsi_shadow contains frag end only => save it and go to next fragment"
+                        )
                 elif nsi_shadow.begin > frag.end:
                     #
                     #      *************** nsi shadow
@@ -483,7 +513,9 @@ class SyncMapFragmentList(Loggable):
                     # **X  |             | frag (X=frag.end)
                     #
                     frag_index += 1
-                    self.log("    nsi_shadow begins after frag end => skip to next fragment")
+                    self.log(
+                        "    nsi_shadow begins after frag end => skip to next fragment"
+                    )
                 else:
                     #
                     #       ***************    nsi shadow
@@ -530,22 +562,31 @@ class SyncMapFragmentList(Loggable):
         self.log("  Second pass: append nonspeech intervals...")
         for i, (nsi, index) in enumerate(pairs, 1):
             identifier = "n%06d" % i
-            self.add(SyncMapFragment(
-                text_fragment=TextFragment(
-                    identifier=identifier,
-                    language=None,
-                    lines=lines,
-                    filtered_lines=lines
+            self.add(
+                SyncMapFragment(
+                    text_fragment=TextFragment(
+                        identifier=identifier,
+                        language=None,
+                        lines=lines,
+                        filtered_lines=lines,
+                    ),
+                    interval=nsi,
+                    fragment_type=SyncMapFragment.NONSPEECH,
                 ),
-                interval=nsi,
-                fragment_type=SyncMapFragment.NONSPEECH
-            ), sort=False)
+                sort=False,
+            )
         self.log("  Second pass: append nonspeech intervals... done")
         self.log("  Third pass: sorting...")
         self.sort()
         self.log("  Third pass: sorting... done")
 
-    def fix_zero_length_fragments(self, duration=TimeValue("0.001"), min_index=None, max_index=None, ensure_adjacent=True):
+    def fix_zero_length_fragments(
+        self,
+        duration=TimeValue("0.001"),
+        min_index=None,
+        max_index=None,
+        ensure_adjacent=True,
+    ):
         """
         Fix fragments with zero length,
         enlarging them to have length ``duration``,
@@ -572,36 +613,72 @@ class SyncMapFragmentList(Loggable):
             return
         original_first_begin = None
         if (
-                (ensure_adjacent) and
-                (min_index > 0) and
-                (self[min_index - 1].interval.is_adjacent_before(self[min_index].interval))
+            (ensure_adjacent)
+            and (min_index > 0)
+            and (
+                self[min_index - 1].interval.is_adjacent_before(
+                    self[min_index].interval
+                )
+            )
         ):
             original_first_begin = self[min_index].begin
-            self.log(["Original first was adjacent with previous, starting at %.3f", original_first_begin])
+            self.log(
+                [
+                    "Original first was adjacent with previous, starting at %.3f",
+                    original_first_begin,
+                ]
+            )
         original_last_end = None
         if (
-                (ensure_adjacent) and
-                (len(self) > 1) and
-                (max_index < len(self)) and
-                (self[max_index - 1].interval.is_adjacent_before(self[max_index].interval))
+            (ensure_adjacent)
+            and (len(self) > 1)
+            and (max_index < len(self))
+            and (
+                self[max_index - 1].interval.is_adjacent_before(
+                    self[max_index].interval
+                )
+            )
         ):
             original_last_end = self[max_index - 1].end
-            self.log(["Original last was adjacent with next, ending at %.3f", original_last_end])
+            self.log(
+                [
+                    "Original last was adjacent with next, ending at %.3f",
+                    original_last_end,
+                ]
+            )
         i = min_index
         while i < max_index:
             if self[i].has_zero_length:
-                self.log(["  Fragment %d (%s) has zero length => ENLARGE", i, self[i].interval])
+                self.log(
+                    [
+                        "  Fragment %d (%s) has zero length => ENLARGE",
+                        i,
+                        self[i].interval,
+                    ]
+                )
                 moves = [(i, "ENLARGE", duration)]
                 slack = duration
                 j = i + 1
                 self.log(["  Entered while with j == %d", j])
                 while (j < max_index) and (self[j].interval.length < slack):
                     if self[j].has_zero_length:
-                        self.log(["  Fragment %d (%s) has zero length => ENLARGE", j, self[j].interval])
+                        self.log(
+                            [
+                                "  Fragment %d (%s) has zero length => ENLARGE",
+                                j,
+                                self[j].interval,
+                            ]
+                        )
                         moves.append((j, "ENLARGE", duration))
                         slack += duration
                     else:
-                        self.log(["  Fragment %d (%s) has non zero length => MOVE", j, self[j].interval])
+                        self.log(
+                            [
+                                "  Fragment %d (%s) has non zero length => MOVE",
+                                j,
+                                self[j].interval,
+                            ]
+                        )
                         moves.append((j, "MOVE", None))
                     j += 1
                 self.log(["  Exited while with j == %d", j])
@@ -617,12 +694,26 @@ class SyncMapFragmentList(Loggable):
                     fixable = True
                 if fixable:
                     for index, move_type, move_amount in moves[::-1]:
-                        self.log(["    Calling move_end_at with %.3f at index %d", current_time, index])
+                        self.log(
+                            [
+                                "    Calling move_end_at with %.3f at index %d",
+                                current_time,
+                                index,
+                            ]
+                        )
                         self[index].interval.move_end_at(current_time)
                         if move_type == "ENLARGE":
-                            self.log(["    Calling enlarge with %.3f at index %d", move_amount, index])
+                            self.log(
+                                [
+                                    "    Calling enlarge with %.3f at index %d",
+                                    move_amount,
+                                    index,
+                                ]
+                            )
                             self[index].interval.enlarge(move_amount)
-                        self.log(["    Interval %d is now: %s", index, self[index].interval])
+                        self.log(
+                            ["    Interval %d is now: %s", index, self[index].interval]
+                        )
                         current_time = self[index].interval.begin
                 else:
                     self.log(["Unable to fix fragment %d (%s)", i, self[i].interval])
@@ -642,33 +733,45 @@ class SyncMapFragmentList(Loggable):
                 self[max_index].begin = self[max_index - 1].end
         self.log("Fragments after fixing:")
         for i, fragment in enumerate(self):
-            self.log(["  %d => %.3f %.3f", i, fragment.interval.begin, fragment.interval.end])
+            self.log(
+                ["  %d => %.3f %.3f", i, fragment.interval.begin, fragment.interval.end]
+            )
 
     def fix_fragment_rate(self, fragment_index, max_rate, aggressive=False):
         def fix_pair(current_index, donor_index):
             self.log("Called fix_pair")
             if (
-                (current_index < 0) or
-                (current_index >= len(self)) or
-                (donor_index < 0) or
-                (donor_index >= len(self)) or
-                (abs(current_index - donor_index) > 1)
+                (current_index < 0)
+                or (current_index >= len(self))
+                or (donor_index < 0)
+                or (donor_index >= len(self))
+                or (abs(current_index - donor_index) > 1)
             ):
                 self.log("Invalid index, returning False")
                 return False
             donor_is_previous = donor_index < current_index
             current_fragment = self[current_index]
             donor_fragment = self[donor_index]
-            if (current_fragment.rate is not None) and (current_fragment.rate <= max_rate):
+            if (current_fragment.rate is not None) and (
+                current_fragment.rate <= max_rate
+            ):
                 self.log("Current fragment rate is already <= max_rate, returning True")
                 return True
             if donor_is_previous:
-                if not donor_fragment.interval.is_non_zero_before_non_zero(current_fragment.interval):
-                    self.log("donor fragment is not adjacent before current fragment, returning False")
+                if not donor_fragment.interval.is_non_zero_before_non_zero(
+                    current_fragment.interval
+                ):
+                    self.log(
+                        "donor fragment is not adjacent before current fragment, returning False"
+                    )
                     return False
             else:
-                if not current_fragment.interval.is_non_zero_before_non_zero(donor_fragment.interval):
-                    self.log("current fragment is not adjacent before donor fragment, returning False")
+                if not current_fragment.interval.is_non_zero_before_non_zero(
+                    donor_fragment.interval
+                ):
+                    self.log(
+                        "current fragment is not adjacent before donor fragment, returning False"
+                    )
                     return False
 
             self.log("Current and donor fragments are adjacent and not zero length")
@@ -682,9 +785,13 @@ class SyncMapFragmentList(Loggable):
             self.log("Donor has some slack")
             effective_slack = min(current_lack, donor_slack)
             if donor_is_previous:
-                self.move_transition_point(donor_index, donor_fragment.end - effective_slack)
+                self.move_transition_point(
+                    donor_index, donor_fragment.end - effective_slack
+                )
             else:
-                self.move_transition_point(current_index, current_fragment.end + effective_slack)
+                self.move_transition_point(
+                    current_index, current_fragment.end + effective_slack
+                )
             if effective_slack == current_lack:
                 self.log("Current lack can be fully stolen from donor")
                 return True

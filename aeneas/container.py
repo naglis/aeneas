@@ -96,9 +96,8 @@ class Container(Loggable):
     def __init__(self, file_path, container_format=None, rconf=None, logger=None):
         if file_path is None:
             raise TypeError("File path is None")
-        if (
-                (container_format is not None) and
-                (container_format not in ContainerFormat.ALLOWED_VALUES)
+        if (container_format is not None) and (
+            container_format not in ContainerFormat.ALLOWED_VALUES
         ):
             raise ValueError("Container format not allowed")
         super().__init__(rconf=rconf, logger=logger)
@@ -224,9 +223,13 @@ class Container(Loggable):
         """
         self.log("Getting entries")
         if not self.exists():
-            self.log_exc("This container does not exist. Wrong path?", None, True, TypeError)
+            self.log_exc(
+                "This container does not exist. Wrong path?", None, True, TypeError
+            )
         if self.actual_container is None:
-            self.log_exc("The actual container object has not been set", None, True, TypeError)
+            self.log_exc(
+                "The actual container object has not been set", None, True, TypeError
+            )
         return self.actual_container.entries
 
     def find_entry(self, entry, exact=True):
@@ -307,13 +310,21 @@ class Container(Loggable):
         """
         self.log(["Decompressing the container into '%s'", output_path])
         if not self.exists():
-            self.log_exc("This container does not exist. Wrong path?", None, True, TypeError)
+            self.log_exc(
+                "This container does not exist. Wrong path?", None, True, TypeError
+            )
         if self.actual_container is None:
-            self.log_exc("The actual container object has not been set", None, True, TypeError)
+            self.log_exc(
+                "The actual container object has not been set", None, True, TypeError
+            )
         if not gf.directory_exists(output_path):
-            self.log_exc("The output path is not an existing directory", None, True, ValueError)
+            self.log_exc(
+                "The output path is not an existing directory", None, True, ValueError
+            )
         if not self.is_safe:
-            self.log_exc("This container contains unsafe entries", None, True, ValueError)
+            self.log_exc(
+                "This container contains unsafe entries", None, True, ValueError
+            )
         self.actual_container.decompress(output_path)
 
     def compress(self, input_path):
@@ -331,9 +342,13 @@ class Container(Loggable):
         if self.file_path is None:
             self.log_exc("The container path has not been set", None, True, TypeError)
         if self.actual_container is None:
-            self.log_exc("The actual container object has not been set", None, True, TypeError)
+            self.log_exc(
+                "The actual container object has not been set", None, True, TypeError
+            )
         if not gf.directory_exists(input_path):
-            self.log_exc("The input path is not an existing directory", None, True, ValueError)
+            self.log_exc(
+                "The input path is not an existing directory", None, True, ValueError
+            )
         gf.ensure_parent_directory(input_path)
         self.actual_container.compress(input_path)
 
@@ -377,14 +392,14 @@ class Container(Loggable):
             ContainerFormat.TAR: (_ContainerTAR, ""),
             ContainerFormat.TAR_GZ: (_ContainerTAR, ":gz"),
             ContainerFormat.TAR_BZ2: (_ContainerTAR, ":bz2"),
-            ContainerFormat.UNPACKED: (_ContainerUnpacked, None)
+            ContainerFormat.UNPACKED: (_ContainerUnpacked, None),
         }
         actual_class, variant = class_map[self.container_format]
         self.actual_container = actual_class(
             file_path=self.file_path,
             variant=variant,
             rconf=self.rconf,
-            logger=self.logger
+            logger=self.logger,
         )
         self.log(["Actual container format: '%s'", self.container_format])
         self.log("Setting actual container... done")
@@ -520,7 +535,7 @@ class _ContainerUnpacked(Loggable):
             for current_dir, dirs, files in os.walk(self.file_path):
                 current_dir_abs = os.path.abspath(current_dir)
                 for f in files:
-                    relative_path = os.path.join(current_dir_abs, f)[(root_len + 1):]
+                    relative_path = os.path.join(current_dir_abs, f)[(root_len + 1) :]
                     result.append(relative_path)
             return sorted(result)
         except Exception as exc:

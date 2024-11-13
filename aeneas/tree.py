@@ -70,7 +70,9 @@ class Tree(Loggable):
         self.__level = 0
 
     def __unicode__(self):
-        return "{} (l: {}, c: {})".format(self.value, gf.safe_int(self.level), gf.safe_int(len(self)))
+        return "{} (l: {}, c: {})".format(
+            self.value, gf.safe_int(self.level), gf.safe_int(len(self))
+        )
 
     def __str__(self):
         return gf.safe_str(self.__unicode__())
@@ -248,7 +250,7 @@ class Tree(Loggable):
         """
         if index < 0:
             index = index + len(self)
-        self.__children = self.__children[0:index] + self.__children[(index + 1):]
+        self.__children = self.__children[0:index] + self.__children[(index + 1) :]
 
     def remove(self):
         """
@@ -431,7 +433,12 @@ class Tree(Loggable):
             self.log_exc("Index is not an integer", None, True, TypeError)
         levels = self.levels
         if (index < 0) or (index >= len(levels)):
-            self.log_exc("The given level index '%d' is not valid" % (index), None, True, ValueError)
+            self.log_exc(
+                "The given level index '%d' is not valid" % (index),
+                None,
+                True,
+                ValueError,
+            )
         return self.levels[index]
 
     def vlevel_at_index(self, index):
@@ -494,10 +501,14 @@ class Tree(Loggable):
                  it contains an element which is not an int
         """
         if not isinstance(level_indices, list):
-            self.log_exc("level_indices is not an instance of list", None, True, TypeError)
+            self.log_exc(
+                "level_indices is not an instance of list", None, True, TypeError
+            )
         for level in level_indices:
             if not isinstance(level, int):
-                self.log_exc("level_indices contains an element not int", None, True, TypeError)
+                self.log_exc(
+                    "level_indices contains an element not int", None, True, TypeError
+                )
         prev_levels = self.levels
         level_indices = set(level_indices)
         if 0 not in level_indices:

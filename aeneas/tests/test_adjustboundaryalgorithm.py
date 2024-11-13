@@ -23,9 +23,7 @@
 import unittest
 
 
-
 class TestAdjustBoundaryAlgorithm(unittest.TestCase):
-
     pass
 
 

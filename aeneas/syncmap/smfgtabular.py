@@ -60,26 +60,23 @@ class SyncMapFormatGenericTabular(SyncMapFormatBase):
     The character delimiting fields.
     """
 
-    FIELDS = {
-        "identifier": 0,
-        "begin": 1,
-        "end": 2,
-        "text": 3
-    }
+    FIELDS = {"identifier": 0, "begin": 1, "end": 2, "text": 3}
     """
     Map that associated each field to its index.
     The map must contain the ``begin`` and ``end`` keys,
     while ``identifier`` and ``text`` are optional.
     """
 
-    TEXT_DELIMITER = "\""
+    TEXT_DELIMITER = '"'
     """
     If ``None``, the text will not be delimited by a special character.
     Otherwise, use the specified character.
     """
 
     def __init__(self, variant=DEFAULT, parameters=None, rconf=None, logger=None):
-        super().__init__(variant=variant, parameters=parameters, rconf=rconf, logger=logger)
+        super().__init__(
+            variant=variant, parameters=parameters, rconf=rconf, logger=logger
+        )
         # store parse/format time functions
         if self.variant in self.MACHINE_ALIASES:
             self.parse_time_function = gf.time_from_ssmmm
@@ -91,7 +88,9 @@ class SyncMapFormatGenericTabular(SyncMapFormatBase):
         placeholders = [None for i in range(len(self.FIELDS))]
         for k in self.FIELDS:
             placeholders[self.FIELDS[k]] = k
-        self.write_template = self.FIELD_DELIMITER.join(["{%s}" % p for p in placeholders])
+        self.write_template = self.FIELD_DELIMITER.join(
+            ["{%s}" % p for p in placeholders]
+        )
 
     def parse(self, input_text, syncmap):
         lines = [line.strip() for line in input_text.splitlines()]
@@ -111,12 +110,12 @@ class SyncMapFormatGenericTabular(SyncMapFormatBase):
 
             # set text
             if "text" in self.FIELDS:
-                text = self.FIELD_DELIMITER.join(split[self.FIELDS["text"]:])
+                text = self.FIELD_DELIMITER.join(split[self.FIELDS["text"] :])
                 if (
-                        (self.TEXT_DELIMITER is not None) and
-                        (len(text) > 1) and
-                        (text[0] == self.TEXT_DELIMITER) and
-                        (text[-1] == self.TEXT_DELIMITER)
+                    (self.TEXT_DELIMITER is not None)
+                    and (len(text) > 1)
+                    and (text[0] == self.TEXT_DELIMITER)
+                    and (text[-1] == self.TEXT_DELIMITER)
                 ):
                     text = text[1:-1]
             else:
@@ -127,7 +126,7 @@ class SyncMapFormatGenericTabular(SyncMapFormatBase):
                 identifier=identifier,
                 lines=[text],
                 begin=begin,
-                end=end
+                end=end,
             )
 
     def format(self, syncmap):
@@ -141,16 +140,11 @@ class SyncMapFormatGenericTabular(SyncMapFormatBase):
             # get text
             text = fragment.text_fragment.text
             if self.TEXT_DELIMITER is not None:
-                text = "{}{}{}".format(
-                    self.TEXT_DELIMITER,
-                    text,
-                    self.TEXT_DELIMITER
-                )
+                text = "{}{}{}".format(self.TEXT_DELIMITER, text, self.TEXT_DELIMITER)
             # format string
-            msg.append(self.write_template.format(
-                identifier=identifier,
-                begin=begin,
-                end=end,
-                text=text
-            ))
+            msg.append(
+                self.write_template.format(
+                    identifier=identifier, begin=begin, end=end, text=text
+                )
+            )
         return "\n".join(msg)

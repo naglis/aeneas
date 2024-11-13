@@ -34,15 +34,8 @@ import sys
 
 CMODULE = Extension(
     name="cmfcc",
-    sources=[
-        "cmfcc_py.c",
-        "cmfcc_func.c",
-        "../cwave/cwave_func.c",
-        "../cint/cint.c"
-    ],
-    include_dirs=[
-        get_include()
-    ]
+    sources=["cmfcc_py.c", "cmfcc_func.c", "../cwave/cwave_func.c", "../cint/cint.c"],
+    include_dirs=[get_include()],
 )
 
 setup(
@@ -50,7 +43,7 @@ setup(
     version="1.7.3",
     description="Python C Extension for computing the MFCCs as fast as your bare metal allows.",
     ext_modules=[CMODULE],
-    include_dirs=[misc_util.get_numpy_include_dirs()]
+    include_dirs=[misc_util.get_numpy_include_dirs()],
 )
 
 print("\n[INFO] Module cmfcc successfully compiled\n")

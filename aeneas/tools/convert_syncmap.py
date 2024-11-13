@@ -37,6 +37,7 @@ class ConvertSyncMapCLI(AbstractCLIProgram):
     """
     Convert a sync map from a format to another.
     """
+
     AUDIO = gf.relative_path("res/audio.mp3", __file__)
     SMIL_PARAMETERS = "--audio-ref=audio/sonnet001.mp3 --page-ref=text/sonnet001.xhtml"
     SYNC_MAP_CSV = gf.relative_path("res/sonnet.csv", __file__)
@@ -63,7 +64,7 @@ class ConvertSyncMapCLI(AbstractCLIProgram):
             "{} {} --input-format=csv".format(SYNC_MAP_ZZZ, OUTPUT_MAP_TXT),
             "{} {} --language=en".format(SYNC_MAP_CSV, OUTPUT_MAP_JSON),
             "{} {} {}".format(SYNC_MAP_JSON, OUTPUT_MAP_SMIL, SMIL_PARAMETERS),
-            "{} {} {} --output-html".format(SYNC_MAP_JSON, OUTPUT_HTML, AUDIO)
+            "{} {} {} --output-html".format(SYNC_MAP_JSON, OUTPUT_HTML, AUDIO),
         ],
         "options": [
             "--audio-ref=REF : use REF for the audio ref attribute (smil, smilh, smilm)",
@@ -71,8 +72,8 @@ class ConvertSyncMapCLI(AbstractCLIProgram):
             "--language=CODE : set language to CODE",
             "--output-format=FMT : output sync map file has format FMT",
             "--output-html : output HTML file for fine tuning",
-            "--page-ref=REF : use REF for the text ref attribute (smil, smilh, smilm)"
-        ]
+            "--page-ref=REF : use REF for the text ref attribute (smil, smilh, smilm)",
+        ],
     }
 
     def perform_command(self):
@@ -119,40 +120,56 @@ class ConvertSyncMapCLI(AbstractCLIProgram):
         parameters = {
             gc.PPN_SYNCMAP_LANGUAGE: language,
             gc.PPN_TASK_OS_FILE_SMIL_AUDIO_REF: audio_ref,
-            gc.PPN_TASK_OS_FILE_SMIL_PAGE_REF: page_ref
+            gc.PPN_TASK_OS_FILE_SMIL_PAGE_REF: page_ref,
         }
 
         try:
-            self.print_info("Reading sync map in '{}' format from file '{}'".format(input_sm_format, input_file_path))
+            self.print_info(
+                "Reading sync map in '{}' format from file '{}'".format(
+                    input_sm_format, input_file_path
+                )
+            )
             self.print_info("Reading sync map...")
             syncmap = SyncMap(logger=self.logger)
             syncmap.read(input_sm_format, input_file_path, parameters)
             self.print_info("Reading sync map... done")
             self.print_info("Read %d sync map fragments" % (len(syncmap)))
         except Exception as exc:
-            self.print_error("An unexpected error occurred while reading the input sync map:")
+            self.print_error(
+                "An unexpected error occurred while reading the input sync map:"
+            )
             self.print_error("%s" % (exc))
             return self.ERROR_EXIT_CODE
 
         if output_html:
             try:
                 self.print_info("Writing HTML file...")
-                syncmap.output_html_for_tuning(audio_file_path, output_file_path, parameters)
+                syncmap.output_html_for_tuning(
+                    audio_file_path, output_file_path, parameters
+                )
                 self.print_info("Writing HTML file... done")
                 self.print_success("Created HTML file '%s'" % (output_file_path))
                 return self.NO_ERROR_EXIT_CODE
             except Exception as exc:
-                self.print_error("An unexpected error occurred while writing the output HTML file:")
+                self.print_error(
+                    "An unexpected error occurred while writing the output HTML file:"
+                )
                 self.print_error("%s" % (exc))
         else:
             try:
                 self.print_info("Writing sync map...")
                 syncmap.write(output_sm_format, output_file_path, parameters)
                 self.print_info("Writing sync map... done")
-                self.print_success("Created '{}' sync map file '{}'".format(output_sm_format, output_file_path))
+                self.print_success(
+                    "Created '{}' sync map file '{}'".format(
+                        output_sm_format, output_file_path
+                    )
+                )
                 return self.NO_ERROR_EXIT_CODE
             except Exception as exc:
-                self.print_error("An unexpected error occurred while writing the output sync map:")
+                self.print_error(
+                    "An unexpected error occurred while writing the output sync map:"
+                )
                 self.print_error("%s" % (exc))
 
         return self.ERROR_EXIT_CODE
@@ -180,5 +197,6 @@ def main():
     """
     ConvertSyncMapCLI().run(arguments=sys.argv)
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     main()

@@ -47,7 +47,19 @@ class SyncMapFormatGenericXML(SyncMapFormatBase):
         """
         # TODO more robust parsing
         from lxml import etree
-        parts = ([node.text] + list(chain(*([etree.tostring(c, with_tail=False), c.tail] for c in node.getchildren()))) + [node.tail])
+
+        parts = (
+            [node.text]
+            + list(
+                chain(
+                    *(
+                        [etree.tostring(c, with_tail=False), c.tail]
+                        for c in node.getchildren()
+                    )
+                )
+            )
+            + [node.tail]
+        )
         parts = [gf.safe_unicode(p) for p in parts]
         parts = [p.strip() for p in parts if not p.startswith("<br ")]
         parts = [p for p in parts if len(p) > 0]
@@ -62,10 +74,13 @@ class SyncMapFormatGenericXML(SyncMapFormatBase):
         Return an ``lxml`` tree as a Unicode string.
         """
         from lxml import etree
-        return gf.safe_unicode(etree.tostring(
-            root_element,
-            encoding="UTF-8",
-            method="xml",
-            xml_declaration=xml_declaration,
-            pretty_print=pretty_print
-        ))
+
+        return gf.safe_unicode(
+            etree.tostring(
+                root_element,
+                encoding="UTF-8",
+                method="xml",
+                xml_declaration=xml_declaration,
+                pretty_print=pretty_print,
+            )
+        )

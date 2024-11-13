@@ -36,7 +36,6 @@ BENCH_TESTS = os.path.exists(BENCH_DIR)
 
 
 class TestBenchmarkExecuteTaskCLI(unittest.TestCase):
-
     def bench_execute(self, parameters, expected_exit_code, timeout):
         if not BENCH_TESTS:
             return
@@ -65,148 +64,220 @@ class TestBenchmarkExecuteTaskCLI(unittest.TestCase):
         self.assertEqual(exit_code, expected_exit_code)
 
     def test_001_mplain(self):
-        self.bench_execute([
-            ("in", "001m.mp3"),
-            ("in", "001m.mplain.txt"),
-            ("", "task_language=eng|is_text_type=mplain|os_task_file_format=json"),
-            ("out", "out.json"),
-        ], 0, 20)
+        self.bench_execute(
+            [
+                ("in", "001m.mp3"),
+                ("in", "001m.mplain.txt"),
+                ("", "task_language=eng|is_text_type=mplain|os_task_file_format=json"),
+                ("out", "out.json"),
+            ],
+            0,
+            20,
+        )
 
     def test_001_plain_sentence(self):
-        self.bench_execute([
-            ("in", "001m.mp3"),
-            ("in", "001m.plain.sentence.txt"),
-            ("", "task_language=eng|is_text_type=plain|os_task_file_format=json"),
-            ("out", "out.json"),
-        ], 0, 5)
+        self.bench_execute(
+            [
+                ("in", "001m.mp3"),
+                ("in", "001m.plain.sentence.txt"),
+                ("", "task_language=eng|is_text_type=plain|os_task_file_format=json"),
+                ("out", "out.json"),
+            ],
+            0,
+            5,
+        )
 
     def test_001_plain_word(self):
-        self.bench_execute([
-            ("in", "001m.mp3"),
-            ("in", "001m.plain.word.txt"),
-            ("", "task_language=eng|is_text_type=plain|os_task_file_format=json"),
-            ("out", "out.json"),
-        ], 0, 5)
+        self.bench_execute(
+            [
+                ("in", "001m.mp3"),
+                ("in", "001m.plain.word.txt"),
+                ("", "task_language=eng|is_text_type=plain|os_task_file_format=json"),
+                ("out", "out.json"),
+            ],
+            0,
+            5,
+        )
 
     def test_005_mplain(self):
-        self.bench_execute([
-            ("in", "005m.mp3"),
-            ("in", "005m.mplain.txt"),
-            ("", "task_language=eng|is_text_type=mplain|os_task_file_format=json"),
-            ("out", "out.json"),
-        ], 0, 100)
+        self.bench_execute(
+            [
+                ("in", "005m.mp3"),
+                ("in", "005m.mplain.txt"),
+                ("", "task_language=eng|is_text_type=mplain|os_task_file_format=json"),
+                ("out", "out.json"),
+            ],
+            0,
+            100,
+        )
 
     def test_005_plain_sentence(self):
-        self.bench_execute([
-            ("in", "005m.mp3"),
-            ("in", "005m.plain.sentence.txt"),
-            ("", "task_language=eng|is_text_type=plain|os_task_file_format=json"),
-            ("out", "out.json"),
-        ], 0, 20)
+        self.bench_execute(
+            [
+                ("in", "005m.mp3"),
+                ("in", "005m.plain.sentence.txt"),
+                ("", "task_language=eng|is_text_type=plain|os_task_file_format=json"),
+                ("out", "out.json"),
+            ],
+            0,
+            20,
+        )
 
     def test_005_plain_word(self):
-        self.bench_execute([
-            ("in", "005m.mp3"),
-            ("in", "005m.plain.word.txt"),
-            ("", "task_language=eng|is_text_type=plain|os_task_file_format=json"),
-            ("out", "out.json"),
-        ], 0, 20)
+        self.bench_execute(
+            [
+                ("in", "005m.mp3"),
+                ("in", "005m.plain.word.txt"),
+                ("", "task_language=eng|is_text_type=plain|os_task_file_format=json"),
+                ("out", "out.json"),
+            ],
+            0,
+            20,
+        )
 
     def test_010_mplain(self):
-        self.bench_execute([
-            ("in", "010m.mp3"),
-            ("in", "010m.mplain.txt"),
-            ("", "task_language=eng|is_text_type=mplain|os_task_file_format=json"),
-            ("out", "out.json"),
-        ], 0, 200)
+        self.bench_execute(
+            [
+                ("in", "010m.mp3"),
+                ("in", "010m.mplain.txt"),
+                ("", "task_language=eng|is_text_type=mplain|os_task_file_format=json"),
+                ("out", "out.json"),
+            ],
+            0,
+            200,
+        )
 
     def test_010_plain_sentence(self):
-        self.bench_execute([
-            ("in", "010m.mp3"),
-            ("in", "010m.plain.sentence.txt"),
-            ("", "task_language=eng|is_text_type=plain|os_task_file_format=json"),
-            ("out", "out.json"),
-        ], 0, 40)
+        self.bench_execute(
+            [
+                ("in", "010m.mp3"),
+                ("in", "010m.plain.sentence.txt"),
+                ("", "task_language=eng|is_text_type=plain|os_task_file_format=json"),
+                ("out", "out.json"),
+            ],
+            0,
+            40,
+        )
 
     def test_010_plain_word(self):
-        self.bench_execute([
-            ("in", "010m.mp3"),
-            ("in", "010m.plain.word.txt"),
-            ("", "task_language=eng|is_text_type=plain|os_task_file_format=json"),
-            ("out", "out.json"),
-        ], 0, 40)
+        self.bench_execute(
+            [
+                ("in", "010m.mp3"),
+                ("in", "010m.plain.word.txt"),
+                ("", "task_language=eng|is_text_type=plain|os_task_file_format=json"),
+                ("out", "out.json"),
+            ],
+            0,
+            40,
+        )
 
     def test_020_mplain(self):
-        self.bench_execute([
-            ("in", "020m.mp3"),
-            ("in", "020m.mplain.txt"),
-            ("", "task_language=eng|is_text_type=mplain|os_task_file_format=json"),
-            ("out", "out.json"),
-        ], 0, 400)
+        self.bench_execute(
+            [
+                ("in", "020m.mp3"),
+                ("in", "020m.mplain.txt"),
+                ("", "task_language=eng|is_text_type=mplain|os_task_file_format=json"),
+                ("out", "out.json"),
+            ],
+            0,
+            400,
+        )
 
     def test_020_plain_sentence(self):
-        self.bench_execute([
-            ("in", "020m.mp3"),
-            ("in", "020m.plain.sentence.txt"),
-            ("", "task_language=eng|is_text_type=plain|os_task_file_format=json"),
-            ("out", "out.json"),
-        ], 0, 60)
+        self.bench_execute(
+            [
+                ("in", "020m.mp3"),
+                ("in", "020m.plain.sentence.txt"),
+                ("", "task_language=eng|is_text_type=plain|os_task_file_format=json"),
+                ("out", "out.json"),
+            ],
+            0,
+            60,
+        )
 
     def test_020_plain_word(self):
-        self.bench_execute([
-            ("in", "020m.mp3"),
-            ("in", "020m.plain.word.txt"),
-            ("", "task_language=eng|is_text_type=plain|os_task_file_format=json"),
-            ("out", "out.json"),
-        ], 0, 60)
+        self.bench_execute(
+            [
+                ("in", "020m.mp3"),
+                ("in", "020m.plain.word.txt"),
+                ("", "task_language=eng|is_text_type=plain|os_task_file_format=json"),
+                ("out", "out.json"),
+            ],
+            0,
+            60,
+        )
 
     def test_030_mplain(self):
-        self.bench_execute([
-            ("in", "030m.mp3"),
-            ("in", "030m.mplain.txt"),
-            ("", "task_language=eng|is_text_type=mplain|os_task_file_format=json"),
-            ("out", "out.json"),
-        ], 0, 600)
+        self.bench_execute(
+            [
+                ("in", "030m.mp3"),
+                ("in", "030m.mplain.txt"),
+                ("", "task_language=eng|is_text_type=mplain|os_task_file_format=json"),
+                ("out", "out.json"),
+            ],
+            0,
+            600,
+        )
 
     def test_030_plain_sentence(self):
-        self.bench_execute([
-            ("in", "030m.mp3"),
-            ("in", "030m.plain.sentence.txt"),
-            ("", "task_language=eng|is_text_type=plain|os_task_file_format=json"),
-            ("out", "out.json"),
-        ], 0, 90)
+        self.bench_execute(
+            [
+                ("in", "030m.mp3"),
+                ("in", "030m.plain.sentence.txt"),
+                ("", "task_language=eng|is_text_type=plain|os_task_file_format=json"),
+                ("out", "out.json"),
+            ],
+            0,
+            90,
+        )
 
     def test_030_plain_word(self):
-        self.bench_execute([
-            ("in", "030m.mp3"),
-            ("in", "030m.plain.word.txt"),
-            ("", "task_language=eng|is_text_type=plain|os_task_file_format=json"),
-            ("out", "out.json"),
-        ], 0, 90)
+        self.bench_execute(
+            [
+                ("in", "030m.mp3"),
+                ("in", "030m.plain.word.txt"),
+                ("", "task_language=eng|is_text_type=plain|os_task_file_format=json"),
+                ("out", "out.json"),
+            ],
+            0,
+            90,
+        )
 
     def test_060_mplain(self):
-        self.bench_execute([
-            ("in", "060m.mp3"),
-            ("in", "060m.mplain.txt"),
-            ("", "task_language=eng|is_text_type=mplain|os_task_file_format=json"),
-            ("out", "out.json"),
-        ], 0, 1200)
+        self.bench_execute(
+            [
+                ("in", "060m.mp3"),
+                ("in", "060m.mplain.txt"),
+                ("", "task_language=eng|is_text_type=mplain|os_task_file_format=json"),
+                ("out", "out.json"),
+            ],
+            0,
+            1200,
+        )
 
     def test_060_plain_sentence(self):
-        self.bench_execute([
-            ("in", "060m.mp3"),
-            ("in", "060m.plain.sentence.txt"),
-            ("", "task_language=eng|is_text_type=plain|os_task_file_format=json"),
-            ("out", "out.json"),
-        ], 0, 180)
+        self.bench_execute(
+            [
+                ("in", "060m.mp3"),
+                ("in", "060m.plain.sentence.txt"),
+                ("", "task_language=eng|is_text_type=plain|os_task_file_format=json"),
+                ("out", "out.json"),
+            ],
+            0,
+            180,
+        )
 
     def test_060_plain_word(self):
-        self.bench_execute([
-            ("in", "060m.mp3"),
-            ("in", "060m.plain.word.txt"),
-            ("", "task_language=eng|is_text_type=plain|os_task_file_format=json"),
-            ("out", "out.json"),
-        ], 0, 180)
+        self.bench_execute(
+            [
+                ("in", "060m.mp3"),
+                ("in", "060m.plain.word.txt"),
+                ("", "task_language=eng|is_text_type=plain|os_task_file_format=json"),
+                ("out", "out.json"),
+            ],
+            0,
+            180,
+        )
 
 
 if __name__ == "__main__":

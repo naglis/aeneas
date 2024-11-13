@@ -28,44 +28,16 @@ import aeneas.globalfunctions as gf
 
 
 class TestAnalyzeContainer(unittest.TestCase):
-
     FILES = [
-        {
-            "path": "res/validator/job_txt_config",
-            "length": 3
-        },
-        {
-            "path": "res/validator/job_txt_config_not_root",
-            "length": 3
-        },
-        {
-            "path": "res/validator/job_txt_config_not_root_nested",
-            "length": 3
-        },
-        {
-            "path": "res/validator/job_txt_config_paged_1",
-            "length": 3
-        },
-        {
-            "path": "res/validator/job_txt_config_paged_2",
-            "length": 3
-        },
-        {
-            "path": "res/validator/job_txt_config_paged_3",
-            "length": 3
-        },
-        {
-            "path": "res/validator/job_xml_config",
-            "length": 3
-        },
-        {
-            "path": "res/validator/job_xml_config_not_root",
-            "length": 3
-        },
-        {
-            "path": "res/validator/job_xml_config_not_root_nested",
-            "length": 3
-        },
+        {"path": "res/validator/job_txt_config", "length": 3},
+        {"path": "res/validator/job_txt_config_not_root", "length": 3},
+        {"path": "res/validator/job_txt_config_not_root_nested", "length": 3},
+        {"path": "res/validator/job_txt_config_paged_1", "length": 3},
+        {"path": "res/validator/job_txt_config_paged_2", "length": 3},
+        {"path": "res/validator/job_txt_config_paged_3", "length": 3},
+        {"path": "res/validator/job_xml_config", "length": 3},
+        {"path": "res/validator/job_xml_config_not_root", "length": 3},
+        {"path": "res/validator/job_xml_config_not_root_nested", "length": 3},
     ]
 
     CONFIG_STRING = r"is_hierarchy_type=flat|is_hierarchy_prefix=assets/|is_text_file_relative_path=.|is_text_file_name_regex=.*\.xhtml|is_text_type=unparsed|is_audio_file_relative_path=.|is_audio_file_name_regex=.*\.mp3|is_text_unparsed_id_regex=f[0-9]+|is_text_unparsed_id_sort=numeric|os_job_file_name=demo_sync_job_output|os_job_file_container=zip|os_job_file_hierarchy_type=flat|os_job_file_hierarchy_prefix=assets/|os_task_file_name=$PREFIX.xhtml.smil|os_task_file_format=smil|os_task_file_smil_page_ref=$PREFIX.xhtml|os_task_file_smil_audio_ref=../Audio/$PREFIX.mp3|job_language=en|job_description=Demo Sync Job"
@@ -76,7 +48,7 @@ class TestAnalyzeContainer(unittest.TestCase):
         "res/container/empty_file.tar",
         "res/container/empty_file.tar.bz2",
         "res/container/empty_file.tar.gz",
-        "res/container/empty_file.zip"
+        "res/container/empty_file.zip",
     ]
 
     INVALID_CONTAINERS = [
@@ -89,7 +61,7 @@ class TestAnalyzeContainer(unittest.TestCase):
         "res/validator/job_xml_config_bad_1",
         "res/validator/job_xml_config_bad_2",
         "res/validator/job_xml_config_bad_3",
-        "res/validator/job_xml_config_bad_4"
+        "res/validator/job_xml_config_bad_4",
     ]
 
     NOT_EXISTING_PATH = gf.absolute_path("res/validator/x/y/z/not_existing", __file__)
@@ -115,7 +87,9 @@ class TestAnalyzeContainer(unittest.TestCase):
 
     def test_analyze(self):
         for f in self.FILES:
-            analyzer = AnalyzeContainer(Container(gf.absolute_path(f["path"], __file__)))
+            analyzer = AnalyzeContainer(
+                Container(gf.absolute_path(f["path"], __file__))
+            )
             job = analyzer.analyze()
             self.assertEqual(len(job), f["length"])
 

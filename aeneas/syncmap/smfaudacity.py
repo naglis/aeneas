@@ -41,10 +41,6 @@ class SyncMapFormatAudacity(SyncMapFormatGenericTabular):
 
     FIELD_DELIMITER = "\t"
 
-    FIELDS = {
-        "begin": 0,
-        "end": 1,
-        "text": 2
-    }
+    FIELDS = {"begin": 0, "end": 1, "text": 2}
 
     TEXT_DELIMITER = None

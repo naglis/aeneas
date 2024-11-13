@@ -44,7 +44,7 @@ class SyncMapFormatJSON(SyncMapFormatBase):
                 language=fragment["language"],
                 lines=fragment["lines"],
                 begin=gf.time_from_ssmmm(fragment["begin"]),
-                end=gf.time_from_ssmmm(fragment["end"])
+                end=gf.time_from_ssmmm(fragment["end"]),
             )
 
     def format(self, syncmap):

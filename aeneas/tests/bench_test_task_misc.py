@@ -36,7 +36,6 @@ BENCH_TESTS = os.path.exists(BENCH_DIR)
 
 
 class TestBenchmarkExecuteTaskCLI(unittest.TestCase):
-
     def bench_execute(self, parameters, expected_exit_code, timeout):
         if not BENCH_TESTS:
             return
@@ -65,116 +64,214 @@ class TestBenchmarkExecuteTaskCLI(unittest.TestCase):
         self.assertEqual(exit_code, expected_exit_code)
 
     def test_rateaggressive_remove_nonspeech(self):
-        self.bench_execute([
-            ("in", "010m.mp3"),
-            ("in", "010m.plain.word.txt"),
-            ("", "task_language=eng|is_text_type=plain|os_task_file_format=srt|task_adjust_boundary_algorithm=rateaggressive|task_adjust_boundary_rate_value=14.000|task_adjust_boundary_nonspeech_min=0.500|task_adjust_boundary_nonspeech_string=REMOVE"),
-            ("out", "sonnet.srt")
-        ], 0, 40)
+        self.bench_execute(
+            [
+                ("in", "010m.mp3"),
+                ("in", "010m.plain.word.txt"),
+                (
+                    "",
+                    "task_language=eng|is_text_type=plain|os_task_file_format=srt|task_adjust_boundary_algorithm=rateaggressive|task_adjust_boundary_rate_value=14.000|task_adjust_boundary_nonspeech_min=0.500|task_adjust_boundary_nonspeech_string=REMOVE",
+                ),
+                ("out", "sonnet.srt"),
+            ],
+            0,
+            40,
+        )
 
     def test_rateaggressive_remove_nonspeech_add(self):
-        self.bench_execute([
-            ("in", "010m.mp3"),
-            ("in", "010m.plain.word.txt"),
-            ("", "task_language=eng|is_text_type=plain|os_task_file_format=srt|task_adjust_boundary_algorithm=rateaggressive|task_adjust_boundary_rate_value=14.000|task_adjust_boundary_nonspeech_min=0.500|task_adjust_boundary_nonspeech_string=REMOVE|os_task_file_head_tail_format=add"),
-            ("out", "sonnet.srt")
-        ], 0, 40)
+        self.bench_execute(
+            [
+                ("in", "010m.mp3"),
+                ("in", "010m.plain.word.txt"),
+                (
+                    "",
+                    "task_language=eng|is_text_type=plain|os_task_file_format=srt|task_adjust_boundary_algorithm=rateaggressive|task_adjust_boundary_rate_value=14.000|task_adjust_boundary_nonspeech_min=0.500|task_adjust_boundary_nonspeech_string=REMOVE|os_task_file_head_tail_format=add",
+                ),
+                ("out", "sonnet.srt"),
+            ],
+            0,
+            40,
+        )
 
     def test_rateaggressive_remove_nonspeech_smaller_rate(self):
-        self.bench_execute([
-            ("in", "010m.mp3"),
-            ("in", "010m.plain.word.txt"),
-            ("", "task_language=eng|is_text_type=plain|os_task_file_format=srt|task_adjust_boundary_algorithm=rateaggressive|task_adjust_boundary_rate_value=12.000|task_adjust_boundary_nonspeech_min=0.500|task_adjust_boundary_nonspeech_string=REMOVE"),
-            ("out", "sonnet.srt")
-        ], 0, 40)
+        self.bench_execute(
+            [
+                ("in", "010m.mp3"),
+                ("in", "010m.plain.word.txt"),
+                (
+                    "",
+                    "task_language=eng|is_text_type=plain|os_task_file_format=srt|task_adjust_boundary_algorithm=rateaggressive|task_adjust_boundary_rate_value=12.000|task_adjust_boundary_nonspeech_min=0.500|task_adjust_boundary_nonspeech_string=REMOVE",
+                ),
+                ("out", "sonnet.srt"),
+            ],
+            0,
+            40,
+        )
 
     def test_rateaggressive_remove_nonspeech_idiotic_rate(self):
-        self.bench_execute([
-            ("in", "010m.mp3"),
-            ("in", "010m.plain.word.txt"),
-            ("", "task_language=eng|is_text_type=plain|os_task_file_format=srt|task_adjust_boundary_algorithm=rateaggressive|task_adjust_boundary_rate_value=2.000|task_adjust_boundary_nonspeech_min=0.500|task_adjust_boundary_nonspeech_string=REMOVE"),
-            ("out", "sonnet.srt")
-        ], 0, 40)
+        self.bench_execute(
+            [
+                ("in", "010m.mp3"),
+                ("in", "010m.plain.word.txt"),
+                (
+                    "",
+                    "task_language=eng|is_text_type=plain|os_task_file_format=srt|task_adjust_boundary_algorithm=rateaggressive|task_adjust_boundary_rate_value=2.000|task_adjust_boundary_nonspeech_min=0.500|task_adjust_boundary_nonspeech_string=REMOVE",
+                ),
+                ("out", "sonnet.srt"),
+            ],
+            0,
+            40,
+        )
 
     def test_rateaggressive_remove_nonspeech_nozero(self):
-        self.bench_execute([
-            ("in", "010m.mp3"),
-            ("in", "010m.plain.word.txt"),
-            ("", "task_language=eng|is_text_type=plain|os_task_file_format=srt|task_adjust_boundary_algorithm=rateaggressive|task_adjust_boundary_rate_value=14.000|task_adjust_boundary_nonspeech_min=0.500|task_adjust_boundary_nonspeech_string=REMOVE|task_adjust_boundary_no_zero=True"),
-            ("out", "sonnet.srt")
-        ], 0, 40)
+        self.bench_execute(
+            [
+                ("in", "010m.mp3"),
+                ("in", "010m.plain.word.txt"),
+                (
+                    "",
+                    "task_language=eng|is_text_type=plain|os_task_file_format=srt|task_adjust_boundary_algorithm=rateaggressive|task_adjust_boundary_rate_value=14.000|task_adjust_boundary_nonspeech_min=0.500|task_adjust_boundary_nonspeech_string=REMOVE|task_adjust_boundary_no_zero=True",
+                ),
+                ("out", "sonnet.srt"),
+            ],
+            0,
+            40,
+        )
 
     def test_rateaggressive_nozero(self):
-        self.bench_execute([
-            ("in", "010m.mp3"),
-            ("in", "010m.plain.word.txt"),
-            ("", "task_language=eng|is_text_type=plain|os_task_file_format=srt|task_adjust_boundary_algorithm=rateaggressive|task_adjust_boundary_rate_value=14.000|task_adjust_boundary_no_zero=True"),
-            ("out", "sonnet.srt")
-        ], 0, 40)
+        self.bench_execute(
+            [
+                ("in", "010m.mp3"),
+                ("in", "010m.plain.word.txt"),
+                (
+                    "",
+                    "task_language=eng|is_text_type=plain|os_task_file_format=srt|task_adjust_boundary_algorithm=rateaggressive|task_adjust_boundary_rate_value=14.000|task_adjust_boundary_no_zero=True",
+                ),
+                ("out", "sonnet.srt"),
+            ],
+            0,
+            40,
+        )
 
     def test_rateaggressive_nozero_add(self):
-        self.bench_execute([
-            ("in", "010m.mp3"),
-            ("in", "010m.plain.word.txt"),
-            ("", "task_language=eng|is_text_type=plain|os_task_file_format=srt|task_adjust_boundary_algorithm=rateaggressive|task_adjust_boundary_rate_value=14.000|task_adjust_boundary_no_zero=True|os_task_file_head_tail_format=add"),
-            ("out", "sonnet.srt")
-        ], 0, 40)
+        self.bench_execute(
+            [
+                ("in", "010m.mp3"),
+                ("in", "010m.plain.word.txt"),
+                (
+                    "",
+                    "task_language=eng|is_text_type=plain|os_task_file_format=srt|task_adjust_boundary_algorithm=rateaggressive|task_adjust_boundary_rate_value=14.000|task_adjust_boundary_no_zero=True|os_task_file_head_tail_format=add",
+                ),
+                ("out", "sonnet.srt"),
+            ],
+            0,
+            40,
+        )
 
     def test_mplain_rateaggressive_remove_nonspeech(self):
-        self.bench_execute([
-            ("in", "010m.mp3"),
-            ("in", "010m.mplain.txt"),
-            ("", "task_language=eng|is_text_type=mplain|os_task_file_format=json|task_adjust_boundary_algorithm=rateaggressive|task_adjust_boundary_rate_value=14.000|task_adjust_boundary_nonspeech_min=0.500|task_adjust_boundary_nonspeech_string=REMOVE"),
-            ("out", "out.json")
-        ], 0, 200)
+        self.bench_execute(
+            [
+                ("in", "010m.mp3"),
+                ("in", "010m.mplain.txt"),
+                (
+                    "",
+                    "task_language=eng|is_text_type=mplain|os_task_file_format=json|task_adjust_boundary_algorithm=rateaggressive|task_adjust_boundary_rate_value=14.000|task_adjust_boundary_nonspeech_min=0.500|task_adjust_boundary_nonspeech_string=REMOVE",
+                ),
+                ("out", "out.json"),
+            ],
+            0,
+            200,
+        )
 
     def test_mplain_rateaggressive_remove_nonspeech_add(self):
-        self.bench_execute([
-            ("in", "010m.mp3"),
-            ("in", "010m.mplain.txt"),
-            ("", "task_language=eng|is_text_type=mplain|os_task_file_format=json|task_adjust_boundary_algorithm=rateaggressive|task_adjust_boundary_rate_value=14.000|task_adjust_boundary_nonspeech_min=0.500|task_adjust_boundary_nonspeech_string=REMOVE|os_task_file_head_tail_format=add"),
-            ("out", "out.json")
-        ], 0, 200)
+        self.bench_execute(
+            [
+                ("in", "010m.mp3"),
+                ("in", "010m.mplain.txt"),
+                (
+                    "",
+                    "task_language=eng|is_text_type=mplain|os_task_file_format=json|task_adjust_boundary_algorithm=rateaggressive|task_adjust_boundary_rate_value=14.000|task_adjust_boundary_nonspeech_min=0.500|task_adjust_boundary_nonspeech_string=REMOVE|os_task_file_head_tail_format=add",
+                ),
+                ("out", "out.json"),
+            ],
+            0,
+            200,
+        )
 
     def test_mplain_rateaggressive_remove_nonspeech_smaller_rate(self):
-        self.bench_execute([
-            ("in", "010m.mp3"),
-            ("in", "010m.mplain.txt"),
-            ("", "task_language=eng|is_text_type=mplain|os_task_file_format=json|task_adjust_boundary_algorithm=rateaggressive|task_adjust_boundary_rate_value=12.000|task_adjust_boundary_nonspeech_min=0.500|task_adjust_boundary_nonspeech_string=REMOVE"),
-            ("out", "out.json")
-        ], 0, 200)
+        self.bench_execute(
+            [
+                ("in", "010m.mp3"),
+                ("in", "010m.mplain.txt"),
+                (
+                    "",
+                    "task_language=eng|is_text_type=mplain|os_task_file_format=json|task_adjust_boundary_algorithm=rateaggressive|task_adjust_boundary_rate_value=12.000|task_adjust_boundary_nonspeech_min=0.500|task_adjust_boundary_nonspeech_string=REMOVE",
+                ),
+                ("out", "out.json"),
+            ],
+            0,
+            200,
+        )
 
     def test_mplain_rateaggressive_remove_nonspeech_idiotic_rate(self):
-        self.bench_execute([
-            ("in", "010m.mp3"),
-            ("in", "010m.mplain.txt"),
-            ("", "task_language=eng|is_text_type=mplain|os_task_file_format=json|task_adjust_boundary_algorithm=rateaggressive|task_adjust_boundary_rate_value=2.000|task_adjust_boundary_nonspeech_min=0.500|task_adjust_boundary_nonspeech_string=REMOVE"),
-            ("out", "out.json")
-        ], 0, 200)
+        self.bench_execute(
+            [
+                ("in", "010m.mp3"),
+                ("in", "010m.mplain.txt"),
+                (
+                    "",
+                    "task_language=eng|is_text_type=mplain|os_task_file_format=json|task_adjust_boundary_algorithm=rateaggressive|task_adjust_boundary_rate_value=2.000|task_adjust_boundary_nonspeech_min=0.500|task_adjust_boundary_nonspeech_string=REMOVE",
+                ),
+                ("out", "out.json"),
+            ],
+            0,
+            200,
+        )
 
     def test_mplain_rateaggressive_remove_nonspeech_nozero(self):
-        self.bench_execute([
-            ("in", "010m.mp3"),
-            ("in", "010m.mplain.txt"),
-            ("", "task_language=eng|is_text_type=mplain|os_task_file_format=json|task_adjust_boundary_algorithm=rateaggressive|task_adjust_boundary_rate_value=14.000|task_adjust_boundary_nonspeech_min=0.500|task_adjust_boundary_nonspeech_string=REMOVE|task_adjust_boundary_no_zero=True"),
-            ("out", "out.json")
-        ], 0, 200)
+        self.bench_execute(
+            [
+                ("in", "010m.mp3"),
+                ("in", "010m.mplain.txt"),
+                (
+                    "",
+                    "task_language=eng|is_text_type=mplain|os_task_file_format=json|task_adjust_boundary_algorithm=rateaggressive|task_adjust_boundary_rate_value=14.000|task_adjust_boundary_nonspeech_min=0.500|task_adjust_boundary_nonspeech_string=REMOVE|task_adjust_boundary_no_zero=True",
+                ),
+                ("out", "out.json"),
+            ],
+            0,
+            200,
+        )
 
     def test_mplain_rateaggressive_nozero(self):
-        self.bench_execute([
-            ("in", "010m.mp3"),
-            ("in", "010m.mplain.txt"),
-            ("", "task_language=eng|is_text_type=mplain|os_task_file_format=json|task_adjust_boundary_algorithm=rateaggressive|task_adjust_boundary_rate_value=14.000|task_adjust_boundary_no_zero=True"),
-            ("out", "out.json")
-        ], 0, 200)
+        self.bench_execute(
+            [
+                ("in", "010m.mp3"),
+                ("in", "010m.mplain.txt"),
+                (
+                    "",
+                    "task_language=eng|is_text_type=mplain|os_task_file_format=json|task_adjust_boundary_algorithm=rateaggressive|task_adjust_boundary_rate_value=14.000|task_adjust_boundary_no_zero=True",
+                ),
+                ("out", "out.json"),
+            ],
+            0,
+            200,
+        )
 
     def test_mplain_rateaggressive_nozero_add(self):
-        self.bench_execute([
-            ("in", "010m.mp3"),
-            ("in", "010m.mplain.txt"),
-            ("", "task_language=eng|is_text_type=mplain|os_task_file_format=json|task_adjust_boundary_algorithm=rateaggressive|task_adjust_boundary_rate_value=14.000|task_adjust_boundary_no_zero=True|os_task_file_head_tail_format=add"),
-            ("out", "out.json")
-        ], 0, 200)
+        self.bench_execute(
+            [
+                ("in", "010m.mp3"),
+                ("in", "010m.mplain.txt"),
+                (
+                    "",
+                    "task_language=eng|is_text_type=mplain|os_task_file_format=json|task_adjust_boundary_algorithm=rateaggressive|task_adjust_boundary_rate_value=14.000|task_adjust_boundary_no_zero=True|os_task_file_head_tail_format=add",
+                ),
+                ("out", "out.json"),
+            ],
+            0,
+            200,
+        )
 
 
 if __name__ == "__main__":

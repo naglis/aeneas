@@ -29,7 +29,6 @@ import aeneas.globalfunctions as gf
 
 
 class TestFFMPEGWrapperCLI(ExecuteCLICase):
-
     CLI_CLS = FFMPEGWrapperCLI
 
     def test_help(self):
@@ -40,77 +39,82 @@ class TestFFMPEGWrapperCLI(ExecuteCLICase):
         self.execute([("", "--version")], 2)
 
     def test_convert(self):
-        self.execute([
-            ("in", "../tools/res/audio.wav"),
-            ("out", "audio.wav")
-        ], 0)
+        self.execute([("in", "../tools/res/audio.wav"), ("out", "audio.wav")], 0)
 
     def test_convert_mp3(self):
-        self.execute([
-            ("in", "../tools/res/audio.mp3"),
-            ("out", "audio.wav")
-        ], 0)
+        self.execute([("in", "../tools/res/audio.mp3"), ("out", "audio.wav")], 0)
 
     def test_convert_16000(self):
-        self.execute([
-            ("in", "../tools/res/audio.wav"),
-            ("out", "audio.wav"),
-            ("", "-r=\"ffmpeg_sample_rate=16000\"")
-        ], 0)
+        self.execute(
+            [
+                ("in", "../tools/res/audio.wav"),
+                ("out", "audio.wav"),
+                ("", '-r="ffmpeg_sample_rate=16000"'),
+            ],
+            0,
+        )
 
     def test_convert_22050(self):
-        self.execute([
-            ("in", "../tools/res/audio.wav"),
-            ("out", "audio.wav"),
-            ("", "-r=\"ffmpeg_sample_rate=22050\"")
-        ], 0)
+        self.execute(
+            [
+                ("in", "../tools/res/audio.wav"),
+                ("out", "audio.wav"),
+                ("", '-r="ffmpeg_sample_rate=22050"'),
+            ],
+            0,
+        )
 
     def test_convert_44100(self):
-        self.execute([
-            ("in", "../tools/res/audio.wav"),
-            ("out", "audio.wav"),
-            ("", "-r=\"ffmpeg_sample_rate=44100\"")
-        ], 0)
+        self.execute(
+            [
+                ("in", "../tools/res/audio.wav"),
+                ("out", "audio.wav"),
+                ("", '-r="ffmpeg_sample_rate=44100"'),
+            ],
+            0,
+        )
 
     def test_convert_path(self):
         path = os.path.expanduser("~")
         path = os.path.join(path, ".bin/myffmpeg")
         if gf.file_exists(path):
-            self.execute([
-                ("in", "../tools/res/audio.wav"),
-                ("out", "audio.wav"),
-                ("", "-r=\"ffmpeg_path=%s\"" % path)
-            ], 0)
+            self.execute(
+                [
+                    ("in", "../tools/res/audio.wav"),
+                    ("out", "audio.wav"),
+                    ("", '-r="ffmpeg_path=%s"' % path),
+                ],
+                0,
+            )
 
     def test_convert_path_bad(self):
         path = "/foo/bar/ffmpeg"
-        self.execute([
-            ("in", "../tools/res/audio.wav"),
-            ("out", "audio.wav"),
-            ("", "-r=\"ffmpeg_path=%s\"" % path)
-        ], 1)
+        self.execute(
+            [
+                ("in", "../tools/res/audio.wav"),
+                ("out", "audio.wav"),
+                ("", '-r="ffmpeg_path=%s"' % path),
+            ],
+            1,
+        )
 
     def test_convert_missing_1(self):
-        self.execute([
-            ("in", "../tools/res/audio.wav")
-        ], 2)
+        self.execute([("in", "../tools/res/audio.wav")], 2)
 
     def test_convert_missing_2(self):
-        self.execute([
-            ("out", "audio.wav")
-        ], 2)
+        self.execute([("out", "audio.wav")], 2)
 
     def test_convert_cannot_read(self):
-        self.execute([
-            ("", "/foo/bar/baz.wav"),
-            ("out", "audio.wav"),
-        ], 1)
+        self.execute(
+            [
+                ("", "/foo/bar/baz.wav"),
+                ("out", "audio.wav"),
+            ],
+            1,
+        )
 
     def test_convert_cannot_write(self):
-        self.execute([
-            ("in", "../tools/res/audio.wav"),
-            ("", "/foo/bar/baz.wav")
-        ], 1)
+        self.execute([("in", "../tools/res/audio.wav"), ("", "/foo/bar/baz.wav")], 1)
 
 
 if __name__ == "__main__":

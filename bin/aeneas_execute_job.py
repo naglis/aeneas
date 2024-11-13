@@ -51,5 +51,5 @@ def main():
     ExecuteJobCLI(invoke="aeneas_execute_job").run(arguments=sys.argv)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

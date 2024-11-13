@@ -80,7 +80,7 @@ class Logger:
         return "Logger(tee=%s, indentation=%d, tee_show_datetime=%s)" % (
             self.tee,
             self.indentation,
-            self.tee_show_datetime
+            self.tee_show_datetime,
         )
 
     @property
@@ -153,7 +153,7 @@ class Logger:
             time=datetime.datetime.now(),
             tag=tag,
             indentation=self.indentation,
-            message=self._sanitize(message)
+            message=self._sanitize(message),
         )
         self.entries.append(entry)
         if self.tee:
@@ -226,13 +226,10 @@ class _LogEntry:
                 gf.object_to_unicode(self.time),
                 " " * self.indentation,
                 self.tag,
-                self.message
+                self.message,
             )
         return "[{}] {}{}: {}".format(
-            self.severity,
-            " " * self.indentation,
-            self.tag,
-            self.message
+            self.severity, " " * self.indentation, self.tag, self.message
         )
 
     @property
@@ -310,6 +307,7 @@ class Loggable:
     :param rconf: the runtime configuration object
     :type  rconf: :class:`~aeneas.runtimeconfiguration.RuntimeConfiguration`
     """
+
     TAG = "Loggable"
 
     def __init__(self, logger=None, rconf=None):

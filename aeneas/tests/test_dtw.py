@@ -30,7 +30,6 @@ import aeneas.globalfunctions as gf
 
 
 class TestDTWAligner(unittest.TestCase):
-
     AUDIO_FILE = gf.absolute_path("res/audioformats/mono.16000.wav", __file__)
     NUMPY_ARRAY_1 = numpy.loadtxt(gf.absolute_path("res/cdtw/mfcc1_12_1332", __file__))
     NUMPY_ARRAY_2 = numpy.loadtxt(gf.absolute_path("res/cdtw/mfcc2_12_868", __file__))

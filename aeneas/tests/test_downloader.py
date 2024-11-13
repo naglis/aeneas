@@ -28,42 +28,43 @@ from aeneas.downloader import DownloadError
 import aeneas.globalfunctions as gf
 
 
-@unittest.skipIf(importlib.util.find_spec("youtube_dl") is None, "youtube-dl is not installed")
+@unittest.skipIf(
+    importlib.util.find_spec("youtube_dl") is None, "youtube-dl is not installed"
+)
 class TestDownloader(unittest.TestCase):
-
     URL_MALFORMED = "foo"
     URL_INVALID = "aaaaaaaaaaa"
     URL_VALID = "https://www.youtube.com/watch?v=rU4a7AA8wM0"
     OUTPUT_PATH_INVALID = "/foo/bar/baz"
 
     def audio_from_youtube(
-            self,
-            source_url,
-            download=True,
-            output_file_path=None,
-            download_format=None,
-            largest_audio=True
+        self,
+        source_url,
+        download=True,
+        output_file_path=None,
+        download_format=None,
+        largest_audio=True,
     ):
         return Downloader().audio_from_youtube(
             source_url,
             download=download,
             output_file_path=output_file_path,
             download_format=download_format,
-            largest_audio=largest_audio
+            largest_audio=largest_audio,
         )
 
     def download(
-            self,
-            expected_size,
-            download_format=None,
-            largest_audio=True,
+        self,
+        expected_size,
+        download_format=None,
+        largest_audio=True,
     ):
         path = self.audio_from_youtube(
             self.URL_VALID,
             download=True,
             output_file_path=None,
             download_format=download_format,
-            largest_audio=largest_audio
+            largest_audio=largest_audio,
         )
         self.assertTrue(gf.file_can_be_read(path))
         self.assertEqual(gf.file_size(path), expected_size)
@@ -80,9 +81,7 @@ class TestDownloader(unittest.TestCase):
     def test_invalid_output_file(self):
         with self.assertRaises(OSError):
             self.audio_from_youtube(
-                self.URL_VALID,
-                download=True,
-                output_file_path=self.OUTPUT_PATH_INVALID
+                self.URL_VALID, download=True, output_file_path=self.OUTPUT_PATH_INVALID
             )
 
     def test_download_list(self):

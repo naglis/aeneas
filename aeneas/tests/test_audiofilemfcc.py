@@ -31,7 +31,6 @@ import aeneas.globalfunctions as gf
 
 
 class TestAudioFileMFCC(unittest.TestCase):
-
     AUDIO_FILE_WAVE = "res/audioformats/mono.16000.wav"
     AUDIO_FILE_EMPTY = "res/audioformats/p001.empty"
     NOT_EXISTING_FILE = "res/audioformats/x/y/z/not_existing.wav"
@@ -56,7 +55,9 @@ class TestAudioFileMFCC(unittest.TestCase):
         af.read_samples_from_file()
         audiofile = AudioFileMFCC(audio_file=af)
         self.assertIsNotNone(audiofile.all_mfcc)
-        self.assertAlmostEqual(audiofile.audio_length, TimeValue("53.3"), places=1)     # 53.266
+        self.assertAlmostEqual(
+            audiofile.audio_length, TimeValue("53.3"), places=1
+        )  # 53.266
 
     def test_load_mfcc_matrix(self):
         mfccs = numpy.zeros((13, 250))
@@ -68,7 +69,9 @@ class TestAudioFileMFCC(unittest.TestCase):
         audiofile = self.load(self.AUDIO_FILE_WAVE)
         self.assertEqual(audiofile.all_mfcc.shape[0], 13)
         self.assertEqual(audiofile.all_mfcc.shape[1], 1331)
-        self.assertAlmostEqual(audiofile.audio_length, TimeValue("53.3"), places=1)     # 53.266
+        self.assertAlmostEqual(
+            audiofile.audio_length, TimeValue("53.3"), places=1
+        )  # 53.266
 
     def test_load_on_non_existing_path(self):
         with self.assertRaises(OSError):
@@ -259,7 +262,9 @@ class TestAudioFileMFCC(unittest.TestCase):
 
     def test_set_head_tail(self):
         audiofile = self.load(self.AUDIO_FILE_WAVE)
-        audiofile.set_head_middle_tail(head_length=TimeValue("2.000"), tail_length=TimeValue("2.000"))
+        audiofile.set_head_middle_tail(
+            head_length=TimeValue("2.000"), tail_length=TimeValue("2.000")
+        )
         self.assertEqual(audiofile.all_length, 1331)
         self.assertEqual(audiofile.head_length, 50)
         self.assertEqual(audiofile.middle_length, 1231)
@@ -267,7 +272,9 @@ class TestAudioFileMFCC(unittest.TestCase):
 
     def test_set_head_middle(self):
         audiofile = self.load(self.AUDIO_FILE_WAVE)
-        audiofile.set_head_middle_tail(head_length=TimeValue("2.000"), middle_length=TimeValue("18.000"))
+        audiofile.set_head_middle_tail(
+            head_length=TimeValue("2.000"), middle_length=TimeValue("18.000")
+        )
         self.assertEqual(audiofile.all_length, 1331)
         self.assertEqual(audiofile.head_length, 50)
         self.assertEqual(audiofile.middle_length, 450)
@@ -275,7 +282,9 @@ class TestAudioFileMFCC(unittest.TestCase):
 
     def test_set_middle_tail(self):
         audiofile = self.load(self.AUDIO_FILE_WAVE)
-        audiofile.set_head_middle_tail(middle_length=TimeValue("20.000"), tail_length=TimeValue("50.000"))
+        audiofile.set_head_middle_tail(
+            middle_length=TimeValue("20.000"), tail_length=TimeValue("50.000")
+        )
         self.assertEqual(audiofile.all_length, 1331)
         self.assertEqual(audiofile.head_length, 0)
         self.assertEqual(audiofile.middle_length, 500)
@@ -319,7 +328,7 @@ class TestAudioFileMFCC(unittest.TestCase):
             -1,
             audiofile.all_length,
             audiofile.all_length + 1,
-            audiofile.all_length + 2
+            audiofile.all_length + 2,
         ]:
             self.assertIsNone(audiofile.inside_nonspeech(index))
         for begin, end in audiofile.intervals(False, False):
@@ -337,7 +346,7 @@ class TestAudioFileMFCC(unittest.TestCase):
             -1,
             audiofile.all_length,
             audiofile.all_length + 1,
-            audiofile.all_length + 2
+            audiofile.all_length + 2,
         ]:
             self.assertIsNone(audiofile.inside_nonspeech(index))
         for begin, end in audiofile.intervals(False, False):
@@ -355,12 +364,18 @@ class TestAudioFileMFCC(unittest.TestCase):
         self.assertNotEqual(audiofile.masked_middle_length, 0)
         self.assertIsNotNone(audiofile.masked_middle_map)
         pre = audiofile.masked_middle_length
-        audiofile.set_head_middle_tail(head_length=TimeValue("0.440"), tail_length=TimeValue("1.200"))
+        audiofile.set_head_middle_tail(
+            head_length=TimeValue("0.440"), tail_length=TimeValue("1.200")
+        )
         self.assertEqual(pre, audiofile.masked_middle_length)
-        audiofile.set_head_middle_tail(head_length=TimeValue("0.480"), tail_length=TimeValue("1.240"))
+        audiofile.set_head_middle_tail(
+            head_length=TimeValue("0.480"), tail_length=TimeValue("1.240")
+        )
         self.assertNotEqual(pre, audiofile.masked_middle_length)
         pre = audiofile.masked_middle_length
-        audiofile.set_head_middle_tail(head_length=TimeValue("10.000"), tail_length=TimeValue("10.000"))
+        audiofile.set_head_middle_tail(
+            head_length=TimeValue("10.000"), tail_length=TimeValue("10.000")
+        )
         self.assertNotEqual(pre, audiofile.masked_middle_length)
 
 

@@ -31,7 +31,6 @@ http://www.cstr.ed.ac.uk/projects/festival/
 for further details.
 """
 
-
 from aeneas.exacttiming import TimeValue
 from aeneas.language import Language
 from aeneas.ttswrappers.basettswrapper import BaseTTSWrapper
@@ -129,7 +128,9 @@ class FESTIVALTTSWrapper(BaseTTSWrapper):
         ENG_USA: "English (USA)",
     }
 
-    CODE_TO_HUMAN_LIST = sorted(["{}\t{}".format(k, v) for k, v in CODE_TO_HUMAN.items()])
+    CODE_TO_HUMAN_LIST = sorted(
+        ["{}\t{}".format(k, v) for k, v in CODE_TO_HUMAN.items()]
+    )
 
     VOICE_CODE_TO_SUBPROCESS = {
         CES: "(language_czech)",
@@ -158,18 +159,22 @@ class FESTIVALTTSWrapper(BaseTTSWrapper):
 
     def __init__(self, rconf=None, logger=None):
         super().__init__(rconf=rconf, logger=logger)
-        self.set_subprocess_arguments([
-            self.tts_path,
-            self.CLI_PARAMETER_VOICE_CODE_FUNCTION,
-            "-o",
-            self.CLI_PARAMETER_WAVE_PATH,
-            self.CLI_PARAMETER_TEXT_STDIN
-        ])
+        self.set_subprocess_arguments(
+            [
+                self.tts_path,
+                self.CLI_PARAMETER_VOICE_CODE_FUNCTION,
+                "-o",
+                self.CLI_PARAMETER_WAVE_PATH,
+                self.CLI_PARAMETER_TEXT_STDIN,
+            ]
+        )
 
     def _voice_code_to_subprocess(self, voice_code):
         return ["-eval", self.VOICE_CODE_TO_SUBPROCESS[voice_code]]
 
-    def _synthesize_multiple_c_extension(self, text_file, output_file_path, quit_after=None, backwards=False):
+    def _synthesize_multiple_c_extension(
+        self, text_file, output_file_path, quit_after=None, backwards=False
+    ):
         """
         Synthesize multiple text fragments, using the cfw extension.
 
@@ -198,7 +203,9 @@ class FESTIVALTTSWrapper(BaseTTSWrapper):
             f_text = fragment.filtered_text
             if f_lang is None:
                 f_lang = self.DEFAULT_LANGUAGE
-            f_voice_code = self.VOICE_CODE_TO_SUBPROCESS[self._language_to_voice_code(f_lang)]
+            f_voice_code = self.VOICE_CODE_TO_SUBPROCESS[
+                self._language_to_voice_code(f_lang)
+            ]
             if f_text is None:
                 f_text = ""
             u_text.append((f_voice_code, f_text))
@@ -217,17 +224,17 @@ class FESTIVALTTSWrapper(BaseTTSWrapper):
         try:
             self.log("Importing aeneas.cfw...")
             import aeneas.cfw.cfw
+
             self.log("Importing aeneas.cfw... done")
             self.log("Calling aeneas.cfw...")
             sr, sf, intervals = aeneas.cfw.cfw.synthesize_multiple(
-                output_file_path,
-                c_quit_after,
-                c_backwards,
-                c_text
+                output_file_path, c_quit_after, c_backwards, c_text
             )
             self.log("Calling aeneas.cfw... done")
         except Exception as exc:
-            self.log_exc("An unexpected error occurred while running cfw", exc, False, None)
+            self.log_exc(
+                "An unexpected error occurred while running cfw", exc, False, None
+            )
             return (False, None)
 
         self.log(["sr: %d", sr])
@@ -243,11 +250,13 @@ class FESTIVALTTSWrapper(BaseTTSWrapper):
             # get the correct fragment
             fragment = fragments[i]
             # store for later output
-            anchors.append([
-                TimeValue(intervals[i][0]),
-                fragment.identifier,
-                fragment.filtered_text
-            ])
+            anchors.append(
+                [
+                    TimeValue(intervals[i][0]),
+                    fragment.identifier,
+                    fragment.filtered_text,
+                ]
+            )
             # increase the character counter
             num_chars += fragment.characters
             # update current_time

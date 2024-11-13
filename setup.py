@@ -64,6 +64,7 @@ __version__ = "1.7.3"
 #
 ##############################################################################
 
+
 def prepare_cew_for_windows():
     """
     Copy files needed to compile the ``cew`` Python C extension on Windows.
@@ -95,7 +96,11 @@ def prepare_cew_for_windows():
             for src_path in espeak_dll_src_paths:
                 if os.path.exists(src_path):
                     found = True
-                    print("[INFO] Copying eSpeak DLL from {} into {}".format(src_path, espeak_dll_dst_path))
+                    print(
+                        "[INFO] Copying eSpeak DLL from {} into {}".format(
+                            src_path, espeak_dll_dst_path
+                        )
+                    )
                     try:
                         shutil.copyfile(src_path, espeak_dll_dst_path)
                         copied = True
@@ -104,15 +109,25 @@ def prepare_cew_for_windows():
                         pass
                     break
             if not found:
-                print("[WARN] Unable to find the eSpeak DLL, probably because you installed eSpeak in a non-standard location.")
+                print(
+                    "[WARN] Unable to find the eSpeak DLL, probably because you installed eSpeak in a non-standard location."
+                )
                 print("[WARN] If you want to run aeneas with the C extension cew,")
-                print("[WARN] please copy espeak_sapi.dll from your eSpeak directory to %s" % espeak_dll_win_path)
+                print(
+                    "[WARN] please copy espeak_sapi.dll from your eSpeak directory to %s"
+                    % espeak_dll_win_path
+                )
                 # print("[WARN] and run the aeneas setup again.")
                 # return False
             elif not copied:
-                print("[WARN] Unable to copy the eSpeak DLL, probably because you are not running with admin privileges.")
+                print(
+                    "[WARN] Unable to copy the eSpeak DLL, probably because you are not running with admin privileges."
+                )
                 print("[WARN] If you want to run aeneas with the C extension cew,")
-                print("[WARN] please copy espeak_sapi.dll from your eSpeak directory to %s" % espeak_dll_win_path)
+                print(
+                    "[WARN] please copy espeak_sapi.dll from your eSpeak directory to %s"
+                    % espeak_dll_win_path
+                )
                 # print("[WARN] and run the aeneas setup again.")
                 # return False
 
@@ -120,7 +135,9 @@ def prepare_cew_for_windows():
         #       so, we copy it in the current working directory from the included thirdparty\ directory
         # NOTE: PREV: copy thirdparty\espeak.lib to $PYTHON\libs\espeak.lib
         # NOTE: PREV: espeak_lib_dst_path = os.path.join(sys.prefix, "libs", "espeak.lib")
-        espeak_lib_src_path = os.path.join(os.path.dirname(__file__), "thirdparty", "espeak.lib")
+        espeak_lib_src_path = os.path.join(
+            os.path.dirname(__file__), "thirdparty", "espeak.lib"
+        )
         espeak_lib_dst_path = os.path.join(os.path.dirname(__file__), "espeak.lib")
         if os.path.exists(espeak_lib_dst_path):
             print("[INFO] Found eSpeak LIB in %s" % espeak_lib_dst_path)
@@ -130,9 +147,14 @@ def prepare_cew_for_windows():
                 shutil.copyfile(espeak_lib_src_path, espeak_lib_dst_path)
                 print("[INFO] Copied eSpeak LIB")
             except:
-                print("[WARN] Unable to copy the eSpeak LIB, probably because you are not running with admin privileges.")
+                print(
+                    "[WARN] Unable to copy the eSpeak LIB, probably because you are not running with admin privileges."
+                )
                 print("[WARN] If you want to compile the C extension cew,")
-                print("[WARN] please copy espeak.lib from the thirdparty directory into %s" % espeak_lib_dst_path)
+                print(
+                    "[WARN] please copy espeak.lib from the thirdparty directory into %s"
+                    % espeak_lib_dst_path
+                )
                 print("[WARN] and run the aeneas setup again.")
                 return False
 
@@ -152,19 +174,10 @@ def prepare_cew_for_windows():
 # get platform
 IS_LINUX = (os.name == "posix") and (os.uname()[0] == "Linux")
 IS_OSX = (os.name == "posix") and (os.uname()[0] == "Darwin")
-IS_WINDOWS = (os.name == "nt")
+IS_WINDOWS = os.name == "nt"
 
 # define what values of environment variables are considered equal to True
-TRUE_VALUES = [
-    "TRUE",
-    "True",
-    "true",
-    "YES",
-    "Yes",
-    "yes",
-    "1",
-    1
-]
+TRUE_VALUES = ["TRUE", "True", "true", "YES", "Yes", "yes", "1", 1]
 
 # check whether the user set additional parameters using environment variables
 # NOTE by the book this should be done by subclassing the setuptools Distribution object
@@ -203,14 +216,8 @@ if IS_WINDOWS:
 # prepare Extension objects
 EXTENSION_CDTW = Extension(
     name="aeneas.cdtw.cdtw",
-    sources=[
-        "aeneas/cdtw/cdtw_py.c",
-        "aeneas/cdtw/cdtw_func.c",
-        "aeneas/cint/cint.c"
-    ],
-    include_dirs=[
-        get_include()
-    ]
+    sources=["aeneas/cdtw/cdtw_py.c", "aeneas/cdtw/cdtw_func.c", "aeneas/cint/cint.c"],
+    include_dirs=[get_include()],
 )
 EXTENSION_CMFCC = Extension(
     name="aeneas.cmfcc.cmfcc",
@@ -218,38 +225,25 @@ EXTENSION_CMFCC = Extension(
         "aeneas/cmfcc/cmfcc_py.c",
         "aeneas/cmfcc/cmfcc_func.c",
         "aeneas/cwave/cwave_func.c",
-        "aeneas/cint/cint.c"
+        "aeneas/cint/cint.c",
     ],
-    include_dirs=[
-        get_include()
-    ]
+    include_dirs=[get_include()],
 )
 EXTENSION_CEW = Extension(
     name="aeneas.cew.cew",
-    sources=[
-        "aeneas/cew/cew_py.c",
-        "aeneas/cew/cew_func.c"
-    ],
-    libraries=[
-        "espeak"
-    ]
+    sources=["aeneas/cew/cew_py.c", "aeneas/cew/cew_func.c"],
+    libraries=["espeak"],
 )
 EXTENSION_CFW = Extension(
     name="aeneas.cfw.cfw",
-    sources=[
-        "aeneas/cfw/cfw_py.cc",
-        "aeneas/cfw/cfw_func.cc"
-    ],
-    include_dirs=[
-        "aeneas/cfw/festival",
-        "aeneas/cfw/speech_tools"
-    ],
+    sources=["aeneas/cfw/cfw_py.cc", "aeneas/cfw/cfw_func.cc"],
+    include_dirs=["aeneas/cfw/festival", "aeneas/cfw/speech_tools"],
     libraries=[
         "Festival",
         "estools",
         "estbase",
         "eststring",
-    ]
+    ],
 )
 # cwave is ready, but currently not used
 # EXTENSION_CWAVE = Extension(
@@ -288,48 +282,76 @@ if WITHOUT_CEW:
     print("[INFO] **********************************************************")
     print("[INFO] ")
 elif FORCE_CEW:
-    print("[INFO] ********************************************************************************")
-    print("[INFO] The user specified AENEAS_FORCE_CEW=True: attempting to build cew without checks")
-    print("[INFO] ********************************************************************************")
+    print(
+        "[INFO] ********************************************************************************"
+    )
+    print(
+        "[INFO] The user specified AENEAS_FORCE_CEW=True: attempting to build cew without checks"
+    )
+    print(
+        "[INFO] ********************************************************************************"
+    )
     print("[INFO] ")
     EXTENSIONS.append(EXTENSION_CEW)
 else:
     if IS_LINUX:
         EXTENSIONS.append(EXTENSION_CEW)
     elif IS_OSX:
-        print("[INFO] *********************************************************************************")
+        print(
+            "[INFO] *********************************************************************************"
+        )
         print("[INFO] Compiling the C extension cew on Mac OS X is experimental.")
         print("[INFO] ")
         print("[INFO] Before installing aeneas with cew, you must run:")
         print("[INFO] $ brew update && brew upgrade --cleanup espeak")
-        print("[INFO] to run the new brew formula installing libespeak, the library version of espeak.")
+        print(
+            "[INFO] to run the new brew formula installing libespeak, the library version of espeak."
+        )
         print("[INFO] ")
-        print("[INFO] If you experience problems, disable cew compilation by specifying")
+        print(
+            "[INFO] If you experience problems, disable cew compilation by specifying"
+        )
         print("[INFO] the environment variable AENEAS_WITH_CEW=False .")
         print("[INFO] Please see the aeneas installation documentation for details.")
-        print("[INFO] ********************************************************************************")
+        print(
+            "[INFO] ********************************************************************************"
+        )
         print("[INFO] ")
         EXTENSIONS.append(EXTENSION_CEW)
     elif IS_WINDOWS:
-        print("[INFO] *****************************************************************")
+        print(
+            "[INFO] *****************************************************************"
+        )
         print("[INFO] Compiling the C extension cew on Windows is experimental.")
         print("[INFO] ")
-        print("[INFO] If you experience problems, disable cew compilation by specifying")
+        print(
+            "[INFO] If you experience problems, disable cew compilation by specifying"
+        )
         print("[INFO] the environment variable AENEAS_WITH_CEW=False .")
         print("[INFO] Please see the aeneas installation documentation for details.")
-        print("[INFO] *****************************************************************")
+        print(
+            "[INFO] *****************************************************************"
+        )
         print("[INFO] ")
         if prepare_cew_for_windows():
             EXTENSIONS.append(EXTENSION_CEW)
         else:
-            print("[WARN] Unable to complete the setup for C extension cew, not building it.")
+            print(
+                "[WARN] Unable to complete the setup for C extension cew, not building it."
+            )
     else:
         print("[INFO] The C extension cew is not available for your OS.")
 
 if FORCE_CFW:
-    print("[INFO] ********************************************************************************")
-    print("[INFO] The user specified AENEAS_FORCE_CFW=True: attempting to build cfw without checks")
-    print("[INFO] ********************************************************************************")
+    print(
+        "[INFO] ********************************************************************************"
+    )
+    print(
+        "[INFO] The user specified AENEAS_FORCE_CFW=True: attempting to build cfw without checks"
+    )
+    print(
+        "[INFO] ********************************************************************************"
+    )
     print("[INFO] ")
     EXTENSIONS.append(EXTENSION_CFW)
 
@@ -351,5 +373,5 @@ setup(
     extras_require=PKG_EXTRAS_REQUIRE,
     scripts=PKG_SCRIPTS,
     include_dirs=INCLUDE_DIRS,
-    ext_modules=EXTENSIONS
+    ext_modules=EXTENSIONS,
 )

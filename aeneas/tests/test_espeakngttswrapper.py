@@ -27,7 +27,6 @@ from aeneas.ttswrappers.espeakngttswrapper import ESPEAKNGTTSWrapper
 
 
 class TestESPEAKNGTTSWrapper(TestBaseTTSWrapper):
-
     TTS = "espeak-ng"
     TTS_PATH = "/usr/bin/espeak-ng"
     TTS_CLASS = ESPEAKNGTTSWrapper

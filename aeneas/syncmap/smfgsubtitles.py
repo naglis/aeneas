@@ -39,7 +39,9 @@ class SyncMapFormatGenericSubtitles(SyncMapFormatBase):
     """
 
     def __init__(self, variant=DEFAULT, parameters=None, rconf=None, logger=None):
-        super().__init__(variant=variant, parameters=parameters, rconf=rconf, logger=logger)
+        super().__init__(
+            variant=variant, parameters=parameters, rconf=rconf, logger=logger
+        )
 
         #
         # NOTE since we store functions (parse_..., format_...)
@@ -118,7 +120,12 @@ class SyncMapFormatGenericSubtitles(SyncMapFormatBase):
             """
             split = string.split(self.time_values_separator)
             if len(split) < 2:
-                self.log_exc("The following timing string is malformed: '%s'" % (string), None, True, ValueError)
+                self.log_exc(
+                    "The following timing string is malformed: '%s'" % (string),
+                    None,
+                    True,
+                    ValueError,
+                )
             #
             # certain formats might have time lines like:
             # "00:00:20,000 --> 00:00:22,000  X1:40 X2:600 Y1:20 Y2:50"
@@ -162,9 +169,8 @@ class SyncMapFormatGenericSubtitles(SyncMapFormatBase):
                 # no block => break
                 break
 
-            if (
-                    (self.footer_string is not None) and
-                    (acc[0].startswith(self.footer_string))
+            if (self.footer_string is not None) and (
+                acc[0].startswith(self.footer_string)
             ):
                 # we reached the footer => break
                 break
@@ -195,7 +201,7 @@ class SyncMapFormatGenericSubtitles(SyncMapFormatBase):
                     identifier=identifier,
                     lines=lines,
                     begin=begin,
-                    end=end
+                    end=end,
                 )
 
                 # increase cue index
@@ -210,11 +216,13 @@ class SyncMapFormatGenericSubtitles(SyncMapFormatBase):
             text = fragment.text_fragment
             if self.cue_has_identifier or self.cue_has_optional_identifier:
                 msg.append("%d" % i)
-            msg.append("{}{}{}".format(
-                self.format_time_function(fragment.begin),
-                self.time_values_separator,
-                self.format_time_function(fragment.end),
-            ))
+            msg.append(
+                "{}{}{}".format(
+                    self.format_time_function(fragment.begin),
+                    self.time_values_separator,
+                    self.format_time_function(fragment.end),
+                )
+            )
             lines = self.line_break_symbol.join(text.lines)
             msg.append(lines)
             msg.append("")

@@ -42,6 +42,7 @@ class ExecuteJobCLI(AbstractCLIProgram):
     as a container and a configuration string
     (i.e., from a wizard).
     """
+
     CONTAINER_FILE = gf.relative_path("res/job.zip", __file__)
     CONTAINER_FILE_NO_CONFIG = gf.relative_path("res/job_no_config.zip", __file__)
     OUTPUT_DIRECTORY = "output/"
@@ -55,17 +56,19 @@ class ExecuteJobCLI(AbstractCLIProgram):
         "description": "Execute a Job, passed as a container.",
         "synopsis": [
             ("--list-parameters", False),
-            ("CONTAINER OUTPUT_DIR [CONFIG_STRING]", True)
+            ("CONTAINER OUTPUT_DIR [CONFIG_STRING]", True),
         ],
         "examples": [
             "{} {}".format(CONTAINER_FILE, OUTPUT_DIRECTORY),
             "{} {} --cewsubprocess".format(CONTAINER_FILE, OUTPUT_DIRECTORY),
-            "{} {} \"{}\"".format(CONTAINER_FILE_NO_CONFIG, OUTPUT_DIRECTORY, CONFIG_STRING)
+            '{} {} "{}"'.format(
+                CONTAINER_FILE_NO_CONFIG, OUTPUT_DIRECTORY, CONFIG_STRING
+            ),
         ],
         "options": [
             "--cewsubprocess : run cew in separate process (see docs)",
-            "--skip-validator : do not validate the given container and/or config string"
-        ]
+            "--skip-validator : do not validate the given container and/or config string",
+        ],
     }
 
     def perform_command(self):
@@ -83,7 +86,9 @@ class ExecuteJobCLI(AbstractCLIProgram):
         container_path = self.actual_arguments[0]
         output_directory_path = self.actual_arguments[1]
         config_string = None
-        if (len(self.actual_arguments)) > 2 and (not self.actual_arguments[2].startswith("-")):
+        if (len(self.actual_arguments)) > 2 and (
+            not self.actual_arguments[2].startswith("-")
+        ):
             config_string = self.actual_arguments[2]
         validate = not self.has_option("--skip-validator")
         if self.has_option("--cewsubprocess"):
@@ -97,16 +102,22 @@ class ExecuteJobCLI(AbstractCLIProgram):
 
         if validate:
             try:
-                self.print_info("Validating the container (specify --skip-validator to bypass)...")
+                self.print_info(
+                    "Validating the container (specify --skip-validator to bypass)..."
+                )
                 validator = Validator(rconf=self.rconf, logger=self.logger)
-                result = validator.check_container(container_path, config_string=config_string)
+                result = validator.check_container(
+                    container_path, config_string=config_string
+                )
                 if not result.passed:
                     self.print_error("The given container is not valid:")
                     self.print_error(result.pretty_print())
                     return self.ERROR_EXIT_CODE
                 self.print_info("Validating the container... done")
             except Exception as exc:
-                self.print_error("An unexpected error occurred while validating the container:")
+                self.print_error(
+                    "An unexpected error occurred while validating the container:"
+                )
                 self.print_error("%s" % exc)
                 return self.ERROR_EXIT_CODE
 
@@ -137,7 +148,9 @@ class ExecuteJobCLI(AbstractCLIProgram):
             executor.clean(True)
             return self.NO_ERROR_EXIT_CODE
         except Exception as exc:
-            self.print_error("An unexpected error occurred while writing the output container:")
+            self.print_error(
+                "An unexpected error occurred while writing the output container:"
+            )
             self.print_error("%s" % exc)
 
         return self.ERROR_EXIT_CODE
@@ -157,5 +170,6 @@ def main():
     """
     ExecuteJobCLI().run(arguments=sys.argv)
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     main()

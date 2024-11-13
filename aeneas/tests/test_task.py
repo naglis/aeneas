@@ -39,15 +39,26 @@ import aeneas.globalfunctions as gf
 
 
 class TestTask(unittest.TestCase):
-
     def dummy_sync_map(self):
         sync_map = SyncMap()
         frag = TextFragment("f001", Language.ENG, ["Fragment 1"])
-        sync_map.add_fragment(SyncMapFragment(text_fragment=frag, begin=TimeValue("0.000"), end=TimeValue("12.345")))
+        sync_map.add_fragment(
+            SyncMapFragment(
+                text_fragment=frag, begin=TimeValue("0.000"), end=TimeValue("12.345")
+            )
+        )
         frag = TextFragment("f002", Language.ENG, ["Fragment 2"])
-        sync_map.add_fragment(SyncMapFragment(text_fragment=frag, begin=TimeValue("12.345"), end=TimeValue("23.456")))
+        sync_map.add_fragment(
+            SyncMapFragment(
+                text_fragment=frag, begin=TimeValue("12.345"), end=TimeValue("23.456")
+            )
+        )
         frag = TextFragment("f003", Language.ENG, ["Fragment 3"])
-        sync_map.add_fragment(SyncMapFragment(text_fragment=frag, begin=TimeValue("23.456"), end=TimeValue("34.567")))
+        sync_map.add_fragment(
+            SyncMapFragment(
+                text_fragment=frag, begin=TimeValue("23.456"), end=TimeValue("34.567")
+            )
+        )
         return sync_map
 
     def setter(self, attribute, value, expected):
@@ -59,7 +70,9 @@ class TestTask(unittest.TestCase):
         else:
             self.assertEqual(read_value, expected)
 
-    def set_text_file(self, path, fmt, expected, id_regex=None, class_regex=None, id_sort=None):
+    def set_text_file(
+        self, path, fmt, expected, id_regex=None, class_regex=None, id_sort=None
+    ):
         task = Task()
         task.configuration = TaskConfiguration()
         task.configuration["language"] = Language.ENG
@@ -138,15 +151,21 @@ class TestTask(unittest.TestCase):
 
     def test_set_audio_file_path_absolute(self):
         task = Task()
-        task.audio_file_path_absolute = gf.absolute_path("res/container/job/assets/p001.mp3", __file__)
+        task.audio_file_path_absolute = gf.absolute_path(
+            "res/container/job/assets/p001.mp3", __file__
+        )
         self.assertIsNotNone(task.audio_file)
         self.assertEqual(task.audio_file.file_size, 426735)
-        self.assertAlmostEqual(task.audio_file.audio_length, TimeValue("53.3"), places=1)
+        self.assertAlmostEqual(
+            task.audio_file.audio_length, TimeValue("53.3"), places=1
+        )
 
     def test_set_audio_file_path_absolute_error(self):
         task = Task()
         with self.assertRaises(OSError):
-            task.audio_file_path_absolute = gf.absolute_path("not_existing.mp3", __file__)
+            task.audio_file_path_absolute = gf.absolute_path(
+                "not_existing.mp3", __file__
+            )
 
     def test_set_text_file_unparsed_id(self):
         self.set_text_file(
@@ -154,7 +173,7 @@ class TestTask(unittest.TestCase):
             TextFileFormat.UNPARSED,
             15,
             id_regex="f[0-9]+",
-            id_sort=IDSortingAlgorithm.NUMERIC
+            id_sort=IDSortingAlgorithm.NUMERIC,
         )
 
     def test_set_text_file_unparsed_class(self):
@@ -164,7 +183,7 @@ class TestTask(unittest.TestCase):
             TextFileFormat.UNPARSED,
             0,
             class_regex="ra",
-            id_sort=IDSortingAlgorithm.NUMERIC
+            id_sort=IDSortingAlgorithm.NUMERIC,
         )
 
     def test_set_text_file_unparsed_id_class(self):
@@ -174,7 +193,7 @@ class TestTask(unittest.TestCase):
             15,
             id_regex="f[0-9]+",
             class_regex="ra",
-            id_sort=IDSortingAlgorithm.NUMERIC
+            id_sort=IDSortingAlgorithm.NUMERIC,
         )
 
     def test_set_text_file_unparsed_id_class_empty(self):
@@ -185,30 +204,20 @@ class TestTask(unittest.TestCase):
             0,
             id_regex="f[0-9]+",
             class_regex="ra",
-            id_sort=IDSortingAlgorithm.NUMERIC
+            id_sort=IDSortingAlgorithm.NUMERIC,
         )
 
     def test_set_text_file_plain(self):
-        self.set_text_file(
-            "res/inputtext/sonnet_plain.txt",
-            TextFileFormat.PLAIN,
-            15
-        )
+        self.set_text_file("res/inputtext/sonnet_plain.txt", TextFileFormat.PLAIN, 15)
 
     def test_set_text_file_parsed(self):
         return
-        self.set_text_file(
-            "res/inputtext/sonnet_parsed.txt",
-            TextFileFormat.PARSED,
-            15
-        )
+        self.set_text_file("res/inputtext/sonnet_parsed.txt", TextFileFormat.PARSED, 15)
 
     def test_set_text_file_subtitles(self):
         return
         self.set_text_file(
-            "res/inputtext/sonnet_subtitles.txt",
-            TextFileFormat.SUBTITLES,
-            15
+            "res/inputtext/sonnet_subtitles.txt", TextFileFormat.SUBTITLES, 15
         )
 
     def test_output_sync_map(self):
@@ -245,7 +254,9 @@ class TestTask(unittest.TestCase):
         self.setter("language", Language.ITA, Language.ITA)
 
     def test_tc_adjust_boundary_algorithm(self):
-        self.setter("aba_algorithm", AdjustBoundaryAlgorithm.AUTO, AdjustBoundaryAlgorithm.AUTO)
+        self.setter(
+            "aba_algorithm", AdjustBoundaryAlgorithm.AUTO, AdjustBoundaryAlgorithm.AUTO
+        )
 
     def test_tc_adjust_boundary_aftercurrent_value(self):
         self.setter("aba_aftercurrent_value", "0.100", TimeValue("0.100"))
@@ -290,7 +301,7 @@ class TestTask(unittest.TestCase):
         self.setter("i_a_process", "100", 100.0)
 
     def test_tc_is_audio_file_tail_length(self):
-        self.setter("i_a_tail", "20", 20.)
+        self.setter("i_a_tail", "20", 20.0)
 
     def test_tc_is_text_file_format(self):
         self.setter("i_t_format", TextFileFormat.PLAIN, TextFileFormat.PLAIN)
@@ -308,19 +319,27 @@ class TestTask(unittest.TestCase):
         self.setter("i_t_unparsed_id_regex", "ra", "ra")
 
     def test_tc_is_text_unparsed_id_sort(self):
-        self.setter("i_t_unparsed_id_sort", IDSortingAlgorithm.NUMERIC, IDSortingAlgorithm.NUMERIC)
+        self.setter(
+            "i_t_unparsed_id_sort",
+            IDSortingAlgorithm.NUMERIC,
+            IDSortingAlgorithm.NUMERIC,
+        )
 
     def test_tc_os_file_format(self):
         self.setter("o_format", SyncMapFormat.SMIL, SyncMapFormat.SMIL)
 
     def test_tc_os_file_head_tail_format(self):
-        self.setter("o_h_t_format", SyncMapHeadTailFormat.ADD, SyncMapHeadTailFormat.ADD)
+        self.setter(
+            "o_h_t_format", SyncMapHeadTailFormat.ADD, SyncMapHeadTailFormat.ADD
+        )
 
     def test_tc_os_file_name(self):
         self.setter("o_name", "output.smil", "output.smil")
 
     def test_tc_os_file_smil_audio_ref(self):
-        self.setter("o_smil_audio_ref", "../audio/audio001.mp3", "../audio/audio001.mp3")
+        self.setter(
+            "o_smil_audio_ref", "../audio/audio001.mp3", "../audio/audio001.mp3"
+        )
 
     def test_tc_os_file_smil_page_ref(self):
         self.setter("o_smil_page_ref", "../text/page001.xhtml", "../text/page001.xhtml")
@@ -371,86 +390,75 @@ class TestTask(unittest.TestCase):
 
     def test_tc_from_string_simple(self):
         self.tc_from_string_some_invalid(
-            "task_description=Test description|task_language=ita",
-            "Test description"
+            "task_description=Test description|task_language=ita", "Test description"
         )
 
     def test_tc_from_string_unicode(self):
         self.tc_from_string_some_invalid(
             "task_description=Test description àèìòù|task_language=ita",
-            "Test description àèìòù"
+            "Test description àèìòù",
         )
 
     def test_tc_from_string_repeated_pipes(self):
         self.tc_from_string_some_invalid(
-            "task_description=Test description|||task_language=ita",
-            "Test description"
+            "task_description=Test description|||task_language=ita", "Test description"
         )
 
     def test_tc_from_string_invalid_key_with_value(self):
         self.tc_from_string_some_invalid(
             "task_description=Test description|not_a_valid_key=foo|task_language=ita",
-            "Test description"
+            "Test description",
         )
 
     def test_tc_from_string_invalid_key_no_value(self):
         self.tc_from_string_some_invalid(
             "task_description=Test description|not_a_valid_key=|task_language=ita",
-            "Test description"
+            "Test description",
         )
 
     def test_tc_from_string_value_without_key(self):
         self.tc_from_string_some_invalid(
             "task_description=Test description|=foo|task_language=ita",
-            "Test description"
+            "Test description",
         )
 
     def test_tc_from_string_trailing_pipe(self):
         self.tc_from_string_some_invalid(
-            "task_description=Test description|task_language=ita|",
-            "Test description"
+            "task_description=Test description|task_language=ita|", "Test description"
         )
 
     def test_tc_from_string_leading_pipe(self):
         self.tc_from_string_some_invalid(
-            "|task_description=Test description|task_language=ita",
-            "Test description"
+            "|task_description=Test description|task_language=ita", "Test description"
         )
 
     def test_tc_from_string_leading_and_trailing_pipe(self):
         self.tc_from_string_some_invalid(
-            "|task_description=Test description|task_language=ita|",
-            "Test description"
+            "|task_description=Test description|task_language=ita|", "Test description"
         )
 
     def test_tc_from_string_valid_key_no_value(self):
-        self.tc_from_string_some_invalid(
-            "task_description=|task_language=ita",
-            None
-        )
+        self.tc_from_string_some_invalid("task_description=|task_language=ita", None)
 
     def test_tc_from_string_space_before_valid_key(self):
         self.tc_from_string_some_invalid(
-            "task_description=Test description=|task_language=ita",
-            None
+            "task_description=Test description=|task_language=ita", None
         )
 
     def test_tc_from_string_value_with_trailing_space(self):
         self.tc_from_string_some_invalid(
-            "task_description=Test with space |task_language=ita",
-            "Test with space "
+            "task_description=Test with space |task_language=ita", "Test with space "
         )
 
     def test_tc_from_string_space_before_and_after_key_value_pair(self):
         self.tc_from_string_some_invalid(
-            " task_description=Test with space |task_language=ita",
-            None
+            " task_description=Test with space |task_language=ita", None
         )
 
     def test_tc_from_string_several_invalid_stuff(self):
         self.tc_from_string_some_invalid(
             "task_description=Test description|foo=|=bar|foo=bar|||task_language=ita",
-            "Test description"
+            "Test description",
         )
 
 

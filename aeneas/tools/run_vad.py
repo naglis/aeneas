@@ -41,6 +41,7 @@ class RunVADCLI(AbstractCLIProgram):
     Extract a list of speech intervals from the given audio file,
     using the MFCC energy-based VAD algorithm.
     """
+
     INPUT_FILE = gf.relative_path("res/audio.mp3", __file__)
     OUTPUT_BOTH = "output/both.txt"
     OUTPUT_NONSPEECH = "output/nonspeech.txt"
@@ -51,17 +52,15 @@ class RunVADCLI(AbstractCLIProgram):
 
     HELP = {
         "description": "Extract a list of speech intervals using the MFCC energy-based VAD.",
-        "synopsis": [
-            ("AUDIO_FILE [%s] [OUTPUT_FILE]" % ("|".join(MODES)), True)
-        ],
+        "synopsis": [("AUDIO_FILE [%s] [OUTPUT_FILE]" % ("|".join(MODES)), True)],
         "examples": [
             "{} both {}".format(INPUT_FILE, OUTPUT_BOTH),
             "{} nonspeech {}".format(INPUT_FILE, OUTPUT_NONSPEECH),
-            "{} speech {}".format(INPUT_FILE, OUTPUT_SPEECH)
+            "{} speech {}".format(INPUT_FILE, OUTPUT_SPEECH),
         ],
         "options": [
             "-i, --index : output intervals as indices instead of seconds",
-        ]
+        ],
     }
 
     def perform_command(self):
@@ -84,14 +83,21 @@ class RunVADCLI(AbstractCLIProgram):
         self.check_c_extensions("cmfcc")
         if not self.check_input_file(audio_file_path):
             return self.ERROR_EXIT_CODE
-        if (output_file_path is not None) and (not self.check_output_file(output_file_path)):
+        if (output_file_path is not None) and (
+            not self.check_output_file(output_file_path)
+        ):
             return self.ERROR_EXIT_CODE
 
         self.print_info("Reading audio...")
         try:
-            audio_file_mfcc = AudioFileMFCC(audio_file_path, rconf=self.rconf, logger=self.logger)
+            audio_file_mfcc = AudioFileMFCC(
+                audio_file_path, rconf=self.rconf, logger=self.logger
+            )
         except AudioFileConverterError:
-            self.print_error("Unable to call the ffmpeg executable '%s'" % (self.rconf[RuntimeConfiguration.FFMPEG_PATH]))
+            self.print_error(
+                "Unable to call the ffmpeg executable '%s'"
+                % (self.rconf[RuntimeConfiguration.FFMPEG_PATH])
+            )
             self.print_error("Make sure the path to ffmpeg is correct")
             return self.ERROR_EXIT_CODE
         except (AudioFileUnsupportedFormatError, AudioFileNotInitializedError):
@@ -99,7 +105,9 @@ class RunVADCLI(AbstractCLIProgram):
             self.print_error("Check that its format is supported by ffmpeg")
             return self.ERROR_EXIT_CODE
         except Exception as exc:
-            self.print_error("An unexpected error occurred while reading the audio file:")
+            self.print_error(
+                "An unexpected error occurred while reading the audio file:"
+            )
             self.print_error("%s" % exc)
             return self.ERROR_EXIT_CODE
         self.print_info("Reading audio... done")
@@ -165,5 +173,6 @@ def main():
     """
     RunVADCLI().run(arguments=sys.argv)
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     main()

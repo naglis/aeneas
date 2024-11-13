@@ -14,11 +14,13 @@ slow_test = unittest.skipIf(
     "slow tests are disabled. Set `UNITTEST_RUN_SLOW_TESTS=1` in the environment to enable them.",
 )
 
-class ExecuteCLICase(unittest.TestCase):
 
+class ExecuteCLICase(unittest.TestCase):
     CLI_CLS: typing.ClassVar
 
-    def execute(self, parameters: typing.Sequence[tuple[str, str]], expected_exit_code: int):
+    def execute(
+        self, parameters: typing.Sequence[tuple[str, str]], expected_exit_code: int
+    ):
         params = ["placeholder"]
         with tempfile.TemporaryDirectory(prefix="aeneas.") as temp_dir:
             for p_type, p_value in parameters:
@@ -35,12 +37,8 @@ class ExecuteCLICase(unittest.TestCase):
 
 
 class ExecuteJobCLICase(ExecuteCLICase):
-
     CLI_CLS = ExecuteJobCLI
 
-    
+
 class ExecuteTaskCLICase(ExecuteCLICase):
-
     CLI_CLS = ExecuteTaskCLI
-
-

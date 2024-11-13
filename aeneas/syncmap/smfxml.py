@@ -36,6 +36,7 @@ class SyncMapFormatXML(SyncMapFormatGenericXML):
 
     def parse(self, input_text, syncmap):
         from lxml import etree
+
         root = etree.fromstring(gf.safe_bytes(input_text))
         for frag in root:
             identifier = gf.safe_unicode(frag.get("id"))
@@ -50,14 +51,14 @@ class SyncMapFormatXML(SyncMapFormatGenericXML):
                 identifier=identifier,
                 lines=lines,
                 begin=begin,
-                end=end
+                end=end,
             )
 
     def format(self, syncmap):
         from lxml import etree
 
         def visit_children(node, parent_elem):
-            """ Recursively visit the fragments_tree """
+            """Recursively visit the fragments_tree"""
             for child in node.children_not_empty:
                 fragment = child.value
                 fragment_elem = etree.SubElement(parent_elem, "fragment")

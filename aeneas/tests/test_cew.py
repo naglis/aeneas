@@ -26,23 +26,20 @@ import aeneas.globalfunctions as gf
 
 
 class TestCEW(unittest.TestCase):
-
     def test_cew_synthesize_multiple(self):
         handler, output_file_path = gf.tmp_file(suffix=".wav")
         try:
             c_quit_after = 0.0
             c_backwards = 0
             c_text = [
-                ("en", "Dummy 1"),        # NOTE cew requires the actual eSpeak voice code
-                ("en", "Dummy 2"),        # NOTE cew requires the actual eSpeak voice code
-                ("en", "Dummy 3"),        # NOTE cew requires the actual eSpeak voice code
+                ("en", "Dummy 1"),  # NOTE cew requires the actual eSpeak voice code
+                ("en", "Dummy 2"),  # NOTE cew requires the actual eSpeak voice code
+                ("en", "Dummy 3"),  # NOTE cew requires the actual eSpeak voice code
             ]
             import aeneas.cew.cew
+
             sr, sf, intervals = aeneas.cew.cew.synthesize_multiple(
-                output_file_path,
-                c_quit_after,
-                c_backwards,
-                c_text
+                output_file_path, c_quit_after, c_backwards, c_text
             )
             self.assertEqual(sr, 22050)
             self.assertEqual(sf, 3)
@@ -57,16 +54,17 @@ class TestCEW(unittest.TestCase):
             c_quit_after = 0.0
             c_backwards = 0
             c_text = [
-                ("en", "Dummy 1"),        # NOTE cew requires the actual eSpeak voice code
-                ("it", "Segnaposto 2"),   # NOTE cew requires the actual eSpeak voice code
-                ("en", "Dummy 3"),        # NOTE cew requires the actual eSpeak voice code
+                ("en", "Dummy 1"),  # NOTE cew requires the actual eSpeak voice code
+                (
+                    "it",
+                    "Segnaposto 2",
+                ),  # NOTE cew requires the actual eSpeak voice code
+                ("en", "Dummy 3"),  # NOTE cew requires the actual eSpeak voice code
             ]
             import aeneas.cew.cew
+
             sr, sf, intervals = aeneas.cew.cew.synthesize_multiple(
-                output_file_path,
-                c_quit_after,
-                c_backwards,
-                c_text
+                output_file_path, c_quit_after, c_backwards, c_text
             )
             self.assertEqual(sr, 22050)
             self.assertEqual(sf, 3)

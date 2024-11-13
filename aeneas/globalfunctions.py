@@ -53,10 +53,11 @@ HHMMSS_MMM_PATTERN_COMMA = re.compile(r"([0-9]*):([0-9]*):([0-9]*),([0-9]*)")
 FROZEN = getattr(sys, "frozen", False)
 
 # True if running under Python 2
-PY2 = (sys.version_info[0] == 2)
+PY2 = sys.version_info[0] == 2
 
 
 # COMMON FUNCTIONS
+
 
 def safe_print(msg):
     """
@@ -76,8 +77,12 @@ def safe_print(msg):
             print(decoded)
         except (UnicodeDecodeError, UnicodeEncodeError):
             print("[ERRO] An unexpected error happened while printing to stdout.")
-            print("[ERRO] Please check that your file/string encoding matches the shell encoding.")
-            print("[ERRO] If possible, set your shell encoding to UTF-8 and convert any files with legacy encodings.")
+            print(
+                "[ERRO] Please check that your file/string encoding matches the shell encoding."
+            )
+            print(
+                "[ERRO] If possible, set your shell encoding to UTF-8 and convert any files with legacy encodings."
+            )
 
 
 def print_error(msg, color=True):
@@ -224,7 +229,7 @@ def datetime_string(time_zone=False):
         time.day,
         time.hour,
         time.minute,
-        time.second
+        time.second,
     )
 
 
@@ -364,6 +369,7 @@ def config_xml_to_dict(contents, result, parse_job=True):
     :rtype: dict (``parse_job=True``) or list of dict (``parse_job=False``)
     """
     from lxml import etree
+
     try:
         root = etree.fromstring(contents)
         pairs = []
@@ -371,11 +377,13 @@ def config_xml_to_dict(contents, result, parse_job=True):
             # parse job
             for elem in root:
                 if (elem.tag != gc.CONFIG_XML_TASKS_TAG) and (elem.text is not None):
-                    pairs.append("{}{}{}".format(
-                        safe_unicode(elem.tag),
-                        gc.CONFIG_STRING_ASSIGNMENT_SYMBOL,
-                        safe_unicode(elem.text.strip())
-                    ))
+                    pairs.append(
+                        "{}{}{}".format(
+                            safe_unicode(elem.tag),
+                            gc.CONFIG_STRING_ASSIGNMENT_SYMBOL,
+                            safe_unicode(elem.text.strip()),
+                        )
+                    )
             return pairs_to_dict(pairs)
         else:
             # parse tasks
@@ -385,11 +393,13 @@ def config_xml_to_dict(contents, result, parse_job=True):
                     pairs = []
                     for elem in task:
                         if elem.text is not None:
-                            pairs.append("{}{}{}".format(
-                                safe_unicode(elem.tag),
-                                gc.CONFIG_STRING_ASSIGNMENT_SYMBOL,
-                                safe_unicode(elem.text.strip())
-                            ))
+                            pairs.append(
+                                "{}{}{}".format(
+                                    safe_unicode(elem.tag),
+                                    gc.CONFIG_STRING_ASSIGNMENT_SYMBOL,
+                                    safe_unicode(elem.text.strip()),
+                                )
+                            )
                     output_list.append(pairs_to_dict(pairs))
             return output_list
     except Exception:
@@ -420,11 +430,9 @@ def config_dict_to_string(dictionary):
     """
     parameters = []
     for key in dictionary:
-        parameters.append("{}{}{}".format(
-            key,
-            gc.CONFIG_STRING_ASSIGNMENT_SYMBOL,
-            dictionary[key]
-        ))
+        parameters.append(
+            "{}{}{}".format(key, gc.CONFIG_STRING_ASSIGNMENT_SYMBOL, dictionary[key])
+        )
     return gc.CONFIG_STRING_SEPARATOR_SYMBOL.join(parameters)
 
 
@@ -448,9 +456,7 @@ def pairs_to_dict(pairs, result=None):
     for pair in pairs:
         if len(pair) > 0:
             tokens = pair.split(gc.CONFIG_STRING_ASSIGNMENT_SYMBOL)
-            if ((len(tokens) == 2) and
-                    (len(tokens[0])) > 0 and
-                    (len(tokens[1]) > 0)):
+            if (len(tokens) == 2) and (len(tokens[0])) > 0 and (len(tokens[1]) > 0):
                 dictionary[tokens[0]] = tokens[1]
             elif result is not None:
                 result.add_warning("Invalid key=value string: '%s'" % pair)
@@ -487,7 +493,7 @@ def copytree(source_directory, destination_directory, ignore=None):
                 copytree(
                     os.path.join(source_directory, f),
                     os.path.join(destination_directory, f),
-                    ignore
+                    ignore,
                 )
     else:
         shutil.copyfile(source_directory, destination_directory)
@@ -629,7 +635,7 @@ def time_to_hhmmssmmm(time_value, decimal_separator="."):
         time_value = 0
     tmp = time_value
     hours = int(math.floor(tmp / 3600))
-    tmp -= (hours * 3600)
+    tmp -= hours * 3600
     minutes = int(math.floor(tmp / 60))
     tmp -= minutes * 60
     seconds = int(math.floor(tmp))
@@ -640,7 +646,7 @@ def time_to_hhmmssmmm(time_value, decimal_separator="."):
         minutes,
         seconds,
         decimal_separator,
-        milliseconds
+        milliseconds,
     )
 
 
@@ -771,34 +777,39 @@ def can_run_c_extension(name=None):
     :param string name: the name of the Python C extension to test
     :rtype: bool
     """
+
     def can_run_cdtw():
-        """ Python C extension for computing DTW """
+        """Python C extension for computing DTW"""
         try:
             import aeneas.cdtw.cdtw
+
             return True
         except ImportError:
             return False
 
     def can_run_cmfcc():
-        """ Python C extension for computing MFCC """
+        """Python C extension for computing MFCC"""
         try:
             import aeneas.cmfcc.cmfcc
+
             return True
         except ImportError:
             return False
 
     def can_run_cew():
-        """ Python C extension for synthesizing with eSpeak """
+        """Python C extension for synthesizing with eSpeak"""
         try:
             import aeneas.cew.cew
+
             return True
         except ImportError:
             return False
 
     def can_run_cfw():
-        """ Python C extension for synthesizing with Festival """
+        """Python C extension for synthesizing with Festival"""
         try:
             import aeneas.cfw.cfw
+
             return True
         except ImportError:
             return False
@@ -817,12 +828,7 @@ def can_run_c_extension(name=None):
 
 
 def run_c_extension_with_fallback(
-        log_function,
-        extension,
-        c_function,
-        py_function,
-        args,
-        rconf
+    log_function, extension, c_function, py_function, args, rconf
 ):
     """
     Run a function calling a C extension, falling back
@@ -855,7 +861,9 @@ def run_c_extension_with_fallback(
             log_function(["C extension '%s' enabled and it can be loaded", extension])
             computed, result = c_function(*args)
         else:
-            log_function(["C extension '%s' enabled but it cannot be loaded", extension])
+            log_function(
+                ["C extension '%s' enabled but it cannot be loaded", extension]
+            )
     if not computed:
         if py_function is None:
             log_function("Python function is None")
@@ -863,7 +871,9 @@ def run_c_extension_with_fallback(
             log_function("Running the pure Python code")
             computed, result = py_function(*args)
     if not computed:
-        raise RuntimeError("Both the C extension and the pure Python code failed. (Wrong arguments? Input too big?)")
+        raise RuntimeError(
+            "Both the C extension and the pure Python code failed. (Wrong arguments? Input too big?)"
+        )
     return result
 
 

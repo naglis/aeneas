@@ -31,7 +31,6 @@ import aeneas.globalfunctions as gf
 
 
 class TestSD(unittest.TestCase):
-
     AUDIO_FILE = gf.absolute_path("res/audioformats/mono.16000.wav", __file__)
     TEXT_FILE = gf.absolute_path("res/inputtext/sonnet_plain.txt", __file__)
 
@@ -46,7 +45,6 @@ class TestSD(unittest.TestCase):
             self.load()
         except Exception as e:
             self.fail("Failed to create sd: %s" % e)
-
 
     def test_detect_interval(self):
         begin, end = self.load().detect_interval()

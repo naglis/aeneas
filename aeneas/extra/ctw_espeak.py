@@ -24,7 +24,6 @@
 A wrapper for a custom TTS engine.
 """
 
-
 from aeneas.language import Language
 from aeneas.ttswrappers.basettswrapper import BaseTTSWrapper
 
@@ -128,14 +127,16 @@ class CustomTTSWrapper(BaseTTSWrapper):
         #      Also, there is a parameter to select the English voice ("en"),
         #      introduced by the "-v" switch.
         #
-        self.set_subprocess_arguments([
-            "/usr/bin/espeak",                     # path of espeak executable or just "espeak" if it is in your PATH
-            "-v",                                  # append "-v"
-            self.CLI_PARAMETER_VOICE_CODE_STRING,   # it will be replaced by the actual voice code
-            "-w",                                  # append "-w"
-            self.CLI_PARAMETER_WAVE_PATH,           # it will be replaced by the actual output file path
-            self.CLI_PARAMETER_TEXT_STDIN           # text is read from stdin
-        ])
+        self.set_subprocess_arguments(
+            [
+                "/usr/bin/espeak",  # path of espeak executable or just "espeak" if it is in your PATH
+                "-v",  # append "-v"
+                self.CLI_PARAMETER_VOICE_CODE_STRING,  # it will be replaced by the actual voice code
+                "-w",  # append "-w"
+                self.CLI_PARAMETER_WAVE_PATH,  # it will be replaced by the actual output file path
+                self.CLI_PARAMETER_TEXT_STDIN,  # text is read from stdin
+            ]
+        )
         #
         # NOTE if your TTS engine only reads text from a file
         #      you can use the

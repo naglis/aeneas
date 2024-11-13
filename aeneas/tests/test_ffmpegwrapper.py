@@ -31,7 +31,6 @@ import aeneas.globalfunctions as gf
 
 
 class TestFFMPEGWrapper(unittest.TestCase):
-
     FILES = [
         {
             "path": "res/audioformats/p001.aac",
@@ -78,7 +77,7 @@ class TestFFMPEGWrapper(unittest.TestCase):
                     pass
                 finally:
                     gf.delete_file(None, path)
-                
+
             exit_stack.enter_context(delete_file(ofp))
             output_file_path = ofp
 
@@ -86,8 +85,7 @@ class TestFFMPEGWrapper(unittest.TestCase):
             try:
                 converter = FFMPEGWrapper(rconf=runtime_configuration)
                 result = converter.convert(
-                    gf.absolute_path(input_file_path, __file__),
-                    output_file_path
+                    gf.absolute_path(input_file_path, __file__), output_file_path
                 )
                 self.assertEqual(result, output_file_path)
             except OSError as exc:

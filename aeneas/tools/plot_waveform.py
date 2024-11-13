@@ -37,6 +37,7 @@ class PlotWaveformCLI(AbstractCLIProgram):
     """
     Plot a waveform and labels to file.
     """
+
     AUDIO_FILE = gf.relative_path("res/audio.mp3", __file__)
     VAD_FILE = gf.relative_path("res/sonnet.vad", __file__)
     OUTPUT_FILE = "output/sonnet.png"
@@ -48,17 +49,15 @@ class PlotWaveformCLI(AbstractCLIProgram):
         "synopsis": [
             ("AUDIO_FILE OUTPUT_FILE [-i LABEL_FILE [-i LABEL_FILE [...]]]", True)
         ],
-        "examples": [
-            "{} {} -i {}".format(AUDIO_FILE, OUTPUT_FILE, VAD_FILE)
-        ],
+        "examples": ["{} {} -i {}".format(AUDIO_FILE, OUTPUT_FILE, VAD_FILE)],
         "options": [
             "--fast : enable fast waveform rendering (default: False)",
             "--hzoom=ZOOM : horizontal zoom (int, default: 5)",
             "--label=LABEL : label for the plot (str)",
             "--text : show fragment text instead of identifier",
             "--time-step=STEP : print time ticks every STEP seconds (int)",
-            "--vzoom=ZOOM : vertical zoom (int, default: 30)"
-        ]
+            "--vzoom=ZOOM : vertical zoom (int, default: 30)",
+        ],
     }
 
     def perform_command(self):
@@ -104,20 +103,40 @@ class PlotWaveformCLI(AbstractCLIProgram):
             # add waveform
             afm = AudioFile(input_file_path, rconf=self.rconf, logger=self.logger)
             afm.read_samples_from_file()
-            plotter.add_waveform(PlotWaveform(afm, label=label, fast=fast, rconf=self.rconf, logger=self.logger))
+            plotter.add_waveform(
+                PlotWaveform(
+                    afm, label=label, fast=fast, rconf=self.rconf, logger=self.logger
+                )
+            )
 
             # add time scale, if requested
             if time_step > 0:
-                plotter.add_timescale(PlotTimeScale(afm.audio_length, time_step=time_step, rconf=self.rconf, logger=self.logger))
+                plotter.add_timescale(
+                    PlotTimeScale(
+                        afm.audio_length,
+                        time_step=time_step,
+                        rconf=self.rconf,
+                        logger=self.logger,
+                    )
+                )
 
             # add labelsets, if any
             for i in range(len(self.actual_arguments)):
-                if (self.actual_arguments[i] == "-i") and (i + 1 < len(self.actual_arguments)):
+                if (self.actual_arguments[i] == "-i") and (
+                    i + 1 < len(self.actual_arguments)
+                ):
                     label_file_path = self.actual_arguments[i + 1]
                     extension = gf.file_extension(label_file_path)
                     if extension == "vad":
-                        labelset = self._read_syncmap_file(label_file_path, SyncMapFormat.TSV, False)
-                        ls = PlotLabelset(labelset, parameters=None, rconf=self.rconf, logger=self.logger)
+                        labelset = self._read_syncmap_file(
+                            label_file_path, SyncMapFormat.TSV, False
+                        )
+                        ls = PlotLabelset(
+                            labelset,
+                            parameters=None,
+                            rconf=self.rconf,
+                            logger=self.logger,
+                        )
                         ls.parameters["labels"] = False
                         ls.parameters["begin_time"] = begin_times
                         ls.parameters["end_time"] = end_times
@@ -125,8 +144,15 @@ class PlotWaveformCLI(AbstractCLIProgram):
                         ls.parameters["end_guide"] = end_guides
                         plotter.add_labelset(ls)
                     if extension in SyncMapFormat.ALLOWED_VALUES:
-                        labelset = self._read_syncmap_file(label_file_path, extension, fragment_text)
-                        ls = PlotLabelset(labelset, parameters=None, rconf=self.rconf, logger=self.logger)
+                        labelset = self._read_syncmap_file(
+                            label_file_path, extension, fragment_text
+                        )
+                        ls = PlotLabelset(
+                            labelset,
+                            parameters=None,
+                            rconf=self.rconf,
+                            logger=self.logger,
+                        )
                         ls.parameters["labels"] = labels
                         ls.parameters["begin_time"] = begin_times
                         ls.parameters["end_time"] = end_times
@@ -140,22 +166,29 @@ class PlotWaveformCLI(AbstractCLIProgram):
             self.print_success("Created file '%s'" % output_file_path)
             return self.NO_ERROR_EXIT_CODE
         except ImportError:
-            self.print_error("You need to install Python module Pillow to output image to file. Run:")
+            self.print_error(
+                "You need to install Python module Pillow to output image to file. Run:"
+            )
             self.print_error("$ pip install Pillow")
             self.print_error("or, to install for all users:")
             self.print_error("$ sudo pip install Pillow")
         except Exception as exc:
-            self.print_error("An unexpected error occurred while generating the image file:")
+            self.print_error(
+                "An unexpected error occurred while generating the image file:"
+            )
             self.print_error("%s" % exc)
 
         return self.ERROR_EXIT_CODE
 
     def _read_syncmap_file(self, path, extension, text=False):
-        """ Read labels from a SyncMap file """
+        """Read labels from a SyncMap file"""
         syncmap = SyncMap(logger=self.logger)
         syncmap.read(extension, path, parameters=None)
         if text:
-            return [(f.begin, f.end, " ".join(f.text_fragment.lines)) for f in syncmap.fragments]
+            return [
+                (f.begin, f.end, " ".join(f.text_fragment.lines))
+                for f in syncmap.fragments
+            ]
         return [(f.begin, f.end, f.text_fragment.identifier) for f in syncmap.fragments]
 
 
@@ -165,5 +198,6 @@ def main():
     """
     PlotWaveformCLI().run(arguments=sys.argv)
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     main()

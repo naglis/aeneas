@@ -41,11 +41,6 @@ class SyncMapFormatCSV(SyncMapFormatGenericTabular):
 
     FIELD_DELIMITER = ","
 
-    FIELDS = {
-        "identifier": 0,
-        "begin": 1,
-        "end": 2,
-        "text": 3
-    }
+    FIELDS = {"identifier": 0, "begin": 1, "end": 2, "text": 3}
 
-    TEXT_DELIMITER = "\""
+    TEXT_DELIMITER = '"'

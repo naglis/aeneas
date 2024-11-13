@@ -30,7 +30,6 @@ This module contains the following classes:
 .. warning:: This module is likely to be refactored in a future version
 """
 
-
 from aeneas.audiofilemfcc import AudioFileMFCC
 from aeneas.exacttiming import Decimal
 from aeneas.exacttiming import TimeValue
@@ -217,7 +216,7 @@ class AdjustBoundaryAlgorithm(Loggable):
         OFFSET,
         PERCENT,
         RATE,
-        RATEAGGRESSIVE
+        RATEAGGRESSIVE,
     ]
     """ List of all the allowed values """
 
@@ -234,7 +233,7 @@ class AdjustBoundaryAlgorithm(Loggable):
         boundary_indices,
         real_wave_mfcc,
         text_file,
-        allow_arbitrary_shift=False
+        allow_arbitrary_shift=False,
     ):
         """
         Adjust the boundaries of the text map
@@ -259,7 +258,9 @@ class AdjustBoundaryAlgorithm(Loggable):
         if boundary_indices is None:
             self.log_exc("boundary_indices is None", None, True, TypeError)
         if not isinstance(real_wave_mfcc, AudioFileMFCC):
-            self.log_exc("real_wave_mfcc is not an AudioFileMFCC object", None, True, TypeError)
+            self.log_exc(
+                "real_wave_mfcc is not an AudioFileMFCC object", None, True, TypeError
+            )
         if not isinstance(text_file, TextFile):
             self.log_exc("text_file is not a TextFile object", None, True, TypeError)
 
@@ -271,10 +272,7 @@ class AdjustBoundaryAlgorithm(Loggable):
         begin = real_wave_mfcc.middle_begin * real_wave_mfcc.rconf.mws
         end = real_wave_mfcc.middle_end * real_wave_mfcc.rconf.mws
         time_values = [begin] + list(boundary_indices * self.mws) + [end]
-        self.intervals_to_fragment_list(
-            text_file=text_file,
-            time_values=time_values
-        )
+        self.intervals_to_fragment_list(text_file=text_file, time_values=time_values)
         self.log("  Converting boundary indices to fragment list... done")
 
         self.log("  Processing fragments with zero length...")
@@ -324,7 +322,9 @@ class AdjustBoundaryAlgorithm(Loggable):
         :raises: ValueError: if ``time_values`` has length less than four
         """
         if not isinstance(text_file, TextFile):
-            self.log_exc("text_file is not an instance of TextFile", None, True, TypeError)
+            self.log_exc(
+                "text_file is not an instance of TextFile", None, True, TypeError
+            )
         if not isinstance(time_values, list):
             self.log_exc("time_values is not a list", None, True, TypeError)
         if len(time_values) < 4:
@@ -332,23 +332,27 @@ class AdjustBoundaryAlgorithm(Loggable):
         self.log("Converting time values to fragment list...")
         begin = time_values[0]
         end = time_values[-1]
-        self.log(["  Creating SyncMapFragmentList with begin %.3f and end %.3f", begin, end])
+        self.log(
+            ["  Creating SyncMapFragmentList with begin %.3f and end %.3f", begin, end]
+        )
         self.smflist = SyncMapFragmentList(
-            begin=begin,
-            end=end,
-            rconf=self.rconf,
-            logger=self.logger
+            begin=begin, end=end, rconf=self.rconf, logger=self.logger
         )
         self.log("  Creating HEAD fragment")
-        self.smflist.add(SyncMapFragment(
-            # NOTE lines and filtered lines MUST be set,
-            #      otherwise some output format might break
-            #      when adding HEAD/TAIL to output
-            text_fragment=TextFragment(identifier="HEAD", lines=[], filtered_lines=[]),
-            begin=time_values[0],
-            end=time_values[1],
-            fragment_type=SyncMapFragment.HEAD
-        ), sort=False)
+        self.smflist.add(
+            SyncMapFragment(
+                # NOTE lines and filtered lines MUST be set,
+                #      otherwise some output format might break
+                #      when adding HEAD/TAIL to output
+                text_fragment=TextFragment(
+                    identifier="HEAD", lines=[], filtered_lines=[]
+                ),
+                begin=time_values[0],
+                end=time_values[1],
+                fragment_type=SyncMapFragment.HEAD,
+            ),
+            sort=False,
+        )
         self.log("  Creating REGULAR fragments")
         # NOTE text_file.fragments() returns a list,
         #      so we cache a copy here instead of
@@ -356,23 +360,31 @@ class AdjustBoundaryAlgorithm(Loggable):
         fragments = text_file.fragments
         for i in range(1, len(time_values) - 2):
             self.log(["    Adding fragment %d ...", i])
-            self.smflist.add(SyncMapFragment(
-                text_fragment=fragments[i - 1],
-                begin=time_values[i],
-                end=time_values[i + 1],
-                fragment_type=SyncMapFragment.REGULAR
-            ), sort=False)
+            self.smflist.add(
+                SyncMapFragment(
+                    text_fragment=fragments[i - 1],
+                    begin=time_values[i],
+                    end=time_values[i + 1],
+                    fragment_type=SyncMapFragment.REGULAR,
+                ),
+                sort=False,
+            )
             self.log(["    Adding fragment %d ... done", i])
         self.log("  Creating TAIL fragment")
-        self.smflist.add(SyncMapFragment(
-            # NOTE lines and filtered lines MUST be set,
-            #      otherwise some output format might break
-            #      when adding HEAD/TAIL to output
-            text_fragment=TextFragment(identifier="TAIL", lines=[], filtered_lines=[]),
-            begin=time_values[len(time_values) - 2],
-            end=end,
-            fragment_type=SyncMapFragment.TAIL
-        ), sort=False)
+        self.smflist.add(
+            SyncMapFragment(
+                # NOTE lines and filtered lines MUST be set,
+                #      otherwise some output format might break
+                #      when adding HEAD/TAIL to output
+                text_fragment=TextFragment(
+                    identifier="TAIL", lines=[], filtered_lines=[]
+                ),
+                begin=time_values[len(time_values) - 2],
+                end=end,
+                fragment_type=SyncMapFragment.TAIL,
+            ),
+            sort=False,
+        )
         self.log("Converting time values to fragment list... done")
         self.log("Sorting fragment list...")
         self.smflist.sort()
@@ -419,9 +431,7 @@ class AdjustBoundaryAlgorithm(Loggable):
         # ignore HEAD and TAIL
         max_index = len(self.smflist) - 1
         self.smflist.fix_zero_length_fragments(
-            duration=duration,
-            min_index=1,
-            max_index=max_index
+            duration=duration, min_index=1, max_index=max_index
         )
         self.log("  Checking and fixing... done")
         if self.smflist.has_zero_length_fragments(1, max_index):
@@ -436,8 +446,14 @@ class AdjustBoundaryAlgorithm(Loggable):
             self.log("  Checking and fixing...")
             tolerance = self.rconf[RuntimeConfiguration.ABA_NONSPEECH_TOLERANCE]
             self.log(["    Tolerance: %.3f", tolerance])
-            long_nonspeech_intervals = [i for i in real_wave_mfcc.intervals(speech=False, time=True) if i.length >= ns_min]
-            pairs = self.smflist.fragments_ending_inside_nonspeech_intervals(long_nonspeech_intervals, tolerance)
+            long_nonspeech_intervals = [
+                i
+                for i in real_wave_mfcc.intervals(speech=False, time=True)
+                if i.length >= ns_min
+            ]
+            pairs = self.smflist.fragments_ending_inside_nonspeech_intervals(
+                long_nonspeech_intervals, tolerance
+            )
             # ignore HEAD and TAIL
             min_index = 1
             max_index = len(self.smflist) - 1
@@ -484,6 +500,7 @@ class AdjustBoundaryAlgorithm(Loggable):
         """
         PERCENT
         """
+
         def new_time(nsi):
             """
             The new boundary time value is ``percent``
@@ -491,6 +508,7 @@ class AdjustBoundaryAlgorithm(Loggable):
             """
             percent = Decimal(algo_parameters[0])
             return nsi.percent_value(percent)
+
         self.log("Called _adjust_percent")
         self._adjust_on_nonspeech(real_wave_mfcc, new_time)
 
@@ -498,6 +516,7 @@ class AdjustBoundaryAlgorithm(Loggable):
         """
         AFTERCURRENT
         """
+
         def new_time(nsi):
             """
             The new boundary time value is ``delay`` after
@@ -507,6 +526,7 @@ class AdjustBoundaryAlgorithm(Loggable):
             """
             delay = max(algo_parameters[0], TimeValue("0.000"))
             return min(nsi.begin + delay, nsi.end)
+
         self.log("Called _adjust_aftercurrent")
         self._adjust_on_nonspeech(real_wave_mfcc, new_time)
 
@@ -514,6 +534,7 @@ class AdjustBoundaryAlgorithm(Loggable):
         """
         BEFORENEXT
         """
+
         def new_time(nsi):
             """
             The new boundary time value is ``delay`` before
@@ -523,6 +544,7 @@ class AdjustBoundaryAlgorithm(Loggable):
             """
             delay = max(algo_parameters[0], TimeValue("0.000"))
             return max(nsi.end - delay, nsi.begin)
+
         self.log("Called _adjust_beforenext")
         self._adjust_on_nonspeech(real_wave_mfcc, new_time)
 
@@ -553,7 +575,9 @@ class AdjustBoundaryAlgorithm(Loggable):
         :type  offset: :class:`~aeneas.exacttiming.TimeValue`
         """
         if not isinstance(offset, TimeValue):
-            self.log_exc("offset is not an instance of TimeValue", None, True, TypeError)
+            self.log_exc(
+                "offset is not an instance of TimeValue", None, True, TypeError
+            )
         self.log(["Applying offset %s", offset])
         self.smflist.offset(offset)
 
@@ -577,14 +601,21 @@ class AdjustBoundaryAlgorithm(Loggable):
         nonspeech_intervals = real_wave_mfcc.intervals(speech=False, time=True)
         self.log("  Getting nonspeech intervals... done")
 
-        self.log("  First pass: find pairs of adjacent fragments transitioning inside nonspeech")
+        self.log(
+            "  First pass: find pairs of adjacent fragments transitioning inside nonspeech"
+        )
         tolerance = self.rconf[RuntimeConfiguration.ABA_NONSPEECH_TOLERANCE]
         self.log(["    Tolerance: %.3f", tolerance])
-        pairs = self.smflist.fragments_ending_inside_nonspeech_intervals(nonspeech_intervals, tolerance)
+        pairs = self.smflist.fragments_ending_inside_nonspeech_intervals(
+            nonspeech_intervals, tolerance
+        )
         self.log("  First pass: done")
 
         self.log("  Second pass: move end point of good pairs")
-        for nsi, frag_index, in pairs:
+        for (
+            nsi,
+            frag_index,
+        ) in pairs:
             new_value = adjust_function(nsi)
             self.log(["    Current interval: %s", self.smflist[frag_index].interval])
             self.log(["    New value:        %.3f", new_value])
@@ -615,7 +646,11 @@ class AdjustBoundaryAlgorithm(Loggable):
         if len(regular_fragments) <= 1:
             self.log("  The list contains at most one regular fragment, returning")
             return
-        faster_fragments = [(i, f) for i, f in regular_fragments if (f.rate is not None) and (f.rate >= max_rate + Decimal("0.001"))]
+        faster_fragments = [
+            (i, f)
+            for i, f in regular_fragments
+            if (f.rate is not None) and (f.rate >= max_rate + Decimal("0.001"))
+        ]
         if len(faster_fragments) == 0:
             self.log("  No regular fragment faster than max rate, returning")
             return
@@ -625,7 +660,11 @@ class AdjustBoundaryAlgorithm(Loggable):
         for frag_index, fragment in faster_fragments:
             self.smflist.fix_fragment_rate(frag_index, max_rate, aggressive=aggressive)
         self.log("Fixing rate for faster fragments... done")
-        faster_fragments = [(i, f) for i, f in regular_fragments if (f.rate is not None) and (f.rate >= max_rate + Decimal("0.001"))]
+        faster_fragments = [
+            (i, f)
+            for i, f in regular_fragments
+            if (f.rate is not None) and (f.rate >= max_rate + Decimal("0.001"))
+        ]
         if len(faster_fragments) > 0:
             self.log_warn("  Some fragments still have rate faster than max rate:")
             self.log(["  %s", [i for i, f in faster_fragments]])

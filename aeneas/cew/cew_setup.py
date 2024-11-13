@@ -32,21 +32,14 @@ import sys
 
 
 CMODULE = Extension(
-    name="cew",
-    sources=[
-        "cew_py.c",
-        "cew_func.c"
-    ],
-    libraries=[
-        "espeak"
-    ]
+    name="cew", sources=["cew_py.c", "cew_func.c"], libraries=["espeak"]
 )
 
 setup(
     name="cew",
     version="1.7.3",
     description="Python C Extension for synthesizing text with eSpeak.",
-    ext_modules=[CMODULE]
+    ext_modules=[CMODULE],
 )
 
 print("\n[INFO] Module cew successfully compiled\n")

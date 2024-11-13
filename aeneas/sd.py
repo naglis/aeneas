@@ -30,7 +30,6 @@ This module contains the following classes:
 .. versionadded:: 1.2.0
 """
 
-
 import decimal
 
 import numpy
@@ -121,11 +120,11 @@ class SD(Loggable):
         self.text_file = text_file
 
     def detect_interval(
-            self,
-            min_head_length=None,
-            max_head_length=None,
-            min_tail_length=None,
-            max_tail_length=None
+        self,
+        min_head_length=None,
+        max_head_length=None,
+        min_tail_length=None,
+        max_tail_length=None,
     ):
         """
         Detect the interval of the audio file
@@ -211,15 +210,20 @@ class SD(Loggable):
         :raises: TypeError: if one of the parameters is not ``None`` or a number
         :raises: ValueError: if one of the parameters is negative
         """
+
         def _sanitize(value, default, name):
             if value is None:
                 value = default
             try:
                 value = TimeValue(value)
             except (TypeError, ValueError, decimal.InvalidOperation) as exc:
-                self.log_exc("The value of %s is not a number" % (name), exc, True, TypeError)
+                self.log_exc(
+                    "The value of %s is not a number" % (name), exc, True, TypeError
+                )
             if value < 0:
-                self.log_exc("The value of %s is negative" % (name), None, True, ValueError)
+                self.log_exc(
+                    "The value of %s is negative" % (name), None, True, ValueError
+                )
             return value
 
         min_length = _sanitize(min_length, self.MIN_LENGTH, "min_length")
@@ -237,13 +241,12 @@ class SD(Loggable):
         self.log("Synthesizing query...")
         synt_duration = max_length * self.QUERY_FACTOR
         self.log(["Synthesizing at least %.3f seconds", synt_duration])
-        tmp_handler, tmp_file_path = gf.tmp_file(suffix=".wav", root=self.rconf[RuntimeConfiguration.TMP_PATH])
+        tmp_handler, tmp_file_path = gf.tmp_file(
+            suffix=".wav", root=self.rconf[RuntimeConfiguration.TMP_PATH]
+        )
         synt = Synthesizer(rconf=self.rconf, logger=self.logger)
         anchors, total_time, synthesized_chars = synt.synthesize(
-            self.text_file,
-            tmp_file_path,
-            quit_after=synt_duration,
-            backwards=tail
+            self.text_file, tmp_file_path, quit_after=synt_duration, backwards=tail
         )
         self.log("Synthesizing query... done")
 
@@ -256,7 +259,9 @@ class SD(Loggable):
         self.log("Cleaning up... done")
 
         search_window = max_length * self.AUDIO_FACTOR
-        search_window_end = min(int(search_window / mws), self.real_wave_mfcc.all_length)
+        search_window_end = min(
+            int(search_window / mws), self.real_wave_mfcc.all_length
+        )
         self.log(["Query MFCC length (frames): %d", query_mfcc.all_length])
         self.log(["Real MFCC length (frames):  %d", self.real_wave_mfcc.all_length])
         self.log(["Search window end (s):      %.3f", search_window])
@@ -279,7 +284,9 @@ class SD(Loggable):
         search_end = None
         candidates_begin = []
         for interval in speech_intervals:
-            if (interval[0] >= min_length_frames) and (interval[0] <= max_length_frames):
+            if (interval[0] >= min_length_frames) and (
+                interval[0] <= max_length_frames
+            ):
                 candidates_begin.append(interval[0])
             search_end = interval[1]
             if search_end >= search_window_end:
@@ -292,29 +299,50 @@ class SD(Loggable):
         # against a portion of the real wave
         candidates = []
         for candidate_begin in candidates_begin:
-            self.log(["Candidate interval starting at %d == %.3f", candidate_begin, candidate_begin * mws])
+            self.log(
+                [
+                    "Candidate interval starting at %d == %.3f",
+                    candidate_begin,
+                    candidate_begin * mws,
+                ]
+            )
             try:
                 rwm = AudioFileMFCC(
-                    mfcc_matrix=self.real_wave_mfcc.all_mfcc[:, candidate_begin:search_end],
+                    mfcc_matrix=self.real_wave_mfcc.all_mfcc[
+                        :, candidate_begin:search_end
+                    ],
                     rconf=self.rconf,
-                    logger=self.logger
+                    logger=self.logger,
                 )
                 dtw = DTWAligner(
                     real_wave_mfcc=rwm,
                     synt_wave_mfcc=query_mfcc,
                     rconf=self.rconf,
-                    logger=self.logger
+                    logger=self.logger,
                 )
                 acm = dtw.compute_accumulated_cost_matrix()
                 last_column = acm[:, -1]
                 min_value = numpy.min(last_column)
                 min_index = numpy.argmin(last_column)
-                self.log(["Candidate interval: %d %d == %.3f %.3f", candidate_begin, search_end, candidate_begin * mws, search_end * mws])
+                self.log(
+                    [
+                        "Candidate interval: %d %d == %.3f %.3f",
+                        candidate_begin,
+                        search_end,
+                        candidate_begin * mws,
+                        search_end * mws,
+                    ]
+                )
                 self.log(["  Min value: %.6f", min_value])
                 self.log(["  Min index: %d == %.3f", min_index, min_index * mws])
                 candidates.append((min_value, candidate_begin, min_index))
             except Exception as exc:
-                self.log_exc("An unexpected error occurred while running _detect", exc, False, None)
+                self.log_exc(
+                    "An unexpected error occurred while running _detect",
+                    exc,
+                    False,
+                    None,
+                )
 
         # reverse again the real wave
         if tail:
@@ -327,7 +355,14 @@ class SD(Loggable):
             return TimeValue("0.000")
         self.log("Candidates:")
         for candidate in candidates:
-            self.log(["  Value: %.6f Begin Time: %.3f Min Index: %d", candidate[0], candidate[1] * mws, candidate[2]])
+            self.log(
+                [
+                    "  Value: %.6f Begin Time: %.3f Min Index: %d",
+                    candidate[0],
+                    candidate[1] * mws,
+                    candidate[2],
+                ]
+            )
         best = sorted(candidates)[0][1]
         self.log(["Best candidate: %d == %.3f", best, best * mws])
         return best * mws

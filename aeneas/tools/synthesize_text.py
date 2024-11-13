@@ -40,6 +40,7 @@ class SynthesizeTextCLI(AbstractCLIProgram):
     Synthesize several text fragments,
     producing a WAV audio file.
     """
+
     OUTPUT_FILE = "output/synthesized.wav"
     TEXT_FILE_MPLAIN = gf.relative_path("res/mplain.txt", __file__)
     TEXT_FILE_MUNPARSED = gf.relative_path("res/munparsed2.xhtml", __file__)
@@ -54,18 +55,29 @@ class SynthesizeTextCLI(AbstractCLIProgram):
         "description": "Synthesize several text fragments.",
         "synopsis": [
             ("list 'fragment 1|fragment 2|...|fragment N' LANGUAGE OUTPUT_FILE", True),
-            ("[mplain|munparsed|parsed|plain|subtitles|unparsed] TEXT_FILE LANGUAGE OUTPUT_FILE", True)
+            (
+                "[mplain|munparsed|parsed|plain|subtitles|unparsed] TEXT_FILE LANGUAGE OUTPUT_FILE",
+                True,
+            ),
         ],
         "examples": [
             "list 'From|fairest|creatures|we|desire|increase' eng %s" % (OUTPUT_FILE),
             "mplain {} eng {}".format(TEXT_FILE_MPLAIN, OUTPUT_FILE),
-            "munparsed {} eng {} --l1-id-regex=p[0-9]+ --l2-id-regex=s[0-9]+ --l3-id-regex=w[0-9]+".format(TEXT_FILE_MUNPARSED, OUTPUT_FILE),
+            "munparsed {} eng {} --l1-id-regex=p[0-9]+ --l2-id-regex=s[0-9]+ --l3-id-regex=w[0-9]+".format(
+                TEXT_FILE_MUNPARSED, OUTPUT_FILE
+            ),
             "parsed {} eng {}".format(TEXT_FILE_PARSED, OUTPUT_FILE),
             "plain {} eng {}".format(TEXT_FILE_PLAIN, OUTPUT_FILE),
             "subtitles {} eng {}".format(TEXT_FILE_SUBTITLES, OUTPUT_FILE),
-            "unparsed {} eng {} --id-regex=f[0-9]*".format(TEXT_FILE_UNPARSED, OUTPUT_FILE),
-            "unparsed {} eng {} --class-regex=ra".format(TEXT_FILE_UNPARSED, OUTPUT_FILE),
-            "unparsed {} eng {} --id-regex=f[0-9]* --sort=numeric".format(TEXT_FILE_UNPARSED, OUTPUT_FILE),
+            "unparsed {} eng {} --id-regex=f[0-9]*".format(
+                TEXT_FILE_UNPARSED, OUTPUT_FILE
+            ),
+            "unparsed {} eng {} --class-regex=ra".format(
+                TEXT_FILE_UNPARSED, OUTPUT_FILE
+            ),
+            "unparsed {} eng {} --id-regex=f[0-9]* --sort=numeric".format(
+                TEXT_FILE_UNPARSED, OUTPUT_FILE
+            ),
             "plain {} eng {} --start=5".format(TEXT_FILE_PLAIN, OUTPUT_FILE),
             "plain {} eng {} --end=10".format(TEXT_FILE_PLAIN, OUTPUT_FILE),
             "plain {} eng {} --start=5 --end=10".format(TEXT_FILE_PLAIN, OUTPUT_FILE),
@@ -84,7 +96,7 @@ class SynthesizeTextCLI(AbstractCLIProgram):
             "--sort=ALGORITHM : sort the matched element id attributes using ALGORITHM (lexicographic, numeric, unsorted)",
             "--start=INDEX : slice the text file from fragment INDEX",
             "-b, --backwards : synthesize from the last fragment to the first one",
-        ]
+        ],
     }
 
     def perform_command(self):
@@ -123,11 +135,21 @@ class SynthesizeTextCLI(AbstractCLIProgram):
             gc.PPN_TASK_IS_TEXT_UNPARSED_ID_REGEX: id_regex,
             gc.PPN_TASK_IS_TEXT_UNPARSED_ID_SORT: sort,
         }
-        if (text_format == TextFileFormat.MUNPARSED) and ((l1_id_regex is None) or (l2_id_regex is None) or (l3_id_regex is None)):
-            self.print_error("You must specify --l1-id-regex and --l2-id-regex and --l3-id-regex for munparsed format")
+        if (text_format == TextFileFormat.MUNPARSED) and (
+            (l1_id_regex is None) or (l2_id_regex is None) or (l3_id_regex is None)
+        ):
+            self.print_error(
+                "You must specify --l1-id-regex and --l2-id-regex and --l3-id-regex for munparsed format"
+            )
             return self.ERROR_EXIT_CODE
-        if (text_format == TextFileFormat.UNPARSED) and (id_regex is None) and (class_regex is None):
-            self.print_error("You must specify --id-regex and/or --class-regex for unparsed format")
+        if (
+            (text_format == TextFileFormat.UNPARSED)
+            and (id_regex is None)
+            and (class_regex is None)
+        ):
+            self.print_error(
+                "You must specify --id-regex and/or --class-regex for unparsed format"
+            )
             return self.ERROR_EXIT_CODE
 
         language = gf.safe_unicode(self.actual_arguments[2])
@@ -153,15 +175,14 @@ class SynthesizeTextCLI(AbstractCLIProgram):
         self.print_info("Synthesizing %d fragments" % (len(text_slice)))
 
         if quit_after is not None:
-            self.print_info("Stop synthesizing upon reaching %.3f seconds" % (quit_after))
+            self.print_info(
+                "Stop synthesizing upon reaching %.3f seconds" % (quit_after)
+            )
 
         try:
             synt = Synthesizer(rconf=self.rconf, logger=self.logger)
             synt.synthesize(
-                text_slice,
-                output_file_path,
-                quit_after=quit_after,
-                backwards=backwards
+                text_slice, output_file_path, quit_after=quit_after, backwards=backwards
             )
             self.print_success("Created file '%s'" % output_file_path)
             synt.clear_cache()
@@ -169,17 +190,23 @@ class SynthesizeTextCLI(AbstractCLIProgram):
         except ImportError as exc:
             tts = self.rconf[RuntimeConfiguration.TTS]
             if tts == Synthesizer.AWS:
-                self.print_error("You need to install Python module boto3 to use the AWS Polly TTS API wrapper. Run:")
+                self.print_error(
+                    "You need to install Python module boto3 to use the AWS Polly TTS API wrapper. Run:"
+                )
                 self.print_error("$ pip install boto3")
                 self.print_error("or, to install for all users:")
                 self.print_error("$ sudo pip install boto3")
             elif tts == Synthesizer.NUANCE:
-                self.print_error("You need to install Python module requests to use the Nuance TTS API wrapper. Run:")
+                self.print_error(
+                    "You need to install Python module requests to use the Nuance TTS API wrapper. Run:"
+                )
                 self.print_error("$ pip install requests")
                 self.print_error("or, to install for all users:")
                 self.print_error("$ sudo pip install requests")
             else:
-                self.print_error("An unexpected error occurred while synthesizing text:")
+                self.print_error(
+                    "An unexpected error occurred while synthesizing text:"
+                )
                 self.print_error("%s" % exc)
         except Exception as exc:
             self.print_error("An unexpected error occurred while synthesizing text:")
@@ -194,5 +221,6 @@ def main():
     """
     SynthesizeTextCLI().run(arguments=sys.argv)
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     main()

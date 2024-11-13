@@ -32,7 +32,6 @@ from aeneas.task import Task
 
 
 class TestJob(unittest.TestCase):
-
     def setter(self, attribute, value):
         jobconf = JobConfiguration()
         jobconf[attribute] = value

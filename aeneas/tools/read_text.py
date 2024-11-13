@@ -36,6 +36,7 @@ class ReadTextCLI(AbstractCLIProgram):
     """
     Read text fragments from file.
     """
+
     TEXT_FILE_MPLAIN = gf.relative_path("res/mplain.txt", __file__)
     TEXT_FILE_MUNPARSED = gf.relative_path("res/munparsed2.xhtml", __file__)
     TEXT_FILE_PARSED = gf.relative_path("res/parsed.txt", __file__)
@@ -49,7 +50,7 @@ class ReadTextCLI(AbstractCLIProgram):
         "description": "Read text fragments from file.",
         "synopsis": [
             ("list 'fragment 1|fragment 2|...|fragment N'", True),
-            ("[mplain|munparsed|parsed|plain|subtitles|unparsed] TEXT_FILE", True)
+            ("[mplain|munparsed|parsed|plain|subtitles|unparsed] TEXT_FILE", True),
         ],
         "options": [
             "--class-regex=REGEX : extract text from elements with class attribute matching REGEX (unparsed)",
@@ -63,7 +64,8 @@ class ReadTextCLI(AbstractCLIProgram):
         "examples": [
             "list 'From|fairest|creatures|we|desire|increase'",
             "mplain %s" % (TEXT_FILE_MPLAIN),
-            "munparsed %s --l1-id-regex=p[0-9]+ --l2-id-regex=s[0-9]+ --l3-id-regex=w[0-9]+" % (TEXT_FILE_MUNPARSED),
+            "munparsed %s --l1-id-regex=p[0-9]+ --l2-id-regex=s[0-9]+ --l3-id-regex=w[0-9]+"
+            % (TEXT_FILE_MUNPARSED),
             "parsed %s" % (TEXT_FILE_PARSED),
             "plain %s" % (TEXT_FILE_PLAIN),
             "plain %s --id-format=Word%%06d" % (TEXT_FILE_PLAIN),
@@ -72,8 +74,9 @@ class ReadTextCLI(AbstractCLIProgram):
             "unparsed %s --id-regex=f[0-9]*" % (TEXT_FILE_UNPARSED),
             "unparsed %s --class-regex=ra --sort=unsorted" % (TEXT_FILE_UNPARSED),
             "unparsed %s --id-regex=f[0-9]* --sort=numeric" % (TEXT_FILE_UNPARSED),
-            "unparsed %s --id-regex=f[0-9]* --sort=lexicographic" % (TEXT_FILE_UNPARSED)
-        ]
+            "unparsed %s --id-regex=f[0-9]* --sort=lexicographic"
+            % (TEXT_FILE_UNPARSED),
+        ],
     }
 
     def perform_command(self):
@@ -108,19 +111,33 @@ class ReadTextCLI(AbstractCLIProgram):
             gc.PPN_TASK_IS_TEXT_UNPARSED_ID_REGEX: id_regex,
             gc.PPN_TASK_IS_TEXT_UNPARSED_CLASS_REGEX: class_regex,
             gc.PPN_TASK_IS_TEXT_UNPARSED_ID_SORT: sort,
-            gc.PPN_TASK_OS_FILE_ID_REGEX: id_format
+            gc.PPN_TASK_OS_FILE_ID_REGEX: id_format,
         }
-        if (text_format == TextFileFormat.MUNPARSED) and ((l1_id_regex is None) or (l2_id_regex is None) or (l3_id_regex is None)):
-            self.print_error("You must specify --l1-id-regex and --l2-id-regex and --l3-id-regex for munparsed format")
+        if (text_format == TextFileFormat.MUNPARSED) and (
+            (l1_id_regex is None) or (l2_id_regex is None) or (l3_id_regex is None)
+        ):
+            self.print_error(
+                "You must specify --l1-id-regex and --l2-id-regex and --l3-id-regex for munparsed format"
+            )
             return self.ERROR_EXIT_CODE
-        if (text_format == TextFileFormat.UNPARSED) and (id_regex is None) and (class_regex is None):
-            self.print_error("You must specify --id-regex and/or --class-regex for unparsed format")
+        if (
+            (text_format == TextFileFormat.UNPARSED)
+            and (id_regex is None)
+            and (class_regex is None)
+        ):
+            self.print_error(
+                "You must specify --id-regex and/or --class-regex for unparsed format"
+            )
             return self.ERROR_EXIT_CODE
-        if (text_format in [TextFileFormat.PLAIN, TextFileFormat.SUBTITLES]) and (id_format is not None):
+        if (text_format in [TextFileFormat.PLAIN, TextFileFormat.SUBTITLES]) and (
+            id_format is not None
+        ):
             try:
                 id_format % 1
             except (TypeError, ValueError):
-                self.print_error("The given string '%s' is not a valid id format" % id_format)
+                self.print_error(
+                    "The given string '%s' is not a valid id format" % id_format
+                )
                 return self.ERROR_EXIT_CODE
 
         text_file = self.get_text_file(text_format, text, parameters)
@@ -140,5 +157,6 @@ def main():
     """
     ReadTextCLI().run(arguments=sys.argv)
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     main()

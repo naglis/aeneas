@@ -276,8 +276,14 @@ class BaseTTSWrapper(Loggable):
     TAG = "BaseTTSWrapper"
 
     def __init__(self, rconf=None, logger=None):
-        if not (self.HAS_SUBPROCESS_CALL or self.HAS_C_EXTENSION_CALL or self.HAS_PYTHON_CALL):
-            raise NotImplementedError("You must implement at least one call method: subprocess, C extension, or Python")
+        if not (
+            self.HAS_SUBPROCESS_CALL
+            or self.HAS_C_EXTENSION_CALL
+            or self.HAS_PYTHON_CALL
+        ):
+            raise NotImplementedError(
+                "You must implement at least one call method: subprocess, C extension, or Python"
+            )
         super().__init__(rconf=rconf, logger=logger)
         self.subprocess_arguments = []
         self.tts_path = self.rconf[RuntimeConfiguration.TTS_PATH]
@@ -309,7 +315,13 @@ class BaseTTSWrapper(Loggable):
             try:
                 voice_code = self.LANGUAGE_TO_VOICE_CODE[language]
             except KeyError as exc:
-                self.log_exc("Language code '%s' not found in LANGUAGE_TO_VOICE_CODE" % (language), exc, False, None)
+                self.log_exc(
+                    "Language code '%s' not found in LANGUAGE_TO_VOICE_CODE"
+                    % (language),
+                    exc,
+                    False,
+                    None,
+                )
                 self.log_warn("Using the language code as the voice code")
                 voice_code = language
         else:
@@ -356,7 +368,9 @@ class BaseTTSWrapper(Loggable):
         self.subprocess_arguments = subprocess_arguments
         self.log(["Subprocess arguments: %s", subprocess_arguments])
 
-    def synthesize_multiple(self, text_file, output_file_path, quit_after=None, backwards=False):
+    def synthesize_multiple(
+        self, text_file, output_file_path, quit_after=None, backwards=False
+    ):
         """
         Synthesize the text contained in the given fragment list
         into a WAVE file.
@@ -392,15 +406,28 @@ class BaseTTSWrapper(Loggable):
         if len(text_file) < 1:
             self.log_exc("The text file has no fragments", None, True, ValueError)
         if text_file.chars == 0:
-            self.log_exc("All fragments in the text file are empty", None, True, ValueError)
+            self.log_exc(
+                "All fragments in the text file are empty", None, True, ValueError
+            )
         if not self.rconf[RuntimeConfiguration.ALLOW_UNLISTED_LANGUAGES]:
             for fragment in text_file.fragments:
                 if fragment.language not in self.LANGUAGE_TO_VOICE_CODE:
-                    self.log_exc("Language '%s' is not supported by the selected TTS engine" % (fragment.language), None, True, ValueError)
+                    self.log_exc(
+                        "Language '%s' is not supported by the selected TTS engine"
+                        % (fragment.language),
+                        None,
+                        True,
+                        ValueError,
+                    )
         for fragment in text_file.fragments:
             for line in fragment.lines:
                 if not gf.is_unicode(line):
-                    self.log_exc("The text file contain a line which is not a Unicode string", None, True, TypeError)
+                    self.log_exc(
+                        "The text file contain a line which is not a Unicode string",
+                        None,
+                        True,
+                        TypeError,
+                    )
 
         # log parameters
         if quit_after is not None:
@@ -410,35 +437,55 @@ class BaseTTSWrapper(Loggable):
 
         # check that output_file_path can be written
         if not gf.file_can_be_written(output_file_path):
-            self.log_exc("Cannot write to output file '%s'" % (output_file_path), None, True, OSError)
+            self.log_exc(
+                "Cannot write to output file '%s'" % (output_file_path),
+                None,
+                True,
+                OSError,
+            )
 
         # first, call Python function _synthesize_multiple_python() if available
         if self.HAS_PYTHON_CALL:
             self.log("Calling TTS engine via Python")
             try:
-                computed, result = self._synthesize_multiple_python(text_file, output_file_path, quit_after, backwards)
+                computed, result = self._synthesize_multiple_python(
+                    text_file, output_file_path, quit_after, backwards
+                )
                 if computed:
-                    self.log("The _synthesize_multiple_python call was successful, returning anchors")
+                    self.log(
+                        "The _synthesize_multiple_python call was successful, returning anchors"
+                    )
                     return result
                 else:
                     self.log("The _synthesize_multiple_python call failed")
             except Exception as exc:
-                self.log_exc("An unexpected error occurred while calling _synthesize_multiple_python", exc, False, None)
+                self.log_exc(
+                    "An unexpected error occurred while calling _synthesize_multiple_python",
+                    exc,
+                    False,
+                    None,
+                )
 
         # call _synthesize_multiple_c_extension() or _synthesize_multiple_subprocess()
         self.log("Calling TTS engine via C extension or subprocess")
-        c_extension_function = self._synthesize_multiple_c_extension if self.HAS_C_EXTENSION_CALL else None
-        subprocess_function = self._synthesize_multiple_subprocess if self.HAS_SUBPROCESS_CALL else None
+        c_extension_function = (
+            self._synthesize_multiple_c_extension if self.HAS_C_EXTENSION_CALL else None
+        )
+        subprocess_function = (
+            self._synthesize_multiple_subprocess if self.HAS_SUBPROCESS_CALL else None
+        )
         return gf.run_c_extension_with_fallback(
             self.log,
             self.C_EXTENSION_NAME,
             c_extension_function,
             subprocess_function,
             (text_file, output_file_path, quit_after, backwards),
-            rconf=self.rconf
+            rconf=self.rconf,
         )
 
-    def _synthesize_multiple_python(self, text_file, output_file_path, quit_after=None, backwards=False):
+    def _synthesize_multiple_python(
+        self, text_file, output_file_path, quit_after=None, backwards=False
+    ):
         """
         Synthesize multiple fragments via a Python call.
 
@@ -450,12 +497,14 @@ class BaseTTSWrapper(Loggable):
             text_file=text_file,
             output_file_path=output_file_path,
             quit_after=quit_after,
-            backwards=backwards
+            backwards=backwards,
         )
         self.log("Synthesizing multiple via a Python call... done")
         return ret
 
-    def _synthesize_single_python_helper(self, text, voice_code, output_file_path=None, return_audio_data=True):
+    def _synthesize_single_python_helper(
+        self, text, voice_code, output_file_path=None, return_audio_data=True
+    ):
         """
         This is an helper function to synthesize a single text fragment via a Python call.
 
@@ -468,17 +517,25 @@ class BaseTTSWrapper(Loggable):
 
         :rtype: tuple (result, (duration, sample_rate, codec, data)) or (result, None)
         """
-        raise NotImplementedError("This function must be implemented in concrete subclasses supporting Python call")
+        raise NotImplementedError(
+            "This function must be implemented in concrete subclasses supporting Python call"
+        )
 
-    def _synthesize_multiple_c_extension(self, text_file, output_file_path, quit_after=None, backwards=False):
+    def _synthesize_multiple_c_extension(
+        self, text_file, output_file_path, quit_after=None, backwards=False
+    ):
         """
         Synthesize multiple fragments via a Python C extension.
 
         :rtype: tuple (result, (anchors, current_time, num_chars))
         """
-        raise NotImplementedError("This function must be implemented in concrete subclasses supporting C extension call")
+        raise NotImplementedError(
+            "This function must be implemented in concrete subclasses supporting C extension call"
+        )
 
-    def _synthesize_single_c_extension_helper(self, text, voice_code, output_file_path=None):
+    def _synthesize_single_c_extension_helper(
+        self, text, voice_code, output_file_path=None
+    ):
         """
         This is an helper function to synthesize a single text fragment via a Python C extension.
 
@@ -487,9 +544,13 @@ class BaseTTSWrapper(Loggable):
 
         :rtype: tuple (result, (duration, sample_rate, codec, data))
         """
-        raise NotImplementedError("This function might be implemented in concrete subclasses supporting C extension call")
+        raise NotImplementedError(
+            "This function might be implemented in concrete subclasses supporting C extension call"
+        )
 
-    def _synthesize_multiple_subprocess(self, text_file, output_file_path, quit_after=None, backwards=False):
+    def _synthesize_multiple_subprocess(
+        self, text_file, output_file_path, quit_after=None, backwards=False
+    ):
         """
         Synthesize multiple fragments via ``subprocess``.
 
@@ -501,12 +562,14 @@ class BaseTTSWrapper(Loggable):
             text_file=text_file,
             output_file_path=output_file_path,
             quit_after=quit_after,
-            backwards=backwards
+            backwards=backwards,
         )
         self.log("Synthesizing multiple via subprocess... done")
         return ret
 
-    def _synthesize_single_subprocess_helper(self, text, voice_code, output_file_path=None, return_audio_data=True):
+    def _synthesize_single_subprocess_helper(
+        self, text, voice_code, output_file_path=None, return_audio_data=True
+    ):
         """
         This is an helper function to synthesize a single text fragment via ``subprocess``.
 
@@ -529,10 +592,14 @@ class BaseTTSWrapper(Loggable):
             return (True, (TimeValue("0.000"), None, None, None))
 
         # create a temporary output file if needed
-        synt_tmp_file = (output_file_path is None)
+        synt_tmp_file = output_file_path is None
         if synt_tmp_file:
-            self.log("Synthesizer helper called with output_file_path=None => creating temporary output file")
-            output_file_handler, output_file_path = gf.tmp_file(suffix=".wav", root=self.rconf[RuntimeConfiguration.TMP_PATH])
+            self.log(
+                "Synthesizer helper called with output_file_path=None => creating temporary output file"
+            )
+            output_file_handler, output_file_path = gf.tmp_file(
+                suffix=".wav", root=self.rconf[RuntimeConfiguration.TMP_PATH]
+            )
             self.log(["Temporary output file path is '%s'", output_file_path])
 
         try:
@@ -540,11 +607,15 @@ class BaseTTSWrapper(Loggable):
             # write the text into a temporary file
             if self.CLI_PARAMETER_TEXT_PATH in self.subprocess_arguments:
                 self.log("TTS engine reads text from file")
-                tmp_text_file_handler, tmp_text_file_path = gf.tmp_file(suffix=".txt", root=self.rconf[RuntimeConfiguration.TMP_PATH])
+                tmp_text_file_handler, tmp_text_file_path = gf.tmp_file(
+                    suffix=".txt", root=self.rconf[RuntimeConfiguration.TMP_PATH]
+                )
                 self.log(["Creating temporary text file '%s'...", tmp_text_file_path])
                 with open(tmp_text_file_path, "w", encoding="utf-8") as tmp_text_file:
                     tmp_text_file.write(text)
-                self.log(["Creating temporary text file '%s'... done", tmp_text_file_path])
+                self.log(
+                    ["Creating temporary text file '%s'... done", tmp_text_file_path]
+                )
             else:
                 self.log("TTS engine reads text from stdin")
                 tmp_text_file_handler = None
@@ -581,7 +652,7 @@ class BaseTTSWrapper(Loggable):
                 stdout=subprocess.PIPE,
                 stdin=subprocess.PIPE,
                 stderr=subprocess.PIPE,
-                universal_newlines=True
+                universal_newlines=True,
             )
             if self.CLI_PARAMETER_TEXT_STDIN in self.subprocess_arguments:
                 self.log("Passing text via stdin...")
@@ -610,16 +681,27 @@ class BaseTTSWrapper(Loggable):
 
             self.log("Calling TTS ... done")
         except Exception as exc:
-            self.log_exc("An unexpected error occurred while calling TTS engine via subprocess", exc, False, None)
+            self.log_exc(
+                "An unexpected error occurred while calling TTS engine via subprocess",
+                exc,
+                False,
+                None,
+            )
             return (False, None)
 
         # check the file can be read
         if not gf.file_can_be_read(output_file_path):
-            self.log_exc("Output file '%s' cannot be read" % (output_file_path), None, True, None)
+            self.log_exc(
+                "Output file '%s' cannot be read" % (output_file_path), None, True, None
+            )
             return (False, None)
 
         # read audio data
-        ret = self._read_audio_data(output_file_path) if return_audio_data else (True, None)
+        ret = (
+            self._read_audio_data(output_file_path)
+            if return_audio_data
+            else (True, None)
+        )
 
         # if the output file was temporary, remove it
         if synt_tmp_file:
@@ -645,22 +727,34 @@ class BaseTTSWrapper(Loggable):
                 file_path=file_path,
                 file_format=self.OUTPUT_AUDIO_FORMAT,
                 rconf=self.rconf,
-                logger=self.logger
+                logger=self.logger,
             )
             audio_file.read_samples_from_file()
             self.log(["Duration of '%s': %f", file_path, audio_file.audio_length])
             self.log("Reading audio data... done")
-            return (True, (
-                audio_file.audio_length,
-                audio_file.audio_sample_rate,
-                audio_file.audio_format,
-                audio_file.audio_samples
-            ))
+            return (
+                True,
+                (
+                    audio_file.audio_length,
+                    audio_file.audio_sample_rate,
+                    audio_file.audio_format,
+                    audio_file.audio_samples,
+                ),
+            )
         except (AudioFileUnsupportedFormatError, OSError) as exc:
-            self.log_exc("An unexpected error occurred while reading audio data", exc, True, None)
+            self.log_exc(
+                "An unexpected error occurred while reading audio data", exc, True, None
+            )
             return (False, None)
 
-    def _synthesize_multiple_generic(self, helper_function, text_file, output_file_path, quit_after=None, backwards=False):
+    def _synthesize_multiple_generic(
+        self,
+        helper_function,
+        text_file,
+        output_file_path,
+        quit_after=None,
+        backwards=False,
+    ):
         """
         Synthesize multiple fragments, generic function.
 
@@ -680,7 +774,7 @@ class BaseTTSWrapper(Loggable):
             succeeded, data = helper_function(
                 text="Dummy text to get sample_rate",
                 voice_code=self._language_to_voice_code(self.DEFAULT_LANGUAGE),
-                output_file_path=None
+                output_file_path=None,
             )
             if not succeeded:
                 self.log_crit("An unexpected error occurred in helper_function")
@@ -710,9 +804,7 @@ class BaseTTSWrapper(Loggable):
         loop_function = self._loop_use_cache if self.use_cache else self._loop_no_cache
         for num, fragment in enumerate(fragments):
             succeeded, data = loop_function(
-                helper_function=helper_function,
-                num=num,
-                fragment=fragment
+                helper_function=helper_function, num=num, fragment=fragment
             )
             if not succeeded:
                 self.log_crit("An unexpected error occurred in loop_function")
@@ -752,7 +844,9 @@ class BaseTTSWrapper(Loggable):
 
         # return output
         if backwards:
-            self.log_warn("Please note that anchor time values do not make sense since backwards=True")
+            self.log_warn(
+                "Please note that anchor time values do not make sense since backwards=True"
+            )
         self.log(["Returning %d time anchors", len(anchors)])
         self.log(["Current time %.3f", current_time])
         self.log(["Synthesized %d characters", num_chars])
@@ -760,7 +854,7 @@ class BaseTTSWrapper(Loggable):
         return (True, (anchors, current_time, num_chars))
 
     def _loop_no_cache(self, helper_function, num, fragment):
-        """ Synthesize all fragments without using the cache """
+        """Synthesize all fragments without using the cache"""
         self.log(["Examining fragment %d (no cache)...", num])
         # synthesize and get the duration of the output file
         voice_code = self._language_to_voice_code(fragment.language)
@@ -769,7 +863,7 @@ class BaseTTSWrapper(Loggable):
             text=fragment.filtered_text,
             voice_code=voice_code,
             output_file_path=None,
-            return_audio_data=True
+            return_audio_data=True,
         )
         # check output
         if not succeeded:
@@ -779,7 +873,7 @@ class BaseTTSWrapper(Loggable):
         return (True, data)
 
     def _loop_use_cache(self, helper_function, num, fragment):
-        """ Synthesize all fragments using the cache """
+        """Synthesize all fragments using the cache"""
         self.log(["Examining fragment %d (cache)...", num])
         fragment_info = (fragment.language, fragment.filtered_text)
         if self.cache.is_cached(fragment_info):
@@ -790,14 +884,18 @@ class BaseTTSWrapper(Loggable):
             self.log(["Reading cached fragment at '%s'...", file_path])
             succeeded, data = self._read_audio_data(file_path)
             if not succeeded:
-                self.log_crit("An unexpected error occurred while reading cached audio file")
+                self.log_crit(
+                    "An unexpected error occurred while reading cached audio file"
+                )
                 return (False, None)
             self.log(["Reading cached fragment at '%s'... done", file_path])
         else:
             self.log("Fragment not cached: synthesizing and caching")
 
             # creating destination file
-            file_info = gf.tmp_file(suffix=".cache.wav", root=self.rconf[RuntimeConfiguration.TMP_PATH])
+            file_info = gf.tmp_file(
+                suffix=".cache.wav", root=self.rconf[RuntimeConfiguration.TMP_PATH]
+            )
             file_handler, file_path = file_info
             self.log(["Synthesizing fragment to '%s'...", file_path])
 
@@ -808,7 +906,7 @@ class BaseTTSWrapper(Loggable):
                 text=fragment.filtered_text,
                 voice_code=voice_code,
                 output_file_path=file_path,
-                return_audio_data=True
+                return_audio_data=True,
             )
             # check output
             if not succeeded:
@@ -822,7 +920,9 @@ class BaseTTSWrapper(Loggable):
                 self.log("Added fragment to cache")
             else:
                 self.log("Fragment has zero duration, not adding it to cache")
-            self.log(["Closing file handler for cached output file path '%s'", file_path])
+            self.log(
+                ["Closing file handler for cached output file path '%s'", file_path]
+            )
             gf.close_file_handler(file_handler)
         self.log(["Examining fragment %d (cache)... done", num])
         return (True, data)

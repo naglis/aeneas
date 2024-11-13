@@ -33,27 +33,21 @@ import sys
 
 CMODULE = Extension(
     name="cfw",
-    sources=[
-        "cfw_py.cc",
-        "cfw_func.cc"
-    ],
-    include_dirs=[
-        "festival",
-        "speech_tools"
-    ],
+    sources=["cfw_py.cc", "cfw_func.cc"],
+    include_dirs=["festival", "speech_tools"],
     libraries=[
         "Festival",
         "estools",
         "estbase",
         "eststring",
-    ]
+    ],
 )
 
 setup(
     name="cfw",
     version="1.7.3",
     description="Python C Extension for synthesizing text with Festival.",
-    ext_modules=[CMODULE]
+    ext_modules=[CMODULE],
 )
 
 print("\n[INFO] Module cfw successfully compiled\n")

@@ -46,7 +46,7 @@ class SyncMapFormatRBSE(SyncMapFormatBase):
                 identifier=fragment["id"],
                 lines=[""],
                 begin=gf.time_from_ssmmm(fragment["begin"]),
-                end=gf.time_from_ssmmm(fragment["end"])
+                end=gf.time_from_ssmmm(fragment["end"]),
             )
 
     def format(self, syncmap):
@@ -54,19 +54,18 @@ class SyncMapFormatRBSE(SyncMapFormatBase):
         smil_ids = []
         for fragment in syncmap.fragments:
             text = fragment.text_fragment
-            smil_data.append({
-                "id": text.identifier,
-                "begin": gf.time_to_ssmmm(fragment.begin),
-                "end": gf.time_to_ssmmm(fragment.end)
-            })
+            smil_data.append(
+                {
+                    "id": text.identifier,
+                    "begin": gf.time_to_ssmmm(fragment.begin),
+                    "end": gf.time_to_ssmmm(fragment.end),
+                }
+            )
             smil_ids.append(text.identifier)
         return gf.safe_unicode(
             json.dumps(
-                obj={
-                    "smil_ids": smil_ids,
-                    "smil_data": smil_data
-                },
+                obj={"smil_ids": smil_ids, "smil_data": smil_data},
                 indent=1,
-                sort_keys=True
+                sort_keys=True,
             )
         )

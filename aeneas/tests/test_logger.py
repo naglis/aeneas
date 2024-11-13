@@ -28,7 +28,6 @@ from aeneas.runtimeconfiguration import RuntimeConfiguration
 
 
 class TestLogger(unittest.TestCase):
-
     def test_log(self):
         logger = Logger(tee=False, indentation=4)
         logger.log("Message 1", Logger.DEBUG)

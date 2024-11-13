@@ -34,14 +34,8 @@ import sys
 
 CMODULE = Extension(
     name="cwave",
-    sources=[
-        "cwave_py.c",
-        "cwave_func.c",
-        "../cint/cint.c"
-    ],
-    include_dirs=[
-        get_include()
-    ]
+    sources=["cwave_py.c", "cwave_func.c", "../cint/cint.c"],
+    include_dirs=[get_include()],
 )
 
 setup(
@@ -49,7 +43,7 @@ setup(
     version="1.7.3",
     description="Python C Extension for for reading WAVE files.",
     ext_modules=[CMODULE],
-    include_dirs=[misc_util.get_numpy_include_dirs()]
+    include_dirs=[misc_util.get_numpy_include_dirs()],
 )
 
 print("\n[INFO] Module cwave successfully compiled\n")

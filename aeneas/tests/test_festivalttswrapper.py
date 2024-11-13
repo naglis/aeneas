@@ -27,7 +27,6 @@ from aeneas.ttswrappers.festivalttswrapper import FESTIVALTTSWrapper
 
 
 class TestFESTIVALTTSWrapper(TestBaseTTSWrapper):
-
     TTS = "festival"
     TTS_PATH = "/usr/bin/text2wave"
     TTS_CLASS = FESTIVALTTSWrapper

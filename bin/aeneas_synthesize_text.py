@@ -49,5 +49,5 @@ def main():
     SynthesizeTextCLI(invoke="aeneas_synthesize_text").run(arguments=sys.argv)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

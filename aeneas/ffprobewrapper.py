@@ -43,6 +43,7 @@ class FFPROBEParsingError(Exception):
     """
     Error raised when the call to ``ffprobe`` does not produce any output.
     """
+
     pass
 
 
@@ -52,6 +53,7 @@ class FFPROBEPathError(Exception):
 
     .. versionadded:: 1.4.1
     """
+
     pass
 
 
@@ -59,6 +61,7 @@ class FFPROBEUnsupportedFormatError(Exception):
     """
     Error raised when ``ffprobe`` cannot decode the format of the given file.
     """
+
     pass
 
 
@@ -119,14 +122,12 @@ class FFPROBEWrapper(Loggable):
     :type  logger: :class:`~aeneas.logger.Logger`
     """
 
-    FFPROBE_PARAMETERS = [
-        "-select_streams",
-        "a",
-        "-show_streams"
-    ]
+    FFPROBE_PARAMETERS = ["-select_streams", "a", "-show_streams"]
     """ ``ffprobe`` parameters """
 
-    STDERR_DURATION_REGEX = re.compile(r"Duration: ([0-9]*):([0-9]*):([0-9]*)\.([0-9]*)")
+    STDERR_DURATION_REGEX = re.compile(
+        r"Duration: ([0-9]*):([0-9]*):([0-9]*)\.([0-9]*)"
+    )
     """ Regex to match ``ffprobe`` stderr duration values """
 
     STDOUT_BEGIN_STREAM = "[STREAM]"
@@ -208,7 +209,12 @@ class FFPROBEWrapper(Loggable):
         if audio_file_path is None:
             self.log_exc("The audio file path is None", None, True, TypeError)
         if not gf.file_can_be_read(audio_file_path):
-            self.log_exc("Input file '%s' cannot be read" % (audio_file_path), None, True, OSError)
+            self.log_exc(
+                "Input file '%s' cannot be read" % (audio_file_path),
+                None,
+                True,
+                OSError,
+            )
 
         # call ffprobe
         arguments = [self.rconf[RuntimeConfiguration.FFPROBE_PATH]]
@@ -220,14 +226,20 @@ class FFPROBEWrapper(Loggable):
                 arguments,
                 stdout=subprocess.PIPE,
                 stdin=subprocess.PIPE,
-                stderr=subprocess.PIPE
+                stderr=subprocess.PIPE,
             )
             (stdoutdata, stderrdata) = proc.communicate()
             proc.stdout.close()
             proc.stdin.close()
             proc.stderr.close()
         except OSError as exc:
-            self.log_exc("Unable to call the '%s' ffprobe executable" % (self.rconf[RuntimeConfiguration.FFPROBE_PATH]), exc, True, FFPROBEPathError)
+            self.log_exc(
+                "Unable to call the '%s' ffprobe executable"
+                % (self.rconf[RuntimeConfiguration.FFPROBE_PATH]),
+                exc,
+                True,
+                FFPROBEPathError,
+            )
         self.log("Call completed")
 
         # check there is some output
@@ -239,14 +251,16 @@ class FFPROBEWrapper(Loggable):
             stdoutdata = gf.safe_unicode(stdoutdata)
             stderrdata = gf.safe_unicode(stderrdata)
         except UnicodeDecodeError as exc:
-            self.log_exc("Unable to decode ffprobe out/err", exc, True, FFPROBEParsingError)
+            self.log_exc(
+                "Unable to decode ffprobe out/err", exc, True, FFPROBEParsingError
+            )
 
         # dictionary for the results
         results = {
             self.STDOUT_CHANNELS: None,
             self.STDOUT_CODEC_NAME: None,
             self.STDOUT_DURATION: None,
-            self.STDOUT_SAMPLE_RATE: None
+            self.STDOUT_SAMPLE_RATE: None,
         }
 
         # scan the first audio stream the ffprobe stdout output
@@ -274,11 +288,18 @@ class FFPROBEWrapper(Loggable):
                 if match is not None:
                     self.log(["Found matching line '%s'", line])
                     results[self.STDOUT_DURATION] = gf.time_from_hhmmssmmm(line)
-                    self.log(["Extracted duration '%.3f'", results[self.STDOUT_DURATION]])
+                    self.log(
+                        ["Extracted duration '%.3f'", results[self.STDOUT_DURATION]]
+                    )
                     break
 
         if results[self.STDOUT_DURATION] is None:
-            self.log_exc("No duration found in stdout or stderr. Unsupported audio file format?", None, True, FFPROBEUnsupportedFormatError)
+            self.log_exc(
+                "No duration found in stdout or stderr. Unsupported audio file format?",
+                None,
+                True,
+                FFPROBEUnsupportedFormatError,
+            )
 
         # return dictionary
         self.log("Returning dict")

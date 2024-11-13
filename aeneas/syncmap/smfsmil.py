@@ -43,7 +43,9 @@ class SyncMapFormatSMIL(SyncMapFormatGenericXML):
     MACHINE_ALIASES = [MACHINE]
 
     def __init__(self, variant=DEFAULT, parameters=None, rconf=None, logger=None):
-        super().__init__(variant=variant, parameters=parameters, rconf=rconf, logger=logger)
+        super().__init__(
+            variant=variant, parameters=parameters, rconf=rconf, logger=logger
+        )
         if self.variant in self.MACHINE_ALIASES:
             self.format_time_function = gf.time_to_ssmmm
         else:
@@ -59,6 +61,7 @@ class SyncMapFormatSMIL(SyncMapFormatGenericXML):
         3. both ``clipBegin`` and ``clipEnd`` attributes of ``<audio>`` must be populated
         """
         from lxml import etree
+
         smil_ns = "{http://www.w3.org/ns/SMIL}"
         root = etree.fromstring(gf.safe_bytes(input_text))
         for par in root.iter(smil_ns + "par"):
@@ -78,23 +81,27 @@ class SyncMapFormatSMIL(SyncMapFormatGenericXML):
                         end = gf.time_from_ssmmm(end_text)
             # TODO read text from additional text_file?
             self._add_fragment(
-                syncmap=syncmap,
-                identifier=identifier,
-                lines=[""],
-                begin=begin,
-                end=end
+                syncmap=syncmap, identifier=identifier, lines=[""], begin=begin, end=end
             )
 
     def format(self, syncmap):
         # check for required parameters
         for key in [
-                gc.PPN_TASK_OS_FILE_SMIL_PAGE_REF,
-                gc.PPN_TASK_OS_FILE_SMIL_AUDIO_REF
+            gc.PPN_TASK_OS_FILE_SMIL_PAGE_REF,
+            gc.PPN_TASK_OS_FILE_SMIL_AUDIO_REF,
         ]:
             if gf.safe_get(self.parameters, key, None) is None:
-                self.log_exc("Parameter {} must be specified for format {}".format(key, self.variant), None, True, SyncMapMissingParameterError)
+                self.log_exc(
+                    "Parameter {} must be specified for format {}".format(
+                        key, self.variant
+                    ),
+                    None,
+                    True,
+                    SyncMapMissingParameterError,
+                )
 
         from lxml import etree
+
         # we are sure we have them
         text_ref = self.parameters[gc.PPN_TASK_OS_FILE_SMIL_PAGE_REF]
         audio_ref = self.parameters[gc.PPN_TASK_OS_FILE_SMIL_AUDIO_REF]
@@ -122,33 +129,57 @@ class SyncMapFormatSMIL(SyncMapFormatGenericXML):
                 text_elem.attrib["src"] = "{}#{}".format(text_ref, text.identifier)
                 audio_elem = etree.SubElement(par_elem, "{%s}audio" % smil_ns)
                 audio_elem.attrib["src"] = audio_ref
-                audio_elem.attrib["clipBegin"] = self.format_time_function(fragment.begin)
+                audio_elem.attrib["clipBegin"] = self.format_time_function(
+                    fragment.begin
+                )
                 audio_elem.attrib["clipEnd"] = self.format_time_function(fragment.end)
         else:
             # TODO support generic multiple levels
             # multiple levels
-            for par_index, par_child in enumerate(syncmap.fragments_tree.children_not_empty, 1):
+            for par_index, par_child in enumerate(
+                syncmap.fragments_tree.children_not_empty, 1
+            ):
                 par_seq_elem = etree.SubElement(seq_elem, "{%s}seq" % smil_ns)
                 # COMMENTED par_seq_elem.attrib["id"] = "p%06d" % (par_index)
                 par_seq_elem.attrib["{%s}type" % epub_ns] = "paragraph"
-                par_seq_elem.attrib["{%s}textref" % epub_ns] = text_ref + "#" + par_child.value.text_fragment.identifier
+                par_seq_elem.attrib["{%s}textref" % epub_ns] = (
+                    text_ref + "#" + par_child.value.text_fragment.identifier
+                )
                 for sen_index, sen_child in enumerate(par_child.children_not_empty, 1):
                     sen_seq_elem = etree.SubElement(par_seq_elem, "{%s}seq" % smil_ns)
                     # COMMENTED sen_seq_elem.attrib["id"] = par_seq_elem.attrib["id"] + "s%06d" % (sen_index)
                     sen_seq_elem.attrib["{%s}type" % epub_ns] = "sentence"
-                    sen_seq_elem.attrib["{%s}textref" % epub_ns] = text_ref + "#" + sen_child.value.text_fragment.identifier
-                    for wor_index, wor_child in enumerate(sen_child.children_not_empty, 1):
+                    sen_seq_elem.attrib["{%s}textref" % epub_ns] = (
+                        text_ref + "#" + sen_child.value.text_fragment.identifier
+                    )
+                    for wor_index, wor_child in enumerate(
+                        sen_child.children_not_empty, 1
+                    ):
                         fragment = wor_child.value
                         text = fragment.text_fragment
-                        wor_seq_elem = etree.SubElement(sen_seq_elem, "{%s}seq" % smil_ns)
+                        wor_seq_elem = etree.SubElement(
+                            sen_seq_elem, "{%s}seq" % smil_ns
+                        )
                         # COMMENTED wor_seq_elem.attrib["id"] = sen_seq_elem.attrib["id"] + "w%06d" % (wor_index)
                         wor_seq_elem.attrib["{%s}type" % epub_ns] = "word"
-                        wor_seq_elem.attrib["{%s}textref" % epub_ns] = text_ref + "#" + text.identifier
-                        wor_par_elem = etree.SubElement(wor_seq_elem, "{%s}par" % smil_ns)
+                        wor_seq_elem.attrib["{%s}textref" % epub_ns] = (
+                            text_ref + "#" + text.identifier
+                        )
+                        wor_par_elem = etree.SubElement(
+                            wor_seq_elem, "{%s}par" % smil_ns
+                        )
                         text_elem = etree.SubElement(wor_par_elem, "{%s}text" % smil_ns)
-                        text_elem.attrib["src"] = "{}#{}".format(text_ref, text.identifier)
-                        audio_elem = etree.SubElement(wor_par_elem, "{%s}audio" % smil_ns)
+                        text_elem.attrib["src"] = "{}#{}".format(
+                            text_ref, text.identifier
+                        )
+                        audio_elem = etree.SubElement(
+                            wor_par_elem, "{%s}audio" % smil_ns
+                        )
                         audio_elem.attrib["src"] = audio_ref
-                        audio_elem.attrib["clipBegin"] = self.format_time_function(fragment.begin)
-                        audio_elem.attrib["clipEnd"] = self.format_time_function(fragment.end)
+                        audio_elem.attrib["clipBegin"] = self.format_time_function(
+                            fragment.begin
+                        )
+                        audio_elem.attrib["clipEnd"] = self.format_time_function(
+                            fragment.end
+                        )
         return self._tree_to_string(smil_elem, xml_declaration=False)

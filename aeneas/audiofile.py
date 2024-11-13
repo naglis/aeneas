@@ -51,6 +51,7 @@ class AudioFileConverterError(Exception):
     """
     Error raised when the audio converter executable cannot be executed.
     """
+
     pass
 
 
@@ -60,6 +61,7 @@ class AudioFileNotInitializedError(Exception):
     an :class:`~aeneas.audiofile.AudioFile` object which
     has not been initialized yet.
     """
+
     pass
 
 
@@ -67,6 +69,7 @@ class AudioFileProbeError(Exception):
     """
     Error raised when the audio probe executable cannot be executed.
     """
+
     pass
 
 
@@ -74,6 +77,7 @@ class AudioFileUnsupportedFormatError(Exception):
     """
     Error raised when the format of the given file cannot be decoded.
     """
+
     pass
 
 
@@ -318,10 +322,15 @@ class AudioFile(Loggable):
         """
         if self.__samples is None:
             if self.file_path is None:
-                self.log_exc("AudioFile object not initialized", None, True, AudioFileNotInitializedError)
+                self.log_exc(
+                    "AudioFile object not initialized",
+                    None,
+                    True,
+                    AudioFileNotInitializedError,
+                )
             else:
                 self.read_samples_from_file()
-        return self.__samples[0:self.__samples_length]
+        return self.__samples[0 : self.__samples_length]
 
     def read_properties(self):
         """
@@ -340,7 +349,9 @@ class AudioFile(Loggable):
 
         # check the file can be read
         if not gf.file_can_be_read(self.file_path):
-            self.log_exc("File '%s' cannot be read" % (self.file_path), None, True, OSError)
+            self.log_exc(
+                "File '%s' cannot be read" % (self.file_path), None, True, OSError
+            )
 
         # get the file size
         self.log(["Getting file size for '%s'", self.file_path])
@@ -351,19 +362,27 @@ class AudioFile(Loggable):
         try:
             self.log("Reading properties with FFPROBEWrapper...")
             properties = FFPROBEWrapper(
-                rconf=self.rconf,
-                logger=self.logger
+                rconf=self.rconf, logger=self.logger
             ).read_properties(self.file_path)
             self.log("Reading properties with FFPROBEWrapper... done")
         except FFPROBEPathError:
-            self.log_exc("Unable to call ffprobe executable", None, True, AudioFileProbeError)
+            self.log_exc(
+                "Unable to call ffprobe executable", None, True, AudioFileProbeError
+            )
         except (FFPROBEUnsupportedFormatError, FFPROBEParsingError):
-            self.log_exc("Audio file format not supported by ffprobe", None, True, AudioFileUnsupportedFormatError)
+            self.log_exc(
+                "Audio file format not supported by ffprobe",
+                None,
+                True,
+                AudioFileUnsupportedFormatError,
+            )
 
         # save relevant properties in results inside the audiofile object
         self.audio_length = TimeValue(properties[FFPROBEWrapper.STDOUT_DURATION])
         self.audio_format = properties[FFPROBEWrapper.STDOUT_CODEC_NAME]
-        self.audio_sample_rate = gf.safe_int(properties[FFPROBEWrapper.STDOUT_SAMPLE_RATE])
+        self.audio_sample_rate = gf.safe_int(
+            properties[FFPROBEWrapper.STDOUT_SAMPLE_RATE]
+        )
         self.audio_channels = gf.safe_int(properties[FFPROBEWrapper.STDOUT_CHANNELS])
         self.log(["Stored audio_length: '%s'", self.audio_length])
         self.log(["Stored audio_format: '%s'", self.audio_format])
@@ -395,22 +414,25 @@ class AudioFile(Loggable):
 
         # check the file can be read
         if not gf.file_can_be_read(self.file_path):
-            self.log_exc("File '%s' cannot be read" % (self.file_path), None, True, OSError)
+            self.log_exc(
+                "File '%s' cannot be read" % (self.file_path), None, True, OSError
+            )
 
         # determine if we need to convert the audio file
-        convert_audio_file = (
-            (self.file_format is None) or
-            (
-                (self.rconf.safety_checks) and
-                (self.file_format != ("pcm_s16le", 1, self.rconf.sample_rate))
-            )
+        convert_audio_file = (self.file_format is None) or (
+            (self.rconf.safety_checks)
+            and (self.file_format != ("pcm_s16le", 1, self.rconf.sample_rate))
         )
 
         # convert the audio file if needed
         if convert_audio_file:
             # convert file to PCM16 mono WAVE with correct sample rate
-            self.log("self.file_format is None or not good => converting self.file_path")
-            tmp_handler, tmp_file_path = gf.tmp_file(suffix=".wav", root=self.rconf[RuntimeConfiguration.TMP_PATH])
+            self.log(
+                "self.file_format is None or not good => converting self.file_path"
+            )
+            tmp_handler, tmp_file_path = gf.tmp_file(
+                suffix=".wav", root=self.rconf[RuntimeConfiguration.TMP_PATH]
+            )
             self.log(["Temporary PCM16 mono WAVE file: '%s'", tmp_file_path])
             try:
                 self.log("Converting audio file to mono...")
@@ -420,16 +442,28 @@ class AudioFile(Loggable):
                 self.log("Converting audio file to mono... done")
             except FFMPEGPathError:
                 gf.delete_file(tmp_handler, tmp_file_path)
-                self.log_exc("Unable to call ffmpeg executable", None, True, AudioFileConverterError)
+                self.log_exc(
+                    "Unable to call ffmpeg executable",
+                    None,
+                    True,
+                    AudioFileConverterError,
+                )
             except OSError:
                 gf.delete_file(tmp_handler, tmp_file_path)
-                self.log_exc("Audio file format not supported by ffmpeg", None, True, AudioFileUnsupportedFormatError)
+                self.log_exc(
+                    "Audio file format not supported by ffmpeg",
+                    None,
+                    True,
+                    AudioFileUnsupportedFormatError,
+                )
         else:
             # read the file directly
             if self.rconf.safety_checks:
                 self.log("self.file_format is good => reading self.file_path directly")
             else:
-                self.log_warn("Safety checks disabled => reading self.file_path directly")
+                self.log_warn(
+                    "Safety checks disabled => reading self.file_path directly"
+                )
             tmp_handler = None
             tmp_file_path = self.file_path
 
@@ -445,7 +479,12 @@ class AudioFile(Loggable):
             self.__samples_length = self.__samples_capacity
             self._update_length()
         except ValueError:
-            self.log_exc("Audio format not supported by scipywavread", None, True, AudioFileUnsupportedFormatError)
+            self.log_exc(
+                "Audio format not supported by scipywavread",
+                None,
+                True,
+                AudioFileUnsupportedFormatError,
+            )
 
         # if we converted the audio file, delete the temporary converted audio file
         if convert_audio_file:
@@ -487,12 +526,18 @@ class AudioFile(Loggable):
             self.__samples = numpy.zeros(capacity)
             self.__samples_length = 0
         else:
-            self.log(["Previous sample length was   (samples): %d", self.__samples_length])
-            self.log(["Previous sample capacity was (samples): %d", self.__samples_capacity])
+            self.log(
+                ["Previous sample length was   (samples): %d", self.__samples_length]
+            )
+            self.log(
+                ["Previous sample capacity was (samples): %d", self.__samples_capacity]
+            )
             self.__samples = numpy.resize(self.__samples, capacity)
             self.__samples_length = min(self.__samples_length, capacity)
         self.__samples_capacity = capacity
-        self.log(["Current sample capacity is   (samples): %d", self.__samples_capacity])
+        self.log(
+            ["Current sample capacity is   (samples): %d", self.__samples_capacity]
+        )
 
     def minimize_memory(self):
         """
@@ -552,11 +597,18 @@ class AudioFile(Loggable):
         """
         if self.__samples is None:
             if self.file_path is None:
-                self.log_exc("AudioFile object not initialized", None, True, AudioFileNotInitializedError)
+                self.log_exc(
+                    "AudioFile object not initialized",
+                    None,
+                    True,
+                    AudioFileNotInitializedError,
+                )
             else:
                 self.read_samples_from_file()
         self.log("Reversing...")
-        self.__samples[0:self.__samples_length] = numpy.flipud(self.__samples[0:self.__samples_length])
+        self.__samples[0 : self.__samples_length] = numpy.flipud(
+            self.__samples[0 : self.__samples_length]
+        )
         self.log("Reversing... done")
 
     def trim(self, begin=None, length=None):
@@ -612,7 +664,12 @@ class AudioFile(Loggable):
         """
         if self.__samples is None:
             if self.file_path is None:
-                self.log_exc("AudioFile object not initialized", None, True, AudioFileNotInitializedError)
+                self.log_exc(
+                    "AudioFile object not initialized",
+                    None,
+                    True,
+                    AudioFileNotInitializedError,
+                )
             else:
                 self.read_samples_from_file()
         self.log(["Writing audio file '%s'...", file_path])
@@ -622,7 +679,9 @@ class AudioFile(Loggable):
             data = (self.audio_samples * 32768).astype("int16")
             scipywavwrite(file_path, self.audio_sample_rate, data)
         except Exception as exc:
-            self.log_exc("Error writing audio file to '%s'" % (file_path), exc, True, OSError)
+            self.log_exc(
+                "Error writing audio file to '%s'" % (file_path), exc, True, OSError
+            )
         self.log(["Writing audio file '%s'... done", file_path])
 
     def clear_data(self):
@@ -646,4 +705,6 @@ class AudioFile(Loggable):
             # NOTE computing TimeValue (... / ...) yields wrong results,
             #      see issue #168
             #      self.audio_length = TimeValue(self.__samples_length / self.audio_sample_rate)
-            self.audio_length = TimeValue(self.__samples_length) / TimeValue(self.audio_sample_rate)
+            self.audio_length = TimeValue(self.__samples_length) / TimeValue(
+                self.audio_sample_rate
+            )

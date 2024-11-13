@@ -39,18 +39,15 @@ class FFPROBEWrapperCLI(AbstractCLIProgram):
     """
     Read audio file properties using the ``ffprobe`` wrapper.
     """
+
     AUDIO_FILE = gf.relative_path("res/audio.mp3", __file__)
 
     NAME = gf.file_name_without_extension(__file__)
 
     HELP = {
         "description": "Read audio file properties using the ffprobe wrapper.",
-        "synopsis": [
-            ("AUDIO_FILE", True)
-        ],
-        "examples": [
-            "%s" % (AUDIO_FILE)
-        ]
+        "synopsis": [("AUDIO_FILE", True)],
+        "examples": ["%s" % (AUDIO_FILE)],
     }
 
     def perform_command(self):
@@ -73,11 +70,16 @@ class FFPROBEWrapperCLI(AbstractCLIProgram):
                 self.print_generic("{} {}".format(key, dictionary[key]))
             return self.NO_ERROR_EXIT_CODE
         except FFPROBEPathError:
-            self.print_error("Unable to call the ffprobe executable '%s'" % (self.rconf[RuntimeConfiguration.FFPROBE_PATH]))
+            self.print_error(
+                "Unable to call the ffprobe executable '%s'"
+                % (self.rconf[RuntimeConfiguration.FFPROBE_PATH])
+            )
             self.print_error("Make sure the path to ffprobe is correct")
         except (FFPROBEUnsupportedFormatError, FFPROBEParsingError):
             self.print_error("Cannot read properties of file '%s'" % (audio_file_path))
-            self.print_error("Make sure the input file has a format supported by ffprobe")
+            self.print_error(
+                "Make sure the input file has a format supported by ffprobe"
+            )
 
         return self.ERROR_EXIT_CODE
 
@@ -88,5 +90,6 @@ def main():
     """
     FFPROBEWrapperCLI().run(arguments=sys.argv)
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     main()

@@ -59,7 +59,7 @@ class VAD(Loggable):
         log_energy_threshold=None,
         min_nonspeech_length=None,
         extend_before=None,
-        extend_after=None
+        extend_after=None,
     ):
         """
         Compute the time intervals containing speech and nonspeech,
@@ -82,17 +82,43 @@ class VAD(Loggable):
         mfcc_window_shift = self.rconf.mws
         self.log(["MFCC window shift (s):         %.3f", mfcc_window_shift])
         if log_energy_threshold is None:
-            log_energy_threshold = self.rconf[RuntimeConfiguration.VAD_LOG_ENERGY_THRESHOLD]
+            log_energy_threshold = self.rconf[
+                RuntimeConfiguration.VAD_LOG_ENERGY_THRESHOLD
+            ]
             self.log(["Log energy threshold:          %.3f", log_energy_threshold])
         if min_nonspeech_length is None:
-            min_nonspeech_length = int(self.rconf[RuntimeConfiguration.VAD_MIN_NONSPEECH_LENGTH] / mfcc_window_shift)
-            self.log(["Min nonspeech length (s):      %.3f", self.rconf[RuntimeConfiguration.VAD_MIN_NONSPEECH_LENGTH]])
+            min_nonspeech_length = int(
+                self.rconf[RuntimeConfiguration.VAD_MIN_NONSPEECH_LENGTH]
+                / mfcc_window_shift
+            )
+            self.log(
+                [
+                    "Min nonspeech length (s):      %.3f",
+                    self.rconf[RuntimeConfiguration.VAD_MIN_NONSPEECH_LENGTH],
+                ]
+            )
         if extend_before is None:
-            extend_before = int(self.rconf[RuntimeConfiguration.VAD_EXTEND_SPEECH_INTERVAL_BEFORE] / mfcc_window_shift)
-            self.log(["Extend speech before (s):      %.3f", self.rconf[RuntimeConfiguration.VAD_EXTEND_SPEECH_INTERVAL_BEFORE]])
+            extend_before = int(
+                self.rconf[RuntimeConfiguration.VAD_EXTEND_SPEECH_INTERVAL_BEFORE]
+                / mfcc_window_shift
+            )
+            self.log(
+                [
+                    "Extend speech before (s):      %.3f",
+                    self.rconf[RuntimeConfiguration.VAD_EXTEND_SPEECH_INTERVAL_BEFORE],
+                ]
+            )
         if extend_after is None:
-            extend_after = int(self.rconf[RuntimeConfiguration.VAD_EXTEND_SPEECH_INTERVAL_AFTER] / mfcc_window_shift)
-            self.log(["Extend speech after (s):       %.3f", self.rconf[RuntimeConfiguration.VAD_EXTEND_SPEECH_INTERVAL_AFTER]])
+            extend_after = int(
+                self.rconf[RuntimeConfiguration.VAD_EXTEND_SPEECH_INTERVAL_AFTER]
+                / mfcc_window_shift
+            )
+            self.log(
+                [
+                    "Extend speech after (s):       %.3f",
+                    self.rconf[RuntimeConfiguration.VAD_EXTEND_SPEECH_INTERVAL_AFTER],
+                ]
+            )
         energy_length = len(wave_energy)
         energy_threshold = numpy.min(wave_energy) + log_energy_threshold
         self.log(["Min nonspeech length (frames): %d", min_nonspeech_length])
@@ -106,7 +132,9 @@ class VAD(Loggable):
         self.log("Determining initial labels...")
         mask = wave_energy >= energy_threshold
         windows = self._rolling_window(mask, min_nonspeech_length)
-        nonspeech_runs = self._compute_runs((numpy.where(numpy.sum(windows, axis=1) == 0))[0])
+        nonspeech_runs = self._compute_runs(
+            (numpy.where(numpy.sum(windows, axis=1) == 0))[0]
+        )
         self.log("Determining initial labels... done")
 
         # initially, everything is marked as speech

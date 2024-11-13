@@ -29,7 +29,6 @@ from aeneas.tests.common import ExecuteCLICase
 
 
 class TestSynthesizeTextCLI(ExecuteCLICase):
-
     CLI_CLS = SynthesizeTextCLI
 
     def test_help(self):
@@ -40,224 +39,292 @@ class TestSynthesizeTextCLI(ExecuteCLICase):
         self.execute([("", "--version")], 2)
 
     def test_synt_list(self):
-        self.execute([
-            ("", "list"),
-            ("", "From|fairest|creatures|we|desire|increase"),
-            ("", "eng"),
-            ("out", "synthesized.wav")
-        ], 0)
+        self.execute(
+            [
+                ("", "list"),
+                ("", "From|fairest|creatures|we|desire|increase"),
+                ("", "eng"),
+                ("out", "synthesized.wav"),
+            ],
+            0,
+        )
 
     def test_synt_parsed(self):
-        self.execute([
-            ("", "parsed"),
-            ("in", "../tools/res/parsed.txt"),
-            ("", "eng"),
-            ("out", "synthesized.wav")
-        ], 0)
+        self.execute(
+            [
+                ("", "parsed"),
+                ("in", "../tools/res/parsed.txt"),
+                ("", "eng"),
+                ("out", "synthesized.wav"),
+            ],
+            0,
+        )
 
     def test_synt_plain(self):
-        self.execute([
-            ("", "plain"),
-            ("in", "../tools/res/plain.txt"),
-            ("", "eng"),
-            ("out", "synthesized.wav")
-        ], 0)
+        self.execute(
+            [
+                ("", "plain"),
+                ("in", "../tools/res/plain.txt"),
+                ("", "eng"),
+                ("out", "synthesized.wav"),
+            ],
+            0,
+        )
 
     def test_synt_subtitles(self):
-        self.execute([
-            ("", "subtitles"),
-            ("in", "../tools/res/subtitles.txt"),
-            ("", "eng"),
-            ("out", "synthesized.wav")
-        ], 0)
+        self.execute(
+            [
+                ("", "subtitles"),
+                ("in", "../tools/res/subtitles.txt"),
+                ("", "eng"),
+                ("out", "synthesized.wav"),
+            ],
+            0,
+        )
 
     def test_synt_unparsed_id_regex(self):
-        self.execute([
-            ("", "unparsed"),
-            ("in", "../tools/res/unparsed.xhtml"),
-            ("", "eng"),
-            ("out", "synthesized.wav"),
-            ("", "--id-regex=f[0-9]*")
-        ], 0)
+        self.execute(
+            [
+                ("", "unparsed"),
+                ("in", "../tools/res/unparsed.xhtml"),
+                ("", "eng"),
+                ("out", "synthesized.wav"),
+                ("", "--id-regex=f[0-9]*"),
+            ],
+            0,
+        )
 
     def test_synt_unparsed_class_regex(self):
-        self.execute([
-            ("", "unparsed"),
-            ("in", "../tools/res/unparsed.xhtml"),
-            ("", "eng"),
-            ("out", "synthesized.wav"),
-            ("", "--class-regex=ra"),
-            ("", "--sort=unsorted"),
-        ], 0)
+        self.execute(
+            [
+                ("", "unparsed"),
+                ("in", "../tools/res/unparsed.xhtml"),
+                ("", "eng"),
+                ("out", "synthesized.wav"),
+                ("", "--class-regex=ra"),
+                ("", "--sort=unsorted"),
+            ],
+            0,
+        )
 
     def test_synt_unparsed_sort_numeric(self):
-        self.execute([
-            ("", "unparsed"),
-            ("in", "../tools/res/unparsed.xhtml"),
-            ("", "eng"),
-            ("out", "synthesized.wav"),
-            ("", "--id-regex=f[0-9]*"),
-            ("", "--sort=numeric")
-        ], 0)
+        self.execute(
+            [
+                ("", "unparsed"),
+                ("in", "../tools/res/unparsed.xhtml"),
+                ("", "eng"),
+                ("out", "synthesized.wav"),
+                ("", "--id-regex=f[0-9]*"),
+                ("", "--sort=numeric"),
+            ],
+            0,
+        )
 
     def test_synt_unparsed_sort_lexicographic(self):
-        self.execute([
-            ("", "unparsed"),
-            ("in", "../tools/res/unparsed.xhtml"),
-            ("", "eng"),
-            ("out", "synthesized.wav"),
-            ("", "--id-regex=f[0-9]*"),
-            ("", "--sort=lexicographic")
-        ], 0)
+        self.execute(
+            [
+                ("", "unparsed"),
+                ("in", "../tools/res/unparsed.xhtml"),
+                ("", "eng"),
+                ("out", "synthesized.wav"),
+                ("", "--id-regex=f[0-9]*"),
+                ("", "--sort=lexicographic"),
+            ],
+            0,
+        )
 
     def test_synt_missing_1(self):
-        self.execute([
-            ("", "list"),
-            ("", "eng"),
-            ("in", "../tools/res/audio.mp3")
-        ], 2)
+        self.execute([("", "list"), ("", "eng"), ("in", "../tools/res/audio.mp3")], 2)
 
     def test_synt_missing_2(self):
-        self.execute([
-            ("", "From|fairest|creatures|we|desire|increase"),
-            ("", "eng"),
-            ("out", "synthesized.wav")
-        ], 2)
+        self.execute(
+            [
+                ("", "From|fairest|creatures|we|desire|increase"),
+                ("", "eng"),
+                ("out", "synthesized.wav"),
+            ],
+            2,
+        )
 
     def test_synt_missing_3(self):
-        self.execute([
-            ("", "list"),
-            ("", "From|fairest|creatures|we|desire|increase"),
-            ("out", "synthesized.wav")
-        ], 2)
+        self.execute(
+            [
+                ("", "list"),
+                ("", "From|fairest|creatures|we|desire|increase"),
+                ("out", "synthesized.wav"),
+            ],
+            2,
+        )
 
     def test_synt_missing_4(self):
-        self.execute([
-            ("", "list"),
-            ("", "From|fairest|creatures|we|desire|increase"),
-            ("", "eng")
-        ], 2)
+        self.execute(
+            [
+                ("", "list"),
+                ("", "From|fairest|creatures|we|desire|increase"),
+                ("", "eng"),
+            ],
+            2,
+        )
 
     def test_synt_cannot_read(self):
-        self.execute([
-            ("", "plain"),
-            ("", "/foo/bar/baz.wav"),
-            ("", "eng"),
-            ("out", "synthesized.wav")
-        ], 1)
+        self.execute(
+            [
+                ("", "plain"),
+                ("", "/foo/bar/baz.wav"),
+                ("", "eng"),
+                ("out", "synthesized.wav"),
+            ],
+            1,
+        )
 
     def test_synt_unparsed_missing(self):
-        self.execute([
-            ("", "unparsed"),
-            ("in", "../tools/res/unparsed.xhtml"),
-            ("", "eng"),
-            ("out", "synthesized.wav")
-        ], 1)
+        self.execute(
+            [
+                ("", "unparsed"),
+                ("in", "../tools/res/unparsed.xhtml"),
+                ("", "eng"),
+                ("out", "synthesized.wav"),
+            ],
+            1,
+        )
 
     def test_synt_plain_start(self):
-        self.execute([
-            ("", "plain"),
-            ("in", "../tools/res/plain.txt"),
-            ("", "eng"),
-            ("out", "synthesized.wav"),
-            ("", "--start=5")
-        ], 0)
+        self.execute(
+            [
+                ("", "plain"),
+                ("in", "../tools/res/plain.txt"),
+                ("", "eng"),
+                ("out", "synthesized.wav"),
+                ("", "--start=5"),
+            ],
+            0,
+        )
 
     def test_synt_plain_end(self):
-        self.execute([
-            ("", "plain"),
-            ("in", "../tools/res/plain.txt"),
-            ("", "eng"),
-            ("out", "synthesized.wav"),
-            ("", "--end=10")
-        ], 0)
+        self.execute(
+            [
+                ("", "plain"),
+                ("in", "../tools/res/plain.txt"),
+                ("", "eng"),
+                ("out", "synthesized.wav"),
+                ("", "--end=10"),
+            ],
+            0,
+        )
 
     def test_synt_plain_start_end(self):
-        self.execute([
-            ("", "plain"),
-            ("in", "../tools/res/plain.txt"),
-            ("", "eng"),
-            ("out", "synthesized.wav"),
-            ("", "--start=5"),
-            ("", "--end=10")
-        ], 0)
+        self.execute(
+            [
+                ("", "plain"),
+                ("in", "../tools/res/plain.txt"),
+                ("", "eng"),
+                ("out", "synthesized.wav"),
+                ("", "--start=5"),
+                ("", "--end=10"),
+            ],
+            0,
+        )
 
     def test_synt_plain_backwards(self):
-        self.execute([
-            ("", "plain"),
-            ("in", "../tools/res/plain.txt"),
-            ("", "eng"),
-            ("out", "synthesized.wav"),
-            ("", "--backwards")
-        ], 0)
+        self.execute(
+            [
+                ("", "plain"),
+                ("in", "../tools/res/plain.txt"),
+                ("", "eng"),
+                ("out", "synthesized.wav"),
+                ("", "--backwards"),
+            ],
+            0,
+        )
 
     def test_synt_plain_quit(self):
-        self.execute([
-            ("", "plain"),
-            ("in", "../tools/res/plain.txt"),
-            ("", "eng"),
-            ("out", "synthesized.wav"),
-            ("", "--quit-after=10.0")
-        ], 0)
+        self.execute(
+            [
+                ("", "plain"),
+                ("in", "../tools/res/plain.txt"),
+                ("", "eng"),
+                ("out", "synthesized.wav"),
+                ("", "--quit-after=10.0"),
+            ],
+            0,
+        )
 
     def test_synt_plain_backwards_quit(self):
-        self.execute([
-            ("", "plain"),
-            ("in", "../tools/res/plain.txt"),
-            ("", "eng"),
-            ("out", "synthesized.wav"),
-            ("", "--backwards"),
-            ("", "--quit-after=10.0")
-        ], 0)
+        self.execute(
+            [
+                ("", "plain"),
+                ("in", "../tools/res/plain.txt"),
+                ("", "eng"),
+                ("out", "synthesized.wav"),
+                ("", "--backwards"),
+                ("", "--quit-after=10.0"),
+            ],
+            0,
+        )
 
     def test_synt_plain_pure(self):
-        self.execute([
-            ("", "plain"),
-            ("in", "../tools/res/plain.txt"),
-            ("", "eng"),
-            ("out", "synthesized.wav"),
-            ("", "-r=\"c_extensions=False\"")
-        ], 0)
+        self.execute(
+            [
+                ("", "plain"),
+                ("in", "../tools/res/plain.txt"),
+                ("", "eng"),
+                ("out", "synthesized.wav"),
+                ("", '-r="c_extensions=False"'),
+            ],
+            0,
+        )
 
     def test_synt_plain_no_cew(self):
-        self.execute([
-            ("", "plain"),
-            ("in", "../tools/res/plain.txt"),
-            ("", "eng"),
-            ("out", "synthesized.wav"),
-            ("", "-r=\"cew=False\"")
-        ], 0)
+        self.execute(
+            [
+                ("", "plain"),
+                ("in", "../tools/res/plain.txt"),
+                ("", "eng"),
+                ("out", "synthesized.wav"),
+                ("", '-r="cew=False"'),
+            ],
+            0,
+        )
 
     def test_synt_plain_cew_subprocess(self):
-        self.execute([
-            ("", "plain"),
-            ("in", "../tools/res/plain.txt"),
-            ("", "eng"),
-            ("out", "synthesized.wav"),
-            ("", "-r=\"cew_subprocess_enabled=True\"")
-        ], 0)
+        self.execute(
+            [
+                ("", "plain"),
+                ("in", "../tools/res/plain.txt"),
+                ("", "eng"),
+                ("out", "synthesized.wav"),
+                ("", '-r="cew_subprocess_enabled=True"'),
+            ],
+            0,
+        )
 
     def test_synt_path(self):
         path = os.path.expanduser("~")
         path = os.path.join(path, ".bin/myespeak")
         if gf.file_exists(path):
-            self.execute([
+            self.execute(
+                [
+                    ("", "plain"),
+                    ("in", "../tools/res/plain.txt"),
+                    ("", "eng"),
+                    ("out", "synthesized.wav"),
+                    ("", '-r="c_extensions=False|tts=espeak|tts_path=%s"' % path),
+                ],
+                0,
+            )
+
+    def test_synt_path_bad(self):
+        path = "/foo/bar/espeak"
+        self.execute(
+            [
                 ("", "plain"),
                 ("in", "../tools/res/plain.txt"),
                 ("", "eng"),
                 ("out", "synthesized.wav"),
-                ("", "-r=\"c_extensions=False|tts=espeak|tts_path=%s\"" % path)
-            ], 0)
-
-    def test_synt_path_bad(self):
-        path = "/foo/bar/espeak"
-        self.execute([
-            ("", "plain"),
-            ("in", "../tools/res/plain.txt"),
-            ("", "eng"),
-            ("out", "synthesized.wav"),
-            ("", "-r=\"c_extensions=False|tts=espeak|tts_path=%s\"" % path)
-        ], 1)
+                ("", '-r="c_extensions=False|tts=espeak|tts_path=%s"' % path),
+            ],
+            1,
+        )
 
 
 if __name__ == "__main__":

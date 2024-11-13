@@ -273,56 +273,58 @@ class NuanceTTSWrapper(BaseTTSWrapper):
         SPA_MEX: "Spanish (Mexico)",
     }
 
-    CODE_TO_HUMAN_LIST = sorted(["{}\t{}".format(k, v) for k, v in CODE_TO_HUMAN.items()])
+    CODE_TO_HUMAN_LIST = sorted(
+        ["{}\t{}".format(k, v) for k, v in CODE_TO_HUMAN.items()]
+    )
 
     LANGUAGE_TO_VOICE_CODE = {
-        ARA: "Laila",           # F, M: Maged, Tarik
-        CAT: "Montserrat",      # F, M: Jordi
-        CES: "Iveta",           # F, F: Zuzana
-        CMN: "Tian-Tian",       # F
-        DAN: "Ida",             # F, M: Magnus
-        DEU: "Anna-ML",         # F-ML, F-ML: Petra-ML, M: Markus, Yannick
-        ELL: "Melina",          # F, M: Nikos
-        ENG: "Kate",            # F
-        EUS: "Miren",           # F
-        FIN: "Satu",            # F
-        FRA: "Audrey-ML",       # F-ML, F: Aurelie, M: Thomas
-        GLG: "Carmela",         # F
-        HEB: "Carmit",          # F
-        HIN: "Lekha",           # F
-        HUN: "Mariska",         # F
-        IND: "Damayanti",       # F
-        ITA: "Alice-ML",        # F-ML, F: Federica, Paola, M: Luca
-        JPN: "Kyoko",           # F, M: Otoya
-        KOR: "Sora",            # F
-        NLD: "Claire",          # F, M: Xander
-        NOR: "Nora",            # F, M: Henrik
-        POL: "Ewa",             # F, F: Zosia
-        POR: "Catarina",        # F
-        RON: "Ioana",           # F
-        RUS: "Katya",           # F, F: Milena, M: Yuri
-        SLK: "Laura",           # F
-        SPA: "Monica",          # F, M: Jorge
-        SWE: "Alva",            # F, M: Oskar
-        THA: "Kanya",           # F
-        TUR: "Yelda",           # F, M: Cem
-        YUE: "Sin-Ji",          # F
-        CMN_CHN: "Tian-Tian",   # F
-        CMN_TWN: "Mei-Jia",     # F
-        FRA_CAN: "Amelie",      # F, F: Chantal, M: Nicolas
-        ENG_AUS: "Karen",       # F, M: Lee
-        ENG_GBR: "Kate",        # F, F: Serena, M: Daniel, Oliver
-        ENG_IND: "Veena",       # F
-        ENG_IRL: "Moira",       # F
-        ENG_SCT: "Fiona",       # F
-        ENG_USA: "Ava",         # F, F: Allison, Samantha, Susan, Zoe, M: Tom
-        ENG_ZAF: "Tessa",       # F
-        NLD_BEL: "Ellen",       # F
-        POR_BRA: "Luciana",     # F, M: Felipe
-        POR_PRT: "Catarina",    # F, F: Joana
-        SPA_COL: "Soledad",     # F, M: Carlos
-        SPA_ESP: "Monica",      # F, F (Valencian): Empar
-        SPA_MEX: "Angelica",    # F, F: Paulina, M: Juan
+        ARA: "Laila",  # F, M: Maged, Tarik
+        CAT: "Montserrat",  # F, M: Jordi
+        CES: "Iveta",  # F, F: Zuzana
+        CMN: "Tian-Tian",  # F
+        DAN: "Ida",  # F, M: Magnus
+        DEU: "Anna-ML",  # F-ML, F-ML: Petra-ML, M: Markus, Yannick
+        ELL: "Melina",  # F, M: Nikos
+        ENG: "Kate",  # F
+        EUS: "Miren",  # F
+        FIN: "Satu",  # F
+        FRA: "Audrey-ML",  # F-ML, F: Aurelie, M: Thomas
+        GLG: "Carmela",  # F
+        HEB: "Carmit",  # F
+        HIN: "Lekha",  # F
+        HUN: "Mariska",  # F
+        IND: "Damayanti",  # F
+        ITA: "Alice-ML",  # F-ML, F: Federica, Paola, M: Luca
+        JPN: "Kyoko",  # F, M: Otoya
+        KOR: "Sora",  # F
+        NLD: "Claire",  # F, M: Xander
+        NOR: "Nora",  # F, M: Henrik
+        POL: "Ewa",  # F, F: Zosia
+        POR: "Catarina",  # F
+        RON: "Ioana",  # F
+        RUS: "Katya",  # F, F: Milena, M: Yuri
+        SLK: "Laura",  # F
+        SPA: "Monica",  # F, M: Jorge
+        SWE: "Alva",  # F, M: Oskar
+        THA: "Kanya",  # F
+        TUR: "Yelda",  # F, M: Cem
+        YUE: "Sin-Ji",  # F
+        CMN_CHN: "Tian-Tian",  # F
+        CMN_TWN: "Mei-Jia",  # F
+        FRA_CAN: "Amelie",  # F, F: Chantal, M: Nicolas
+        ENG_AUS: "Karen",  # F, M: Lee
+        ENG_GBR: "Kate",  # F, F: Serena, M: Daniel, Oliver
+        ENG_IND: "Veena",  # F
+        ENG_IRL: "Moira",  # F
+        ENG_SCT: "Fiona",  # F
+        ENG_USA: "Ava",  # F, F: Allison, Samantha, Susan, Zoe, M: Tom
+        ENG_ZAF: "Tessa",  # F
+        NLD_BEL: "Ellen",  # F
+        POR_BRA: "Luciana",  # F, M: Felipe
+        POR_PRT: "Catarina",  # F, F: Joana
+        SPA_COL: "Soledad",  # F, M: Carlos
+        SPA_ESP: "Monica",  # F, F (Valencian): Empar
+        SPA_MEX: "Angelica",  # F, F: Paulina, M: Juan
     }
     DEFAULT_LANGUAGE = ENG_GBR
 
@@ -345,16 +347,19 @@ class NuanceTTSWrapper(BaseTTSWrapper):
     def __init__(self, rconf=None, logger=None):
         super().__init__(rconf=rconf, logger=logger)
 
-    def _synthesize_single_python_helper(self, text, voice_code, output_file_path=None, return_audio_data=True):
+    def _synthesize_single_python_helper(
+        self, text, voice_code, output_file_path=None, return_audio_data=True
+    ):
         self.log("Importing requests...")
         import requests
+
         self.log("Importing requests... done")
 
         # prepare request header and contents
         request_id = str(uuid.uuid4()).replace("-", "")[0:16]
         headers = {
             "Content-Type": "text/plain; charset=utf-8",
-            "Accept": "audio/x-wav;codec=pcm;bit=16;rate=%d" % self.SAMPLE_RATE
+            "Accept": "audio/x-wav;codec=pcm;bit=16;rate=%d" % self.SAMPLE_RATE,
         }
         text_to_synth = text.encode("utf-8")
         url = "{}/{}?appId={}&appKey={}&id={}&voice={}".format(
@@ -363,7 +368,7 @@ class NuanceTTSWrapper(BaseTTSWrapper):
             self.rconf[RuntimeConfiguration.NUANCE_TTS_API_ID],
             self.rconf[RuntimeConfiguration.NUANCE_TTS_API_KEY],
             request_id,
-            voice_code
+            voice_code,
         )
 
         # post request
@@ -379,7 +384,12 @@ class NuanceTTSWrapper(BaseTTSWrapper):
             try:
                 response = requests.post(url, data=text_to_synth, headers=headers)
             except Exception as exc:
-                self.log_exc("Unexpected exception on HTTP POST. Are you offline?", exc, True, ValueError)
+                self.log_exc(
+                    "Unexpected exception on HTTP POST. Are you offline?",
+                    exc,
+                    True,
+                    ValueError,
+                )
             self.log("Posting... done")
             status_code = response.status_code
             self.log(["Status code: %d", status_code])
@@ -391,7 +401,9 @@ class NuanceTTSWrapper(BaseTTSWrapper):
                 attempts -= 1
 
         if attempts <= 0:
-            self.log_exc("All API requests returned status code != 200", None, True, ValueError)
+            self.log_exc(
+                "All API requests returned status code != 200", None, True, ValueError
+            )
 
         # save to file if requested
         if output_file_path is None:
@@ -399,10 +411,11 @@ class NuanceTTSWrapper(BaseTTSWrapper):
         else:
             self.log("output_file_path is not None => saving to file...")
             import wave
+
             output_file = wave.open(output_file_path, "wb")
             output_file.setframerate(self.SAMPLE_RATE)  # sample rate
-            output_file.setnchannels(1)                 # 1 channel, i.e. mono
-            output_file.setsampwidth(2)                 # 16 bit/sample, i.e. 2 bytes/sample
+            output_file.setnchannels(1)  # 1 channel, i.e. mono
+            output_file.setsampwidth(2)  # 16 bit/sample, i.e. 2 bytes/sample
             output_file.writeframes(response.content)
             output_file.close()
             self.log("output_file_path is not None => saving to file... done")
@@ -415,7 +428,10 @@ class NuanceTTSWrapper(BaseTTSWrapper):
         self.log(["Number of frames: %d", number_of_frames])
         self.log(["Audio length (s): %.3f", audio_length])
         audio_format = "pcm16"
-        audio_samples = numpy.fromstring(response.content, dtype=numpy.int16).astype("float64") / 32768
+        audio_samples = (
+            numpy.fromstring(response.content, dtype=numpy.int16).astype("float64")
+            / 32768
+        )
 
         # return data
         return (True, (audio_length, audio_sample_rate, audio_format, audio_samples))

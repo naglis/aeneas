@@ -39,7 +39,9 @@ class SyncMapFormatSUB(SyncMapFormatGenericSubtitles):
     DEFAULT = SUB
 
     def __init__(self, variant=DEFAULT, parameters=None, rconf=None, logger=None):
-        super().__init__(variant=variant, parameters=parameters, rconf=rconf, logger=logger)
+        super().__init__(
+            variant=variant, parameters=parameters, rconf=rconf, logger=logger
+        )
         self.header_string = "[SUBTITLE]"
         self.header_might_not_have_trailing_blank_line = True
         self.footer_string = "[END SUBTITLE]"

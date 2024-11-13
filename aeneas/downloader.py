@@ -43,6 +43,7 @@ class DownloadError(Exception):
     it cannot be downloaded because of temporary
     network issues.
     """
+
     pass
 
 
@@ -61,12 +62,12 @@ class Downloader(Loggable):
     TAG = "Downloader"
 
     def audio_from_youtube(
-            self,
-            source_url,
-            download=True,
-            output_file_path=None,
-            download_format=None,
-            largest_audio=True,
+        self,
+        source_url,
+        download=True,
+        output_file_path=None,
+        download_format=None,
+        largest_audio=True,
     ):
         """
         Download an audio stream from a YouTube video,
@@ -120,18 +121,26 @@ class Downloader(Loggable):
             }
             with youtube_dl.YoutubeDL(options) as ydl:
                 info = ydl.extract_info(source_url, download=False)
-                audio_formats = [f for f in info["formats"] if f["vcodec"] == "none" and f["acodec"] != "none"]
+                audio_formats = [
+                    f
+                    for f in info["formats"]
+                    if f["vcodec"] == "none" and f["acodec"] != "none"
+                ]
                 for a in audio_formats:
-                    audiostreams.append({
-                        "format": a["format"].split(" ")[0],
-                        "filesize": a["filesize"],
-                        "ext": a["ext"],
-                        "abr": a["abr"]
-                    })
+                    audiostreams.append(
+                        {
+                            "format": a["format"].split(" ")[0],
+                            "filesize": a["filesize"],
+                            "ext": a["ext"],
+                            "abr": a["abr"],
+                        }
+                    )
             self.log("Getting audiostreams... done")
             return audiostreams
 
-        def _select_audiostream(self, audiostreams, download_format=None, largest_audio=False):
+        def _select_audiostream(
+            self, audiostreams, download_format=None, largest_audio=False
+        ):
             """
             Select the best-matching audiostream:
             if a ``download_format`` is given, use it,
@@ -163,13 +172,21 @@ class Downloader(Loggable):
                 self.log("output_file_path is None: creating temp file")
                 handler, output_file_path = gf.tmp_file(
                     root=self.rconf[RuntimeConfiguration.TMP_PATH],
-                    suffix=(".%s" % extension)
+                    suffix=(".%s" % extension),
                 )
                 gf.delete_file(handler, output_file_path)
             else:
-                self.log("output_file_path is not None: cheking that file can be written")
+                self.log(
+                    "output_file_path is not None: cheking that file can be written"
+                )
                 if not gf.file_can_be_written(output_file_path):
-                    self.log_exc("Path '%s' cannot be written. Wrong permissions?" % (output_file_path), None, True, OSError)
+                    self.log_exc(
+                        "Path '%s' cannot be written. Wrong permissions?"
+                        % (output_file_path),
+                        None,
+                        True,
+                        OSError,
+                    )
             self.log("Determining output file path... done")
             self.log(["Output file path is '%s'", output_file_path])
             return output_file_path
@@ -190,7 +207,9 @@ class Downloader(Loggable):
         try:
             import youtube_dl
         except ImportError as exc:
-            self.log_exc("Python module youtube-dl is not installed", exc, True, ImportError)
+            self.log_exc(
+                "Python module youtube-dl is not installed", exc, True, ImportError
+            )
 
         # retry parameters
         sleep_delay = self.rconf[RuntimeConfiguration.DOWNLOADER_SLEEP]
@@ -211,7 +230,12 @@ class Downloader(Loggable):
                 self.log_warn("Unable to list audio streams, retry")
                 att -= 1
         if att <= 0:
-            self.log_exc("All downloader requests failed: wrong URL or you are offline", None, True, DownloadError)
+            self.log_exc(
+                "All downloader requests failed: wrong URL or you are offline",
+                None,
+                True,
+                DownloadError,
+            )
 
         if not download:
             self.log("Returning list of audiostreams")
@@ -219,21 +243,34 @@ class Downloader(Loggable):
 
         # download the best-matching audiostream
         if len(audiostreams) == 0:
-            self.log_exc("No audiostreams available for the provided URL", None, True, OSError)
-        audiostream = _select_audiostream(self, audiostreams, download_format, largest_audio)
-        output_path = _compose_output_file_path(self, audiostream["ext"], output_file_path)
+            self.log_exc(
+                "No audiostreams available for the provided URL", None, True, OSError
+            )
+        audiostream = _select_audiostream(
+            self, audiostreams, download_format, largest_audio
+        )
+        output_path = _compose_output_file_path(
+            self, audiostream["ext"], output_file_path
+        )
         att = attempts
         while att > 0:
             self.log("Sleeping to throttle API usage...")
             time.sleep(sleep_delay)
             self.log("Sleeping to throttle API usage... done")
             try:
-                _download_audiostream(self, source_url, audiostream["format"], output_path)
+                _download_audiostream(
+                    self, source_url, audiostream["format"], output_path
+                )
                 break
             except Exception:
                 self.log_warn("Unable to download audio streams, retry")
                 att -= 1
         if att <= 0:
-            self.log_exc("All downloader requests failed: wrong URL or you are offline", None, True, DownloadError)
+            self.log_exc(
+                "All downloader requests failed: wrong URL or you are offline",
+                None,
+                True,
+                DownloadError,
+            )
 
         return output_path

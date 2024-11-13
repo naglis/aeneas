@@ -29,7 +29,6 @@ from aeneas.exacttiming import TimeValue
 
 
 class TestExactTiming(unittest.TestCase):
-
     def check(self, value, expected=None):
         self.assertTrue(isinstance(value, TimeValue))
         if expected is not None:
@@ -142,16 +141,28 @@ class TestExactTiming(unittest.TestCase):
     def test_numpy_int(self):
         tv1 = TimeValue("1.000")
         n1 = numpy.array([0, 1, 2], dtype=int)
-        n2 = numpy.array([TimeValue("1.000"), TimeValue("2.000"), TimeValue("3.000")], dtype=TimeValue)
-        n3 = numpy.array([TimeValue("0.000"), TimeValue("1.000"), TimeValue("2.000")], dtype=TimeValue)
+        n2 = numpy.array(
+            [TimeValue("1.000"), TimeValue("2.000"), TimeValue("3.000")],
+            dtype=TimeValue,
+        )
+        n3 = numpy.array(
+            [TimeValue("0.000"), TimeValue("1.000"), TimeValue("2.000")],
+            dtype=TimeValue,
+        )
         self.check_numpy(n1 + tv1, n2)
         self.check_numpy(n1 * tv1, n3)
 
     def test_numpy_float(self):
         tv1 = TimeValue("1.000")
         n1 = numpy.array([0.0, 1.0, 2.0], dtype=float)
-        n2 = numpy.array([TimeValue("1.000"), TimeValue("2.000"), TimeValue("3.000")], dtype=TimeValue)
-        n3 = numpy.array([TimeValue("0.000"), TimeValue("1.000"), TimeValue("2.000")], dtype=TimeValue)
+        n2 = numpy.array(
+            [TimeValue("1.000"), TimeValue("2.000"), TimeValue("3.000")],
+            dtype=TimeValue,
+        )
+        n3 = numpy.array(
+            [TimeValue("0.000"), TimeValue("1.000"), TimeValue("2.000")],
+            dtype=TimeValue,
+        )
         with self.assertRaises(TypeError):
             self.check_numpy(n1 + tv1, n2)
         with self.assertRaises(TypeError):
@@ -159,17 +170,34 @@ class TestExactTiming(unittest.TestCase):
 
     def test_numpy_tv(self):
         tv1 = TimeValue("1.000")
-        n1 = numpy.array([TimeValue("0.000"), TimeValue("1.000"), TimeValue("2.000")], dtype=TimeValue)
-        n2 = numpy.array([TimeValue("1.000"), TimeValue("2.000"), TimeValue("3.000")], dtype=TimeValue)
-        n3 = numpy.array([TimeValue("0.000"), TimeValue("1.000"), TimeValue("2.000")], dtype=TimeValue)
+        n1 = numpy.array(
+            [TimeValue("0.000"), TimeValue("1.000"), TimeValue("2.000")],
+            dtype=TimeValue,
+        )
+        n2 = numpy.array(
+            [TimeValue("1.000"), TimeValue("2.000"), TimeValue("3.000")],
+            dtype=TimeValue,
+        )
+        n3 = numpy.array(
+            [TimeValue("0.000"), TimeValue("1.000"), TimeValue("2.000")],
+            dtype=TimeValue,
+        )
         self.check_numpy(n1 + tv1, n2)
         self.check_numpy(n1 * tv1, n3)
 
     def test_numpy_decimal(self):
         tv1 = TimeValue("1.000")
-        n1 = numpy.array([Decimal("0.000"), Decimal("1.000"), Decimal("2.000")], dtype=Decimal)
-        n2 = numpy.array([TimeValue("1.000"), TimeValue("2.000"), TimeValue("3.000")], dtype=TimeValue)
-        n3 = numpy.array([TimeValue("0.000"), TimeValue("1.000"), TimeValue("2.000")], dtype=TimeValue)
+        n1 = numpy.array(
+            [Decimal("0.000"), Decimal("1.000"), Decimal("2.000")], dtype=Decimal
+        )
+        n2 = numpy.array(
+            [TimeValue("1.000"), TimeValue("2.000"), TimeValue("3.000")],
+            dtype=TimeValue,
+        )
+        n3 = numpy.array(
+            [TimeValue("0.000"), TimeValue("1.000"), TimeValue("2.000")],
+            dtype=TimeValue,
+        )
         self.check_numpy(n1 + tv1, n2)
         self.check_numpy(n1 * tv1, n3)
 
@@ -400,7 +428,6 @@ class TestExactTiming(unittest.TestCase):
             (("1.000", "2.000"), "0.000", False, ("1.000", "2.000")),
             (("1.000", "2.000"), "0.500", False, ("1.500", "2.500")),
             (("1.000", "2.000"), "1.000", False, ("2.000", "3.000")),
-
             (("0.000", "0.000"), "-1.000", True, ("-1.000", "-1.000")),
             (("0.000", "0.000"), "-0.000", True, ("0.000", "0.000")),
             (("0.000", "0.000"), "0.000", True, ("0.000", "0.000")),
@@ -428,14 +455,12 @@ class TestExactTiming(unittest.TestCase):
             ("1.000", "1.000", "1.000", True),
             ("1.000", "1.000", "1.001", False),
             ("1.000", "1.000", "2.000", False),
-
             ("1.000", "1.001", "0.000", False),
             ("1.000", "1.001", "0.999", False),
             ("1.000", "1.001", "1.000", True),
             ("1.000", "1.001", "1.001", True),
             ("1.000", "1.001", "1.002", False),
             ("1.000", "1.001", "2.000", False),
-
             ("1.000", "1.002", "0.000", False),
             ("1.000", "1.002", "0.999", False),
             ("1.000", "1.002", "1.000", True),
@@ -443,7 +468,6 @@ class TestExactTiming(unittest.TestCase):
             ("1.000", "1.002", "1.002", True),
             ("1.000", "1.002", "1.003", False),
             ("1.000", "1.002", "2.000", False),
-
             ("1.234", "1.237", "0.000", False),
             ("1.234", "1.237", "1.233", False),
             ("1.234", "1.237", "1.234", True),
@@ -464,14 +488,12 @@ class TestExactTiming(unittest.TestCase):
             ("1.000", "1.000", "1.000", False),
             ("1.000", "1.000", "1.001", False),
             ("1.000", "1.000", "2.000", False),
-
             ("1.000", "1.001", "0.000", False),
             ("1.000", "1.001", "0.999", False),
             ("1.000", "1.001", "1.000", False),
             ("1.000", "1.001", "1.001", False),
             ("1.000", "1.001", "1.002", False),
             ("1.000", "1.001", "2.000", False),
-
             ("1.000", "1.002", "0.000", False),
             ("1.000", "1.002", "0.999", False),
             ("1.000", "1.002", "1.000", False),
@@ -479,7 +501,6 @@ class TestExactTiming(unittest.TestCase):
             ("1.000", "1.002", "1.002", False),
             ("1.000", "1.002", "1.003", False),
             ("1.000", "1.002", "2.000", False),
-
             ("1.234", "1.237", "0.000", False),
             ("1.234", "1.237", "1.233", False),
             ("1.234", "1.237", "1.234", False),
@@ -496,39 +517,143 @@ class TestExactTiming(unittest.TestCase):
     def test_time_interval_relative_position_of(self):
         params = [
             # TABLE 1
-            (("1.000", "1.000"), ("0.000", "0.000"), TimeInterval.RELATIVE_POSITION_PP_L),
-            (("1.000", "1.000"), ("1.000", "1.000"), TimeInterval.RELATIVE_POSITION_PP_C),
-            (("1.000", "1.000"), ("2.000", "2.000"), TimeInterval.RELATIVE_POSITION_PP_G),
+            (
+                ("1.000", "1.000"),
+                ("0.000", "0.000"),
+                TimeInterval.RELATIVE_POSITION_PP_L,
+            ),
+            (
+                ("1.000", "1.000"),
+                ("1.000", "1.000"),
+                TimeInterval.RELATIVE_POSITION_PP_C,
+            ),
+            (
+                ("1.000", "1.000"),
+                ("2.000", "2.000"),
+                TimeInterval.RELATIVE_POSITION_PP_G,
+            ),
             # TABLE 2
-            (("1.000", "1.000"), ("0.000", "0.500"), TimeInterval.RELATIVE_POSITION_PI_LL),
-            (("1.000", "1.000"), ("0.500", "1.000"), TimeInterval.RELATIVE_POSITION_PI_LC),
-            (("1.000", "1.000"), ("0.500", "1.500"), TimeInterval.RELATIVE_POSITION_PI_LG),
-            (("1.000", "1.000"), ("1.000", "1.500"), TimeInterval.RELATIVE_POSITION_PI_CG),
-            (("1.000", "1.000"), ("1.500", "2.000"), TimeInterval.RELATIVE_POSITION_PI_GG),
+            (
+                ("1.000", "1.000"),
+                ("0.000", "0.500"),
+                TimeInterval.RELATIVE_POSITION_PI_LL,
+            ),
+            (
+                ("1.000", "1.000"),
+                ("0.500", "1.000"),
+                TimeInterval.RELATIVE_POSITION_PI_LC,
+            ),
+            (
+                ("1.000", "1.000"),
+                ("0.500", "1.500"),
+                TimeInterval.RELATIVE_POSITION_PI_LG,
+            ),
+            (
+                ("1.000", "1.000"),
+                ("1.000", "1.500"),
+                TimeInterval.RELATIVE_POSITION_PI_CG,
+            ),
+            (
+                ("1.000", "1.000"),
+                ("1.500", "2.000"),
+                TimeInterval.RELATIVE_POSITION_PI_GG,
+            ),
             # TABLE 3
-            (("1.000", "2.000"), ("0.000", "0.000"), TimeInterval.RELATIVE_POSITION_IP_L),
-            (("1.000", "2.000"), ("1.000", "1.000"), TimeInterval.RELATIVE_POSITION_IP_B),
-            (("1.000", "2.000"), ("1.500", "1.500"), TimeInterval.RELATIVE_POSITION_IP_I),
-            (("1.000", "2.000"), ("2.000", "2.000"), TimeInterval.RELATIVE_POSITION_IP_E),
-            (("1.000", "2.000"), ("2.500", "2.500"), TimeInterval.RELATIVE_POSITION_IP_G),
+            (
+                ("1.000", "2.000"),
+                ("0.000", "0.000"),
+                TimeInterval.RELATIVE_POSITION_IP_L,
+            ),
+            (
+                ("1.000", "2.000"),
+                ("1.000", "1.000"),
+                TimeInterval.RELATIVE_POSITION_IP_B,
+            ),
+            (
+                ("1.000", "2.000"),
+                ("1.500", "1.500"),
+                TimeInterval.RELATIVE_POSITION_IP_I,
+            ),
+            (
+                ("1.000", "2.000"),
+                ("2.000", "2.000"),
+                TimeInterval.RELATIVE_POSITION_IP_E,
+            ),
+            (
+                ("1.000", "2.000"),
+                ("2.500", "2.500"),
+                TimeInterval.RELATIVE_POSITION_IP_G,
+            ),
             # TABLE 4
-            (("1.000", "2.000"), ("0.000", "0.500"), TimeInterval.RELATIVE_POSITION_II_LL),
-            (("1.000", "2.000"), ("0.000", "1.000"), TimeInterval.RELATIVE_POSITION_II_LB),
-            (("1.000", "2.000"), ("0.000", "1.500"), TimeInterval.RELATIVE_POSITION_II_LI),
-            (("1.000", "2.000"), ("0.000", "2.000"), TimeInterval.RELATIVE_POSITION_II_LE),
-            (("1.000", "2.000"), ("0.000", "2.500"), TimeInterval.RELATIVE_POSITION_II_LG),
+            (
+                ("1.000", "2.000"),
+                ("0.000", "0.500"),
+                TimeInterval.RELATIVE_POSITION_II_LL,
+            ),
+            (
+                ("1.000", "2.000"),
+                ("0.000", "1.000"),
+                TimeInterval.RELATIVE_POSITION_II_LB,
+            ),
+            (
+                ("1.000", "2.000"),
+                ("0.000", "1.500"),
+                TimeInterval.RELATIVE_POSITION_II_LI,
+            ),
+            (
+                ("1.000", "2.000"),
+                ("0.000", "2.000"),
+                TimeInterval.RELATIVE_POSITION_II_LE,
+            ),
+            (
+                ("1.000", "2.000"),
+                ("0.000", "2.500"),
+                TimeInterval.RELATIVE_POSITION_II_LG,
+            ),
             # TABLE 5
-            (("1.000", "2.000"), ("1.000", "1.500"), TimeInterval.RELATIVE_POSITION_II_BI),
-            (("1.000", "2.000"), ("1.000", "2.000"), TimeInterval.RELATIVE_POSITION_II_BE),
-            (("1.000", "2.000"), ("1.000", "2.500"), TimeInterval.RELATIVE_POSITION_II_BG),
+            (
+                ("1.000", "2.000"),
+                ("1.000", "1.500"),
+                TimeInterval.RELATIVE_POSITION_II_BI,
+            ),
+            (
+                ("1.000", "2.000"),
+                ("1.000", "2.000"),
+                TimeInterval.RELATIVE_POSITION_II_BE,
+            ),
+            (
+                ("1.000", "2.000"),
+                ("1.000", "2.500"),
+                TimeInterval.RELATIVE_POSITION_II_BG,
+            ),
             # TABLE 6
-            (("1.000", "2.000"), ("1.100", "1.500"), TimeInterval.RELATIVE_POSITION_II_II),
-            (("1.000", "2.000"), ("1.100", "2.000"), TimeInterval.RELATIVE_POSITION_II_IE),
-            (("1.000", "2.000"), ("1.100", "2.500"), TimeInterval.RELATIVE_POSITION_II_IG),
+            (
+                ("1.000", "2.000"),
+                ("1.100", "1.500"),
+                TimeInterval.RELATIVE_POSITION_II_II,
+            ),
+            (
+                ("1.000", "2.000"),
+                ("1.100", "2.000"),
+                TimeInterval.RELATIVE_POSITION_II_IE,
+            ),
+            (
+                ("1.000", "2.000"),
+                ("1.100", "2.500"),
+                TimeInterval.RELATIVE_POSITION_II_IG,
+            ),
             # TABLE 7
-            (("1.000", "2.000"), ("2.000", "2.500"), TimeInterval.RELATIVE_POSITION_II_EG),
+            (
+                ("1.000", "2.000"),
+                ("2.000", "2.500"),
+                TimeInterval.RELATIVE_POSITION_II_EG,
+            ),
             # TABLE 8
-            (("1.000", "2.000"), ("2.500", "3.000"), TimeInterval.RELATIVE_POSITION_II_GG),
+            (
+                ("1.000", "2.000"),
+                ("2.500", "3.000"),
+                TimeInterval.RELATIVE_POSITION_II_GG,
+            ),
         ]
         for ti1, ti2, exp in params:
             ti1 = TimeInterval(begin=TimeValue(ti1[0]), end=TimeValue(ti1[1]))

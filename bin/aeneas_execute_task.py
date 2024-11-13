@@ -49,5 +49,5 @@ def main():
     ExecuteTaskCLI(invoke="aeneas_execute_task").run(arguments=sys.argv)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

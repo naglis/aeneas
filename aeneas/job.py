@@ -27,7 +27,6 @@ This module contains the following classes:
 * :class:`~aeneas.job.JobConfiguration`, representing a job configuration.
 """
 
-
 from aeneas.configuration import Configuration
 from aeneas.logger import Loggable
 import aeneas.globalconstants as gc
@@ -54,7 +53,9 @@ class Job(Loggable):
         super().__init__(rconf=rconf, logger=logger)
         self.tasks = []
         self.identifier = gf.uuid_string()
-        self.configuration = None if config_string is None else JobConfiguration(config_string)
+        self.configuration = (
+            None if config_string is None else JobConfiguration(config_string)
+        )
 
     def __len__(self):
         return len(self.tasks)
@@ -132,17 +133,47 @@ class JobConfiguration(Configuration):
     FIELDS = [
         (gc.PPN_JOB_DESCRIPTION, (None, None, ["description"], "description")),
         (gc.PPN_JOB_LANGUAGE, (None, None, ["language"], "language")),
-        (gc.PPN_JOB_IS_AUDIO_FILE_NAME_REGEX, (None, None, ["i_a_name_regex"], "regex to find audio files")),
-        (gc.PPN_JOB_IS_AUDIO_FILE_RELATIVE_PATH, (None, None, ["i_a_relative_path"], "relative path of audio files")),
-        (gc.PPN_JOB_IS_HIERARCHY_PREFIX, (None, None, ["i_hierarchy_prefix"], "prefix inside the input container")),
-        (gc.PPN_JOB_IS_HIERARCHY_TYPE, (None, None, ["i_hierarchy_type"], "type of input container hierarchy")),
-        (gc.PPN_JOB_IS_TASK_DIRECTORY_NAME_REGEX, (None, None, ["i_task_directory_name_regex"], "regex to find task dirs")),
-        (gc.PPN_JOB_IS_TEXT_FILE_NAME_REGEX, (None, None, ["i_t_name_regex"], "regex to find text files")),
-        (gc.PPN_JOB_IS_TEXT_FILE_RELATIVE_PATH, (None, None, ["i_t_relative_path"], "relative path of text files")),
-        (gc.PPN_JOB_OS_CONTAINER_FORMAT, (None, None, ["o_container_format"], "format of input container")),
+        (
+            gc.PPN_JOB_IS_AUDIO_FILE_NAME_REGEX,
+            (None, None, ["i_a_name_regex"], "regex to find audio files"),
+        ),
+        (
+            gc.PPN_JOB_IS_AUDIO_FILE_RELATIVE_PATH,
+            (None, None, ["i_a_relative_path"], "relative path of audio files"),
+        ),
+        (
+            gc.PPN_JOB_IS_HIERARCHY_PREFIX,
+            (None, None, ["i_hierarchy_prefix"], "prefix inside the input container"),
+        ),
+        (
+            gc.PPN_JOB_IS_HIERARCHY_TYPE,
+            (None, None, ["i_hierarchy_type"], "type of input container hierarchy"),
+        ),
+        (
+            gc.PPN_JOB_IS_TASK_DIRECTORY_NAME_REGEX,
+            (None, None, ["i_task_directory_name_regex"], "regex to find task dirs"),
+        ),
+        (
+            gc.PPN_JOB_IS_TEXT_FILE_NAME_REGEX,
+            (None, None, ["i_t_name_regex"], "regex to find text files"),
+        ),
+        (
+            gc.PPN_JOB_IS_TEXT_FILE_RELATIVE_PATH,
+            (None, None, ["i_t_relative_path"], "relative path of text files"),
+        ),
+        (
+            gc.PPN_JOB_OS_CONTAINER_FORMAT,
+            (None, None, ["o_container_format"], "format of input container"),
+        ),
         (gc.PPN_JOB_OS_FILE_NAME, (None, None, ["o_name"], "name of output container")),
-        (gc.PPN_JOB_OS_HIERARCHY_PREFIX, (None, None, ["o_hierarchy_prefix"], "prefix inside the output container")),
-        (gc.PPN_JOB_OS_HIERARCHY_TYPE, (None, None, ["o_hierarchy_type"], "type of output container hierarchy")),
+        (
+            gc.PPN_JOB_OS_HIERARCHY_PREFIX,
+            (None, None, ["o_hierarchy_prefix"], "prefix inside the output container"),
+        ),
+        (
+            gc.PPN_JOB_OS_HIERARCHY_TYPE,
+            (None, None, ["o_hierarchy_type"], "type of output container hierarchy"),
+        ),
     ]
 
     TAG = "JobConfiguration"

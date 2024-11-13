@@ -27,9 +27,10 @@ from aeneas.tools.download import DownloadCLI
 from aeneas.tests.common import ExecuteCLICase
 
 
-@unittest.skipIf(importlib.util.find_spec("youtube_dl") is None, "youtube-dl is not installed")
+@unittest.skipIf(
+    importlib.util.find_spec("youtube_dl") is None, "youtube-dl is not installed"
+)
 class TestDownloadCLI(ExecuteCLICase):
-
     CLI_CLS = DownloadCLI
 
     def test_help(self):
@@ -39,60 +40,78 @@ class TestDownloadCLI(ExecuteCLICase):
         self.execute([("", "--version")], 2)
 
     def test_list(self):
-        self.execute([
-            ("", "https://www.youtube.com/watch?v=rU4a7AA8wM0"),
-            ("", "--list")
-        ], 0)
+        self.execute(
+            [("", "https://www.youtube.com/watch?v=rU4a7AA8wM0"), ("", "--list")], 0
+        )
 
     def test_download(self):
-        self.execute([
-            ("", "https://www.youtube.com/watch?v=rU4a7AA8wM0"),
-            ("out", "sonnet.m4a")
-        ], 0)
+        self.execute(
+            [
+                ("", "https://www.youtube.com/watch?v=rU4a7AA8wM0"),
+                ("out", "sonnet.m4a"),
+            ],
+            0,
+        )
 
     def test_download_bad_url(self):
-        self.execute([
-            ("", "https://www.youtube.com/watch?v=aaaaaaaaaaa"),
-            ("out", "sonnet.m4a")
-        ], 1)
+        self.execute(
+            [
+                ("", "https://www.youtube.com/watch?v=aaaaaaaaaaa"),
+                ("out", "sonnet.m4a"),
+            ],
+            1,
+        )
 
     def test_download_cannot_write(self):
-        self.execute([
-            ("", "https://www.youtube.com/watch?v=rU4a7AA8wM0"),
-            ("", "/foo/bar/baz.m4a")
-        ], 1)
+        self.execute(
+            [
+                ("", "https://www.youtube.com/watch?v=rU4a7AA8wM0"),
+                ("", "/foo/bar/baz.m4a"),
+            ],
+            1,
+        )
 
     def test_download_missing_1(self):
-        self.execute([
-            ("", "https://www.youtube.com/watch?v=rU4a7AA8wM0"),
-        ], 2)
+        self.execute(
+            [
+                ("", "https://www.youtube.com/watch?v=rU4a7AA8wM0"),
+            ],
+            2,
+        )
 
     def test_download_missing_2(self):
-        self.execute([
-            ("out", "sonnet.m4a")
-        ], 2)
+        self.execute([("out", "sonnet.m4a")], 2)
 
     def test_download_index(self):
-        self.execute([
-            ("", "https://www.youtube.com/watch?v=rU4a7AA8wM0"),
-            ("out", "sonnet.m4a"),
-            ("", "--index=0")
-        ], 0)
+        self.execute(
+            [
+                ("", "https://www.youtube.com/watch?v=rU4a7AA8wM0"),
+                ("out", "sonnet.m4a"),
+                ("", "--index=0"),
+            ],
+            0,
+        )
 
     def test_download_smallest(self):
-        self.execute([
-            ("", "https://www.youtube.com/watch?v=rU4a7AA8wM0"),
-            ("out", "sonnet.ogg"),
-            ("", "--smallest-audio")
-        ], 0)
+        self.execute(
+            [
+                ("", "https://www.youtube.com/watch?v=rU4a7AA8wM0"),
+                ("out", "sonnet.ogg"),
+                ("", "--smallest-audio"),
+            ],
+            0,
+        )
 
     def test_download_format(self):
-        self.execute([
-            ("", "https://www.youtube.com/watch?v=rU4a7AA8wM0"),
-            ("out", "sonnet.ogg"),
-            ("", "--largest-audio"),
-            ("", "--format=ogg")
-        ], 0)
+        self.execute(
+            [
+                ("", "https://www.youtube.com/watch?v=rU4a7AA8wM0"),
+                ("out", "sonnet.ogg"),
+                ("", "--largest-audio"),
+                ("", "--format=ogg"),
+            ],
+            0,
+        )
 
 
 if __name__ == "__main__":

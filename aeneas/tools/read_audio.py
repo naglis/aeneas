@@ -38,23 +38,17 @@ class ReadAudioCLI(AbstractCLIProgram):
     """
     Read audio file properties.
     """
+
     AUDIO_FILE = gf.relative_path("res/audio.mp3", __file__)
 
     NAME = gf.file_name_without_extension(__file__)
 
     HELP = {
         "description": "Read audio file properties.",
-        "synopsis": [
-            ("AUDIO_FILE", True)
-        ],
-        "options": [
-            "-f, --full : load samples from file, possibly converting to WAVE"
-        ],
-        "parameters": [
-        ],
-        "examples": [
-            "%s" % (AUDIO_FILE)
-        ]
+        "synopsis": [("AUDIO_FILE", True)],
+        "options": ["-f, --full : load samples from file, possibly converting to WAVE"],
+        "parameters": [],
+        "examples": ["%s" % (AUDIO_FILE)],
     }
 
     def perform_command(self):
@@ -76,13 +70,20 @@ class ReadAudioCLI(AbstractCLIProgram):
             return self.NO_ERROR_EXIT_CODE
         except OSError:
             self.print_error("Cannot read file '%s'" % (audio_file_path))
-            self.print_error("Make sure the input file path is written/escaped correctly")
+            self.print_error(
+                "Make sure the input file path is written/escaped correctly"
+            )
         except AudioFileProbeError:
-            self.print_error("Unable to call the ffprobe executable '%s'" % (self.rconf[RuntimeConfiguration.FFPROBE_PATH]))
+            self.print_error(
+                "Unable to call the ffprobe executable '%s'"
+                % (self.rconf[RuntimeConfiguration.FFPROBE_PATH])
+            )
             self.print_error("Make sure the path to ffprobe is correct")
         except AudioFileUnsupportedFormatError:
             self.print_error("Cannot read properties of file '%s'" % (audio_file_path))
-            self.print_error("Make sure the input file has a format supported by ffprobe")
+            self.print_error(
+                "Make sure the input file has a format supported by ffprobe"
+            )
 
         return self.ERROR_EXIT_CODE
 
@@ -93,5 +94,6 @@ def main():
     """
     ReadAudioCLI().run(arguments=sys.argv)
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     main()

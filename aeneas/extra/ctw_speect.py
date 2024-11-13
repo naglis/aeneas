@@ -61,9 +61,7 @@ class CustomTTSWrapper(BaseTTSWrapper):
     #
     ENG = Language.ENG
     """ English """
-    LANGUAGE_TO_VOICE_CODE = {
-        ENG: ENG
-    }
+    LANGUAGE_TO_VOICE_CODE = {ENG: ENG}
     DEFAULT_LANGUAGE = ENG
 
     #
@@ -84,11 +82,7 @@ class CustomTTSWrapper(BaseTTSWrapper):
         super().__init__(rconf=rconf, logger=logger)
 
     def _synthesize_single_python_helper(
-        self,
-        text,
-        voice_code,
-        output_file_path=None,
-        return_audio_data=True
+        self, text, voice_code, output_file_path=None, return_audio_data=True
     ):
         """
         This is an helper function to synthesize a single text fragment via a Python call.
@@ -146,13 +140,8 @@ class CustomTTSWrapper(BaseTTSWrapper):
         audio_sample_rate = int(waveform["samplerate"])
         audio_length = TimeValue(audio.num_samples() / audio_sample_rate)
         audio_format = "pcm16"
-        audio_samples = numpy.fromstring(
-            waveform["samples"],
-            dtype=numpy.int16
-        ).astype("float64") / 32768
-        return (True, (
-            audio_length,
-            audio_sample_rate,
-            audio_format,
-            audio_samples
-        ))
+        audio_samples = (
+            numpy.fromstring(waveform["samples"], dtype=numpy.int16).astype("float64")
+            / 32768
+        )
+        return (True, (audio_length, audio_sample_rate, audio_format, audio_samples))

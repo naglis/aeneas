@@ -47,5 +47,5 @@ def main():
     DownloadCLI(invoke="aeneas_download").run(arguments=sys.argv)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

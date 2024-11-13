@@ -253,13 +253,7 @@ class TextFragment:
 
     TAG = "TextFragment"
 
-    def __init__(
-            self,
-            identifier=None,
-            language=None,
-            lines=None,
-            filtered_lines=None
-    ):
+    def __init__(self, identifier=None, language=None, lines=None, filtered_lines=None):
         self.identifier = identifier
         self.language = language
         self.lines = lines
@@ -323,7 +317,9 @@ class TextFragment:
                 raise TypeError("lines is not an instance of list")
             for line in lines:
                 if not gf.is_unicode(line):
-                    raise TypeError("lines contains an element which is not a Unicode string")
+                    raise TypeError(
+                        "lines contains an element which is not a Unicode string"
+                    )
         self.__lines = lines
 
     @property
@@ -404,12 +400,7 @@ class TextFile(Loggable):
     TAG = "TextFile"
 
     def __init__(
-            self,
-            file_path=None,
-            file_format=None,
-            parameters=None,
-            rconf=None,
-            logger=None
+        self, file_path=None, file_format=None, parameters=None, rconf=None, logger=None
     ):
         super().__init__(rconf=rconf, logger=logger)
         self.file_path = file_path
@@ -474,7 +465,9 @@ class TextFile(Loggable):
     @file_path.setter
     def file_path(self, file_path):
         if (file_path is not None) and (not gf.file_can_be_read(file_path)):
-            self.log_exc("Text file '%s' cannot be read" % (file_path), None, True, OSError)
+            self.log_exc(
+                "Text file '%s' cannot be read" % (file_path), None, True, OSError
+            )
         self.__file_path = file_path
 
     @property
@@ -488,8 +481,15 @@ class TextFile(Loggable):
 
     @file_format.setter
     def file_format(self, file_format):
-        if (file_format is not None) and (file_format not in TextFileFormat.ALLOWED_VALUES):
-            self.log_exc("Text file format '%s' is not allowed" % (file_format), None, True, ValueError)
+        if (file_format is not None) and (
+            file_format not in TextFileFormat.ALLOWED_VALUES
+        ):
+            self.log_exc(
+                "Text file format '%s' is not allowed" % (file_format),
+                None,
+                True,
+                ValueError,
+            )
         self.__file_format = file_format
 
     @property
@@ -550,7 +550,9 @@ class TextFile(Loggable):
         :param bool as_last: if ``True`` append fragment, otherwise prepend it
         """
         if not isinstance(fragment, TextFragment):
-            self.log_exc("fragment is not an instance of TextFragment", None, True, TypeError)
+            self.log_exc(
+                "fragment is not an instance of TextFragment", None, True, TypeError
+            )
         self.fragments_tree.add_child(Tree(value=fragment), as_last=as_last)
 
     def get_subtree(self, root):
@@ -637,10 +639,17 @@ class TextFile(Loggable):
         """
         # test if we can read the given file
         if not gf.file_can_be_read(self.file_path):
-            self.log_exc("File '%s' cannot be read" % (self.file_path), None, True, OSError)
+            self.log_exc(
+                "File '%s' cannot be read" % (self.file_path), None, True, OSError
+            )
 
         if self.file_format not in TextFileFormat.ALLOWED_VALUES:
-            self.log_exc("Text file format '%s' is not supported." % (self.file_format), None, True, ValueError)
+            self.log_exc(
+                "Text file format '%s' is not supported." % (self.file_format),
+                None,
+                True,
+                ValueError,
+            )
 
         # read the contents of the file
         self.log(["Reading contents of file '%s'", self.file_path])
@@ -657,7 +666,7 @@ class TextFile(Loggable):
             TextFileFormat.PARSED: self._read_parsed,
             TextFileFormat.PLAIN: self._read_plain,
             TextFileFormat.SUBTITLES: self._read_subtitles,
-            TextFileFormat.UNPARSED: self._read_unparsed
+            TextFileFormat.UNPARSED: self._read_unparsed,
         }
         map_read_function[self.file_format](lines)
 
@@ -670,7 +679,9 @@ class TextFile(Loggable):
 
         :rtype: string
         """
-        word_separator = gf.safe_get(self.parameters, gc.PPN_TASK_IS_TEXT_MPLAIN_WORD_SEPARATOR, " ")
+        word_separator = gf.safe_get(
+            self.parameters, gc.PPN_TASK_IS_TEXT_MPLAIN_WORD_SEPARATOR, " "
+        )
         if (word_separator is None) or (word_separator == "space"):
             return " "
         elif word_separator == "equal":
@@ -711,7 +722,7 @@ class TextFile(Loggable):
                 paragraph_fragment = TextFragment(
                     identifier=paragraph_identifier,
                     lines=paragraph_lines,
-                    filtered_lines=paragraph_lines
+                    filtered_lines=paragraph_lines,
                 )
                 paragraph_node = Tree(value=paragraph_fragment)
                 tree.add_child(paragraph_node)
@@ -725,7 +736,7 @@ class TextFile(Loggable):
                     sentence_fragment = TextFragment(
                         identifier=sentence_identifier,
                         lines=sentence_lines,
-                        filtered_lines=sentence_lines
+                        filtered_lines=sentence_lines,
                     )
                     sentence_node = Tree(value=sentence_fragment)
                     paragraph_node.add_child(sentence_node)
@@ -740,7 +751,7 @@ class TextFile(Loggable):
                         word_fragment = TextFragment(
                             identifier=word_identifier,
                             lines=word_lines,
-                            filtered_lines=word_lines
+                            filtered_lines=word_lines,
                         )
                         word_node = Tree(value=word_fragment)
                         sentence_node.add_child(word_node)
@@ -763,7 +774,7 @@ class TextFile(Loggable):
         from bs4 import BeautifulSoup
 
         def nodes_at_level(root, level):
-            """ Return a dict with the bs4 filter parameters """
+            """Return a dict with the bs4 filter parameters"""
             LEVEL_TO_REGEX_MAP = [
                 None,
                 gc.PPN_TASK_IS_TEXT_MUNPARSED_L1_ID_REGEX,
@@ -776,6 +787,7 @@ class TextFile(Loggable):
             self.log(["%sRegex for %s: '%s'", indent, attribute_name, regex_string])
             regex = re.compile(r".*\b" + regex_string + r"\b.*")
             return root.findAll(attrs={attribute_name: regex})
+
         #
         # TODO better and/or parametric parsing,
         #      for example, removing tags but keeping text, etc.
@@ -806,9 +818,7 @@ class TextFile(Loggable):
                         self.log(["    Found l3 node with id:   '%s'", l3_id])
                         self.log(["    Found l3 node with text: '%s'", l3_text])
                         word_fragment = TextFragment(
-                            identifier=l3_id,
-                            lines=[l3_text],
-                            filtered_lines=[l3_text]
+                            identifier=l3_id, lines=[l3_text], filtered_lines=[l3_text]
                         )
                         word_node = Tree(value=word_fragment)
                         sentence_node.add_child(word_node)
@@ -819,7 +829,7 @@ class TextFile(Loggable):
                     sentence_node.value = TextFragment(
                         identifier=l2_id,
                         lines=[sentence_text],
-                        filtered_lines=[sentence_text]
+                        filtered_lines=[sentence_text],
                     )
                     self.log(["  Found l2 node with text: '%s'" % sentence_text])
                 if has_word:
@@ -827,7 +837,7 @@ class TextFile(Loggable):
                     paragraph_node.value = TextFragment(
                         identifier=l1_id,
                         lines=[paragraph_text],
-                        filtered_lines=[paragraph_text]
+                        filtered_lines=[paragraph_text],
                     )
                     tree.add_child(paragraph_node)
                     self.log(["Found l1 node with text: '%s'" % paragraph_text])
@@ -916,11 +926,11 @@ class TextFile(Loggable):
         from bs4 import BeautifulSoup
 
         def filter_attributes():
-            """ Return a dict with the bs4 filter parameters """
+            """Return a dict with the bs4 filter parameters"""
             attributes = {}
             for attribute_name, filter_name in [
-                    ("class", gc.PPN_TASK_IS_TEXT_UNPARSED_CLASS_REGEX),
-                    ("id", gc.PPN_TASK_IS_TEXT_UNPARSED_ID_REGEX)
+                ("class", gc.PPN_TASK_IS_TEXT_UNPARSED_CLASS_REGEX),
+                ("id", gc.PPN_TASK_IS_TEXT_UNPARSED_ID_REGEX),
             ]:
                 if filter_name in self.parameters:
                     regex_string = self.parameters[filter_name]
@@ -929,6 +939,7 @@ class TextFile(Loggable):
                         regex = re.compile(r".*\b" + regex_string + r"\b.*")
                         attributes[attribute_name] = regex
             return attributes
+
         #
         # TODO better and/or parametric parsing,
         #      for example, removing tags but keeping text, etc.
@@ -959,7 +970,7 @@ class TextFile(Loggable):
             dictionary=self.parameters,
             key=gc.PPN_TASK_IS_TEXT_UNPARSED_ID_SORT,
             default_value=IDSortingAlgorithm.UNSORTED,
-            can_return_none=False
+            can_return_none=False,
         )
         self.log(["Sorting text fragments using '%s'", id_sort])
         sorted_ids = IDSortingAlgorithm(id_sort).sort(ids)
@@ -969,17 +980,22 @@ class TextFile(Loggable):
         self._create_text_fragments([(key, [text_from_id[key]]) for key in sorted_ids])
 
     def _get_id_format(self):
-        """ Return the id regex from the parameters"""
+        """Return the id regex from the parameters"""
         id_format = gf.safe_get(
             self.parameters,
             gc.PPN_TASK_OS_FILE_ID_REGEX,
             self.DEFAULT_ID_FORMAT,
-            can_return_none=False
+            can_return_none=False,
         )
         try:
             id_format % 1
         except (TypeError, ValueError) as exc:
-            self.log_exc("String '%s' is not a valid id format" % (id_format), exc, True, ValueError)
+            self.log_exc(
+                "String '%s' is not a valid id format" % (id_format),
+                exc,
+                True,
+                ValueError,
+            )
         return id_format
 
     def _create_text_fragments(self, pairs):
@@ -995,7 +1011,7 @@ class TextFile(Loggable):
                 TextFragment(
                     identifier=pair[0],
                     lines=pair[1],
-                    filtered_lines=text_filter.apply_filter(pair[1])
+                    filtered_lines=text_filter.apply_filter(pair[1]),
                 )
             )
 
@@ -1006,31 +1022,26 @@ class TextFile(Loggable):
         text_filter = TextFilter(logger=self.logger)
         self.log("Created TextFilter object")
         for key, cls, param_name in [
-                (
-                    gc.PPN_TASK_IS_TEXT_FILE_IGNORE_REGEX,
-                    TextFilterIgnoreRegex,
-                    "regex"
-                ),
-                (
-                    gc.PPN_TASK_IS_TEXT_FILE_TRANSLITERATE_MAP,
-                    TextFilterTransliterate,
-                    "map_file_path"
-                )
+            (gc.PPN_TASK_IS_TEXT_FILE_IGNORE_REGEX, TextFilterIgnoreRegex, "regex"),
+            (
+                gc.PPN_TASK_IS_TEXT_FILE_TRANSLITERATE_MAP,
+                TextFilterTransliterate,
+                "map_file_path",
+            ),
         ]:
             cls_name = cls.__name__
             param_value = gf.safe_get(self.parameters, key, None)
             if param_value is not None:
                 self.log(["Creating %s object...", cls_name])
-                params = {
-                    param_name: param_value,
-                    "logger": self.logger
-                }
+                params = {param_name: param_value, "logger": self.logger}
                 try:
                     inner_filter = cls(**params)
                     text_filter.add_filter(inner_filter)
                     self.log(["Creating %s object... done", cls_name])
                 except ValueError as exc:
-                    self.log_exc("Creating %s object failed" % (cls_name), exc, False, None)
+                    self.log_exc(
+                        "Creating %s object failed" % (cls_name), exc, False, None
+                    )
         return text_filter
 
 
@@ -1112,7 +1123,7 @@ class TextFilterIgnoreRegex(TextFilter):
         return [self._apply_single(s) for s in strings]
 
     def _apply_single(self, string):
-        """ Apply filter to single string """
+        """Apply filter to single string"""
         if string is None:
             return None
         result = self.regex.sub("", string)
@@ -1146,17 +1157,14 @@ class TextFilterTransliterate(TextFilter):
                 raise TypeError("map_object is not an instance of TransliterationMap")
             self.trans_map = map_object
         elif map_file_path is not None:
-            self.trans_map = TransliterationMap(
-                file_path=map_file_path,
-                logger=logger
-            )
+            self.trans_map = TransliterationMap(file_path=map_file_path, logger=logger)
         TextFilter.__init__(self, rconf=rconf, logger=logger)
 
     def apply_filter(self, strings):
         return [self._apply_single(s) for s in strings]
 
     def _apply_single(self, string):
-        """ Apply filter to single string """
+        """Apply filter to single string"""
         if string is None:
             return None
         result = self.trans_map.transliterate(string)
@@ -1206,7 +1214,9 @@ class TransliterationMap(Loggable):
     @file_path.setter
     def file_path(self, file_path):
         if (file_path is not None) and (not gf.file_can_be_read(file_path)):
-            self.log_exc("Map file '%s' cannot be read" % (file_path), None, True, OSError)
+            self.log_exc(
+                "Map file '%s' cannot be read" % (file_path), None, True, OSError
+            )
         self.__file_path = file_path
         self._build_map()
 
@@ -1220,7 +1230,9 @@ class TransliterationMap(Loggable):
         #      and hence it cannot be found as a key of the map
         #
         if gf.is_py2_narrow_build():
-            self.log_warn("Running on a Python 2 narrow build: be aware that Unicode chars above 0x10000 cannot be replaced correctly.")
+            self.log_warn(
+                "Running on a Python 2 narrow build: be aware that Unicode chars above 0x10000 cannot be replaced correctly."
+            )
         for char in string:
             try:
                 result.append(self.trans_map[char])
@@ -1234,7 +1246,9 @@ class TransliterationMap(Loggable):
         Read the map file at path.
         """
         if gf.is_py2_narrow_build():
-            self.log_warn("Running on a Python 2 narrow build: be aware that Unicode chars above 0x10000 cannot be replaced correctly.")
+            self.log_warn(
+                "Running on a Python 2 narrow build: be aware that Unicode chars above 0x10000 cannot be replaced correctly."
+            )
         self.trans_map = {}
         with open(self.file_path, encoding="utf-8") as file_obj:
             contents = file_obj.read().replace("\t", " ")
@@ -1288,6 +1302,7 @@ class TransliterationMap(Loggable):
         """
         Process the second group of a (replace) rule.
         """
+
         def _replace_codepoint(match):
             """
             Replace the matched Unicode hex code
@@ -1297,6 +1312,7 @@ class TransliterationMap(Loggable):
             if result == -1:
                 return ""
             return gf.safe_unichr(result)
+
         result = group
         try:
             result = re.sub(self.CODEPOINT_REGEX, _replace_codepoint, result)

@@ -59,13 +59,13 @@ class SyncMapFragment:
     """ Types of fragment different than ``REGULAR`` """
 
     def __init__(
-            self,
-            text_fragment=None,
-            interval=None,
-            begin=None,
-            end=None,
-            fragment_type=REGULAR,
-            confidence=1.0
+        self,
+        text_fragment=None,
+        interval=None,
+        begin=None,
+        end=None,
+        fragment_type=REGULAR,
+        confidence=1.0,
     ):
         self.text_fragment = text_fragment
         if interval is not None:
@@ -82,7 +82,7 @@ class SyncMapFragment:
             self.text_fragment.identifier,
             self.fragment_type,
             self.begin,
-            self.end
+            self.end,
         )
 
     def __str__(self):
@@ -211,7 +211,7 @@ class SyncMapFragment:
             (self.identifier or ""),
             (self.begin if self.begin is not None else TimeValue("-2.000")),
             (self.end if self.end is not None else TimeValue("-1.000")),
-            (self.text or "")
+            (self.text or ""),
         )
 
     @property
@@ -328,10 +328,7 @@ class SyncMapFragment:
 
         .. versionadded:: 1.2.0
         """
-        if (
-            (self.fragment_type != self.REGULAR) or
-            (self.has_zero_length)
-        ):
+        if (self.fragment_type != self.REGULAR) or (self.has_zero_length):
             return None
         return Decimal(self.chars / self.length)
 

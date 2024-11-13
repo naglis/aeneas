@@ -99,7 +99,7 @@ class CEWSubprocess(Loggable):
             "%d" % c_backwards,
             text_file_path,
             audio_file_path,
-            data_file_path
+            data_file_path,
         ]
         self.log(["Calling with arguments '%s'", " ".join(arguments)])
         proc = subprocess.Popen(
@@ -107,7 +107,8 @@ class CEWSubprocess(Loggable):
             stdout=subprocess.PIPE,
             stdin=subprocess.PIPE,
             stderr=subprocess.PIPE,
-            universal_newlines=True)
+            universal_newlines=True,
+        )
         proc.communicate()
 
         self.log("Reading output data...")
@@ -137,11 +138,13 @@ def main():
 
     # make sure we have enough parameters
     if len(sys.argv) < 6:
-        print("You must pass five arguments: QUIT_AFTER BACKWARDS TEXT_FILE_PATH AUDIO_FILE_PATH DATA_FILE_PATH")
+        print(
+            "You must pass five arguments: QUIT_AFTER BACKWARDS TEXT_FILE_PATH AUDIO_FILE_PATH DATA_FILE_PATH"
+        )
         return 1
 
     # read parameters
-    c_quit_after = float(sys.argv[1])   # NOTE: cew needs float, not TimeValue
+    c_quit_after = float(sys.argv[1])  # NOTE: cew needs float, not TimeValue
     c_backwards = int(sys.argv[2])
     text_file_path = sys.argv[3]
     audio_file_path = sys.argv[4]
@@ -156,7 +159,7 @@ def main():
             idx = line.find(" ")
             if idx > 0:
                 f_voice_code = line[:idx]
-                f_text = line[(idx + 1):]
+                f_text = line[(idx + 1) :]
                 s_text.append((f_voice_code, f_text))
 
     # convert to bytes/unicode as required by subprocess
@@ -166,16 +169,16 @@ def main():
 
     try:
         import aeneas.cew.cew
+
         sr, sf, intervals = aeneas.cew.cew.synthesize_multiple(
-            audio_file_path,
-            c_quit_after,
-            c_backwards,
-            c_text
+            audio_file_path, c_quit_after, c_backwards, c_text
         )
         with open(data_file_path, "w", encoding="utf-8") as data:
             data.write("%d\n" % (sr))
             data.write("%d\n" % (sf))
-            data.write("\n".join(["{:.3f} {:.3f}".format(i[0], i[1]) for i in intervals]))
+            data.write(
+                "\n".join(["{:.3f} {:.3f}".format(i[0], i[1]) for i in intervals])
+            )
     except Exception as exc:
         print("Unexpected error: %s" % str(exc))
 

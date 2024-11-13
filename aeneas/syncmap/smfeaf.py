@@ -37,12 +37,15 @@ class SyncMapFormatEAF(SyncMapFormatGenericXML):
 
     def parse(self, input_text, syncmap):
         from lxml import etree
+
         # get root
         root = etree.fromstring(gf.safe_bytes(input_text))
         # get time slots
         time_slots = dict()
         for ts in root.iter("TIME_SLOT"):
-            time_slots[ts.get("TIME_SLOT_ID")] = gf.time_from_ssmmm(ts.get("TIME_VALUE")) / 1000
+            time_slots[ts.get("TIME_SLOT_ID")] = (
+                gf.time_from_ssmmm(ts.get("TIME_VALUE")) / 1000
+            )
         # parse annotations
         for alignable in root.iter("ALIGNABLE_ANNOTATION"):
             identifier = gf.safe_unicode(alignable.get("ANNOTATION_ID"))
@@ -56,17 +59,20 @@ class SyncMapFormatEAF(SyncMapFormatGenericXML):
                 identifier=identifier,
                 lines=lines,
                 begin=begin,
-                end=end
+                end=end,
             )
 
     def format(self, syncmap):
         from lxml import etree
+
         # namespaces
         xsi = "http://www.w3.org/2001/XMLSchema-instance"
         ns_map = {"xsi": xsi}
         # build doc
         doc = etree.Element("ANNOTATION_DOCUMENT", nsmap=ns_map)
-        doc.attrib["{%s}noNamespaceSchemaLocation" % xsi] = "http://www.mpi.nl/tools/elan/EAFv2.8.xsd"
+        doc.attrib["{%s}noNamespaceSchemaLocation" % xsi] = (
+            "http://www.mpi.nl/tools/elan/EAFv2.8.xsd"
+        )
         doc.attrib["AUTHOR"] = "aeneas"
         doc.attrib["DATE"] = gf.datetime_string(time_zone=True)
         doc.attrib["FORMAT"] = "2.8"
@@ -75,10 +81,18 @@ class SyncMapFormatEAF(SyncMapFormatGenericXML):
         header = etree.SubElement(doc, "HEADER")
         header.attrib["MEDIA_FILE"] = ""
         header.attrib["TIME_UNITS"] = "milliseconds"
-        if (self.parameters is not None) and (gc.PPN_TASK_OS_FILE_EAF_AUDIO_REF in self.parameters) and (self.parameters[gc.PPN_TASK_OS_FILE_EAF_AUDIO_REF] is not None):
+        if (
+            (self.parameters is not None)
+            and (gc.PPN_TASK_OS_FILE_EAF_AUDIO_REF in self.parameters)
+            and (self.parameters[gc.PPN_TASK_OS_FILE_EAF_AUDIO_REF] is not None)
+        ):
             media = etree.SubElement(header, "MEDIA_DESCRIPTOR")
-            media.attrib["MEDIA_URL"] = self.parameters[gc.PPN_TASK_OS_FILE_EAF_AUDIO_REF]
-            media.attrib["MIME_TYPE"] = gf.mimetype_from_path(self.parameters[gc.PPN_TASK_OS_FILE_EAF_AUDIO_REF])
+            media.attrib["MEDIA_URL"] = self.parameters[
+                gc.PPN_TASK_OS_FILE_EAF_AUDIO_REF
+            ]
+            media.attrib["MIME_TYPE"] = gf.mimetype_from_path(
+                self.parameters[gc.PPN_TASK_OS_FILE_EAF_AUDIO_REF]
+            )
         # time order
         time_order = etree.SubElement(doc, "TIME_ORDER")
         # tier

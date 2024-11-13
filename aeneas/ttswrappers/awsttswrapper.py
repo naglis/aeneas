@@ -212,37 +212,39 @@ class AWSTTSWrapper(BaseTTSWrapper):
         SPA_USA: "Spanish (USA)",
     }
 
-    CODE_TO_HUMAN_LIST = sorted(["{}\t{}".format(k, v) for k, v in CODE_TO_HUMAN.items()])
+    CODE_TO_HUMAN_LIST = sorted(
+        ["{}\t{}".format(k, v) for k, v in CODE_TO_HUMAN.items()]
+    )
 
     LANGUAGE_TO_VOICE_CODE = {
-        CYM: "Gwyneth",         # F
-        DAN: "Naja",            # F, M: Mads
-        DEU: "Marlene",         # F, M: Hans
-        ENG: "Joanna",          # F
-        FRA: "Celine",          # F, M: Mathieu
-        ISL: "Dora",            # F, M: Karl
-        ITA: "Carla",           # F, M: Giorgio
-        JPN: "Mizuki",          # F
-        NLD: "Lotte",           # F, M: Ruben
-        NOR: "Liv",             # F
-        POL: "Maja",            # F, F: Ewa, M: Jan, Jacek
-        POR: "Ines",            # F
-        RON: "Carmen",          # F
-        RUS: "Tatyana",         # F, M: Maxim
-        SPA: "Conchita",        # F, M: Enrique
-        SWE: "Astrid",          # F
-        TUR: "Filiz",           # F
-        ENG_AUS: "Nicole",      # F, M: Russell
-        ENG_GBR: "Emma",        # F, F: Amy, M: Brian
-        ENG_IND: "Raveena",     # F
-        ENG_USA: "Joanna",      # F, F: Salli, Kimberly, Kendra, Ivy, M: Justin, Joey
-        ENG_WLS: "Geraint",     # M
-        FRA_FRA: "Celine",      # F, M: Mathieu
-        FRA_CAN: "Chantal",     # F
-        POR_BRA: "Vitoria",     # F, M: Ricardo
-        POR_PRT: "Ines",        # F, M: Cristiano
-        SPA_ESP: "Conchita",    # F, M: Enrique
-        SPA_USA: "Penelope",    # F, M: Miguel
+        CYM: "Gwyneth",  # F
+        DAN: "Naja",  # F, M: Mads
+        DEU: "Marlene",  # F, M: Hans
+        ENG: "Joanna",  # F
+        FRA: "Celine",  # F, M: Mathieu
+        ISL: "Dora",  # F, M: Karl
+        ITA: "Carla",  # F, M: Giorgio
+        JPN: "Mizuki",  # F
+        NLD: "Lotte",  # F, M: Ruben
+        NOR: "Liv",  # F
+        POL: "Maja",  # F, F: Ewa, M: Jan, Jacek
+        POR: "Ines",  # F
+        RON: "Carmen",  # F
+        RUS: "Tatyana",  # F, M: Maxim
+        SPA: "Conchita",  # F, M: Enrique
+        SWE: "Astrid",  # F
+        TUR: "Filiz",  # F
+        ENG_AUS: "Nicole",  # F, M: Russell
+        ENG_GBR: "Emma",  # F, F: Amy, M: Brian
+        ENG_IND: "Raveena",  # F
+        ENG_USA: "Joanna",  # F, F: Salli, Kimberly, Kendra, Ivy, M: Justin, Joey
+        ENG_WLS: "Geraint",  # M
+        FRA_FRA: "Celine",  # F, M: Mathieu
+        FRA_CAN: "Chantal",  # F
+        POR_BRA: "Vitoria",  # F, M: Ricardo
+        POR_PRT: "Ines",  # F, M: Cristiano
+        SPA_ESP: "Conchita",  # F, M: Enrique
+        SPA_USA: "Penelope",  # F, M: Miguel
     }
     DEFAULT_LANGUAGE = ENG_USA
 
@@ -261,9 +263,12 @@ class AWSTTSWrapper(BaseTTSWrapper):
     def __init__(self, rconf=None, logger=None):
         super().__init__(rconf=rconf, logger=logger)
 
-    def _synthesize_single_python_helper(self, text, voice_code, output_file_path=None, return_audio_data=True):
+    def _synthesize_single_python_helper(
+        self, text, voice_code, output_file_path=None, return_audio_data=True
+    ):
         self.log("Importing boto3...")
         import boto3
+
         self.log("Importing boto3... done")
 
         # prepare client
@@ -285,17 +290,25 @@ class AWSTTSWrapper(BaseTTSWrapper):
                     Text=text,
                     OutputFormat=self.SAMPLE_FORMAT,
                     SampleRate="%d" % self.SAMPLE_RATE,
-                    VoiceId=voice_code
+                    VoiceId=voice_code,
                 )
             except Exception as exc:
-                self.log_exc("Unexpected exception on HTTP POST. Are you offline?", exc, True, ValueError)
+                self.log_exc(
+                    "Unexpected exception on HTTP POST. Are you offline?",
+                    exc,
+                    True,
+                    ValueError,
+                )
             self.log("Posting... done")
             self.log("Reading response...")
             try:
                 status_code = response["ResponseMetadata"]["HTTPStatusCode"]
                 response_content = response["AudioStream"].read()
             except Exception as exc:
-                self.log_warn("Error while reading the response status code or the response content: %s" % exc)
+                self.log_warn(
+                    "Error while reading the response status code or the response content: %s"
+                    % exc
+                )
                 status_code = 999
             self.log("Reading response... done")
             self.log(["Status code: %d", status_code])
@@ -307,7 +320,9 @@ class AWSTTSWrapper(BaseTTSWrapper):
                 attempts -= 1
 
         if attempts <= 0:
-            self.log_exc("All API requests returned status code != 200", None, True, ValueError)
+            self.log_exc(
+                "All API requests returned status code != 200", None, True, ValueError
+            )
 
         # save to file if requested
         if output_file_path is None:
@@ -315,10 +330,11 @@ class AWSTTSWrapper(BaseTTSWrapper):
         else:
             self.log("output_file_path is not None => saving to file...")
             import wave
+
             output_file = wave.open(output_file_path, "wb")
             output_file.setframerate(self.SAMPLE_RATE)  # sample rate
-            output_file.setnchannels(1)                 # 1 channel, i.e. mono
-            output_file.setsampwidth(2)                 # 16 bit/sample, i.e. 2 bytes/sample
+            output_file.setnchannels(1)  # 1 channel, i.e. mono
+            output_file.setsampwidth(2)  # 16 bit/sample, i.e. 2 bytes/sample
             output_file.writeframes(response_content)
             output_file.close()
             self.log("output_file_path is not None => saving to file... done")
@@ -331,7 +347,10 @@ class AWSTTSWrapper(BaseTTSWrapper):
         self.log(["Number of frames: %d", number_of_frames])
         self.log(["Audio length (s): %.3f", audio_length])
         audio_format = "pcm16"
-        audio_samples = numpy.fromstring(response_content, dtype=numpy.int16).astype("float64") / 32768
+        audio_samples = (
+            numpy.fromstring(response_content, dtype=numpy.int16).astype("float64")
+            / 32768
+        )
 
         # return data
         return (True, (audio_length, audio_sample_rate, audio_format, audio_samples))

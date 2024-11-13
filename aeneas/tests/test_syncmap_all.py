@@ -30,7 +30,6 @@ import aeneas.globalfunctions as gf
 
 
 class TestSyncMap(unittest.TestCase):
-
     NOT_EXISTING_SRT = gf.absolute_path("not_existing.srt", __file__)
     EXISTING_SRT = gf.absolute_path("res/syncmaps/sonnet001.srt", __file__)
     NOT_WRITEABLE_SRT = gf.absolute_path("x/y/z/not_writeable.srt", __file__)

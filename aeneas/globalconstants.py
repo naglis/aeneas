@@ -61,7 +61,7 @@ MIMETYPE_MAP = {
     "oga": "audio/x-vorbis+ogg",
     "ogg": "audio/x-vorbis+ogg",
     "wav": "audio/x-wav",
-    "webm": "video/webm"
+    "webm": "video/webm",
 }
 """ Map from audio file extension to mimetype """
 

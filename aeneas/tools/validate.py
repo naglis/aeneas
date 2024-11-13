@@ -49,6 +49,7 @@ class ValidateCLI(AbstractCLIProgram):
     5. a job TXT configuration file
     6. a job XML configuration file
     """
+
     CONFIG_FILE_TXT = gf.relative_path("res/config.txt", __file__)
     CONFIG_FILE_XML = gf.relative_path("res/config.xml", __file__)
     CONTAINER_FILE = gf.relative_path("res/job.zip", __file__)
@@ -67,16 +68,16 @@ class ValidateCLI(AbstractCLIProgram):
             ("container CONTAINER", True),
             ("job CONFIG_STRING", True),
             ("task CONFIG_STRING", True),
-            ("wizard CONFIG_STRING CONTAINER", True)
+            ("wizard CONFIG_STRING CONTAINER", True),
         ],
         "examples": [
             "config %s" % (CONFIG_FILE_TXT),
             "config %s" % (CONFIG_FILE_XML),
             "container %s" % (CONTAINER_FILE),
-            "job \"%s\"" % (JOB_CONFIG_STRING),
-            "task \"%s\"" % (TASK_CONFIG_STRING),
-            "wizard \"{}\" {}".format(GOOD_CONFIG_STRING, CONTAINER_FILE)
-        ]
+            'job "%s"' % (JOB_CONFIG_STRING),
+            'task "%s"' % (TASK_CONFIG_STRING),
+            'wizard "{}" {}'.format(GOOD_CONFIG_STRING, CONTAINER_FILE),
+        ],
     }
 
     def perform_command(self):
@@ -120,16 +121,22 @@ class ValidateCLI(AbstractCLIProgram):
             msg = "job configuration string"
         elif mode == "task":
             config_string = self.actual_arguments[1]
-            result = validator.check_configuration_string(config_string, is_job=False, external_name=True)
+            result = validator.check_configuration_string(
+                config_string, is_job=False, external_name=True
+            )
             msg = "task configuration string"
         elif mode == "wizard":
-            if (len(self.actual_arguments) < 3) or (self.actual_arguments[2].startswith("-")):
+            if (len(self.actual_arguments) < 3) or (
+                self.actual_arguments[2].startswith("-")
+            ):
                 return self.print_help()
             config_string = self.actual_arguments[1]
             container_path = self.actual_arguments[2]
             if not self.check_input_file(container_path):
                 return self.ERROR_EXIT_CODE
-            result = validator.check_container(container_path, config_string=config_string)
+            result = validator.check_container(
+                container_path, config_string=config_string
+            )
             msg = "container with configuration string from wizard"
         else:
             return self.print_help()
@@ -153,5 +160,6 @@ def main():
     """
     ValidateCLI().run(arguments=sys.argv)
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     main()

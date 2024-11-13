@@ -31,7 +31,6 @@ http://espeak.sourceforge.net/
 for further details.
 """
 
-
 from aeneas.exacttiming import TimeValue
 from aeneas.language import Language
 from aeneas.runtimeconfiguration import RuntimeConfiguration
@@ -631,7 +630,9 @@ class ESPEAKTTSWrapper(BaseTTSWrapper):
         ZH_YUE: "Yue Chinese (not tested)",
     }
 
-    CODE_TO_HUMAN_LIST = sorted(["{}\t{}".format(k, v) for k, v in CODE_TO_HUMAN.items()])
+    CODE_TO_HUMAN_LIST = sorted(
+        ["{}\t{}".format(k, v) for k, v in CODE_TO_HUMAN.items()]
+    )
 
     LANGUAGE_TO_VOICE_CODE = {
         AF: "af",
@@ -700,7 +701,7 @@ class ESPEAKTTSWrapper(BaseTTSWrapper):
         SW: "sw",
         TA: "ta",
         TR: "tr",
-        UK: "ru",   # NOTE mocking support for Ukrainian with Russian voice
+        UK: "ru",  # NOTE mocking support for Ukrainian with Russian voice
         VI: "vi",
         VI_HUE: "vi-hue",
         VI_SGN: "vi-sgn",
@@ -770,7 +771,7 @@ class ESPEAKTTSWrapper(BaseTTSWrapper):
         FRA_BEL: "fr-be",
         FRA_FRA: "fr-fr",
         POR_BRA: "pt-br",
-        POR_PRT: "pt-pt"
+        POR_PRT: "pt-pt",
     }
     DEFAULT_LANGUAGE = ENG
 
@@ -788,16 +789,20 @@ class ESPEAKTTSWrapper(BaseTTSWrapper):
 
     def __init__(self, rconf=None, logger=None):
         super().__init__(rconf=rconf, logger=logger)
-        self.set_subprocess_arguments([
-            self.tts_path,
-            "-v",
-            self.CLI_PARAMETER_VOICE_CODE_STRING,
-            "-w",
-            self.CLI_PARAMETER_WAVE_PATH,
-            self.CLI_PARAMETER_TEXT_STDIN
-        ])
+        self.set_subprocess_arguments(
+            [
+                self.tts_path,
+                "-v",
+                self.CLI_PARAMETER_VOICE_CODE_STRING,
+                "-w",
+                self.CLI_PARAMETER_WAVE_PATH,
+                self.CLI_PARAMETER_TEXT_STDIN,
+            ]
+        )
 
-    def _synthesize_multiple_c_extension(self, text_file, output_file_path, quit_after=None, backwards=False):
+    def _synthesize_multiple_c_extension(
+        self, text_file, output_file_path, quit_after=None, backwards=False
+    ):
         """
         Synthesize multiple text fragments, using the cew extension.
 
@@ -841,13 +846,21 @@ class ESPEAKTTSWrapper(BaseTTSWrapper):
             try:
                 self.log("Importing aeneas.cewsubprocess...")
                 from aeneas.cewsubprocess import CEWSubprocess
+
                 self.log("Importing aeneas.cewsubprocess... done")
                 self.log("Calling aeneas.cewsubprocess...")
                 cewsub = CEWSubprocess(rconf=self.rconf, logger=self.logger)
-                sr, sf, intervals = cewsub.synthesize_multiple(output_file_path, c_quit_after, c_backwards, u_text)
+                sr, sf, intervals = cewsub.synthesize_multiple(
+                    output_file_path, c_quit_after, c_backwards, u_text
+                )
                 self.log("Calling aeneas.cewsubprocess... done")
             except Exception as exc:
-                self.log_exc("An unexpected error occurred while running cewsubprocess", exc, False, None)
+                self.log_exc(
+                    "An unexpected error occurred while running cewsubprocess",
+                    exc,
+                    False,
+                    None,
+                )
                 # NOTE not critical, try calling aeneas.cew directly
                 # COMMENTED return (False, None)
 
@@ -860,17 +873,17 @@ class ESPEAKTTSWrapper(BaseTTSWrapper):
             try:
                 self.log("Importing aeneas.cew...")
                 import aeneas.cew.cew
+
                 self.log("Importing aeneas.cew... done")
                 self.log("Calling aeneas.cew...")
                 sr, sf, intervals = aeneas.cew.cew.synthesize_multiple(
-                    output_file_path,
-                    c_quit_after,
-                    c_backwards,
-                    c_text
+                    output_file_path, c_quit_after, c_backwards, c_text
                 )
                 self.log("Calling aeneas.cew... done")
             except Exception as exc:
-                self.log_exc("An unexpected error occurred while running cew", exc, False, None)
+                self.log_exc(
+                    "An unexpected error occurred while running cew", exc, False, None
+                )
                 return (False, None)
 
         self.log(["sr: %d", sr])
@@ -886,11 +899,13 @@ class ESPEAKTTSWrapper(BaseTTSWrapper):
             # get the correct fragment
             fragment = fragments[i]
             # store for later output
-            anchors.append([
-                TimeValue(intervals[i][0]),
-                fragment.identifier,
-                fragment.filtered_text
-            ])
+            anchors.append(
+                [
+                    TimeValue(intervals[i][0]),
+                    fragment.identifier,
+                    fragment.filtered_text,
+                ]
+            )
             # increase the character counter
             num_chars += fragment.characters
             # update current_time

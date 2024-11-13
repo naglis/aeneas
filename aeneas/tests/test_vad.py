@@ -28,7 +28,6 @@ import aeneas.globalfunctions as gf
 
 
 class TestVAD(unittest.TestCase):
-
     FILES = [
         {
             "path": "res/vad/nsn.wav",

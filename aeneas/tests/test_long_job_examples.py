@@ -27,97 +27,64 @@ from aeneas.tests.common import ExecuteJobCLICase, slow_test
 
 @slow_test
 class TestExecuteJobCLI(ExecuteJobCLICase):
-
     def test_exec_tool_example(self):
-        self.execute([
-            ("in", "../tools/res/job.zip"),
-            ("out", "")
-        ], 0)
+        self.execute([("in", "../tools/res/job.zip"), ("out", "")], 0)
 
     def test_exec_tool_wizard(self):
-        self.execute([
-            ("in", "../tools/res/job_no_config.zip"),
-            ("out", ""),
-            ("", r"is_hierarchy_type=flat|is_hierarchy_prefix=assets/|is_text_file_relative_path=.|is_text_file_name_regex=.*\.xhtml|is_text_type=unparsed|is_audio_file_relative_path=.|is_audio_file_name_regex=.*\.mp3|is_text_unparsed_id_regex=f[0-9]+|is_text_unparsed_id_sort=numeric|os_job_file_name=demo_sync_job_output|os_job_file_container=zip|os_job_file_hierarchy_type=flat|os_job_file_hierarchy_prefix=assets/|os_task_file_name=\$PREFIX.xhtml.smil|os_task_file_format=smil|os_task_file_smil_page_ref=\$PREFIX.xhtml|os_task_file_smil_audio_ref=../Audio/\$PREFIX.mp3|job_language=eng|job_description=Demo Sync Job")
-        ], 0)
+        self.execute(
+            [
+                ("in", "../tools/res/job_no_config.zip"),
+                ("out", ""),
+                (
+                    "",
+                    r"is_hierarchy_type=flat|is_hierarchy_prefix=assets/|is_text_file_relative_path=.|is_text_file_name_regex=.*\.xhtml|is_text_type=unparsed|is_audio_file_relative_path=.|is_audio_file_name_regex=.*\.mp3|is_text_unparsed_id_regex=f[0-9]+|is_text_unparsed_id_sort=numeric|os_job_file_name=demo_sync_job_output|os_job_file_container=zip|os_job_file_hierarchy_type=flat|os_job_file_hierarchy_prefix=assets/|os_task_file_name=\$PREFIX.xhtml.smil|os_task_file_format=smil|os_task_file_smil_page_ref=\$PREFIX.xhtml|os_task_file_smil_audio_ref=../Audio/\$PREFIX.mp3|job_language=eng|job_description=Demo Sync Job",
+                ),
+            ],
+            0,
+        )
 
     def test_epub(self):
-        self.execute([
-            ("in", "res/container/job.epub"),
-            ("out", "")
-        ], 0)
+        self.execute([("in", "res/container/job.epub"), ("out", "")], 0)
 
     def test_example2(self):
-        self.execute([
-            ("in", "res/example_jobs/example2"),
-            ("out", "")
-        ], 0)
+        self.execute([("in", "res/example_jobs/example2"), ("out", "")], 0)
 
     def test_example3(self):
-        self.execute([
-            ("in", "res/example_jobs/example3"),
-            ("out", "")
-        ], 0)
+        self.execute([("in", "res/example_jobs/example3"), ("out", "")], 0)
 
     def test_example4(self):
-        self.execute([
-            ("in", "res/example_jobs/example4"),
-            ("out", "")
-        ], 0)
+        self.execute([("in", "res/example_jobs/example4"), ("out", "")], 0)
 
     def test_example5(self):
-        self.execute([
-            ("in", "res/example_jobs/example5"),
-            ("out", "")
-        ], 0)
+        self.execute([("in", "res/example_jobs/example5"), ("out", "")], 0)
 
     def test_example6(self):
-        self.execute([
-            ("in", "res/example_jobs/example6"),
-            ("out", "")
-        ], 0)
+        self.execute([("in", "res/example_jobs/example6"), ("out", "")], 0)
 
     def test_example7(self):
-        self.execute([
-            ("in", "res/example_jobs/example7"),
-            ("out", "")
-        ], 0)
+        self.execute([("in", "res/example_jobs/example7"), ("out", "")], 0)
 
     def test_txt_config_paged_1(self):
-        self.execute([
-            ("in", "res/validator/job_txt_config_paged_1"),
-            ("out", "")
-        ], 0)
+        self.execute([("in", "res/validator/job_txt_config_paged_1"), ("out", "")], 0)
 
     def test_txt_config_not_root_nested(self):
-        self.execute([
-            ("in", "res/validator/job_txt_config_not_root_nested"),
-            ("out", "")
-        ], 0)
+        self.execute(
+            [("in", "res/validator/job_txt_config_not_root_nested"), ("out", "")], 0
+        )
 
     def test_txt_config(self):
-        self.execute([
-            ("in", "res/validator/job_txt_config"),
-            ("out", "")
-        ], 0)
+        self.execute([("in", "res/validator/job_txt_config"), ("out", "")], 0)
 
     def test_xml_config_not_root_nested(self):
-        self.execute([
-            ("in", "res/validator/job_xml_config_not_root_nested"),
-            ("out", "")
-        ], 0)
+        self.execute(
+            [("in", "res/validator/job_xml_config_not_root_nested"), ("out", "")], 0
+        )
 
     def test_xml_config(self):
-        self.execute([
-            ("in", "res/validator/job_xml_config"),
-            ("out", "")
-        ], 0)
+        self.execute([("in", "res/validator/job_xml_config"), ("out", "")], 0)
 
     def test_zip(self):
-        self.execute([
-            ("in", "res/container/job.zip"),
-            ("out", "")
-        ], 0)
+        self.execute([("in", "res/container/job.zip"), ("out", "")], 0)
 
 
 if __name__ == "__main__":

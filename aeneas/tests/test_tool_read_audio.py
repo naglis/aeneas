@@ -29,7 +29,6 @@ import aeneas.globalfunctions as gf
 
 
 class TestReadAudioCLI(ExecuteCLICase):
-
     CLI_CLS = ReadAudioCLI
 
     def test_help(self):
@@ -40,47 +39,34 @@ class TestReadAudioCLI(ExecuteCLICase):
         self.execute([("", "--version")], 2)
 
     def test_read_audio(self):
-        self.execute([
-            ("in", "../tools/res/audio.wav")
-        ], 0)
+        self.execute([("in", "../tools/res/audio.wav")], 0)
 
     def test_read_audio_full(self):
-        self.execute([
-            ("in", "../tools/res/audio.wav"),
-            ("", "-f")
-        ], 0)
+        self.execute([("in", "../tools/res/audio.wav"), ("", "-f")], 0)
 
     def test_read_audio_mp3(self):
-        self.execute([
-            ("in", "../tools/res/audio.mp3")
-        ], 0)
+        self.execute([("in", "../tools/res/audio.mp3")], 0)
 
     def test_read_audio_mp3_full(self):
-        self.execute([
-            ("in", "../tools/res/audio.mp3"),
-            ("", "-f")
-        ], 0)
+        self.execute([("in", "../tools/res/audio.mp3"), ("", "-f")], 0)
 
     def test_read_audio_path(self):
         path = os.path.expanduser("~")
         path = os.path.join(path, ".bin/myffprobe")
         if gf.file_exists(path):
-            self.execute([
-                ("in", "../tools/res/audio.wav"),
-                ("", "-r=\"ffprobe_path=%s\"" % path)
-            ], 0)
+            self.execute(
+                [("in", "../tools/res/audio.wav"), ("", '-r="ffprobe_path=%s"' % path)],
+                0,
+            )
 
     def test_read_audio_path_bad(self):
         path = "/foo/bar/ffprobe"
-        self.execute([
-            ("in", "../tools/res/audio.wav"),
-            ("", "-r=\"ffprobe_path=%s\"" % path)
-        ], 1)
+        self.execute(
+            [("in", "../tools/res/audio.wav"), ("", '-r="ffprobe_path=%s"' % path)], 1
+        )
 
     def test_read_audio_cannot_read(self):
-        self.execute([
-            ("", "/foo/bar/baz.wav")
-        ], 1)
+        self.execute([("", "/foo/bar/baz.wav")], 1)
 
 
 if __name__ == "__main__":

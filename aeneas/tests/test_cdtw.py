@@ -27,13 +27,13 @@ import aeneas.globalfunctions as gf
 
 
 class TestCDTW(unittest.TestCase):
-
     MFCC1 = gf.absolute_path("res/cdtw/mfcc1_12_1332", __file__)
     MFCC2 = gf.absolute_path("res/cdtw/mfcc2_12_868", __file__)
 
     def test_compute_path(self):
         try:
             import aeneas.cdtw.cdtw
+
             mfcc1 = numpy.loadtxt(self.MFCC1)
             mfcc2 = numpy.loadtxt(self.MFCC2)
             l, n = mfcc1.shape

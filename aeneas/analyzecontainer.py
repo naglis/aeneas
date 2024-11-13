@@ -88,7 +88,9 @@ class AnalyzeContainer(Loggable):
             else:
                 self.log("No configuration file in this container, returning None")
         except (OSError, KeyError, TypeError) as exc:
-            self.log_exc("An unexpected error occurred while analyzing", exc, True, None)
+            self.log_exc(
+                "An unexpected error occurred while analyzing", exc, True, None
+            )
         return None
 
     def _analyze_txt_config(self, config_string=None):
@@ -129,27 +131,39 @@ class AnalyzeContainer(Loggable):
 
         self.log("Calculating the path of the tasks root directory")
         tasks_root_directory = gf.norm_join(
-            config_dir,
-            parameters[gc.PPN_JOB_IS_HIERARCHY_PREFIX]
+            config_dir, parameters[gc.PPN_JOB_IS_HIERARCHY_PREFIX]
         )
         self.log(["Path of the tasks root directory: '%s'", tasks_root_directory])
 
         self.log("Calculating the path of the sync map root directory")
         sync_map_root_directory = gf.norm_join(
-            config_dir,
-            parameters[gc.PPN_JOB_OS_HIERARCHY_PREFIX]
+            config_dir, parameters[gc.PPN_JOB_OS_HIERARCHY_PREFIX]
         )
         job_os_hierarchy_type = parameters[gc.PPN_JOB_OS_HIERARCHY_TYPE]
         self.log(["Path of the sync map root directory: '%s'", sync_map_root_directory])
 
         text_file_relative_path = parameters[gc.PPN_JOB_IS_TEXT_FILE_RELATIVE_PATH]
         self.log(["Relative path for text file: '%s'", text_file_relative_path])
-        text_file_name_regex = re.compile(r"" + parameters[gc.PPN_JOB_IS_TEXT_FILE_NAME_REGEX])
-        self.log(["Regex for text file: '%s'", parameters[gc.PPN_JOB_IS_TEXT_FILE_NAME_REGEX]])
+        text_file_name_regex = re.compile(
+            r"" + parameters[gc.PPN_JOB_IS_TEXT_FILE_NAME_REGEX]
+        )
+        self.log(
+            [
+                "Regex for text file: '%s'",
+                parameters[gc.PPN_JOB_IS_TEXT_FILE_NAME_REGEX],
+            ]
+        )
         audio_file_relative_path = parameters[gc.PPN_JOB_IS_AUDIO_FILE_RELATIVE_PATH]
         self.log(["Relative path for audio file: '%s'", audio_file_relative_path])
-        audio_file_name_regex = re.compile(r"" + parameters[gc.PPN_JOB_IS_AUDIO_FILE_NAME_REGEX])
-        self.log(["Regex for audio file: '%s'", parameters[gc.PPN_JOB_IS_AUDIO_FILE_NAME_REGEX]])
+        audio_file_name_regex = re.compile(
+            r"" + parameters[gc.PPN_JOB_IS_AUDIO_FILE_NAME_REGEX]
+        )
+        self.log(
+            [
+                "Regex for audio file: '%s'",
+                parameters[gc.PPN_JOB_IS_AUDIO_FILE_NAME_REGEX],
+            ]
+        )
 
         if parameters[gc.PPN_JOB_IS_HIERARCHY_TYPE] == HierarchyType.FLAT:
             self.log("Looking for text/audio pairs in flat hierarchy")
@@ -157,22 +171,19 @@ class AnalyzeContainer(Loggable):
                 entries,
                 tasks_root_directory,
                 text_file_relative_path,
-                text_file_name_regex
+                text_file_name_regex,
             )
             self.log(["Found text files: '%s'", text_files])
             audio_files = self._find_files(
                 entries,
                 tasks_root_directory,
                 audio_file_relative_path,
-                audio_file_name_regex
+                audio_file_name_regex,
             )
             self.log(["Found audio files: '%s'", audio_files])
 
             self.log("Matching files in flat hierarchy...")
-            matched_tasks = self._match_files_flat_hierarchy(
-                text_files,
-                audio_files
-            )
+            matched_tasks = self._match_files_flat_hierarchy(text_files, audio_files)
             self.log("Matching files in flat hierarchy... done")
 
             for task_info in matched_tasks:
@@ -181,7 +192,7 @@ class AnalyzeContainer(Loggable):
                     task_info,
                     config_string,
                     sync_map_root_directory,
-                    job_os_hierarchy_type
+                    job_os_hierarchy_type,
                 )
                 job.add_task(task)
 
@@ -192,47 +203,52 @@ class AnalyzeContainer(Loggable):
             matched_directories = self._match_directories(
                 entries,
                 tasks_root_directory,
-                parameters[gc.PPN_JOB_IS_TASK_DIRECTORY_NAME_REGEX]
+                parameters[gc.PPN_JOB_IS_TASK_DIRECTORY_NAME_REGEX],
             )
             for matched_directory in matched_directories:
                 # rebuild the full path
                 matched_directory_full_path = gf.norm_join(
-                    tasks_root_directory,
-                    matched_directory
+                    tasks_root_directory, matched_directory
                 )
-                self.log(["Looking for text/audio pairs in directory '%s'", matched_directory_full_path])
+                self.log(
+                    [
+                        "Looking for text/audio pairs in directory '%s'",
+                        matched_directory_full_path,
+                    ]
+                )
 
                 # look for text and audio files there
                 text_files = self._find_files(
                     entries,
                     matched_directory_full_path,
                     text_file_relative_path,
-                    text_file_name_regex
+                    text_file_name_regex,
                 )
                 self.log(["Found text files: '%s'", text_files])
                 audio_files = self._find_files(
                     entries,
                     matched_directory_full_path,
                     audio_file_relative_path,
-                    audio_file_name_regex
+                    audio_file_name_regex,
                 )
                 self.log(["Found audio files: '%s'", audio_files])
 
                 # if we have found exactly one text and one audio file,
                 # create a Task
                 if (len(text_files) == 1) and (len(audio_files) == 1):
-                    self.log(["Exactly one text file and one audio file in '%s'", matched_directory])
-                    task_info = [
-                        matched_directory,
-                        text_files[0],
-                        audio_files[0]
-                    ]
+                    self.log(
+                        [
+                            "Exactly one text file and one audio file in '%s'",
+                            matched_directory,
+                        ]
+                    )
+                    task_info = [matched_directory, text_files[0], audio_files[0]]
                     self.log(["Creating task: '%s'", str(task_info)])
                     task = self._create_task(
                         task_info,
                         config_string,
                         sync_map_root_directory,
-                        job_os_hierarchy_type
+                        job_os_hierarchy_type,
                     )
                     job.add_task(task)
                 elif len(text_files) > 1:
@@ -270,21 +286,16 @@ class AnalyzeContainer(Loggable):
 
         self.log("Converting config contents into job config dict")
         job_parameters = gf.config_xml_to_dict(
-            config_contents,
-            result=None,
-            parse_job=True
+            config_contents, result=None, parse_job=True
         )
         self.log("Converting config contents into tasks config dict")
         tasks_parameters = gf.config_xml_to_dict(
-            config_contents,
-            result=None,
-            parse_job=False
+            config_contents, result=None, parse_job=False
         )
 
         self.log("Calculating the path of the sync map root directory")
         sync_map_root_directory = gf.norm_join(
-            config_dir,
-            job_parameters[gc.PPN_JOB_OS_HIERARCHY_PREFIX]
+            config_dir, job_parameters[gc.PPN_JOB_OS_HIERARCHY_PREFIX]
         )
         job_os_hierarchy_type = job_parameters[gc.PPN_JOB_OS_HIERARCHY_TYPE]
         self.log(["Path of the sync map root directory: '%s'", sync_map_root_directory])
@@ -303,32 +314,21 @@ class AnalyzeContainer(Loggable):
                 custom_id = ""
             task_info = [
                 custom_id,
+                gf.norm_join(config_dir, task_parameters[gc.PPN_TASK_IS_TEXT_FILE_XML]),
                 gf.norm_join(
-                    config_dir,
-                    task_parameters[gc.PPN_TASK_IS_TEXT_FILE_XML]
+                    config_dir, task_parameters[gc.PPN_TASK_IS_AUDIO_FILE_XML]
                 ),
-                gf.norm_join(
-                    config_dir,
-                    task_parameters[gc.PPN_TASK_IS_AUDIO_FILE_XML]
-                )
             ]
             self.log(["Creating task: '%s'", str(task_info)])
             task = self._create_task(
-                task_info,
-                config_string,
-                sync_map_root_directory,
-                job_os_hierarchy_type
+                task_info, config_string, sync_map_root_directory, job_os_hierarchy_type
             )
             job.add_task(task)
 
         return job
 
     def _create_task(
-            self,
-            task_info,
-            config_string,
-            sync_map_root_directory,
-            job_os_hierarchy_type
+        self, task_info, config_string, sync_map_root_directory, job_os_hierarchy_type
     ):
         """
         Create a task object from
@@ -366,19 +366,17 @@ class AnalyzeContainer(Loggable):
             sync_map_root_directory,
             job_os_hierarchy_type,
             custom_id,
-            task.configuration["o_name"]
+            task.configuration["o_name"],
         )
         self.log(["Task sync map file path: %s", task.sync_map_file_path])
 
         self.log("Replacing placeholder in os_file_smil_audio_ref")
         task.configuration["o_smil_audio_ref"] = self._replace_placeholder(
-            task.configuration["o_smil_audio_ref"],
-            custom_id
+            task.configuration["o_smil_audio_ref"], custom_id
         )
         self.log("Replacing placeholder in os_file_smil_page_ref")
         task.configuration["o_smil_page_ref"] = self._replace_placeholder(
-            task.configuration["o_smil_page_ref"],
-            custom_id
+            task.configuration["o_smil_page_ref"], custom_id
         )
         self.log("Returning task")
         return task
@@ -393,16 +391,17 @@ class AnalyzeContainer(Loggable):
         """
         if string is None:
             return None
-        self.log(["Replacing '%s' with '%s' in '%s'", gc.PPV_OS_TASK_PREFIX, custom_id, string])
+        self.log(
+            [
+                "Replacing '%s' with '%s' in '%s'",
+                gc.PPV_OS_TASK_PREFIX,
+                custom_id,
+                string,
+            ]
+        )
         return string.replace(gc.PPV_OS_TASK_PREFIX, custom_id)
 
-    def _compute_sync_map_file_path(
-            self,
-            root,
-            hierarchy_type,
-            custom_id,
-            file_name
-    ):
+    def _compute_sync_map_file_path(self, root, hierarchy_type, custom_id, file_name):
         """
         Compute the sync map file path inside the output container.
 
@@ -444,7 +443,7 @@ class AnalyzeContainer(Loggable):
         for entry in entries:
             if entry.startswith(target):
                 self.log(["Examining entry: '%s'", entry])
-                entry_suffix = entry[target_len + 1:]
+                entry_suffix = entry[target_len + 1 :]
                 self.log(["Examining entry suffix: '%s'", entry_suffix])
                 if re.search(file_name_regex, entry_suffix) is not None:
                     self.log(["Match: '%s'", entry])
@@ -484,7 +483,9 @@ class AnalyzeContainer(Loggable):
         for audio_file in audio_files:
             audio_file_no_ext = gf.file_name_without_extension(audio_file)
             d_audio[audio_file_no_ext] = audio_file
-            self.log(["Added audio file '%s' to key '%s'", audio_file, audio_file_no_ext])
+            self.log(
+                ["Added audio file '%s' to key '%s'", audio_file, audio_file_no_ext]
+            )
         tasks = []
         for key in d_text.keys():
             self.log(["Examining text key '%s'", key])
@@ -530,12 +531,13 @@ class AnalyzeContainer(Loggable):
             if entry.startswith(root):
                 self.log(["Examining '%s'", entry])
                 # remove common prefix root/
-                entry = entry[root_len + 1:]
+                entry = entry[root_len + 1 :]
                 # split path
                 entry_splitted = entry.split(os.sep)
                 # match regex
-                if ((len(entry_splitted) >= 2) and
-                        (re.match(regex, entry_splitted[0]) is not None)):
+                if (len(entry_splitted) >= 2) and (
+                    re.match(regex, entry_splitted[0]) is not None
+                ):
                     directories.add(entry_splitted[0])
                     self.log(["Match: '%s'", entry_splitted[0]])
                 else:
