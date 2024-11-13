@@ -233,7 +233,7 @@ class FFMPEGWrapper(Loggable):
                 FFMPEGPathError,
             )
         except subprocess.CalledProcessError as e:
-            self.log_exc("ffmpeg returned non-zero status %r: %s" % (e.returncode, e.stderr), critical=True, raise_type=OSError)
+            self.log_exc("ffmpeg returned non-zero status %r: %s" % (e.returncode, e.stderr.decode("utf-8", "replace")), critical=True, raise_type=OSError)
 
         self.log("Call completed")
 
