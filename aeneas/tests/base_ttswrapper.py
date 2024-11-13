@@ -22,13 +22,14 @@
 
 import unittest
 import os
+import tempfile
+import contextlib
 import typing
 
 from aeneas.textfile import TextFile
 from aeneas.textfile import TextFragment
 from aeneas.ttswrappers.basettswrapper import BaseTTSWrapper
 from aeneas.runtimeconfiguration import RuntimeConfiguration
-import aeneas.globalfunctions as gf
 
 
 class TestBaseTTSWrapper(unittest.TestCase):
@@ -56,35 +57,36 @@ class TestBaseTTSWrapper(unittest.TestCase):
             return
 
         def inner(c_ext, cew_subprocess, cache):
-            if ofp is None:
-                handler, output_file_path = gf.tmp_file(suffix=".wav")
-            else:
-                handler = None
-                output_file_path = ofp
-            try:
-                rconf = RuntimeConfiguration()
-                rconf[RuntimeConfiguration.TTS] = self.TTS
-                rconf[RuntimeConfiguration.TTS_PATH] = self.TTS_PATH
-                rconf[RuntimeConfiguration.C_EXTENSIONS] = c_ext
-                rconf[RuntimeConfiguration.CEW_SUBPROCESS_ENABLED] = cew_subprocess
-                rconf[RuntimeConfiguration.TTS_CACHE] = cache
-                tts_engine = self.TTS_CLASS(rconf=rconf)
-                anchors, total_time, num_chars = tts_engine.synthesize_multiple(
-                    text_file, output_file_path, quit_after, backwards
-                )
-                gf.delete_file(handler, output_file_path)
-                if cache:
-                    tts_engine.clear_cache()
-                if zero_length:
-                    self.assertEqual(total_time, 0.0)
+            with contextlib.ExitStack() as exit_stack:
+                if ofp is None:
+                    tmp_file = tempfile.NamedTemporaryFile(suffix=".wav")
+                    exit_stack.enter_context(tmp_file)
+                    output_file_path = tmp_file.name
                 else:
-                    self.assertGreater(total_time, 0.0)
-            except (OSError, TypeError, UnicodeDecodeError, ValueError) as exc:
-                gf.delete_file(handler, output_file_path)
-                if (cache) and (tts_engine is not None):
-                    tts_engine.clear_cache()
-                with self.assertRaises(expected_exc):
-                    raise exc
+                    output_file_path = ofp
+
+                try:
+                    rconf = RuntimeConfiguration()
+                    rconf[RuntimeConfiguration.TTS] = self.TTS
+                    rconf[RuntimeConfiguration.TTS_PATH] = self.TTS_PATH
+                    rconf[RuntimeConfiguration.C_EXTENSIONS] = c_ext
+                    rconf[RuntimeConfiguration.CEW_SUBPROCESS_ENABLED] = cew_subprocess
+                    rconf[RuntimeConfiguration.TTS_CACHE] = cache
+                    tts_engine = self.TTS_CLASS(rconf=rconf)
+                    anchors, total_time, num_chars = tts_engine.synthesize_multiple(
+                        text_file, output_file_path, quit_after, backwards
+                    )
+                    if cache:
+                        tts_engine.clear_cache()
+                    if zero_length:
+                        self.assertEqual(total_time, 0.0)
+                    else:
+                        self.assertGreater(total_time, 0.0)
+                except (OSError, TypeError, UnicodeDecodeError, ValueError) as exc:
+                    if (cache) and (tts_engine is not None):
+                        tts_engine.clear_cache()
+                    with self.assertRaises(expected_exc):
+                        raise exc
 
         if self.TTS == "espeak":
             for c_ext in [True, False]:
