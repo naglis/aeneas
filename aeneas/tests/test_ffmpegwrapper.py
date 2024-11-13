@@ -62,26 +62,25 @@ class TestFFMPEGWrapper(unittest.TestCase):
     NOT_EXISTING_PATH = "this_file_does_not_exist.mp3"
     EMPTY_FILE_PATH = "res/audioformats/p001.empty"
 
-    def convert(self, input_file_path, ofp=None, runtime_configuration=None):
-        exit_stack = contextlib.ExitStack()
-        if ofp is None:
-            tmp_dir = tempfile.TemporaryDirectory()
-            exit_stack.enter_context(tmp_dir)
-            output_path = tmp_dir.name
-            output_file_path = os.path.join(output_path, "audio.wav")
-        else:
+    def convert(self, input_file_path, *, ofp=None, runtime_configuration=None):
+        with contextlib.ExitStack() as exit_stack:
+            if ofp is None:
+                tmp_dir = tempfile.TemporaryDirectory()
+                exit_stack.enter_context(tmp_dir)
+                output_path = tmp_dir.name
+                output_file_path = os.path.join(output_path, "audio.wav")
+            else:
 
-            @contextlib.contextmanager
-            def delete_file(path):
-                try:
-                    yield
-                finally:
-                    gf.delete_file(None, path)
+                @contextlib.contextmanager
+                def delete_file(path):
+                    try:
+                        yield
+                    finally:
+                        gf.delete_file(None, path)
 
-            exit_stack.enter_context(delete_file(ofp))
-            output_file_path = ofp
+                exit_stack.enter_context(delete_file(ofp))
+                output_file_path = ofp
 
-        with exit_stack:
             converter = FFMPEGWrapper(rconf=runtime_configuration)
             result = converter.convert(
                 gf.absolute_path(input_file_path, __file__), output_file_path
@@ -90,7 +89,14 @@ class TestFFMPEGWrapper(unittest.TestCase):
 
     def test_convert(self):
         for f in self.FILES:
-            self.convert(f["path"])
+            with self.subTest(path=f["path"]):
+                self.convert(f["path"])
+
+    def test_convert_with_runtime_config(self):
+        rc = RuntimeConfiguration("ffmpeg_sample_rate=44100")
+        for f in self.FILES:
+            with self.subTest(path=f["path"]):
+                self.convert(f["path"], runtime_configuration=rc)
 
     def test_not_existing(self):
         with self.assertRaises(OSError):
@@ -102,12 +108,7 @@ class TestFFMPEGWrapper(unittest.TestCase):
 
     def test_cannot_be_written(self):
         with self.assertRaises(OSError):
-            self.convert(self.FILES[0]["path"], self.CANNOT_BE_WRITTEN_PATH)
-
-    def test_convert_rc(self):
-        rc = RuntimeConfiguration("ffmpeg_sample_rate=44100")
-        for f in self.FILES:
-            self.convert(f["path"], runtime_configuration=rc)
+            self.convert(self.FILES[0]["path"], ofp=self.CANNOT_BE_WRITTEN_PATH)
 
 
 if __name__ == "__main__":
