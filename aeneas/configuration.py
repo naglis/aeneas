@@ -31,6 +31,8 @@ This module contains the following classes:
 """
 
 from copy import deepcopy
+import enum
+import typing
 
 from aeneas.exacttiming import Decimal
 from aeneas.exacttiming import TimeValue
@@ -64,7 +66,17 @@ class Configuration:
     :raises: KeyError: if trying to access a key not listed above
     """
 
-    FIELDS = [
+    FIELDS: typing.Sequence[
+        tuple[
+            str,
+            tuple[
+                typing.Any,
+                typing.Callable[[typing.Any], typing.Any] | None,
+                typing.Sequence[str],
+                str,
+            ],
+        ]
+    ] = [
         #
         # in subclasses, create fields like this:
         # (field_name, (default_value, conversion_function, [alias1, alias2, ...], human_description))
@@ -169,13 +181,18 @@ class Configuration:
 
         :rtype: string
         """
-        return (gc.CONFIG_STRING_SEPARATOR_SYMBOL).join(
-            [
-                f"{fn}{gc.CONFIG_STRING_ASSIGNMENT_SYMBOL}{self.data[fn]}"
-                for fn in sorted(self.data.keys())
-                if self.data[fn] is not None
-            ]
-        )
+        values = []
+        for fn in sorted(self.data):
+            value = self.data[fn]
+            if value is None:
+                continue
+
+            if isinstance(value, enum.Enum):
+                value = value.value
+
+            values.append(f"{fn}{gc.CONFIG_STRING_ASSIGNMENT_SYMBOL}{value}")
+
+        return gc.CONFIG_STRING_SEPARATOR_SYMBOL.join(values)
 
     @classmethod
     def parameters(cls, sort=True, as_strings=False):

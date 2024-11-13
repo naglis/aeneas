@@ -37,6 +37,7 @@ import re
 from aeneas.idsortingalgorithm import IDSortingAlgorithm
 from aeneas.logger import Loggable
 from aeneas.tree import Tree
+from aeneas.language import Language
 import aeneas.globalconstants as gc
 import aeneas.globalfunctions as gf
 
@@ -253,22 +254,28 @@ class TextFragment:
 
     TAG = "TextFragment"
 
-    def __init__(self, identifier=None, language=None, lines=None, filtered_lines=None):
+    def __init__(
+        self,
+        identifier: str | None = None,
+        language: Language | None = None,
+        lines: list[str] | None = None,
+        filtered_lines: list[str] | None = None,
+    ) -> None:
         self.identifier = identifier
         self.language = language
         self.lines = lines
         self.filtered_lines = filtered_lines
 
-    def __len__(self):
+    def __len__(self) -> int:
         if self.lines is None:
             return 0
         return len(self.lines)
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"{self.identifier} {self.text}"
 
     @property
-    def identifier(self):
+    def identifier(self) -> str | None:
         """
         The identifier of the text fragment.
 
@@ -277,13 +284,13 @@ class TextFragment:
         return self.__identifier
 
     @identifier.setter
-    def identifier(self, identifier):
-        if (identifier is not None) and (not isinstance(identifier, str)):
+    def identifier(self, identifier: str | None):
+        if identifier is not None and not isinstance(identifier, str):
             raise TypeError("identifier is not a string")
         self.__identifier = identifier
 
     @property
-    def language(self):
+    def language(self) -> Language | None:
         """
         The language of the text fragment.
 
@@ -292,14 +299,14 @@ class TextFragment:
         return self.__language
 
     @language.setter
-    def language(self, language):
+    def language(self, language: Language | None):
         # NOTE disabling this check to allow for language codes not listed in Language
         # COMMENTED if (language is not None) and (language not in Language.ALLOWED_VALUES):
         # COMMENTED     raise ValueError(u"language value is not allowed")
         self.__language = language
 
     @property
-    def lines(self):
+    def lines(self) -> list[str] | None:
         """
         The lines of the text fragment.
 
@@ -308,7 +315,7 @@ class TextFragment:
         return self.__lines
 
     @lines.setter
-    def lines(self, lines):
+    def lines(self, lines: list[str] | None):
         if lines is not None:
             if not isinstance(lines, list):
                 raise TypeError("lines is not an instance of list")
@@ -318,7 +325,7 @@ class TextFragment:
         self.__lines = lines
 
     @property
-    def text(self):
+    def text(self) -> str:
         """
         The text of the text fragment.
 
@@ -329,7 +336,7 @@ class TextFragment:
         return " ".join(self.lines)
 
     @property
-    def characters(self):
+    def characters(self) -> int:
         """
         The number of characters in this text fragment,
         including line separators, if any.
@@ -339,7 +346,7 @@ class TextFragment:
         return len(self.text)
 
     @property
-    def chars(self):
+    def chars(self) -> int:
         """
         Return the number of characters of the text fragment,
         not including the line separators.
@@ -348,10 +355,10 @@ class TextFragment:
         """
         if self.lines is None:
             return 0
-        return sum([len(line) for line in self.lines])
+        return sum(len(line) for line in self.lines)
 
     @property
-    def filtered_text(self):
+    def filtered_text(self) -> str:
         """
         The filtered text of the text fragment.
 
@@ -362,7 +369,7 @@ class TextFragment:
         return " ".join(self.filtered_lines)
 
     @property
-    def filtered_characters(self):
+    def filtered_characters(self) -> int:
         """
         The number of filtered characters in this text fragment.
 

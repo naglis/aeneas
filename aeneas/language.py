@@ -26,8 +26,12 @@ This module contains the following classes:
 * :class:`~aeneas.language.Language`, an enumeration of the supported languages.
 """
 
+import enum
 
-class Language:
+
+@enum.unique
+# TODO: Use `enum.StrEnum` as base class once support for Python 3.10 is dropped.
+class Language(str, enum.Enum):
     """
     Enumeration of the supported languages.
 
@@ -400,7 +404,7 @@ class Language:
     }
     """ Map from language code to human-readable name """
 
-    ALLOWED_VALUES = sorted(CODE_TO_HUMAN.keys())
+    # ALLOWED_VALUES = sorted(CODE_TO_HUMAN.keys())
     """ List of all the allowed values """
 
     CODE_TO_HUMAN_LIST = sorted([f"{k}\t{v}" for k, v in CODE_TO_HUMAN.items()])

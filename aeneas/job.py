@@ -29,6 +29,7 @@ This module contains the following classes:
 
 from aeneas.configuration import Configuration
 from aeneas.logger import Loggable
+from aeneas.language import Language
 import aeneas.globalconstants as gc
 import aeneas.globalfunctions as gf
 
@@ -129,7 +130,7 @@ class JobConfiguration(Configuration):
 
     FIELDS = [
         (gc.PPN_JOB_DESCRIPTION, (None, None, ["description"], "description")),
-        (gc.PPN_JOB_LANGUAGE, (None, None, ["language"], "language")),
+        (gc.PPN_JOB_LANGUAGE, (None, Language, ["language"], "language")),
         (
             gc.PPN_JOB_IS_AUDIO_FILE_NAME_REGEX,
             (None, None, ["i_a_name_regex"], "regex to find audio files"),

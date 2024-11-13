@@ -651,9 +651,11 @@ class AdjustBoundaryAlgorithm(Loggable):
             for i, f in regular_fragments
             if (f.rate is not None) and (f.rate >= max_rate + Decimal("0.001"))
         ]
-        if len(faster_fragments) == 0:
+
+        if not faster_fragments:
             self.log("  No regular fragment faster than max rate, returning")
             return
+
         self.log_warn("  Some fragments have rate faster than max rate:")
         self.log(["  %s", [i for i, f in faster_fragments]])
         self.log("Fixing rate for faster fragments...")
@@ -665,6 +667,6 @@ class AdjustBoundaryAlgorithm(Loggable):
             for i, f in regular_fragments
             if (f.rate is not None) and (f.rate >= max_rate + Decimal("0.001"))
         ]
-        if len(faster_fragments) > 0:
+        if faster_fragments:
             self.log_warn("  Some fragments still have rate faster than max rate:")
             self.log(["  %s", [i for i, f in faster_fragments]])

@@ -35,6 +35,7 @@ from aeneas.configuration import Configuration
 from aeneas.exacttiming import Decimal
 from aeneas.exacttiming import TimeValue
 from aeneas.logger import Loggable
+from aeneas.language import Language
 from aeneas.textfile import TextFile
 import aeneas.globalconstants as gc
 import aeneas.globalfunctions as gf
@@ -357,7 +358,7 @@ class TaskConfiguration(Configuration):
     FIELDS = [
         (gc.PPN_TASK_CUSTOM_ID, (None, None, ["custom_id"], "custom ID")),
         (gc.PPN_TASK_DESCRIPTION, (None, None, ["description"], "description")),
-        (gc.PPN_TASK_LANGUAGE, (None, None, ["language"], "language (REQ, *)")),
+        (gc.PPN_TASK_LANGUAGE, (None, Language, ["language"], "language (REQ, *)")),
         (
             gc.PPN_TASK_ADJUST_BOUNDARY_AFTERCURRENT_VALUE,
             (
