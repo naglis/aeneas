@@ -20,6 +20,7 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+import typing
 
 from aeneas.syncmap.smfbase import SyncMapFormatBase
 import aeneas.globalfunctions as gf
@@ -67,7 +68,7 @@ class SyncMapFormatGenericTabular(SyncMapFormatBase):
     while ``identifier`` and ``text`` are optional.
     """
 
-    TEXT_DELIMITER = '"'
+    TEXT_DELIMITER: typing.ClassVar[str | None] = '"'
     """
     If ``None``, the text will not be delimited by a special character.
     Otherwise, use the specified character.

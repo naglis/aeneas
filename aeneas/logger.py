@@ -29,6 +29,7 @@ This module contains the following classes:
 """
 
 import datetime
+import typing
 
 from aeneas.runtimeconfiguration import RuntimeConfiguration
 import aeneas.globalfunctions as gf
@@ -64,7 +65,7 @@ class Logger:
     def __init__(
         self, tee: bool = False, indentation: int = 0, tee_show_datetime: bool = True
     ):
-        self.entries = []
+        self.entries: list[_LogEntry] = []
         self.tee = tee
         self.indentation = indentation
         self.tee_show_datetime = tee_show_datetime
@@ -303,7 +304,7 @@ class Loggable:
     :type  rconf: :class:`~aeneas.runtimeconfiguration.RuntimeConfiguration`
     """
 
-    TAG = "Loggable"
+    TAG: typing.ClassVar[str] = "Loggable"
 
     def __init__(self, logger=None, rconf=None):
         self.logger = logger if logger is not None else Logger()

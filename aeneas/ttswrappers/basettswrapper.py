@@ -30,10 +30,12 @@ This module contains the following classes:
 """
 
 import subprocess
+import typing
 
 from aeneas.audiofile import AudioFile
 from aeneas.audiofile import AudioFileUnsupportedFormatError
 from aeneas.exacttiming import TimeValue
+from aeneas.language import Language
 from aeneas.logger import Loggable
 from aeneas.runtimeconfiguration import RuntimeConfiguration
 import aeneas.globalfunctions as gf
@@ -204,7 +206,7 @@ class BaseTTSWrapper(Loggable):
     outputs the audio data to stdout.
     """
 
-    LANGUAGE_TO_VOICE_CODE = {}
+    LANGUAGE_TO_VOICE_CODE: typing.Mapping[str, str] = {}
     """
     Map a language code to a voice code.
     Concrete subclasses must populate this class field,
@@ -212,17 +214,17 @@ class BaseTTSWrapper(Loggable):
     supported by the TTS engine they wrap.
     """
 
-    CODE_TO_HUMAN = {}
+    CODE_TO_HUMAN: typing.Mapping[str, str] = {}
     """
     Map from voice code to human-readable name.
     """
 
-    CODE_TO_HUMAN_LIST = []
+    CODE_TO_HUMAN_LIST: list[str] = []
     """
     List of all language codes with their human-readable names.
     """
 
-    OUTPUT_AUDIO_FORMAT = None
+    OUTPUT_AUDIO_FORMAT: typing.ClassVar[tuple[str, int, int] | None] = None
     """
     A tuple ``(codec, channels, rate)``
     specifying the format
@@ -233,7 +235,7 @@ class BaseTTSWrapper(Loggable):
     to PCM16 mono WAVE (RIFF) as needed.
     """
 
-    DEFAULT_LANGUAGE = None
+    DEFAULT_LANGUAGE: typing.ClassVar[Language | str | None] = None
     """
     The default language for this TTS engine.
     Concrete subclasses must populate this class field,
@@ -241,7 +243,7 @@ class BaseTTSWrapper(Loggable):
     by the TTS engine they wrap.
     """
 
-    DEFAULT_TTS_PATH = None
+    DEFAULT_TTS_PATH: typing.ClassVar[str | None] = None
     """
     The default path for this TTS engine,
     when called via ``subprocess``,

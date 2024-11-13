@@ -22,6 +22,7 @@
 
 import unittest
 import os
+import typing
 
 from aeneas.textfile import TextFile
 from aeneas.textfile import TextFragment
@@ -34,9 +35,9 @@ class TestBaseTTSWrapper(unittest.TestCase):
     TTS = ""
     TTS_PATH = ""
 
-    TTS_CLASS = BaseTTSWrapper
-    TTS_LANGUAGE = "eng"
-    TTS_LANGUAGE_VARIATION = None
+    TTS_CLASS: typing.ClassVar = BaseTTSWrapper
+    TTS_LANGUAGE: typing.ClassVar[str] = "eng"
+    TTS_LANGUAGE_VARIATION: typing.ClassVar[str | None] = None
 
     def synthesize(
         self,

@@ -86,7 +86,7 @@ class AbstractCLIProgram(Loggable):
 
     RCONF_PARAMETERS = RuntimeConfiguration.parameters(sort=True, as_strings=True)
 
-    TAG: typing.ClassVar[str] = "CLI"
+    TAG = "CLI"
 
     def __init__(self, use_sys=True, invoke=None, rconf=None, logger=None):
         super().__init__(rconf=rconf, logger=logger)
@@ -280,7 +280,7 @@ class AbstractCLIProgram(Loggable):
             self.print_generic("\n" + "\n".join(self.RCONF_PARAMETERS) + "\n")
         return self.exit(self.HELP_EXIT_CODE)
 
-    def run(self, arguments, show_help=True):
+    def run(self, arguments: typing.Sequence[str], *, show_help: bool = True) -> int:
         """
         Program entry point.
 
@@ -394,7 +394,7 @@ class AbstractCLIProgram(Loggable):
 
         return self.exit(exit_code)
 
-    def has_option(self, target):
+    def has_option(self, target: str | typing.Sequence[str]) -> bool:
         """
         Return ``True`` if the actual arguments include
         the specified ``target`` option or,
@@ -405,24 +405,26 @@ class AbstractCLIProgram(Loggable):
         :type  target: Unicode string or list of Unicode strings
         :rtype: bool
         """
-        if isinstance(target, list):
-            target_set = set(target)
-        else:
+        if isinstance(target, str):
             target_set = {target}
+        else:
+            target_set = set(target)
         return len(target_set & set(self.actual_arguments)) > 0
 
-    def has_option_with_value(self, prefix, actual_arguments=True):
+    def has_option_with_value(
+        self, prefix: str, *, actual_arguments: bool = True
+    ) -> str | None:
         """
         Check if the actual arguments include an option
         starting with the given ``prefix`` and having a value,
         e.g. ``--format=ogg`` for ``prefix="--format"``.
 
         :param prefix: the option prefix
-        :type  prefix: Unicode string
+        :type  prefix: string
         :param actual_arguments: if ``True``, check among actual arguments;
                                  otherwise check among formal arguments
         :rtype actual_arguments: bool
-        :rtype: Unicode string or None
+        :rtype: string or None
         """
         if actual_arguments:
             args = self.actual_arguments
@@ -436,7 +438,7 @@ class AbstractCLIProgram(Loggable):
                 return "=".join(lis[1:])
         return None
 
-    def perform_command(self):
+    def perform_command(self) -> int:
         """
         Perform command and return the appropriate exit code.
 
@@ -446,7 +448,7 @@ class AbstractCLIProgram(Loggable):
         self.log(["Invoked with %s", self.actual_arguments])
         return self.NO_ERROR_EXIT_CODE
 
-    def check_c_extensions(self, name=None):
+    def check_c_extensions(self, name: str | None = None) -> bool:
         """
         If C extensions cannot be run, emit a warning
         and return ``False``. Otherwise return ``True``.
@@ -469,7 +471,7 @@ class AbstractCLIProgram(Loggable):
             return False
         return True
 
-    def check_input_file_or_directory(self, path):
+    def check_input_file_or_directory(self, path: str) -> bool:
         """
         If the given path does not exist, emit an error
         and return ``False``. Otherwise return ``True``.
@@ -486,7 +488,7 @@ class AbstractCLIProgram(Loggable):
             return False
         return True
 
-    def check_input_file(self, path):
+    def check_input_file(self, path: str) -> bool:
         """
         If the given path does not exist, emit an error
         and return ``False``. Otherwise return ``True``.
@@ -503,7 +505,7 @@ class AbstractCLIProgram(Loggable):
             return False
         return True
 
-    def check_output_file(self, path):
+    def check_output_file(self, path: str) -> bool:
         """
         If the given path cannot be written, emit an error
         and return ``False``. Otherwise return ``True``.
@@ -520,7 +522,7 @@ class AbstractCLIProgram(Loggable):
             return False
         return True
 
-    def check_output_directory(self, path):
+    def check_output_directory(self, path: str) -> bool:
         """
         If the given directory cannot be written, emit an error
         and return ``False``. Otherwise return ``True``.
@@ -541,7 +543,7 @@ class AbstractCLIProgram(Loggable):
             return False
         return True
 
-    def get_text_file(self, text_format, text, parameters):
+    def get_text_file(self, text_format: str, text, parameters):
         if text_format == "list":
             text_file = TextFile(logger=self.logger)
             text_file.read_from_list(text.split("|"))
@@ -569,12 +571,12 @@ class AbstractCLIProgram(Loggable):
         self.print_error("$ sudo pip install youtube-dl")
 
 
-def main():
+def main() -> int:
     """
     Execute program.
     """
-    AbstractCLIProgram().run(arguments=sys.argv)
+    return AbstractCLIProgram().run(arguments=sys.argv)
 
 
 if __name__ == "__main__":
-    main()
+    raise SystemExit(main())
