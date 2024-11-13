@@ -20,17 +20,22 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+import itertools
 
-from aeneas.tests.base_ttswrapper import TestBaseTTSWrapper
+from aeneas.tests.base_ttswrapper import BaseTTSWrapperCase, SynthesizeCase
 from aeneas.ttswrappers.espeakttswrapper import ESPEAKTTSWrapper
 
 
-class TestESPEAKTTSWrapper(TestBaseTTSWrapper):
+class TestESPEAKTTSWrapper(BaseTTSWrapperCase):
     TTS = "espeak"
     TTS_PATH = "/usr/bin/espeak"
     TTS_CLASS = ESPEAKTTSWrapper
     TTS_LANGUAGE = ESPEAKTTSWrapper.ENG
     TTS_LANGUAGE_VARIATION = ESPEAKTTSWrapper.ENG_GBR
+
+    def iter_synthesize_cases(self):
+        for v in itertools.product([True, False], repeat=3):
+            yield SynthesizeCase(*v)
 
     def test_multiple_replace_language(self):
         tfl = self.tfl(

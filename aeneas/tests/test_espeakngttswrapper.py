@@ -21,11 +21,11 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-from aeneas.tests.base_ttswrapper import TestBaseTTSWrapper
 from aeneas.ttswrappers.espeakngttswrapper import ESPEAKNGTTSWrapper
+from aeneas.tests.base_ttswrapper import BaseTTSWrapperCase
 
 
-class TestESPEAKNGTTSWrapper(TestBaseTTSWrapper):
+class TestESPEAKNGTTSWrapper(BaseTTSWrapperCase):
     TTS = "espeak-ng"
     TTS_PATH = "/usr/bin/espeak-ng"
     TTS_CLASS = ESPEAKNGTTSWrapper

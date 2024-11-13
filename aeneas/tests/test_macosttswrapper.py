@@ -21,11 +21,11 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-from aeneas.tests.base_ttswrapper import TestBaseTTSWrapper
+from aeneas.tests.base_ttswrapper import BaseTTSWrapperCase
 from aeneas.ttswrappers.macosttswrapper import MacOSTTSWrapper
 
 
-class TestESPEAKNGTTSWrapper(TestBaseTTSWrapper):
+class TestMacOSTTSWrapper(BaseTTSWrapperCase):
     TTS = "macos"
     TTS_PATH = "/usr/bin/say"
     TTS_CLASS = MacOSTTSWrapper

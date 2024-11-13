@@ -25,14 +25,26 @@ import os
 import tempfile
 import contextlib
 import typing
-import itertools
 
+from aeneas.exacttiming import TimeValue
 from aeneas.textfile import TextFile, TextFragment
 from aeneas.ttswrappers.basettswrapper import BaseTTSWrapper
 from aeneas.runtimeconfiguration import RuntimeConfiguration
 
 
+class SynthesizeCase(typing.NamedTuple):
+    c_ext: bool
+    cew_subprocess: bool
+    cache: bool
+
+
 class TestBaseTTSWrapper(unittest.TestCase):
+    def test_not_implemented(self):
+        with self.assertRaises(NotImplementedError):
+            BaseTTSWrapper()
+
+
+class BaseTTSWrapperCase(unittest.TestCase):
     TTS = ""
     TTS_PATH = ""
 
@@ -43,20 +55,20 @@ class TestBaseTTSWrapper(unittest.TestCase):
     def synthesize(
         self,
         text_file,
-        ofp=None,
-        quit_after=None,
-        backwards=False,
-        zero_length=False,
+        ofp: str | None = None,
+        quit_after: TimeValue | None = None,
+        backwards: bool = False,
+        zero_length: bool = False,
         expected_exc=None,
     ):
-        if (
-            (self.TTS == "")
-            or (self.TTS_PATH == "")
-            or (not os.path.exists(self.TTS_PATH))
-        ):
-            return
+        if not self.TTS:
+            self.skipTest("`self.TTS` is not set")
+        elif not self.TTS_PATH:
+            self.skipTest("`self.TTS_PATH` is not set")
+        elif not os.path.isfile(self.TTS_PATH):
+            self.skipTest(f"`self.TTS_PATH` ({self.TTS_PATH}) does not exist")
 
-        def inner(c_ext, cew_subprocess, cache):
+        def inner(case: SynthesizeCase):
             with contextlib.ExitStack() as exit_stack:
                 if ofp is None:
                     tmp_file = tempfile.NamedTemporaryFile(suffix=".wav")
@@ -69,36 +81,36 @@ class TestBaseTTSWrapper(unittest.TestCase):
                     rconf = RuntimeConfiguration()
                     rconf[RuntimeConfiguration.TTS] = self.TTS
                     rconf[RuntimeConfiguration.TTS_PATH] = self.TTS_PATH
-                    rconf[RuntimeConfiguration.C_EXTENSIONS] = c_ext
-                    rconf[RuntimeConfiguration.CEW_SUBPROCESS_ENABLED] = cew_subprocess
-                    rconf[RuntimeConfiguration.TTS_CACHE] = cache
+                    rconf[RuntimeConfiguration.C_EXTENSIONS] = case.c_ext
+                    rconf[RuntimeConfiguration.CEW_SUBPROCESS_ENABLED] = (
+                        case.cew_subprocess
+                    )
+                    rconf[RuntimeConfiguration.TTS_CACHE] = case.cache
                     tts_engine = self.TTS_CLASS(rconf=rconf)
                     anchors, total_time, num_chars = tts_engine.synthesize_multiple(
                         text_file, output_file_path, quit_after, backwards
                     )
-                    if cache:
+                    if case.cache:
                         tts_engine.clear_cache()
+
                     if zero_length:
                         self.assertEqual(total_time, 0.0)
                     else:
                         self.assertGreater(total_time, 0.0)
+
                 except (OSError, TypeError, UnicodeDecodeError, ValueError) as exc:
-                    if cache and tts_engine is not None:
+                    if case.cache and tts_engine is not None:
                         tts_engine.clear_cache()
                     with self.assertRaises(expected_exc):
                         raise exc
 
-        if self.TTS == "espeak":
-            for c_ext, cew_subprocess, cache in itertools.product(
-                [True, False], repeat=3
-            ):
-                inner(c_ext=c_ext, cew_subprocess=cew_subprocess, cache=cache)
-        elif self.TTS == "festival":
-            for c_ext, cache in itertools.product([True, False], repeat=2):
-                inner(c_ext=c_ext, cew_subprocess=False, cache=cache)
-        else:
-            for cache in [True, False]:
-                inner(c_ext=True, cew_subprocess=False, cache=cache)
+        for case in self.iter_synthesize_cases():
+            with self.subTest(case=case):
+                inner(case)
+
+    def iter_synthesize_cases(self) -> typing.Iterator[SynthesizeCase]:
+        yield SynthesizeCase(c_ext=True, cew_subprocess=False, cache=True)
+        yield SynthesizeCase(c_ext=True, cew_subprocess=False, cache=False)
 
     def tfl(self, frags):
         tfl = TextFile()
@@ -107,10 +119,6 @@ class TestBaseTTSWrapper(unittest.TestCase):
                 TextFragment(language=language, lines=lines, filtered_lines=lines)
             )
         return tfl
-
-    def test_not_implemented(self):
-        with self.assertRaises(NotImplementedError):
-            BaseTTSWrapper()
 
     def test_use_cache(self):
         if self.TTS == "":

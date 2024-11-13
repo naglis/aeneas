@@ -20,14 +20,19 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+import itertools
 
-from aeneas.tests.base_ttswrapper import TestBaseTTSWrapper
+from aeneas.tests.base_ttswrapper import BaseTTSWrapperCase, SynthesizeCase
 from aeneas.ttswrappers.festivalttswrapper import FESTIVALTTSWrapper
 
 
-class TestFESTIVALTTSWrapper(TestBaseTTSWrapper):
+class TestFESTIVALTTSWrapper(BaseTTSWrapperCase):
     TTS = "festival"
     TTS_PATH = "/usr/bin/text2wave"
     TTS_CLASS = FESTIVALTTSWrapper
     TTS_LANGUAGE = FESTIVALTTSWrapper.ENG
     TTS_LANGUAGE_VARIATION = FESTIVALTTSWrapper.ENG_GBR
+
+    def iter_synthesize_cases(self):
+        for c_ext, cache in itertools.product([True, False], repeat=2):
+            yield SynthesizeCase(c_ext=c_ext, cew_subprocess=False, cache=cache)
