@@ -31,8 +31,11 @@ import aeneas.globalconstants as gc
 import aeneas.globalfunctions as gf
 
 
+class _Sentinel: ...
+
+
 class BaseSyncMapCase(unittest.TestCase):
-    NOT_SET = object()
+    NOT_SET = _Sentinel()
     PARAMETERS = {
         gc.PPN_TASK_OS_FILE_SMIL_PAGE_REF: "sonnet001.xhtml",
         gc.PPN_TASK_OS_FILE_SMIL_AUDIO_REF: "sonnet001.mp3",
@@ -58,7 +61,7 @@ class BaseSyncMapCase(unittest.TestCase):
         fmt: str,
         multiline: bool = False,
         utf8: bool = False,
-        parameters: dict | None = NOT_SET,
+        parameters: dict | None | _Sentinel = NOT_SET,
     ):
         if parameters is self.NOT_SET:
             parameters = self.PARAMETERS
