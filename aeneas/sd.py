@@ -36,11 +36,11 @@ import numpy
 
 from aeneas.audiofilemfcc import AudioFileMFCC
 from aeneas.dtw import DTWAligner
-from aeneas.exacttiming import Decimal
 from aeneas.exacttiming import TimeValue
 from aeneas.logger import Loggable
 from aeneas.runtimeconfiguration import RuntimeConfiguration
 from aeneas.synthesizer import Synthesizer
+from aeneas.textfile import TextFile
 import aeneas.globalfunctions as gf
 
 
@@ -76,7 +76,7 @@ class SD(Loggable):
     :type  logger: :class:`~aeneas.logger.Logger`
     """
 
-    QUERY_FACTOR = Decimal("1.0")
+    QUERY_FACTOR = decimal.Decimal("1.0")
     """
     Multiply the max head/tail length by this factor
     to get the minimum query length to be synthesized.
@@ -85,7 +85,7 @@ class SD(Loggable):
     .. versionadded:: 1.5.0
     """
 
-    AUDIO_FACTOR = Decimal("2.5")
+    AUDIO_FACTOR = decimal.Decimal("2.5")
     """
     Multiply the max head/tail length by this factor
     to get the minimum length in the audio that will be searched
@@ -114,18 +114,24 @@ class SD(Loggable):
 
     TAG = "SD"
 
-    def __init__(self, real_wave_mfcc, text_file, rconf=None, logger=None):
+    def __init__(
+        self,
+        real_wave_mfcc: AudioFileMFCC,
+        text_file: TextFile,
+        rconf=None,
+        logger=None,
+    ):
         super().__init__(rconf=rconf, logger=logger)
         self.real_wave_mfcc = real_wave_mfcc
         self.text_file = text_file
 
     def detect_interval(
         self,
-        min_head_length=None,
-        max_head_length=None,
-        min_tail_length=None,
-        max_tail_length=None,
-    ):
+        min_head_length: TimeValue | None = None,
+        max_head_length: TimeValue | None = None,
+        min_tail_length: TimeValue | None = None,
+        max_tail_length: TimeValue | None = None,
+    ) -> tuple[TimeValue, TimeValue]:
         """
         Detect the interval of the audio file
         containing the fragments in the text file.
@@ -165,7 +171,11 @@ class SD(Loggable):
         self.log("Returning (0.000, 0.000)")
         return (TimeValue("0.000"), TimeValue("0.000"))
 
-    def detect_head(self, min_head_length=None, max_head_length=None):
+    def detect_head(
+        self,
+        min_head_length: TimeValue | None = None,
+        max_head_length: TimeValue | None = None,
+    ) -> TimeValue:
         """
         Detect the audio head, returning its duration, in seconds.
 
@@ -179,7 +189,11 @@ class SD(Loggable):
         """
         return self._detect(min_head_length, max_head_length, tail=False)
 
-    def detect_tail(self, min_tail_length=None, max_tail_length=None):
+    def detect_tail(
+        self,
+        min_tail_length: TimeValue | None = None,
+        max_tail_length: TimeValue | None = None,
+    ) -> TimeValue:
         """
         Detect the audio tail, returning its duration, in seconds.
 
@@ -193,7 +207,12 @@ class SD(Loggable):
         """
         return self._detect(min_tail_length, max_tail_length, tail=True)
 
-    def _detect(self, min_length, max_length, tail=False):
+    def _detect(
+        self,
+        min_length: TimeValue | None,
+        max_length: TimeValue | None,
+        tail: bool = False,
+    ) -> TimeValue:
         """
         Detect the head or tail within ``min_length`` and ``max_length`` duration.
 
@@ -211,7 +230,9 @@ class SD(Loggable):
         :raises: ValueError: if one of the parameters is negative
         """
 
-        def _sanitize(value, default, name):
+        def _sanitize(
+            value: TimeValue | None, default: TimeValue, name: str
+        ) -> TimeValue:
             if value is None:
                 value = default
             try:
