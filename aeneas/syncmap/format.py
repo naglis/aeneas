@@ -788,5 +788,5 @@ class SyncMapFormat:
         XML_LEGACY: SyncMapFormatXMLLegacy,
     }
 
-    ALLOWED_VALUES = sorted(list(CODE_TO_CLASS.keys()))
+    ALLOWED_VALUES = sorted(CODE_TO_CLASS)
     """ List of all the allowed values """

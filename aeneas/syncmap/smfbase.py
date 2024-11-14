@@ -20,34 +20,57 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+import abc
+import typing
 
 from aeneas.logger import Loggable
+from aeneas.language import Language
+from aeneas.exacttiming import TimeValue
 from aeneas.syncmap.fragment import SyncMapFragment
 from aeneas.textfile import TextFragment
 
 
-class SyncMapFormatBase(Loggable):
+# FIXME: Remove this hack.
+if typing.TYPE_CHECKING:
+    from aeneas.syncmap import SyncMap
+
+
+class SyncMapFormatBase(Loggable, abc.ABC):
     """
     Base class for I/O handlers.
     """
 
     TAG = "SyncMapFormatBase"
 
-    def __init__(self, variant=None, parameters=None, rconf=None, logger=None):
+    def __init__(
+        self,
+        variant: str | None = None,
+        parameters: dict | None = None,
+        rconf=None,
+        logger=None,
+    ):
         """
         TBW
 
         :param variant: the code of the format variant to read or write
         :type variant: string
         :param parameters: additional parameters to read or write
-        :type paramenters: ``None`` or ``dict``
+        :type parameters: ``None`` or ``dict``
         """
         super().__init__(rconf=rconf, logger=logger)
         self.variant = variant
         self.parameters = parameters
 
     @classmethod
-    def _add_fragment(cls, syncmap, identifier, lines, begin, end, language=None):
+    def _add_fragment(
+        cls,
+        syncmap: "SyncMap",
+        identifier: str,
+        lines: typing.Sequence[str],
+        begin: TimeValue,
+        end: TimeValue,
+        language: Language | None = None,
+    ):
         """
         Add a new fragment to ``syncmap``.
 
@@ -74,34 +97,15 @@ class SyncMapFormatBase(Loggable):
             )
         )
 
-    def parse(self, input_text, syncmap):
+    @abc.abstractmethod
+    def parse(self, input_text: str, syncmap: "SyncMap") -> str:
         """
         Parse the given ``input_text`` and
         append the extracted fragments to ``syncmap``.
-
-        :param input_text: the input text as a Unicode string (read from file)
-        :type input_text: string
-        :param syncmap: the syncmap to append to
-        :type syncmap: :class:`~aeneas.syncmap.SyncMap`
         """
-        self.log_exc(
-            "%s is abstract and cannot be called directly" % (self.TAG),
-            None,
-            True,
-            NotImplementedError,
-        )
 
-    def format(self, syncmap):
+    @abc.abstractmethod
+    def format(self, syncmap: "SyncMap") -> str:
         """
-        Format the given ``syncmap`` as a Unicode string.
-
-        :param syncmap: the syncmap to output
-        :type syncmap: :class:`~aeneas.syncmap.SyncMap`
-        :rtype: string
+        Format the given ``syncmap`` as a string.
         """
-        self.log_exc(
-            "%s is abstract and cannot be called directly" % (self.TAG),
-            None,
-            True,
-            NotImplementedError,
-        )

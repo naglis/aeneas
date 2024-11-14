@@ -427,7 +427,7 @@ class SyncMap(Loggable):
 
     def write(
         self,
-        sync_map_format: SyncMapFormat,
+        sync_map_format: str,
         output_file_path: str,
         parameters: dict | None = None,
     ):

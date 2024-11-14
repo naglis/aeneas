@@ -26,6 +26,13 @@ from aeneas.syncmap.smfbase import SyncMapFormatBase
 import aeneas.globalfunctions as gf
 
 
+class TabularFormatField(typing.TypedDict):
+    identifier: int
+    begin: int
+    end: int
+    text: int
+
+
 class SyncMapFormatGenericTabular(SyncMapFormatBase):
     """
     Base class for tabular-like I/O format handlers.
@@ -51,17 +58,22 @@ class SyncMapFormatGenericTabular(SyncMapFormatBase):
     associated with this format.
     """
 
-    MACHINE_ALIASES = [DEFAULT, MACHINE]
+    MACHINE_ALIASES: typing.ClassVar[typing.Sequence[str]] = [DEFAULT, MACHINE]
     """
     Aliases for the machine-readable variant.
     """
 
-    FIELD_DELIMITER = ","
+    FIELD_DELIMITER: typing.ClassVar[str] = ","
     """
     The character delimiting fields.
     """
 
-    FIELDS = {"identifier": 0, "begin": 1, "end": 2, "text": 3}
+    FIELDS: typing.ClassVar[TabularFormatField] = {
+        "identifier": 0,
+        "begin": 1,
+        "end": 2,
+        "text": 3,
+    }
     """
     Map that associated each field to its index.
     The map must contain the ``begin`` and ``end`` keys,
@@ -94,10 +106,15 @@ class SyncMapFormatGenericTabular(SyncMapFormatBase):
         )
 
     def parse(self, input_text, syncmap):
-        lines = [line.strip() for line in input_text.splitlines()]
-        lines = [line for line in lines if len(line) > 0]
-        for index, line in enumerate(lines, 1):
-            split = line.strip().split(self.FIELD_DELIMITER)
+        lines = []
+        for line in input_text.splitlines():
+            line = line.strip()
+            if not line:
+                continue
+            lines.append(line)
+
+        for index, line in enumerate(lines, start=1):
+            split = line.split(self.FIELD_DELIMITER)
 
             # set identifier
             if "identifier" in self.FIELDS:

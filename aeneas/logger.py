@@ -35,6 +35,9 @@ from aeneas.runtimeconfiguration import RuntimeConfiguration
 import aeneas.globalfunctions as gf
 
 
+type Message = str | typing.Sequence[typing.Any]
+
+
 class Logger:
     """
     A logger class for debugging and performance profiling.
@@ -119,12 +122,14 @@ class Logger:
     def indentation(self, indentation: int):
         self.__indentation = indentation
 
-    def pretty_print(self, as_list=False, show_datetime=True) -> str | list[str]:
+    def pretty_print(
+        self, as_list: bool = False, show_datetime: bool = True
+    ) -> str | list[str]:
         """
         Return a string pretty print of the log entries.
 
         :param bool as_list: if ``True``, return a list of strings,
-                             one for each entry, instead of a Unicode string
+                             one for each entry, instead of a string
         :param bool show_datetime: if ``True``, show the date and time of the entries
         :rtype: string or list of strings
         """
@@ -133,7 +138,7 @@ class Logger:
             return ppl
         return "\n".join(ppl)
 
-    def log(self, message, severity=INFO, tag=""):
+    def log(self, message: Message, severity=INFO, tag: str = "") -> datetime.datetime:
         """
         Add a given message to the log, and return its time.
 
@@ -162,7 +167,7 @@ class Logger:
         """
         self.entries = []
 
-    def write(self, path):
+    def write(self, path: str):
         """
         Output the log to file.
 
@@ -172,7 +177,7 @@ class Logger:
             log_file.write(self.pretty_print())
 
     @classmethod
-    def _sanitize(cls, message):
+    def _sanitize(cls, message: Message) -> str:
         """
         Sanitize the given message,
         dealing with multiple arguments
@@ -182,15 +187,15 @@ class Logger:
         :type  message: string or list of strings
         :rtype: string
         """
-        if isinstance(message, list):
+        if isinstance(message, str):
+            sanitized = message
+        else:
             if len(message) == 0:
                 sanitized = "Empty log message"
             elif len(message) == 1:
                 sanitized = message[0]
             else:
                 sanitized = message[0] % tuple(message[1:])
-        else:
-            sanitized = message
         if not isinstance(sanitized, str):
             raise TypeError("The given log message is not a string")
         return sanitized
@@ -201,16 +206,16 @@ class _LogEntry:
     A structure for a log entry.
     """
 
-    def __init__(self, message, severity, tag, indentation, time):
+    def __init__(self, message: str, severity, tag: str, indentation: int, time):
         self.message = message
         self.severity = severity
         self.tag = tag
         self.indentation = indentation
         self.time = time
 
-    def pretty_print(self, show_datetime=True):
+    def pretty_print(self, show_datetime: bool = True) -> str:
         """
-        Returns a Unicode string containing
+        Returns a string containing
         the pretty printing of a given log entry.
 
         :param bool show_datetime: if ``True``, print the date and time of the entry
@@ -229,16 +234,14 @@ class _LogEntry:
         )
 
     @property
-    def message(self):
+    def message(self) -> str:
         """
         The message of this log entry.
-
-        :rtype: string
         """
         return self.__message
 
     @message.setter
-    def message(self, message):
+    def message(self, message: str):
         self.__message = message
 
     @property
@@ -255,16 +258,14 @@ class _LogEntry:
         self.__severity = severity
 
     @property
-    def tag(self):
+    def tag(self) -> str:
         """
         The tag of this log entry.
-
-        :rtype: string
         """
         return self.__tag
 
     @tag.setter
-    def tag(self, tag):
+    def tag(self, tag: str):
         self.__tag = tag
 
     @property
@@ -281,16 +282,16 @@ class _LogEntry:
         self.__indentation = indentation
 
     @property
-    def time(self):
+    def time(self) -> datetime.datetime:
         """
         The date and time of this log entry.
 
-        :rtype: datetime.time
+        :rtype: datetime.datetime
         """
         return self.__time
 
     @time.setter
-    def time(self, time):
+    def time(self, time: datetime.datetime):
         self.__time = time
 
 
@@ -306,11 +307,13 @@ class Loggable:
 
     TAG: typing.ClassVar[str] = "Loggable"
 
-    def __init__(self, logger=None, rconf=None):
+    def __init__(
+        self, logger: Logger | None = None, rconf: RuntimeConfiguration | None = None
+    ):
         self.logger = logger if logger is not None else Logger()
         self.rconf = rconf if rconf is not None else RuntimeConfiguration()
 
-    def _log(self, message, severity=Logger.DEBUG):
+    def _log(self, message: Message, severity=Logger.DEBUG) -> datetime.datetime:
         """
         Log generic message
 
@@ -320,7 +323,13 @@ class Loggable:
         """
         return self.logger.log(message, severity, self.TAG)
 
-    def log_exc(self, message, exc=None, critical=True, raise_type=None):
+    def log_exc(
+        self,
+        message: Message,
+        exc: Exception | None = None,
+        critical: bool = True,
+        raise_type: type[Exception] | None = None,
+    ) -> None:
         """
         Log exception, and possibly raise exception.
 
@@ -340,38 +349,26 @@ class Loggable:
                 raise_message = f"{message} : {exc}"
             raise raise_type(raise_message)
 
-    def log(self, message):
+    def log(self, message: Message) -> datetime.datetime:
         """
         Log DEBUG message, and return its time.
-
-        :param string message: the message to log
-        :rtype: datetime
         """
         return self._log(message)
 
-    def log_info(self, message):
+    def log_info(self, message: Message) -> datetime.datetime:
         """
         Log INFO message, and return its time.
-
-        :param string message: the message to log
-        :rtype: datetime
         """
         return self._log(message, Logger.INFO)
 
-    def log_warn(self, message):
+    def log_warn(self, message: Message) -> datetime.datetime:
         """
         Log WARNING message, and return its time.
-
-        :param string message: the message to log
-        :rtype: datetime
         """
         return self._log(message, Logger.WARNING)
 
-    def log_crit(self, message):
+    def log_crit(self, message: Message) -> datetime.datetime:
         """
         Log CRITICAL message, and return its time.
-
-        :param string message: the message to log
-        :rtype: datetime
         """
         return self._log(message, Logger.CRITICAL)
