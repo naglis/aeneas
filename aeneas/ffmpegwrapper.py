@@ -194,15 +194,6 @@ class FFMPEGWrapper(Loggable):
                 OSError,
             )
 
-        # test if we can write the output file
-        if not gf.file_can_be_written(output_file_path):
-            self.log_exc(
-                "Output file '%s' cannot be written" % (output_file_path),
-                None,
-                True,
-                OSError,
-            )
-
         # call ffmpeg
         arguments = [self.rconf[RuntimeConfiguration.FFMPEG_PATH]]
         arguments.extend(["-i", input_file_path])
