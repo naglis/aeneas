@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 # aeneas is a Python/C library and a set of tools
 # to automagically synchronize audio and text (aka forced alignment)
 #
@@ -20,94 +18,37 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import unittest
+import tempfile
+import itertools
+import typing
 
-from aeneas.language import Language
-from aeneas.syncmap import SyncMap
 from aeneas.syncmap import SyncMapFormat
-import aeneas.globalconstants as gc
-import aeneas.globalfunctions as gf
+
+from aeneas.tests.test_syncmap import BaseSyncMapCase
 
 
-class TestSyncMap(unittest.TestCase):
-    NOT_EXISTING_SRT = gf.absolute_path("not_existing.srt", __file__)
-    EXISTING_SRT = gf.absolute_path("res/syncmaps/sonnet001.srt", __file__)
-    NOT_WRITEABLE_SRT = gf.absolute_path("x/y/z/not_writeable.srt", __file__)
-
-    PARAMETERS = {
-        gc.PPN_TASK_OS_FILE_SMIL_PAGE_REF: "sonnet001.xhtml",
-        gc.PPN_TASK_OS_FILE_SMIL_AUDIO_REF: "sonnet001.mp3",
-        gc.PPN_SYNCMAP_LANGUAGE: Language.ENG,
-    }
-
-    def read(self, fmt, multiline=False, utf8=False, parameters=PARAMETERS):
-        syn = SyncMap()
-        if multiline and utf8:
-            path = "res/syncmaps/sonnet001_mu."
-        elif multiline:
-            path = "res/syncmaps/sonnet001_m."
-        elif utf8:
-            path = "res/syncmaps/sonnet001_u."
-        else:
-            path = "res/syncmaps/sonnet001."
-        syn.read(fmt, gf.absolute_path(path + fmt, __file__), parameters=parameters)
-        return syn
-
-    def write(self, fmt, multiline=False, utf8=False, parameters=PARAMETERS):
-        suffix = "." + fmt
-        syn = self.read(SyncMapFormat.XML, multiline, utf8, self.PARAMETERS)
-        handler, output_file_path = gf.tmp_file(suffix=suffix)
-        syn.write(fmt, output_file_path, parameters)
-        gf.delete_file(handler, output_file_path)
+class TestSyncMapAllFormats(BaseSyncMapCase):
+    def iter_cases(self) -> typing.Iterator[tuple[str, bool, bool]]:
+        for fmt in SyncMapFormat.ALLOWED_VALUES:
+            for multiline, utf8 in itertools.product([True, False], repeat=2):
+                yield fmt, multiline, utf8
 
     def test_read(self):
-        for fmt in SyncMapFormat.ALLOWED_VALUES:
-            syn = self.read(fmt)
-            self.assertEqual(len(syn), 15)
-            try:
-                str(syn)
-            except Exception as e:
-                self.fail("Failed to convert to string: %s" % e)
-
-    def test_read_m(self):
-        for fmt in SyncMapFormat.ALLOWED_VALUES:
-            syn = self.read(fmt, multiline=True)
-            self.assertEqual(len(syn), 15)
-            try:
-                str(syn)
-            except Exception as e:
-                self.fail("Failed to convert to string: %s" % e)
-
-    def test_read_u(self):
-        for fmt in SyncMapFormat.ALLOWED_VALUES:
-            syn = self.read(fmt, utf8=True)
-            self.assertEqual(len(syn), 15)
-            try:
-                str(syn)
-            except Exception as e:
-                self.fail("Failed to convert to string: %s" % e)
-
-    def test_read_mu(self):
-        for fmt in SyncMapFormat.ALLOWED_VALUES:
-            syn = self.read(fmt, multiline=True, utf8=True)
-            self.assertEqual(len(syn), 15)
-            try:
-                str(syn)
-            except Exception as e:
-                self.fail("Failed to convert to string: %s" % e)
+        for fmt, multiline, utf8 in self.iter_cases():
+            with self.subTest(fmt=fmt, multiline=multiline, utf8=utf8):
+                syn = self.read(fmt, multiline=multiline, utf8=utf8)
+                self.assertEqual(len(syn), 15)
+                try:
+                    str(syn)
+                except Exception as e:
+                    raise AssertionError("Failed to convert to string") from e
 
     def test_write(self):
-        for fmt in SyncMapFormat.ALLOWED_VALUES:
-            self.write(fmt)
-
-    def test_write_m(self):
-        for fmt in SyncMapFormat.ALLOWED_VALUES:
-            self.write(fmt, multiline=True)
-
-    def test_write_u(self):
-        for fmt in SyncMapFormat.ALLOWED_VALUES:
-            self.write(fmt, utf8=True)
-
-    def test_write_mu(self):
-        for fmt in SyncMapFormat.ALLOWED_VALUES:
-            self.write(fmt, multiline=True, utf8=True)
+        for fmt, multiline, utf8 in self.iter_cases():
+            with self.subTest(fmt=fmt, multiline=multiline, utf8=utf8):
+                syn = self.read(SyncMapFormat.XML, multiline, utf8)
+                with tempfile.NamedTemporaryFile(suffix=f".{fmt}") as tmp_file:
+                    try:
+                        syn.write(fmt, tmp_file.name, self.PARAMETERS)
+                    except Exception as e:
+                        raise AssertionError("Failed to write syncmap") from e

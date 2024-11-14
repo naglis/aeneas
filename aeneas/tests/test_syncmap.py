@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 # aeneas is a Python/C library and a set of tools
 # to automagically synchronize audio and text (aka forced alignment)
 #
@@ -21,49 +19,71 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import unittest
+import tempfile
+import typing
 
-from aeneas.exacttiming import TimeInterval
-from aeneas.exacttiming import TimeValue
+from aeneas.exacttiming import TimeInterval, TimeValue
 from aeneas.language import Language
-from aeneas.syncmap import SyncMap
-from aeneas.syncmap import SyncMapFormat
-from aeneas.syncmap import SyncMapFragment
+from aeneas.syncmap import SyncMap, SyncMapFormat, SyncMapFragment
 from aeneas.syncmap.missingparametererror import SyncMapMissingParameterError
 from aeneas.tree import Tree
 import aeneas.globalconstants as gc
 import aeneas.globalfunctions as gf
 
 
-class TestSyncMap(unittest.TestCase):
-    NOT_EXISTING_SRT = gf.absolute_path("not_existing.srt", __file__)
-    EXISTING_SRT = gf.absolute_path("res/syncmaps/sonnet001.srt", __file__)
-    NOT_WRITEABLE_SRT = gf.absolute_path("x/y/z/not_writeable.srt", __file__)
-
+class BaseSyncMapCase(unittest.TestCase):
+    NOT_SET = object()
     PARAMETERS = {
         gc.PPN_TASK_OS_FILE_SMIL_PAGE_REF: "sonnet001.xhtml",
         gc.PPN_TASK_OS_FILE_SMIL_AUDIO_REF: "sonnet001.mp3",
         gc.PPN_SYNCMAP_LANGUAGE: Language.ENG,
     }
 
-    def read(self, fmt, multiline=False, utf8=False, parameters=PARAMETERS):
-        syn = SyncMap()
+    def read(self, fmt, multiline: bool = False, utf8: bool = False):
         if multiline and utf8:
-            path = "res/syncmaps/sonnet001_mu."
+            path = f"res/syncmaps/sonnet001_mu.{fmt}"
         elif multiline:
-            path = "res/syncmaps/sonnet001_m."
+            path = f"res/syncmaps/sonnet001_m.{fmt}"
         elif utf8:
-            path = "res/syncmaps/sonnet001_u."
+            path = f"res/syncmaps/sonnet001_u.{fmt}"
         else:
-            path = "res/syncmaps/sonnet001."
-        syn.read(fmt, gf.absolute_path(path + fmt, __file__), parameters=parameters)
+            path = f"res/syncmaps/sonnet001.{fmt}"
+
+        syn = SyncMap()
+        syn.read(fmt, gf.absolute_path(path, __file__), parameters=self.PARAMETERS)
         return syn
 
-    def write(self, fmt, multiline=False, utf8=False, parameters=PARAMETERS):
-        suffix = "." + fmt
-        syn = self.read(SyncMapFormat.XML, multiline, utf8, self.PARAMETERS)
-        handler, output_file_path = gf.tmp_file(suffix=suffix)
-        syn.write(fmt, output_file_path, parameters)
-        gf.delete_file(handler, output_file_path)
+    def write(
+        self,
+        fmt: str,
+        multiline: bool = False,
+        utf8: bool = False,
+        parameters: dict | None = NOT_SET,
+    ):
+        if parameters is self.NOT_SET:
+            parameters = self.PARAMETERS
+
+        syn = self.read(SyncMapFormat.XML, multiline=multiline, utf8=utf8)
+        with tempfile.NamedTemporaryFile(suffix=f".{fmt}") as tmp_file:
+            syn.write(fmt, tmp_file.name, parameters)
+
+
+class TestSyncMap(BaseSyncMapCase):
+    NOT_EXISTING_SRT = gf.absolute_path("not_existing.srt", __file__)
+    EXISTING_SRT = gf.absolute_path("res/syncmaps/sonnet001.srt", __file__)
+    NOT_WRITEABLE_SRT = gf.absolute_path("x/y/z/not_writeable.srt", __file__)
+
+    def build_tree_from_intervals(
+        self, intervals: typing.Sequence[tuple[str, str]]
+    ) -> Tree:
+        tree = Tree()
+        for begin, end in intervals:
+            interval = TimeInterval(begin=TimeValue(begin), end=TimeValue(end))
+            smf = SyncMapFragment(interval=interval)
+            child = Tree(value=smf)
+            tree.add_child(child, as_last=True)
+
+        return tree
 
     def test_constructor(self):
         syn = SyncMap()
@@ -123,19 +143,19 @@ class TestSyncMap(unittest.TestCase):
 
     def test_fragments(self):
         syn = self.read("txt")
-        self.assertTrue(len(syn.fragments) > 0)
+        self.assertTrue(syn.fragments)
 
     def test_leaves_empty(self):
         syn = SyncMap()
-        self.assertEqual(len(syn.leaves()), 0)
+        self.assertFalse(syn.leaves())
 
     def test_leaves(self):
         syn = self.read("txt")
-        self.assertTrue(len(syn.leaves()) > 0)
+        self.assertTrue(syn.leaves())
 
     def test_json_string(self):
         syn = self.read("txt")
-        self.assertTrue(len(syn.json_string) > 0)
+        self.assertTrue(syn.json_string)
 
     def test_clear(self):
         syn = self.read("txt")
@@ -162,7 +182,7 @@ class TestSyncMap(unittest.TestCase):
         self.assertTrue(syn.has_adjacent_leaves_only)
 
     def test_has_adjacent_leaves_only(self):
-        params = [
+        cases = [
             ([("0.000", "0.000"), ("0.000", "0.000")], True),
             ([("0.000", "0.000"), ("0.000", "1.000")], True),
             ([("0.000", "1.000"), ("1.000", "1.000")], True),
@@ -172,15 +192,11 @@ class TestSyncMap(unittest.TestCase):
             ([("0.000", "1.000"), ("2.000", "2.000")], False),
             ([("0.000", "1.000"), ("2.000", "3.000")], False),
         ]
-        for lst, exp in params:
-            tree = Tree()
-            for b, e in lst:
-                interval = TimeInterval(begin=TimeValue(b), end=TimeValue(e))
-                smf = SyncMapFragment(interval=interval)
-                child = Tree(value=smf)
-                tree.add_child(child, as_last=True)
-            syn = SyncMap(tree=tree)
-            self.assertEqual(syn.has_adjacent_leaves_only, exp)
+        for intervals, expexted in cases:
+            with self.subTest(intervals=intervals, expected=expexted):
+                syn = SyncMap(tree=self.build_tree_from_intervals(intervals))
+
+                self.assertEqual(syn.has_adjacent_leaves_only, expexted)
 
     def test_has_zero_length_leaves_empty(self):
         syn = SyncMap()
@@ -191,7 +207,7 @@ class TestSyncMap(unittest.TestCase):
         self.assertFalse(syn.has_zero_length_leaves)
 
     def test_has_zero_length_leaves(self):
-        params = [
+        cases = [
             ([("0.000", "0.000"), ("0.000", "0.000")], True),
             ([("0.000", "0.000"), ("0.000", "1.000")], True),
             ([("0.000", "1.000"), ("1.000", "1.000")], True),
@@ -201,15 +217,11 @@ class TestSyncMap(unittest.TestCase):
             ([("0.000", "1.000"), ("2.000", "2.000")], True),
             ([("0.000", "1.000"), ("2.000", "3.000")], False),
         ]
-        for lst, exp in params:
-            tree = Tree()
-            for b, e in lst:
-                interval = TimeInterval(begin=TimeValue(b), end=TimeValue(e))
-                smf = SyncMapFragment(interval=interval)
-                child = Tree(value=smf)
-                tree.add_child(child, as_last=True)
-            syn = SyncMap(tree=tree)
-            self.assertEqual(syn.has_zero_length_leaves, exp)
+        for intervals, expected in cases:
+            with self.subTest(intervals=intervals, expected=expected):
+                syn = SyncMap(tree=self.build_tree_from_intervals(intervals))
+
+                self.assertEqual(syn.has_zero_length_leaves, expected)
 
     def test_leaves_are_consistent_empty(self):
         syn = SyncMap()
@@ -220,7 +232,7 @@ class TestSyncMap(unittest.TestCase):
         self.assertTrue(syn.leaves_are_consistent)
 
     def test_leaves_are_consistent(self):
-        params = [
+        cases = [
             ([("0.000", "0.000"), ("0.000", "0.000")], True),
             ([("0.000", "0.000"), ("0.000", "1.000")], True),
             ([("0.000", "1.000"), ("1.000", "1.000")], True),
@@ -245,15 +257,10 @@ class TestSyncMap(unittest.TestCase):
             ([("0.000", "1.000"), ("2.000", "3.000"), ("1.500", "2.500")], False),
             ([("0.000", "1.000"), ("0.960", "2.000")], False),
         ]
-        for lst, exp in params:
-            tree = Tree()
-            for b, e in lst:
-                interval = TimeInterval(begin=TimeValue(b), end=TimeValue(e))
-                smf = SyncMapFragment(interval=interval)
-                child = Tree(value=smf)
-                tree.add_child(child, as_last=True)
-            syn = SyncMap(tree=tree)
-            self.assertEqual(syn.leaves_are_consistent, exp)
+        for intervals, expexted in cases:
+            syn = SyncMap(tree=self.build_tree_from_intervals(intervals))
+
+            self.assertEqual(syn.leaves_are_consistent, expexted)
 
     def test_append_none(self):
         syn = SyncMap()
@@ -323,7 +330,5 @@ class TestSyncMap(unittest.TestCase):
 
     def test_output_html_for_tuning(self):
         syn = self.read(SyncMapFormat.XML, multiline=True, utf8=True)
-        handler, output_file_path = gf.tmp_file(suffix=".html")
-        audio_file_path = "foo.mp3"
-        syn.output_html_for_tuning(audio_file_path, output_file_path, None)
-        gf.delete_file(handler, output_file_path)
+        with tempfile.NamedTemporaryFile(suffix=".html") as tmp_file:
+            syn.output_html_for_tuning("foo.mp3", tmp_file.name, parameters=None)
