@@ -340,15 +340,15 @@ class AdjustBoundaryAlgorithm(Loggable):
         )
         self.log("  Creating HEAD fragment")
         self.smflist.add(
-            SyncMapFragment(
+            SyncMapFragment.from_begin_end(
+                begin=time_values[0],
+                end=time_values[1],
                 # NOTE lines and filtered lines MUST be set,
                 #      otherwise some output format might break
                 #      when adding HEAD/TAIL to output
                 text_fragment=TextFragment(
                     identifier="HEAD", lines=[], filtered_lines=[]
                 ),
-                begin=time_values[0],
-                end=time_values[1],
                 fragment_type=FragmentType.HEAD,
             ),
             sort=False,
@@ -361,10 +361,10 @@ class AdjustBoundaryAlgorithm(Loggable):
         for i in range(1, len(time_values) - 2):
             self.log(["    Adding fragment %d ...", i])
             self.smflist.add(
-                SyncMapFragment(
-                    text_fragment=fragments[i - 1],
+                SyncMapFragment.from_begin_end(
                     begin=time_values[i],
                     end=time_values[i + 1],
+                    text_fragment=fragments[i - 1],
                     fragment_type=FragmentType.REGULAR,
                 ),
                 sort=False,
@@ -372,15 +372,15 @@ class AdjustBoundaryAlgorithm(Loggable):
             self.log(["    Adding fragment %d ... done", i])
         self.log("  Creating TAIL fragment")
         self.smflist.add(
-            SyncMapFragment(
+            SyncMapFragment.from_begin_end(
+                begin=time_values[len(time_values) - 2],
+                end=end,
                 # NOTE lines and filtered lines MUST be set,
                 #      otherwise some output format might break
                 #      when adding HEAD/TAIL to output
                 text_fragment=TextFragment(
                     identifier="TAIL", lines=[], filtered_lines=[]
                 ),
-                begin=time_values[len(time_values) - 2],
-                end=end,
                 fragment_type=FragmentType.TAIL,
             ),
             sort=False,

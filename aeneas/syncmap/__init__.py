@@ -364,7 +364,7 @@ class SyncMap(Loggable):
 
     def read(
         self,
-        sync_map_format: SyncMapFormat,
+        sync_map_format: str,
         input_file_path: str,
         parameters: dict | None = None,
     ):
@@ -423,7 +423,8 @@ class SyncMap(Loggable):
         if language is not None:
             self.log(["Overwriting language to '%s'", language])
             for fragment in self.fragments:
-                fragment.text_fragment.language = language
+                if fragment.text_fragment is not None:
+                    fragment.text_fragment.language = language
 
     def write(
         self,

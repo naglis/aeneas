@@ -75,14 +75,16 @@ class TestSyncMap(BaseSyncMapCase):
     NOT_EXISTING_SRT = gf.absolute_path("not_existing.srt", __file__)
     EXISTING_SRT = gf.absolute_path("res/syncmaps/sonnet001.srt", __file__)
     NOT_WRITEABLE_SRT = gf.absolute_path("x/y/z/not_writeable.srt", __file__)
+    EMPTY_INTERVAL = TimeInterval(begin=TimeValue("0.000"), end=TimeValue("0.000"))
 
     def build_tree_from_intervals(
         self, intervals: typing.Sequence[tuple[str, str]]
     ) -> Tree:
         tree = Tree()
         for begin, end in intervals:
-            interval = TimeInterval(begin=TimeValue(begin), end=TimeValue(end))
-            smf = SyncMapFragment(interval=interval)
+            smf = SyncMapFragment.from_begin_end(
+                begin=TimeValue(begin), end=TimeValue(end)
+            )
             child = Tree(value=smf)
             tree.add_child(child, as_last=True)
 
@@ -110,7 +112,7 @@ class TestSyncMap(BaseSyncMapCase):
         self.assertEqual(len(syn.fragments_tree), 0)
 
     def test_fragments_tree_not_empty(self):
-        smf = SyncMapFragment()
+        smf = SyncMapFragment(interval=self.EMPTY_INTERVAL)
         child = Tree(value=smf)
         tree = Tree()
         tree.add_child(child)
@@ -122,7 +124,7 @@ class TestSyncMap(BaseSyncMapCase):
         self.assertTrue(syn.is_single_level)
 
     def test_is_single_level_true_not_empty(self):
-        smf = SyncMapFragment()
+        smf = SyncMapFragment(interval=self.EMPTY_INTERVAL)
         child = Tree(value=smf)
         tree = Tree()
         tree.add_child(child)
@@ -130,9 +132,9 @@ class TestSyncMap(BaseSyncMapCase):
         self.assertTrue(syn.is_single_level)
 
     def test_is_single_level_false(self):
-        smf2 = SyncMapFragment()
+        smf2 = SyncMapFragment(interval=self.EMPTY_INTERVAL)
         child2 = Tree(value=smf2)
-        smf = SyncMapFragment()
+        smf = SyncMapFragment(interval=self.EMPTY_INTERVAL)
         child = Tree(value=smf)
         child.add_child(child2)
         tree = Tree()

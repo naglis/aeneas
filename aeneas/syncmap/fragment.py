@@ -63,22 +63,33 @@ class SyncMapFragment:
 
     def __init__(
         self,
+        interval: TimeInterval,
+        *,
         text_fragment: TextFragment | None = None,
-        interval: TimeInterval | None = None,
-        begin: TimeValue | None = None,
-        end: TimeValue | None = None,
         fragment_type: FragmentType = FragmentType.REGULAR,
         confidence: float = 1.0,
     ):
         self.text_fragment = text_fragment
-        if interval is not None:
-            self.interval = interval
-        elif begin is not None and end is not None:
-            self.interval = TimeInterval(begin, end)
-        else:
-            self.interval = None
+        self.interval = interval
         self.fragment_type = fragment_type
         self.confidence = confidence
+
+    @classmethod
+    def from_begin_end(
+        cls,
+        begin: TimeValue,
+        end: TimeValue,
+        *,
+        text_fragment: TextFragment | None = None,
+        fragment_type: FragmentType = FragmentType.REGULAR,
+        confidence: float = 1.0,
+    ) -> "SyncMapFragment":
+        return cls(
+            interval=TimeInterval(begin, end),
+            text_fragment=text_fragment,
+            fragment_type=fragment_type,
+            confidence=confidence,
+        )
 
     def __str__(self):
         return "%s %d %.3f %.3f" % (
@@ -124,14 +135,14 @@ class SyncMapFragment:
         self.__text_fragment = text_fragment
 
     @property
-    def interval(self) -> TimeInterval | None:
+    def interval(self) -> TimeInterval:
         """
         The time interval corresponding to this fragment.
         """
         return self.__interval
 
     @interval.setter
-    def interval(self, interval: TimeInterval | None):
+    def interval(self, interval: TimeInterval):
         self.__interval = interval
 
     @property
@@ -185,10 +196,10 @@ class SyncMapFragment:
         .. versionadded:: 1.7.0
         """
         return "{}\t{:.3f}\t{:.3f}\t{}".format(
-            (self.identifier or ""),
-            (self.begin if self.begin is not None else TimeValue("-2.000")),
-            (self.end if self.end is not None else TimeValue("-1.000")),
-            (self.text or ""),
+            self.identifier or "",
+            self.interval.begin,
+            self.interval.end,
+            self.text or "",
         )
 
     @property
@@ -214,37 +225,27 @@ class SyncMapFragment:
         return self.text_fragment.text
 
     @property
-    def begin(self) -> TimeValue | None:
+    def begin(self) -> TimeValue:
         """
         The begin time of this sync map fragment.
         """
-        if self.interval is None:
-            return None
         return self.interval.begin
 
     @begin.setter
     def begin(self, begin: TimeValue):
-        if self.interval is None:
-            raise TypeError("Attempting to set begin when interval is None")
         if not isinstance(begin, TimeValue):
             raise TypeError("The given begin value is not an instance of TimeValue")
         self.interval.begin = begin
 
     @property
-    def end(self) -> TimeValue | None:
+    def end(self) -> TimeValue:
         """
         The end time of this sync map fragment.
-
-        :rtype: :class:`~aeneas.exacttiming.TimeValue`
         """
-        if self.interval is None:
-            return None
         return self.interval.end
 
     @end.setter
     def end(self, end: TimeValue):
-        if self.interval is None:
-            raise TypeError("Attempting to set end when interval is None")
         if not isinstance(end, TimeValue):
             raise TypeError("The given end value is not an instance of TimeValue")
         self.interval.end = end
@@ -254,11 +255,7 @@ class SyncMapFragment:
         """
         The audio duration of this sync map fragment,
         as end time minus begin time.
-
-        :rtype: :class:`~aeneas.exacttiming.TimeValue`
         """
-        if self.interval is None:
-            return TimeValue("0.000")
         return self.interval.length
 
     @property

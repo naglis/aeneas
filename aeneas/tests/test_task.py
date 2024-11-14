@@ -43,20 +43,24 @@ class TestTask(unittest.TestCase):
         sync_map = SyncMap()
         frag = TextFragment("f001", Language.ENG, ["Fragment 1"])
         sync_map.add_fragment(
-            SyncMapFragment(
-                text_fragment=frag, begin=TimeValue("0.000"), end=TimeValue("12.345")
+            SyncMapFragment.from_begin_end(
+                begin=TimeValue("0.000"),
+                end=TimeValue("12.345"),
+                text_fragment=frag,
             )
         )
         frag = TextFragment("f002", Language.ENG, ["Fragment 2"])
         sync_map.add_fragment(
-            SyncMapFragment(
-                text_fragment=frag, begin=TimeValue("12.345"), end=TimeValue("23.456")
+            SyncMapFragment.from_begin_end(
+                begin=TimeValue("12.345"),
+                end=TimeValue("23.456"),
+                text_fragment=frag,
             )
         )
         frag = TextFragment("f003", Language.ENG, ["Fragment 3"])
         sync_map.add_fragment(
-            SyncMapFragment(
-                text_fragment=frag, begin=TimeValue("23.456"), end=TimeValue("34.567")
+            SyncMapFragment.from_begin_end(
+                begin=TimeValue("23.456"), end=TimeValue("34.567"), text_fragment=frag
             )
         )
         return sync_map

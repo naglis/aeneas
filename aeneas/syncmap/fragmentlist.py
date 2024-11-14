@@ -445,7 +445,7 @@ class SyncMapFragmentList(Loggable):
 
     def fragments_ending_inside_nonspeech_intervals(
         self, nonspeech_intervals: list[TimeInterval], tolerance: TimeValue
-    ) -> list[tuple[TimeInterval, int]]:
+    ) -> list[tuple[TimeInterval | None, int]]:
         """
         Determine a list of pairs (nonspeech interval, fragment index),
         such that the nonspeech interval contains exactly one fragment
@@ -463,7 +463,9 @@ class SyncMapFragmentList(Loggable):
         self.log(["  List end:   %.3f", self.end])
         nsi_index = 0
         frag_index = 0
-        nsi_counter = [(n, []) for n in nonspeech_intervals]
+        nsi_counter: list[tuple[TimeInterval | None, list[int]]] = [
+            (n, []) for n in nonspeech_intervals
+        ]
         # NOTE the last fragment is not eligible to be returned
         while (nsi_index < len(nonspeech_intervals)) and (frag_index < len(self) - 1):
             nsi = nonspeech_intervals[nsi_index]
@@ -569,13 +571,13 @@ class SyncMapFragmentList(Loggable):
             identifier = "n%06d" % i
             self.add(
                 SyncMapFragment(
+                    interval=nsi,
                     text_fragment=TextFragment(
                         identifier=identifier,
                         language=None,
                         lines=lines,
                         filtered_lines=lines,
                     ),
-                    interval=nsi,
                     fragment_type=FragmentType.NONSPEECH,
                 ),
                 sort=False,
@@ -664,7 +666,9 @@ class SyncMapFragmentList(Loggable):
                         self[i].interval,
                     ]
                 )
-                moves = [(i, "ENLARGE", duration)]
+                moves: list[tuple[int, str, TimeValue | None]] = [
+                    (i, "ENLARGE", duration)
+                ]
                 slack = duration
                 j = i + 1
                 self.log(["  Entered while with j == %d", j])

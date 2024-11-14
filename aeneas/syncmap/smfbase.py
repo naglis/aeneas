@@ -66,7 +66,7 @@ class SyncMapFormatBase(Loggable, abc.ABC):
         cls,
         syncmap: "SyncMap",
         identifier: str,
-        lines: typing.Sequence[str],
+        lines: list[str],
         begin: TimeValue,
         end: TimeValue,
         language: Language | None = None,
@@ -88,7 +88,7 @@ class SyncMapFormatBase(Loggable, abc.ABC):
         :type language: string
         """
         syncmap.add_fragment(
-            SyncMapFragment(
+            SyncMapFragment.from_begin_end(
                 text_fragment=TextFragment(
                     identifier=identifier, lines=lines, language=language
                 ),
