@@ -20,10 +20,26 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+import decimal
+import enum
 
-from aeneas.exacttiming import Decimal
-from aeneas.exacttiming import TimeInterval
-from aeneas.exacttiming import TimeValue
+from aeneas.exacttiming import TimeInterval, TimeValue
+from aeneas.textfile import TextFragment
+
+
+@enum.unique
+class FragmentType(enum.IntEnum):
+    REGULAR = 0
+    """ Regular fragment """
+
+    HEAD = 1
+    """ Head fragment """
+
+    TAIL = 2
+    """ Tail fragment """
+
+    NONSPEECH = 3
+    """ Nonspeech fragment (not head nor tail) """
 
 
 class SyncMapFragment:
@@ -42,34 +58,22 @@ class SyncMapFragment:
 
     TAG = "SyncMapFragment"
 
-    REGULAR = 0
-    """ Regular fragment """
-
-    HEAD = 1
-    """ Head fragment """
-
-    TAIL = 2
-    """ Tail fragment """
-
-    NONSPEECH = 3
-    """ Nonspeech fragment (not head nor tail) """
-
-    NOT_REGULAR_TYPES = [HEAD, TAIL, NONSPEECH]
+    NOT_REGULAR_TYPES = [FragmentType.HEAD, FragmentType.TAIL, FragmentType.NONSPEECH]
     """ Types of fragment different than ``REGULAR`` """
 
     def __init__(
         self,
-        text_fragment=None,
-        interval=None,
-        begin=None,
-        end=None,
-        fragment_type=REGULAR,
-        confidence=1.0,
+        text_fragment: TextFragment | None = None,
+        interval: TimeInterval | None = None,
+        begin: TimeValue | None = None,
+        end: TimeValue | None = None,
+        fragment_type: FragmentType = FragmentType.REGULAR,
+        confidence: float = 1.0,
     ):
         self.text_fragment = text_fragment
         if interval is not None:
             self.interval = interval
-        elif (begin is not None) and (end is not None):
+        elif begin is not None and end is not None:
             self.interval = TimeInterval(begin, end)
         else:
             self.interval = None
@@ -109,97 +113,74 @@ class SyncMapFragment:
         return (self < other) or (self == other)
 
     @property
-    def text_fragment(self):
+    def text_fragment(self) -> TextFragment | None:
         """
         The text fragment associated with this sync map fragment.
-
-        :rtype: :class:`~aeneas.textfile.TextFragment`
         """
         return self.__text_fragment
 
     @text_fragment.setter
-    def text_fragment(self, text_fragment):
+    def text_fragment(self, text_fragment: TextFragment | None):
         self.__text_fragment = text_fragment
 
     @property
-    def interval(self):
+    def interval(self) -> TimeInterval | None:
         """
         The time interval corresponding to this fragment.
-
-        :rtype: :class:`~aeneas.exacttiming.TimeInterval`
         """
         return self.__interval
 
     @interval.setter
-    def interval(self, interval):
+    def interval(self, interval: TimeInterval | None):
         self.__interval = interval
 
     @property
-    def fragment_type(self):
+    def fragment_type(self) -> FragmentType:
         """
         The type of fragment.
-
-        Possible values are:
-
-        * :data:`~aeneas.syncmap.fragment.SyncMapFragment.REGULAR`
-        * :data:`~aeneas.syncmap.fragment.SyncMapFragment.HEAD`
-        * :data:`~aeneas.syncmap.fragment.SyncMapFragment.TAIL`
-        * :data:`~aeneas.syncmap.fragment.SyncMapFragment.NONSPEECH`
-
-        :rtype: int
         """
         return self.__fragment_type
 
     @fragment_type.setter
-    def fragment_type(self, fragment_type):
+    def fragment_type(self, fragment_type: FragmentType):
         self.__fragment_type = fragment_type
 
     @property
-    def is_head_or_tail(self):
+    def is_head_or_tail(self) -> bool:
         """
-        Return ``True`` if the fragment
-        is HEAD or TAIL.
-
-        :rtype: bool
+        Return ``True`` if the fragment is HEAD or TAIL.
 
         .. versionadded:: 1.7.0
         """
-        return self.fragment_type in [self.HEAD, self.TAIL]
+        return self.fragment_type in (FragmentType.HEAD, FragmentType.TAIL)
 
     @property
-    def is_regular(self):
+    def is_regular(self) -> bool:
         """
-        Return ``True`` if the fragment
-        is REGULAR.
-
-        :rtype: bool
+        Return ``True`` if the fragment is REGULAR.
 
         .. versionadded:: 1.7.0
         """
-        return self.fragment_type == self.REGULAR
+        return self.fragment_type == FragmentType.REGULAR
 
     @property
-    def confidence(self):
+    def confidence(self) -> float:
         """
         The confidence of the audio timing, from ``0.0`` to ``1.0``.
 
         Currently this value is not used, and it is always ``1.0``.
-
-        :rtype: float
         """
         return self.__confidence
 
     @confidence.setter
-    def confidence(self, confidence):
+    def confidence(self, confidence: float):
         self.__confidence = confidence
 
     @property
-    def pretty_print(self):
+    def pretty_print(self) -> str:
         """
         Pretty print representation of this fragment,
         as ``(identifier, begin, end, text)``.
-
-        :rtype: string
 
         .. versionadded:: 1.7.0
         """
@@ -211,11 +192,9 @@ class SyncMapFragment:
         )
 
     @property
-    def identifier(self):
+    def identifier(self) -> str | None:
         """
         The identifier of this sync map fragment.
-
-        :rtype: string
 
         .. versionadded:: 1.7.0
         """
@@ -224,11 +203,9 @@ class SyncMapFragment:
         return self.text_fragment.identifier
 
     @property
-    def text(self):
+    def text(self) -> str | None:
         """
         The text of this sync map fragment.
-
-        :rtype: string
 
         .. versionadded:: 1.7.0
         """
@@ -237,18 +214,16 @@ class SyncMapFragment:
         return self.text_fragment.text
 
     @property
-    def begin(self):
+    def begin(self) -> TimeValue | None:
         """
         The begin time of this sync map fragment.
-
-        :rtype: :class:`~aeneas.exacttiming.TimeValue`
         """
         if self.interval is None:
             return None
         return self.interval.begin
 
     @begin.setter
-    def begin(self, begin):
+    def begin(self, begin: TimeValue):
         if self.interval is None:
             raise TypeError("Attempting to set begin when interval is None")
         if not isinstance(begin, TimeValue):
@@ -256,7 +231,7 @@ class SyncMapFragment:
         self.interval.begin = begin
 
     @property
-    def end(self):
+    def end(self) -> TimeValue | None:
         """
         The end time of this sync map fragment.
 
@@ -267,7 +242,7 @@ class SyncMapFragment:
         return self.interval.end
 
     @end.setter
-    def end(self, end):
+    def end(self, end: TimeValue):
         if self.interval is None:
             raise TypeError("Attempting to set end when interval is None")
         if not isinstance(end, TimeValue):
@@ -275,7 +250,7 @@ class SyncMapFragment:
         self.interval.end = end
 
     @property
-    def length(self):
+    def length(self) -> TimeValue:
         """
         The audio duration of this sync map fragment,
         as end time minus begin time.
@@ -287,7 +262,7 @@ class SyncMapFragment:
         return self.interval.length
 
     @property
-    def has_zero_length(self):
+    def has_zero_length(self) -> bool:
         """
         Returns ``True`` if this sync map fragment has zero length,
         that is, if its begin and end values coincide.
@@ -299,12 +274,10 @@ class SyncMapFragment:
         return self.length == TimeValue("0.000")
 
     @property
-    def chars(self):
+    def chars(self) -> int:
         """
         Return the number of characters of the text fragment,
         not including the line separators.
-
-        :rtype: int
 
         .. versionadded:: 1.2.0
         """
@@ -313,22 +286,20 @@ class SyncMapFragment:
         return self.text_fragment.chars
 
     @property
-    def rate(self):
+    def rate(self) -> decimal.Decimal | None:
         """
         The rate, in characters/second, of this fragment.
 
         If the fragment is not ``REGULAR`` or its duration is zero,
         return ``None``.
 
-        :rtype: ``None`` or :class:`~aeneas.exacttiming.Decimal`
-
         .. versionadded:: 1.2.0
         """
-        if (self.fragment_type != self.REGULAR) or (self.has_zero_length):
+        if self.fragment_type != FragmentType.REGULAR or self.has_zero_length:
             return None
-        return Decimal(self.chars / self.length)
+        return decimal.Decimal(self.chars / self.length)
 
-    def rate_lack(self, max_rate):
+    def rate_lack(self, max_rate: decimal.Decimal) -> TimeValue:
         """
         The time interval that this fragment lacks
         to respect the given max rate.
@@ -341,16 +312,15 @@ class SyncMapFragment:
         Always return ``0.000`` for fragments that are not ``REGULAR``.
 
         :param max_rate: the maximum rate (characters/second)
-        :type  max_rate: :class:`~aeneas.exacttiming.Decimal`
-        :rtype: :class:`~aeneas.exacttiming.TimeValue`
+        :type  max_rate: :class:`~decimal.Decimal`
 
         .. versionadded:: 1.7.0
         """
-        if self.fragment_type == self.REGULAR:
+        if self.fragment_type == FragmentType.REGULAR:
             return self.chars / max_rate - self.length
         return TimeValue("0.000")
 
-    def rate_slack(self, max_rate):
+    def rate_slack(self, max_rate: decimal.Decimal) -> TimeValue:
         """
         The maximum time interval that can be stolen to this fragment
         while keeping it respecting the given max rate.
@@ -363,14 +333,14 @@ class SyncMapFragment:
         meaning that they cannot be stolen.
 
         :param max_rate: the maximum rate (characters/second)
-        :type  max_rate: :class:`~aeneas.exacttiming.Decimal`
+        :type  max_rate: :class:`~decimal.Decimal`
         :rtype: :class:`~aeneas.exacttiming.TimeValue`
 
         .. versionadded:: 1.7.0
         """
-        if self.fragment_type == self.REGULAR:
+        if self.fragment_type == FragmentType.REGULAR:
             return -self.rate_lack(max_rate)
-        elif self.fragment_type == self.NONSPEECH:
+        elif self.fragment_type == FragmentType.NONSPEECH:
             return self.length
         else:
             return TimeValue("0.000")

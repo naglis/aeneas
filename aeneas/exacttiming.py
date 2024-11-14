@@ -47,12 +47,10 @@ class TimeValue(Decimal):
         return super().__repr__().replace("Decimal", "TimeValue")
 
     @property
-    def is_integer(self):
+    def is_integer(self) -> bool:
         """
         Return ``True`` if this time value represents
         an integer.
-
-        :rtype: bool
         """
         return self == int(self)
 
@@ -86,6 +84,9 @@ class TimeValue(Decimal):
 
     def __mul__(self, other, context=None):
         return TimeValue(Decimal.__mul__(self, other))
+
+    def __neg__(self, context=None):
+        return TimeValue(Decimal.__neg__(self))
 
     def __radd__(self, other, context=None):
         return TimeValue(Decimal.__radd__(self, other))

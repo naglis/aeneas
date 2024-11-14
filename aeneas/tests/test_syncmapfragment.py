@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 # aeneas is a Python/C library and a set of tools
 # to automagically synchronize audio and text (aka forced alignment)
 #
@@ -20,12 +18,11 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+import decimal
 import unittest
 
-from aeneas.exacttiming import Decimal
-from aeneas.exacttiming import TimeInterval
-from aeneas.exacttiming import TimeValue
-from aeneas.syncmap import SyncMapFragment
+from aeneas.exacttiming import TimeInterval, TimeValue
+from aeneas.syncmap.fragment import FragmentType, SyncMapFragment
 from aeneas.textfile import TextFragment
 
 
@@ -163,20 +160,20 @@ class TestSyncMap(unittest.TestCase):
         text = TextFragment(lines=["Hello", "World"])
         frag = SyncMapFragment(
             text_fragment=text,
-            fragment_type=SyncMapFragment.REGULAR,
+            fragment_type=FragmentType.REGULAR,
             begin=TimeValue("1.234"),
             end=TimeValue("6.234"),
         )
         self.assertEqual(frag.length, 5)
         self.assertEqual(frag.chars, 10)
         self.assertEqual(frag.rate, 2.000)
-        self.assertEqual(frag.rate, Decimal("2.000"))
+        self.assertEqual(frag.rate, decimal.Decimal("2.000"))
 
     def test_fragment_regular_rate_zero_length(self):
         text = TextFragment(lines=["Hello", "World"])
         frag = SyncMapFragment(
             text_fragment=text,
-            fragment_type=SyncMapFragment.REGULAR,
+            fragment_type=FragmentType.REGULAR,
             begin=TimeValue("1.234"),
             end=TimeValue("1.234"),
         )
@@ -188,7 +185,7 @@ class TestSyncMap(unittest.TestCase):
         text = TextFragment()
         frag = SyncMapFragment(
             text_fragment=text,
-            fragment_type=SyncMapFragment.REGULAR,
+            fragment_type=FragmentType.REGULAR,
             begin=TimeValue("1.234"),
             end=TimeValue("6.234"),
         )
@@ -197,144 +194,174 @@ class TestSyncMap(unittest.TestCase):
         self.assertEqual(frag.rate, 0)
 
     def test_fragment_not_regular_rate_non_zero_length(self):
-        for t in SyncMapFragment.NOT_REGULAR_TYPES:
-            text = TextFragment()
-            frag = SyncMapFragment(
-                text_fragment=text,
-                fragment_type=t,
-                begin=TimeValue("1.234"),
-                end=TimeValue("6.234"),
-            )
-            self.assertEqual(frag.length, 5)
-            self.assertEqual(frag.chars, 0)
-            self.assertIsNone(frag.rate)
+        for fragment_type in SyncMapFragment.NOT_REGULAR_TYPES:
+            with self.subTest(fragment_type=fragment_type):
+                text = TextFragment()
+                frag = SyncMapFragment(
+                    text_fragment=text,
+                    fragment_type=fragment_type,
+                    begin=TimeValue("1.234"),
+                    end=TimeValue("6.234"),
+                )
+                self.assertEqual(frag.length, 5)
+                self.assertEqual(frag.chars, 0)
+                self.assertIsNone(frag.rate)
 
     def test_fragment_not_regular_rate_zero_length(self):
-        for t in SyncMapFragment.NOT_REGULAR_TYPES:
-            text = TextFragment()
-            frag = SyncMapFragment(
-                text_fragment=text,
-                fragment_type=t,
-                begin=TimeValue("1.234"),
-                end=TimeValue("1.234"),
-            )
-            self.assertEqual(frag.length, 0)
-            self.assertEqual(frag.chars, 0)
-            self.assertIsNone(frag.rate)
+        for fragment_type in SyncMapFragment.NOT_REGULAR_TYPES:
+            with self.subTest(fragment_type=fragment_type):
+                text = TextFragment()
+                frag = SyncMapFragment(
+                    text_fragment=text,
+                    fragment_type=fragment_type,
+                    begin=TimeValue("1.234"),
+                    end=TimeValue("1.234"),
+                )
+                self.assertEqual(frag.length, 0)
+                self.assertEqual(frag.chars, 0)
+                self.assertIsNone(frag.rate)
 
     def test_fragment_regular_rate_lack(self):
-        params = [
+        cases = (
             ("20.000", "0.500", "-0.500"),
             ("10.000", "1.000", "0.000"),
             ("5.000", "2.000", "1.000"),
-        ]
+        )
         text = TextFragment(lines=["Hello", "World"])
-        for r, e_zero, e_nonzero in params:
-            frag = SyncMapFragment(
-                text_fragment=text,
-                fragment_type=SyncMapFragment.REGULAR,
-                begin=TimeValue("1.000"),
-                end=TimeValue("1.000"),
-            )
-            self.assertEqual(frag.rate_lack(Decimal(r)), TimeValue(e_zero))
-            frag = SyncMapFragment(
-                text_fragment=text,
-                fragment_type=SyncMapFragment.REGULAR,
-                begin=TimeValue("0.000"),
-                end=TimeValue("1.000"),
-            )
-            self.assertEqual(frag.rate_lack(Decimal(r)), TimeValue(e_nonzero))
+        for r, e_zero, e_nonzero in cases:
+            with self.subTest(r=r, e_zero=e_zero, e_nonzero=e_nonzero):
+                frag = SyncMapFragment(
+                    text_fragment=text,
+                    fragment_type=FragmentType.REGULAR,
+                    begin=TimeValue("1.000"),
+                    end=TimeValue("1.000"),
+                )
+                self.assertEqual(frag.rate_lack(decimal.Decimal(r)), TimeValue(e_zero))
+
+                frag = SyncMapFragment(
+                    text_fragment=text,
+                    fragment_type=FragmentType.REGULAR,
+                    begin=TimeValue("0.000"),
+                    end=TimeValue("1.000"),
+                )
+                self.assertEqual(
+                    frag.rate_lack(decimal.Decimal(r)), TimeValue(e_nonzero)
+                )
 
     def test_fragment_regular_rate_slack(self):
-        params = [
+        cases = (
             ("20.000", "-0.500", "0.500"),
             ("10.000", "-1.000", "0.000"),
             ("5.000", "-2.000", "-1.000"),
-        ]
+        )
         text = TextFragment(lines=["Hello", "World"])
-        for r, e_zero, e_nonzero in params:
-            frag = SyncMapFragment(
-                text_fragment=text,
-                fragment_type=SyncMapFragment.REGULAR,
-                begin=TimeValue("1.000"),
-                end=TimeValue("1.000"),
-            )
-            self.assertEqual(frag.rate_slack(Decimal(r)), TimeValue(e_zero))
-            frag = SyncMapFragment(
-                text_fragment=text,
-                fragment_type=SyncMapFragment.REGULAR,
-                begin=TimeValue("0.000"),
-                end=TimeValue("1.000"),
-            )
-            self.assertEqual(frag.rate_slack(Decimal(r)), TimeValue(e_nonzero))
-
-    def test_fragment_not_regular_rate_lack(self):
-        params = [
-            ("20.000", "0.000", "0.000"),
-            ("10.000", "0.000", "0.000"),
-            ("5.000", "0.000", "0.000"),
-        ]
-        text = TextFragment()
-        for t in SyncMapFragment.NOT_REGULAR_TYPES:
-            for r, e_zero, e_nonzero in params:
+        for r, e_zero, e_nonzero in cases:
+            with self.subTest(r=r, e_zero=e_zero, e_nonzero=e_nonzero):
                 frag = SyncMapFragment(
                     text_fragment=text,
-                    fragment_type=t,
+                    fragment_type=FragmentType.REGULAR,
                     begin=TimeValue("1.000"),
                     end=TimeValue("1.000"),
                 )
-                self.assertEqual(frag.rate_lack(Decimal(r)), TimeValue(e_zero))
+                self.assertEqual(frag.rate_slack(decimal.Decimal(r)), TimeValue(e_zero))
+
                 frag = SyncMapFragment(
                     text_fragment=text,
-                    fragment_type=t,
+                    fragment_type=FragmentType.REGULAR,
                     begin=TimeValue("0.000"),
                     end=TimeValue("1.000"),
                 )
-                self.assertEqual(frag.rate_lack(Decimal(r)), TimeValue(e_nonzero))
+                self.assertEqual(
+                    frag.rate_slack(decimal.Decimal(r)), TimeValue(e_nonzero)
+                )
+
+    def test_fragment_not_regular_rate_lack(self):
+        cases = (
+            ("20.000", "0.000", "0.000"),
+            ("10.000", "0.000", "0.000"),
+            ("5.000", "0.000", "0.000"),
+        )
+        text = TextFragment()
+        for fragment_type in SyncMapFragment.NOT_REGULAR_TYPES:
+            for r, e_zero, e_nonzero in cases:
+                with self.subTest(
+                    fragment_type=fragment_type, r=r, e_zero=e_zero, e_nonzero=e_nonzero
+                ):
+                    frag = SyncMapFragment(
+                        text_fragment=text,
+                        fragment_type=fragment_type,
+                        begin=TimeValue("1.000"),
+                        end=TimeValue("1.000"),
+                    )
+                    self.assertEqual(
+                        frag.rate_lack(decimal.Decimal(r)), TimeValue(e_zero)
+                    )
+
+                    frag = SyncMapFragment(
+                        text_fragment=text,
+                        fragment_type=fragment_type,
+                        begin=TimeValue("0.000"),
+                        end=TimeValue("1.000"),
+                    )
+                    self.assertEqual(
+                        frag.rate_lack(decimal.Decimal(r)), TimeValue(e_nonzero)
+                    )
 
     def test_fragment_nonspeech_rate_slack(self):
-        params = [
+        cases = (
             ("20.000", "0.000", "1.000"),
             ("10.000", "0.000", "1.000"),
             ("5.000", "0.000", "1.000"),
-        ]
+        )
         text = TextFragment()
-        for r, e_zero, e_nonzero in params:
-            frag = SyncMapFragment(
-                text_fragment=text,
-                fragment_type=SyncMapFragment.NONSPEECH,
-                begin=TimeValue("1.000"),
-                end=TimeValue("1.000"),
-            )
-            self.assertEqual(frag.rate_slack(Decimal(r)), TimeValue(e_zero))
-            frag = SyncMapFragment(
-                text_fragment=text,
-                fragment_type=SyncMapFragment.NONSPEECH,
-                begin=TimeValue("0.000"),
-                end=TimeValue("1.000"),
-            )
-            self.assertEqual(frag.rate_slack(Decimal(r)), TimeValue(e_nonzero))
-
-    def test_fragment_head_tail_rate_slack(self):
-        params = [
-            ("20.000", "0.000", "0.000"),
-            ("10.000", "0.000", "0.000"),
-            ("5.000", "0.000", "0.000"),
-        ]
-        text = TextFragment()
-        for t in [SyncMapFragment.HEAD, SyncMapFragment.TAIL]:
-            for r, e_zero, e_nonzero in params:
+        for r, e_zero, e_nonzero in cases:
+            with self.subTest(r=r, e_zero=e_zero, e_nonzero=e_nonzero):
                 frag = SyncMapFragment(
                     text_fragment=text,
-                    fragment_type=t,
+                    fragment_type=FragmentType.NONSPEECH,
                     begin=TimeValue("1.000"),
                     end=TimeValue("1.000"),
                 )
-                self.assertEqual(frag.rate_slack(Decimal(r)), TimeValue(e_zero))
+                self.assertEqual(frag.rate_slack(decimal.Decimal(r)), TimeValue(e_zero))
+
                 frag = SyncMapFragment(
                     text_fragment=text,
-                    fragment_type=t,
+                    fragment_type=FragmentType.NONSPEECH,
                     begin=TimeValue("0.000"),
                     end=TimeValue("1.000"),
                 )
-                self.assertEqual(frag.rate_slack(Decimal(r)), TimeValue(e_nonzero))
+                self.assertEqual(
+                    frag.rate_slack(decimal.Decimal(r)), TimeValue(e_nonzero)
+                )
+
+    def test_fragment_head_tail_rate_slack(self):
+        cases = (
+            ("20.000", "0.000", "0.000"),
+            ("10.000", "0.000", "0.000"),
+            ("5.000", "0.000", "0.000"),
+        )
+        text = TextFragment()
+        for fragment_type in (FragmentType.HEAD, FragmentType.TAIL):
+            for r, e_zero, e_nonzero in cases:
+                with self.subTest(
+                    fragment_type=fragment_type, r=r, e_zero=e_zero, e_nonzero=e_nonzero
+                ):
+                    frag = SyncMapFragment(
+                        text_fragment=text,
+                        fragment_type=fragment_type,
+                        begin=TimeValue("1.000"),
+                        end=TimeValue("1.000"),
+                    )
+                    self.assertEqual(
+                        frag.rate_slack(decimal.Decimal(r)), TimeValue(e_zero)
+                    )
+
+                    frag = SyncMapFragment(
+                        text_fragment=text,
+                        fragment_type=fragment_type,
+                        begin=TimeValue("0.000"),
+                        end=TimeValue("1.000"),
+                    )
+                    self.assertEqual(
+                        frag.rate_slack(decimal.Decimal(r)), TimeValue(e_nonzero)
+                    )
