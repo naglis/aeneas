@@ -63,11 +63,11 @@ class Downloader(Loggable):
 
     def audio_from_youtube(
         self,
-        source_url,
-        download=True,
-        output_file_path=None,
-        download_format=None,
-        largest_audio=True,
+        source_url: str,
+        download: bool = True,
+        output_file_path: str | None = None,
+        download_format: int | None = None,
+        largest_audio: bool = True,
     ):
         """
         Download an audio stream from a YouTube video,
@@ -107,7 +107,7 @@ class Downloader(Loggable):
                                                             network issues
         """
 
-        def _list_audiostreams(self, source_url):
+        def _list_audiostreams(self, source_url: str):
             """
             Return a list of dicts, each describing
             an available audiostream for the given ``source_url``.
