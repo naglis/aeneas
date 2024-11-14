@@ -42,6 +42,7 @@ See the following discussions for details:
 
 import subprocess
 import sys
+import tempfile
 
 from aeneas.exacttiming import TimeValue
 from aeneas.logger import Loggable
@@ -80,53 +81,54 @@ class CEWSubprocess(Loggable):
         self.log(["c_quit_after: '%.3f'", c_quit_after])
         self.log(["c_backwards: '%d'", c_backwards])
 
-        text_file_handler, text_file_path = gf.tmp_file()
-        data_file_handler, data_file_path = gf.tmp_file()
-        self.log(["Temporary text file path: '%s'", text_file_path])
-        self.log(["Temporary data file path: '%s'", data_file_path])
+        with tempfile.NamedTemporaryFile(
+            suffix=".text"
+        ) as tmp_text_file, tempfile.NamedTemporaryFile(
+            suffix=".data"
+        ) as tmp_data_file:
+            text_file_path = tmp_text_file.name
+            data_file_path = tmp_data_file.name
 
-        self.log("Populating the text file...")
-        with open(text_file_path, "w", encoding="utf-8") as tmp_text_file:
-            for f_voice_code, f_text in u_text:
-                tmp_text_file.write(f"{f_voice_code} {f_text}\n")
-        self.log("Populating the text file... done")
+            self.log(["Temporary text file path: '%s'", text_file_path])
+            self.log(["Temporary data file path: '%s'", data_file_path])
 
-        arguments = [
-            self.rconf[RuntimeConfiguration.CEW_SUBPROCESS_PATH],
-            "-m",
-            "aeneas.cewsubprocess",
-            "%.3f" % c_quit_after,
-            "%d" % c_backwards,
-            text_file_path,
-            audio_file_path,
-            data_file_path,
-        ]
-        self.log(["Calling with arguments '%s'", " ".join(arguments)])
-        proc = subprocess.Popen(
-            arguments,
-            stdout=subprocess.PIPE,
-            stdin=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-            universal_newlines=True,
-        )
-        proc.communicate()
+            self.log("Populating the text file...")
+            with open(text_file_path, "w", encoding="utf-8") as tmp_text_file:
+                for f_voice_code, f_text in u_text:
+                    tmp_text_file.write(f"{f_voice_code} {f_text}\n")
+            self.log("Populating the text file... done")
 
-        self.log("Reading output data...")
-        with open(data_file_path, encoding="utf-8") as data_file:
-            lines = data_file.read().splitlines()
-            sr = int(lines[0])
-            sf = int(lines[1])
-            intervals = []
-            for line in lines[2:]:
-                values = line.split(" ")
-                if len(values) == 2:
-                    intervals.append((TimeValue(values[0]), TimeValue(values[1])))
-        self.log("Reading output data... done")
+            arguments = [
+                self.rconf[RuntimeConfiguration.CEW_SUBPROCESS_PATH],
+                "-m",
+                "aeneas.cewsubprocess",
+                "%.3f" % c_quit_after,
+                "%d" % c_backwards,
+                text_file_path,
+                audio_file_path,
+                data_file_path,
+            ]
+            self.log(["Calling with arguments '%s'", " ".join(arguments)])
+            proc = subprocess.Popen(
+                arguments,
+                stdout=subprocess.PIPE,
+                stdin=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                universal_newlines=True,
+            )
+            proc.communicate()
 
-        self.log("Deleting text and data files...")
-        gf.delete_file(text_file_handler, text_file_path)
-        gf.delete_file(data_file_handler, data_file_path)
-        self.log("Deleting text and data files... done")
+            self.log("Reading output data...")
+            with open(data_file_path, encoding="utf-8") as data_file:
+                lines = data_file.read().splitlines()
+                sr = int(lines[0])
+                sf = int(lines[1])
+                intervals = []
+                for line in lines[2:]:
+                    values = line.split(" ")
+                    if len(values) == 2:
+                        intervals.append((TimeValue(values[0]), TimeValue(values[1])))
+            self.log("Reading output data... done")
 
         return (sr, sf, intervals)
 

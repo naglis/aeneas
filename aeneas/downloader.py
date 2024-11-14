@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 # aeneas is a Python/C library and a set of tools
 # to automagically synchronize audio and text (aka forced alignment)
 #
@@ -31,6 +29,7 @@ This module contains the following classes:
 """
 
 import time
+import tempfile
 
 from aeneas.logger import Loggable
 from aeneas.runtimeconfiguration import RuntimeConfiguration
@@ -170,11 +169,11 @@ class Downloader(Loggable):
             self.log("Determining output file path...")
             if output_file_path is None:
                 self.log("output_file_path is None: creating temp file")
-                handler, output_file_path = gf.tmp_file(
-                    root=self.rconf[RuntimeConfiguration.TMP_PATH],
-                    suffix=(".%s" % extension),
-                )
-                gf.delete_file(handler, output_file_path)
+                with tempfile.NamedTemporaryFile(
+                    suffix=f".{extension}",
+                    dir=self.rconf[RuntimeConfiguration.TMP_PATH],
+                ) as tmp_file:
+                    output_file_path = tmp_file.name
             else:
                 self.log(
                     "output_file_path is not None: cheking that file can be written"

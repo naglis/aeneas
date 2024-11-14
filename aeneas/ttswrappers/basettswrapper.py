@@ -29,6 +29,8 @@ This module contains the following classes:
   an abstract wrapper for a TTS engine.
 """
 
+import tempfile
+import contextlib
 import subprocess
 import typing
 
@@ -593,125 +595,136 @@ class BaseTTSWrapper(Loggable):
             self.log("len(text) is zero: returning 0.000")
             return (True, (TimeValue("0.000"), None, None, None))
 
-        # create a temporary output file if needed
-        synt_tmp_file = output_file_path is None
-        if synt_tmp_file:
-            self.log(
-                "Synthesizer helper called with output_file_path=None => creating temporary output file"
-            )
-            output_file_handler, output_file_path = gf.tmp_file(
-                suffix=".wav", root=self.rconf[RuntimeConfiguration.TMP_PATH]
-            )
-            self.log(["Temporary output file path is '%s'", output_file_path])
-
-        try:
-            # if the TTS engine reads text from file,
-            # write the text into a temporary file
-            if self.CLI_PARAMETER_TEXT_PATH in self.subprocess_arguments:
-                self.log("TTS engine reads text from file")
-                tmp_text_file_handler, tmp_text_file_path = gf.tmp_file(
-                    suffix=".txt", root=self.rconf[RuntimeConfiguration.TMP_PATH]
-                )
-                self.log(["Creating temporary text file '%s'...", tmp_text_file_path])
-                with open(tmp_text_file_path, "w", encoding="utf-8") as tmp_text_file:
-                    tmp_text_file.write(text)
+        with contextlib.ExitStack() as exit_stack:
+            # create a temporary output file if needed
+            synt_tmp_file = output_file_path is None
+            if synt_tmp_file:
                 self.log(
-                    ["Creating temporary text file '%s'... done", tmp_text_file_path]
+                    "Synthesizer helper called with output_file_path=None => creating temporary output file"
                 )
-            else:
-                self.log("TTS engine reads text from stdin")
-                tmp_text_file_handler = None
-                tmp_text_file_path = None
+                tmp_output_file = tempfile.NamedTemporaryFile(
+                    suffix=".wav", dir=self.rconf[RuntimeConfiguration.TMP_PATH]
+                )
+                exit_stack.enter_context(tmp_output_file)
+                output_file_path = tmp_output_file.name
 
-            # copy all relevant arguments
-            self.log("Creating arguments list...")
-            arguments = []
-            for arg in self.subprocess_arguments:
-                if arg == self.CLI_PARAMETER_VOICE_CODE_FUNCTION:
-                    arguments.extend(self._voice_code_to_subprocess(voice_code))
-                elif arg == self.CLI_PARAMETER_VOICE_CODE_STRING:
-                    arguments.append(voice_code)
-                elif arg == self.CLI_PARAMETER_TEXT_PATH:
-                    arguments.append(tmp_text_file_path)
-                elif arg == self.CLI_PARAMETER_WAVE_PATH:
-                    arguments.append(output_file_path)
-                elif arg == self.CLI_PARAMETER_TEXT_STDIN:
-                    # placeholder, do not append
-                    pass
-                elif arg == self.CLI_PARAMETER_WAVE_STDOUT:
-                    # placeholder, do not append
-                    pass
+                self.log(["Temporary output file path is '%s'", output_file_path])
+
+            try:
+                # if the TTS engine reads text from file,
+                # write the text into a temporary file
+                if self.CLI_PARAMETER_TEXT_PATH in self.subprocess_arguments:
+                    self.log("TTS engine reads text from file")
+
+                    tmp_text_file = tempfile.NamedTemporaryFile(
+                        suffix=".txt",
+                        mode="w",
+                        encoding="utf-8",
+                        dir=self.rconf[RuntimeConfiguration.TMP_PATH],
+                    )
+                    exit_stack.enter_context(tmp_text_file)
+                    tmp_text_file_path = tmp_text_file.name
+
+                    self.log(
+                        ["Creating temporary text file '%s'...", tmp_text_file_path]
+                    )
+                    tmp_text_file.write(text)
+                    tmp_text_file.flush()
+                    self.log(
+                        [
+                            "Creating temporary text file '%s'... done",
+                            tmp_text_file_path,
+                        ]
+                    )
                 else:
-                    arguments.append(arg)
-            self.log("Creating arguments list... done")
+                    self.log("TTS engine reads text from stdin")
+                    tmp_text_file_path = None
 
-            # actual call via subprocess
-            self.log("Calling TTS engine...")
-            self.log(["Calling with arguments '%s'", arguments])
-            self.log(["Calling with text '%s'", text])
-            proc = subprocess.Popen(
-                arguments,
-                stdout=subprocess.PIPE,
-                stdin=subprocess.PIPE,
-                stderr=subprocess.PIPE,
-                universal_newlines=True,
+                # copy all relevant arguments
+                self.log("Creating arguments list...")
+                arguments = []
+                for arg in self.subprocess_arguments:
+                    if arg == self.CLI_PARAMETER_VOICE_CODE_FUNCTION:
+                        arguments.extend(self._voice_code_to_subprocess(voice_code))
+                    elif arg == self.CLI_PARAMETER_VOICE_CODE_STRING:
+                        arguments.append(voice_code)
+                    elif arg == self.CLI_PARAMETER_TEXT_PATH:
+                        arguments.append(tmp_text_file_path)
+                    elif arg == self.CLI_PARAMETER_WAVE_PATH:
+                        arguments.append(output_file_path)
+                    elif arg == self.CLI_PARAMETER_TEXT_STDIN:
+                        # placeholder, do not append
+                        pass
+                    elif arg == self.CLI_PARAMETER_WAVE_STDOUT:
+                        # placeholder, do not append
+                        pass
+                    else:
+                        arguments.append(arg)
+                self.log("Creating arguments list... done")
+
+                # actual call via subprocess
+                self.log("Calling TTS engine...")
+                self.log(["Calling with arguments '%s'", arguments])
+                self.log(["Calling with text '%s'", text])
+                proc = subprocess.Popen(
+                    arguments,
+                    stdout=subprocess.PIPE,
+                    stdin=subprocess.PIPE,
+                    stderr=subprocess.PIPE,
+                    universal_newlines=True,
+                )
+                if self.CLI_PARAMETER_TEXT_STDIN in self.subprocess_arguments:
+                    self.log("Passing text via stdin...")
+                    (stdoutdata, stderrdata) = proc.communicate(input=text)
+                    self.log("Passing text via stdin... done")
+                else:
+                    self.log("Passing text via file...")
+                    (stdoutdata, stderrdata) = proc.communicate()
+                    self.log("Passing text via file... done")
+                proc.stdout.close()
+                proc.stdin.close()
+                proc.stderr.close()
+
+                if self.CLI_PARAMETER_WAVE_STDOUT in self.subprocess_arguments:
+                    self.log("TTS engine wrote audio data to stdout")
+                    self.log(["Writing audio data to file '%s'...", output_file_path])
+                    with open(output_file_path, "wb") as output_file:
+                        output_file.write(stdoutdata)
+                    self.log(
+                        ["Writing audio data to file '%s'... done", output_file_path]
+                    )
+                else:
+                    self.log("TTS engine wrote audio data to file")
+
+                self.log("Calling TTS ... done")
+            except Exception as exc:
+                self.log_exc(
+                    "An unexpected error occurred while calling TTS engine via subprocess",
+                    exc,
+                    False,
+                    None,
+                )
+                return (False, None)
+
+            # check the file can be read
+            if not gf.file_can_be_read(output_file_path):
+                self.log_exc(
+                    "Output file '%s' cannot be read" % (output_file_path),
+                    None,
+                    True,
+                    None,
+                )
+                return (False, None)
+
+            # read audio data
+            ret = (
+                self._read_audio_data(output_file_path)
+                if return_audio_data
+                else (True, None)
             )
-            if self.CLI_PARAMETER_TEXT_STDIN in self.subprocess_arguments:
-                self.log("Passing text via stdin...")
-                (stdoutdata, stderrdata) = proc.communicate(input=text)
-                self.log("Passing text via stdin... done")
-            else:
-                self.log("Passing text via file...")
-                (stdoutdata, stderrdata) = proc.communicate()
-                self.log("Passing text via file... done")
-            proc.stdout.close()
-            proc.stdin.close()
-            proc.stderr.close()
 
-            if self.CLI_PARAMETER_WAVE_STDOUT in self.subprocess_arguments:
-                self.log("TTS engine wrote audio data to stdout")
-                self.log(["Writing audio data to file '%s'...", output_file_path])
-                with open(output_file_path, "wb") as output_file:
-                    output_file.write(stdoutdata)
-                self.log(["Writing audio data to file '%s'... done", output_file_path])
-            else:
-                self.log("TTS engine wrote audio data to file")
-
-            if tmp_text_file_path is not None:
-                self.log(["Delete temporary text file '%s'", tmp_text_file_path])
-                gf.delete_file(tmp_text_file_handler, tmp_text_file_path)
-
-            self.log("Calling TTS ... done")
-        except Exception as exc:
-            self.log_exc(
-                "An unexpected error occurred while calling TTS engine via subprocess",
-                exc,
-                False,
-                None,
-            )
-            return (False, None)
-
-        # check the file can be read
-        if not gf.file_can_be_read(output_file_path):
-            self.log_exc(
-                "Output file '%s' cannot be read" % (output_file_path), None, True, None
-            )
-            return (False, None)
-
-        # read audio data
-        ret = (
-            self._read_audio_data(output_file_path)
-            if return_audio_data
-            else (True, None)
-        )
-
-        # if the output file was temporary, remove it
-        if synt_tmp_file:
-            self.log(["Removing temporary output file path '%s'", output_file_path])
-            gf.delete_file(output_file_handler, output_file_path)
-
-        # return audio data or (True, None)
-        return ret
+            # return audio data or (True, None)
+            return ret
 
     def _read_audio_data(self, file_path):
         """

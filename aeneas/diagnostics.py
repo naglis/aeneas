@@ -34,6 +34,7 @@ This module can be executed from command line with::
 """
 
 import sys
+import tempfile
 
 import aeneas.globalfunctions as gf
 
@@ -120,10 +121,11 @@ class Diagnostics:
             from aeneas.ffmpegwrapper import FFMPEGWrapper
 
             input_file_path = gf.absolute_path("tools/res/audio.mp3", __file__)
-            handler, output_file_path = gf.tmp_file(suffix=".wav")
             converter = FFMPEGWrapper()
-            result = converter.convert(input_file_path, output_file_path)
-            gf.delete_file(handler, output_file_path)
+            with tempfile.NamedTemporaryFile(
+                prefix="aeneas.diagnostics.", suffix=".wav"
+            ) as tmp_file:
+                result = converter.convert(input_file_path, tmp_file.name)
             if result:
                 gf.print_success("ffmpeg         OK")
                 return False
@@ -153,9 +155,10 @@ class Diagnostics:
             text_file.add_fragment(
                 TextFragment(language="eng", lines=[text], filtered_lines=[text])
             )
-            handler, output_file_path = gf.tmp_file(suffix=".wav")
-            ESPEAKTTSWrapper().synthesize_multiple(text_file, output_file_path)
-            gf.delete_file(handler, output_file_path)
+            with tempfile.NamedTemporaryFile(
+                prefix="aeneas.diagnostics.", suffix=".wav"
+            ) as tmp_file:
+                ESPEAKTTSWrapper().synthesize_multiple(text_file, tmp_file.name)
             gf.print_success("espeak         OK")
         except Exception:
             gf.print_error("espeak         ERROR")

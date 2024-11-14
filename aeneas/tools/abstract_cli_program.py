@@ -28,6 +28,7 @@ to the CLI programs in aeneas.tools.
 import os
 import sys
 import typing
+import tempfile
 
 from aeneas import __version__ as aeneas_version
 from aeneas.logger import Loggable
@@ -360,9 +361,13 @@ class AbstractCLIProgram(Loggable):
             if log_path is not None:
                 args.remove(f"{flag}={log_path}")
             elif flag in set_args:
-                handler, log_path = gf.tmp_file(
-                    suffix=".log", root=self.rconf[RuntimeConfiguration.TMP_PATH]
-                )
+                with tempfile.NamedTemporaryFile(
+                    prefix="aeneas.",
+                    suffix=".log",
+                    dir=self.rconf[RuntimeConfiguration.TMP_PATH],
+                ) as tmp_file:
+                    log_path = tmp_file.name
+
                 args.remove(flag)
             if log_path is not None:
                 self.log_file_path = log_path

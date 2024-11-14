@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 # aeneas is a Python/C library and a set of tools
 # to automagically synchronize audio and text (aka forced alignment)
 #
@@ -21,6 +19,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import unittest
+import tempfile
 
 from aeneas.adjustboundaryalgorithm import AdjustBoundaryAlgorithm
 from aeneas.exacttiming import TimeValue
@@ -229,12 +228,13 @@ class TestTask(unittest.TestCase):
         task.configuration["language"] = Language.ENG
         task.configuration["o_format"] = SyncMapFormat.TXT
         task.sync_map = self.dummy_sync_map()
-        handler, output_file_path = gf.tmp_file(suffix=".txt")
-        task.sync_map_file_path_absolute = output_file_path
-        path = task.output_sync_map_file()
+
+        with tempfile.NamedTemporaryFile(suffix=".txt") as tmp_file:
+            task.sync_map_file_path_absolute = tmp_file.name
+            path = task.output_sync_map_file()
+
         self.assertIsNotNone(path)
-        self.assertEqual(path, output_file_path)
-        gf.delete_file(handler, output_file_path)
+        self.assertEqual(path, tmp_file.name)
 
     def test_task_sync_map_leaves(self):
         task = Task()

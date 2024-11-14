@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 # aeneas is a Python/C library and a set of tools
 # to automagically synchronize audio and text (aka forced alignment)
 #
@@ -29,6 +27,8 @@ This module contains the following classes:
   representing errors generated while processing tasks.
 """
 
+import tempfile
+
 from aeneas.adjustboundaryalgorithm import AdjustBoundaryAlgorithm
 from aeneas.audiofile import AudioFile
 from aeneas.audiofilemfcc import AudioFileMFCC
@@ -40,7 +40,7 @@ from aeneas.sd import SD
 from aeneas.syncmap import SyncMap
 from aeneas.synthesizer import Synthesizer
 from aeneas.task import Task
-from aeneas.textfile import TextFileFormat
+from aeneas.textfile import TextFileFormat, TextFile
 from aeneas.tree import Tree
 import aeneas.globalfunctions as gf
 
@@ -453,17 +453,21 @@ class ExecuteTask(Loggable):
         :param bool leaf_level: alert aba if the computation is at a leaf level
         :rtype: :class:`~aeneas.tree.Tree`
         """
-        self._step_begin("synthesize text", log=log)
-        synt_handler, synt_path, synt_anchors, synt_format = self._synthesize(text_file)
-        self._step_end(log=log)
 
-        self._step_begin("extract MFCC synt wave", log=log)
-        synt_wave_mfcc = self._extract_mfcc(
-            file_path=synt_path,
-            file_format=synt_format,
-        )
-        gf.delete_file(synt_handler, synt_path)
-        self._step_end(log=log)
+        with tempfile.NamedTemporaryFile(
+            suffix=".wav",
+            dir=self.rconf[RuntimeConfiguration.TMP_PATH],
+        ) as tmp_file:
+            self._step_begin("synthesize text", log=log)
+            synt_anchors, synt_format = self._synthesize(text_file, tmp_file.name)
+            self._step_end(log=log)
+
+            self._step_begin("extract MFCC synt wave", log=log)
+            synt_wave_mfcc = self._extract_mfcc(
+                file_path=tmp_file.name,
+                file_format=synt_format,
+            )
+            self._step_end(log=log)
 
         self._step_begin("align waves", log=log)
         indices = self._align_waves(audio_file_mfcc, synt_wave_mfcc, synt_anchors)
@@ -602,7 +606,7 @@ class ExecuteTask(Loggable):
         self.synthesizer.clear_cache()
         self.log("Clearing synthesizer... done")
 
-    def _synthesize(self, text_file):
+    def _synthesize(self, text_file: TextFile, output_path: str):
         """
         Synthesize text into a WAVE file.
 
@@ -618,13 +622,10 @@ class ExecuteTask(Loggable):
 
         :param text_file: the text to be synthesized
         :type  text_file: :class:`~aeneas.textfile.TextFile`
-        :rtype: tuple (handler, string, list)
+        :rtype: tuple (string, list)
         """
-        handler, path = gf.tmp_file(
-            suffix=".wav", root=self.rconf[RuntimeConfiguration.TMP_PATH]
-        )
-        result = self.synthesizer.synthesize(text_file, path)
-        return (handler, path, result[0], self.synthesizer.output_audio_format)
+        result = self.synthesizer.synthesize(text_file, output_path)
+        return (result[0], self.synthesizer.output_audio_format)
 
     def _align_waves(self, real_wave_mfcc, synt_wave_mfcc, synt_anchors):
         """
