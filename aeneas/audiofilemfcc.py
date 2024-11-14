@@ -29,10 +29,10 @@ This module contains the following classes:
 """
 
 import numpy
+import numpy.typing as npt
 
 from aeneas.audiofile import AudioFile
-from aeneas.exacttiming import TimeInterval
-from aeneas.exacttiming import TimeValue
+from aeneas.exacttiming import TimeInterval, TimeValue
 from aeneas.logger import Loggable
 from aeneas.mfcc import MFCC
 from aeneas.runtimeconfiguration import RuntimeConfiguration
@@ -101,14 +101,14 @@ class AudioFileMFCC(Loggable):
 
     def __init__(
         self,
-        file_path=None,
-        file_format=None,
-        mfcc_matrix=None,
-        audio_file=None,
+        file_path: str | None = None,
+        file_format: tuple[str, int, int] | None = None,
+        mfcc_matrix: npt.NDArray | None = None,
+        audio_file: AudioFile | None = None,
         rconf=None,
         logger=None,
     ):
-        if (file_path is None) and (audio_file is None) and (mfcc_matrix is None):
+        if file_path is None and audio_file is None and mfcc_matrix is None:
             raise ValueError(
                 "You must initialize with at least one of: file_path, audio_file, or mfcc_matrix"
             )
@@ -119,7 +119,7 @@ class AudioFileMFCC(Loggable):
         self.__mfcc = None
         self.__mfcc_mask = None
         self.__mfcc_mask_map = None
-        self.__speech_intervals = None
+        self.__speech_intervals = []
         self.__nonspeech_intervals = None
         self.log("Initializing MFCCs...")
         if mfcc_matrix is not None:
@@ -163,7 +163,7 @@ class AudioFileMFCC(Loggable):
         return "\n".join(msg)
 
     @property
-    def all_mfcc(self):
+    def all_mfcc(self) -> npt.NDArray:
         """
         The MFCCs of the entire audio file,
         that is, HEAD + MIDDLE + TAIL.
@@ -173,7 +173,7 @@ class AudioFileMFCC(Loggable):
         return self.__mfcc
 
     @property
-    def all_length(self):
+    def all_length(self) -> int:
         """
         The length, in MFCC coefficients,
         of the entire audio file,
@@ -184,7 +184,7 @@ class AudioFileMFCC(Loggable):
         return self.__mfcc.shape[1]
 
     @property
-    def middle_mfcc(self):
+    def middle_mfcc(self) -> npt.NDArray:
         """
         The MFCCs of the middle part of the audio file,
         that is, without HEAD and TAIL.
@@ -194,7 +194,7 @@ class AudioFileMFCC(Loggable):
         return self.__mfcc[:, self.__middle_begin : self.__middle_end]
 
     @property
-    def middle_length(self):
+    def middle_length(self) -> int:
         """
         The length, in MFCC coefficients,
         of the middle part of the audio file,
@@ -205,7 +205,7 @@ class AudioFileMFCC(Loggable):
         return self.__middle_end - self.__middle_begin
 
     @property
-    def middle_map(self):
+    def middle_map(self) -> npt.NDArray:
         """
         Return the map
         from the MFCC frame indices
@@ -225,54 +225,46 @@ class AudioFileMFCC(Loggable):
         return numpy.arange(self.__middle_begin, self.__middle_end)
 
     @property
-    def head_length(self):
+    def head_length(self) -> int:
         """
         The length, in MFCC coefficients,
         of the HEAD of the audio file.
-
-        :rtype: int
         """
         return self.__middle_begin
 
     @property
-    def tail_length(self):
+    def tail_length(self) -> int:
         """
         The length, in MFCC coefficients,
         of the TAIL of the audio file.
-
-        :rtype: int
         """
         return self.all_length - self.__middle_end
 
     @property
-    def tail_begin(self):
+    def tail_begin(self) -> int:
         """
         The index, in MFCC coefficients,
         where the TAIL of the audio file starts.
-
-        :rtype: int
         """
         return self.__middle_end
 
     @property
-    def audio_length(self):
+    def audio_length(self) -> TimeValue:
         """
         The length, in seconds, of the audio file.
 
         This value is the actual length of the audio file,
         computed as ``number of samples / sample_rate``,
         hence it might differ than ``len(self.__mfcc) * mfcc_window_shift``.
-
-        :rtype: :class:`~aeneas.exacttiming.TimeValue`
         """
         return self.__audio_length
 
     @audio_length.setter
-    def audio_length(self, audio_length):
+    def audio_length(self, audio_length: TimeValue):
         self.__audio_length = audio_length
 
     @property
-    def is_reversed(self):
+    def is_reversed(self) -> bool:
         """
         Return ``True`` if currently reversed.
 
@@ -281,11 +273,11 @@ class AudioFileMFCC(Loggable):
         return self.__is_reversed
 
     @is_reversed.setter
-    def is_reversed(self, is_reversed):
+    def is_reversed(self, is_reversed: bool):
         self.__is_reversed = is_reversed
 
     @property
-    def masked_mfcc(self):
+    def masked_mfcc(self) -> npt.NDArray:
         """
         Return the MFCC speech frames
         in the FULL wave.
@@ -296,18 +288,16 @@ class AudioFileMFCC(Loggable):
         return self.__mfcc[:, self.__mfcc_mask]
 
     @property
-    def masked_length(self):
+    def masked_length(self) -> int:
         """
         Return the number of MFCC speech frames
         in the FULL wave.
-
-        :rtype: int
         """
         self._ensure_mfcc_mask()
         return len(self.__mfcc_mask_map)
 
     @property
-    def masked_map(self):
+    def masked_map(self) -> npt.NDArray:
         """
         Return the map
         from the MFCC speech frame indices
@@ -319,7 +309,7 @@ class AudioFileMFCC(Loggable):
         return self.__mfcc_mask_map
 
     @property
-    def masked_middle_mfcc(self):
+    def masked_middle_mfcc(self) -> npt.NDArray:
         """
         Return the MFCC speech frames
         in the MIDDLE portion of the wave.
@@ -330,7 +320,7 @@ class AudioFileMFCC(Loggable):
         return (self.masked_mfcc)[:, begin:end]
 
     @property
-    def masked_middle_length(self):
+    def masked_middle_length(self) -> int:
         """
         Return the number of MFCC speech frames
         in the MIDDLE portion of the wave.
@@ -341,7 +331,7 @@ class AudioFileMFCC(Loggable):
         return end - begin
 
     @property
-    def masked_middle_map(self):
+    def masked_middle_map(self) -> npt.NDArray:
         """
         Return the map
         from the MFCC speech frame indices
@@ -353,14 +343,12 @@ class AudioFileMFCC(Loggable):
         begin, end = self._masked_middle_begin_end()
         return self.__mfcc_mask_map[begin:end]
 
-    def _masked_middle_begin_end(self):
+    def _masked_middle_begin_end(self) -> tuple[int, int]:
         """
         Return the begin and end indices w.r.t. ``self.__mfcc_mask_map``,
         corresponding to indices in the MIDDLE portion of the wave,
         that is, which fall between ``self.__middle_begin`` and
         ``self.__middle_end`` in ``self.__mfcc``.
-
-        :rtype: (int, int)
         """
         self._ensure_mfcc_mask()
         begin = numpy.searchsorted(
@@ -369,7 +357,9 @@ class AudioFileMFCC(Loggable):
         end = numpy.searchsorted(self.__mfcc_mask_map, self.__middle_end, side="right")
         return (begin, end)
 
-    def intervals(self, speech=True, time=True):
+    def intervals(
+        self, speech: bool = True, time: bool = True
+    ) -> list[int] | list[TimeValue]:
         """
         Return a list of intervals::
 
@@ -399,16 +389,12 @@ class AudioFileMFCC(Loggable):
         self.log("Converting... done")
         return intervals
 
-    def inside_nonspeech(self, index):
+    def inside_nonspeech(self, index: int) -> tuple[int, int] | None:
         """
         If ``index`` is contained in a nonspeech interval,
         return a pair ``(interval_begin, interval_end)``
         such that ``interval_begin <= index < interval_end``,
         i.e., ``interval_end`` is assumed not to be included.
-
-        Otherwise, return ``None``.
-
-        :rtype: ``None`` or tuple
         """
         self._ensure_mfcc_mask()
         if (index < 0) or (index >= self.all_length) or (self.__mfcc_mask[index]):
@@ -416,7 +402,7 @@ class AudioFileMFCC(Loggable):
         return self._binary_search_intervals(self.__nonspeech_intervals, index)
 
     @classmethod
-    def _binary_search_intervals(cls, intervals, index):
+    def _binary_search_intervals(cls, intervals, index: int):
         """
         Binary search for the interval containing index,
         assuming there is such an interval.
@@ -436,16 +422,14 @@ class AudioFileMFCC(Loggable):
         return None
 
     @property
-    def middle_begin(self):
+    def middle_begin(self) -> int:
         """
         Return the index where MIDDLE starts.
-
-        :rtype: int
         """
         return self.__middle_begin
 
     @middle_begin.setter
-    def middle_begin(self, index):
+    def middle_begin(self, index: int):
         """
         Set the index where MIDDLE starts.
 
@@ -456,25 +440,21 @@ class AudioFileMFCC(Loggable):
         self.__middle_begin = index
 
     @property
-    def middle_begin_seconds(self):
+    def middle_begin_seconds(self) -> TimeValue:
         """
         Return the time instant, in seconds, where MIDDLE starts.
-
-        :rtype: :class:`~aeneas.exacttiming.TimeValue`
         """
         return TimeValue(self.__middle_begin) * self.rconf.mws
 
     @property
-    def middle_end(self):
+    def middle_end(self) -> int:
         """
         Return the index (+1) where MIDDLE ends.
-
-        :rtype: int
         """
         return self.__middle_end
 
     @middle_end.setter
-    def middle_end(self, index):
+    def middle_end(self, index: int):
         """
         Set the index (+1) where MIDDLE ends.
 
@@ -485,11 +465,9 @@ class AudioFileMFCC(Loggable):
         self.__middle_end = index
 
     @property
-    def middle_end_seconds(self):
+    def middle_end_seconds(self) -> TimeValue:
         """
         Return the time instant, in seconds, where MIDDLE ends.
-
-        :rtype: :class:`~aeneas.exacttiming.TimeValue`
         """
         return TimeValue(self.__middle_end) * self.rconf.mws
 
@@ -502,7 +480,7 @@ class AudioFileMFCC(Loggable):
             self.log("VAD was not run: running it now")
             self.run_vad()
 
-    def _compute_mfcc_c_extension(self):
+    def _compute_mfcc_c_extension(self) -> tuple[bool, None]:
         """
         Compute MFCCs using the Python C extension cmfcc.
         """
@@ -534,7 +512,7 @@ class AudioFileMFCC(Loggable):
             )
         return (False, None)
 
-    def _compute_mfcc_pure_python(self):
+    def _compute_mfcc_pure_python(self) -> tuple[bool, None]:
         """
         Compute MFCCs using the pure Python code.
         """
@@ -595,10 +573,10 @@ class AudioFileMFCC(Loggable):
 
     def run_vad(
         self,
-        log_energy_threshold=None,
-        min_nonspeech_length=None,
-        extend_before=None,
-        extend_after=None,
+        log_energy_threshold: float | None = None,
+        min_nonspeech_length: int | None = None,
+        extend_before: int | None = None,
+        extend_after: int | None = None,
     ):
         """
         Determine which frames contain speech and nonspeech,
@@ -650,7 +628,10 @@ class AudioFileMFCC(Loggable):
         self.log("Storing speech and nonspeech intervals... done")
 
     def set_head_middle_tail(
-        self, head_length=None, middle_length=None, tail_length=None
+        self,
+        head_length: TimeValue | None = None,
+        middle_length: TimeValue | None = None,
+        tail_length: TimeValue | None = None,
     ):
         """
         Set the HEAD, MIDDLE, TAIL explicitly.
