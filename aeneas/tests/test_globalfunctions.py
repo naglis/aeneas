@@ -36,12 +36,12 @@ class TestGlobalFunctions(unittest.TestCase):
 
     def test_tmp_file(self):
         tmp_handler, tmp_file = gf.tmp_file()
-        self.assertTrue(gf.file_exists(tmp_file))
+        self.assertTrue(os.path.isfile(tmp_file))
         gf.delete_file(tmp_handler, tmp_file)
 
     def test_tmp_file_suffix(self):
         tmp_handler, tmp_file = gf.tmp_file(suffix=".txt")
-        self.assertTrue(gf.file_exists(tmp_file))
+        self.assertTrue(os.path.isfile(tmp_file))
         gf.delete_file(tmp_handler, tmp_file)
 
     def test_file_extension(self):
@@ -314,7 +314,7 @@ class TestGlobalFunctions(unittest.TestCase):
 
             gf.copytree(orig, dest)
 
-            self.assertTrue(gf.file_exists(os.path.join(dest, "foo.bar")))
+            self.assertTrue(os.path.isfile(os.path.join(dest, "foo.bar")))
 
     def test_ensure_parent_directory(self):
         with tempfile.TemporaryDirectory() as orig:
@@ -526,15 +526,6 @@ class TestGlobalFunctions(unittest.TestCase):
         path = "/foo/bar/baz"
         self.assertFalse(gf.file_can_be_written(path))
 
-    def test_file_exists_true(self):
-        handler, path = gf.tmp_file()
-        self.assertTrue(gf.file_exists(path))
-        gf.delete_file(handler, path)
-
-    def test_file_exists_false(self):
-        path = "/foo/bar/baz"
-        self.assertFalse(gf.file_exists(path))
-
     def test_file_size_nonzero(self):
         handler, path = gf.tmp_file()
         with open(path, "w", encoding="utf-8") as tmp_file:
@@ -565,24 +556,24 @@ class TestGlobalFunctions(unittest.TestCase):
 
     def test_close_file_handler(self):
         handler, path = gf.tmp_file()
-        self.assertTrue(gf.file_exists(path))
+        self.assertTrue(os.path.isfile(path))
         gf.close_file_handler(handler)
-        self.assertTrue(gf.file_exists(path))
+        self.assertTrue(os.path.isfile(path))
         gf.delete_file(handler, path)
-        self.assertFalse(gf.file_exists(path))
+        self.assertFalse(os.path.isfile(path))
 
     def test_delete_file_existing(self):
         handler, path = gf.tmp_file()
-        self.assertTrue(gf.file_exists(path))
+        self.assertTrue(os.path.isfile(path))
         gf.delete_file(handler, path)
-        self.assertFalse(gf.file_exists(path))
+        self.assertFalse(os.path.isfile(path))
 
     def test_delete_file_not_existing(self):
         handler = None
         path = "/foo/bar/baz"
-        self.assertFalse(gf.file_exists(path))
+        self.assertFalse(os.path.isfile(path))
         gf.delete_file(handler, path)
-        self.assertFalse(gf.file_exists(path))
+        self.assertFalse(os.path.isfile(path))
 
     def test_relative_path(self):
         tests = [

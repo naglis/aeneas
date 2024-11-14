@@ -20,10 +20,8 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import os
 
 from aeneas.tools.synthesize_text import SynthesizeTextCLI
-import aeneas.globalfunctions as gf
 from aeneas.tests.common import ExecuteCLICase
 
 
@@ -296,21 +294,6 @@ class TestSynthesizeTextCLI(ExecuteCLICase):
             ],
             0,
         )
-
-    def test_synt_path(self):
-        path = os.path.expanduser("~")
-        path = os.path.join(path, ".bin/myespeak")
-        if gf.file_exists(path):
-            self.execute(
-                [
-                    ("", "plain"),
-                    ("in", "../tools/res/plain.txt"),
-                    ("", "eng"),
-                    ("out", "synthesized.wav"),
-                    ("", '-r="c_extensions=False|tts=espeak|tts_path=%s"' % path),
-                ],
-                0,
-            )
 
     def test_synt_path_bad(self):
         path = "/foo/bar/espeak"

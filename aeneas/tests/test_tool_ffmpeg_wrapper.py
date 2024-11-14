@@ -20,11 +20,9 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import os
 
 from aeneas.tools.ffmpeg_wrapper import FFMPEGWrapperCLI
 from aeneas.tests.common import ExecuteCLICase
-import aeneas.globalfunctions as gf
 
 
 class TestFFMPEGWrapperCLI(ExecuteCLICase):
@@ -72,19 +70,6 @@ class TestFFMPEGWrapperCLI(ExecuteCLICase):
             ],
             0,
         )
-
-    def test_convert_path(self):
-        path = os.path.expanduser("~")
-        path = os.path.join(path, ".bin/myffmpeg")
-        if gf.file_exists(path):
-            self.execute(
-                [
-                    ("in", "../tools/res/audio.wav"),
-                    ("out", "audio.wav"),
-                    ("", '-r="ffmpeg_path=%s"' % path),
-                ],
-                0,
-            )
 
     def test_convert_path_bad(self):
         path = "/foo/bar/ffmpeg"

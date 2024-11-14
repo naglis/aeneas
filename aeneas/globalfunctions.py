@@ -887,19 +887,6 @@ def file_can_be_written(path):
     return False
 
 
-def file_exists(path):
-    """
-    Return ``True`` if the given ``path`` string
-    points to an existing file.
-
-    :param string path: the file path
-    :rtype: bool
-    """
-    if (path is None) or (not os.path.isfile(path)):
-        return False
-    return True
-
-
 def file_size(path):
     """
     Return the size, in bytes, of the file at the given ``path``.

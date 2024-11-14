@@ -31,6 +31,7 @@ This module contains the following classes:
 """
 
 import importlib.util
+import os.path
 
 from aeneas.logger import Loggable
 from aeneas.runtimeconfiguration import RuntimeConfiguration
@@ -185,7 +186,13 @@ class Synthesizer(Loggable):
         if self.tts_engine is not None:
             self.tts_engine.clear_cache()
 
-    def synthesize(self, text_file, audio_file_path, quit_after=None, backwards=False):
+    def synthesize(
+        self,
+        text_file: TextFile,
+        audio_file_path: str,
+        quit_after=None,
+        backwards=False,
+    ):
         """
         Synthesize the text contained in the given fragment list
         into a ``wav`` file.
@@ -231,7 +238,7 @@ class Synthesizer(Loggable):
         self.log("Synthesizing text... done")
 
         # check that the output file has been written
-        if not gf.file_exists(audio_file_path):
+        if not os.path.isfile(audio_file_path):
             self.log_exc(
                 "Audio file path '%s' cannot be read" % (audio_file_path),
                 None,
