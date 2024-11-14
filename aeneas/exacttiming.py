@@ -69,50 +69,49 @@ class TimeValue(Decimal):
     # NOTE overriding so that the result
     #      is still an instance of TimeValue
 
-    # TODO: Check if `context` parameter is needed in Python 3.
-    def __add__(self, other, context=None):
+    def __add__(self, other):
         return TimeValue(Decimal.__add__(self, other))
 
-    def __div__(self, other, context=None):
+    def __div__(self, other):
         return TimeValue(Decimal.__div__(self, other))
 
-    def __floordiv__(self, other, context=None):
+    def __floordiv__(self, other):
         return TimeValue(Decimal.__floordiv__(self, other))
 
-    def __mod__(self, other, context=None):
+    def __mod__(self, other):
         return TimeValue(Decimal.__mod__(self, other))
 
-    def __mul__(self, other, context=None):
+    def __mul__(self, other):
         return TimeValue(Decimal.__mul__(self, other))
 
-    def __neg__(self, context=None):
+    def __neg__(self):
         return TimeValue(Decimal.__neg__(self))
 
-    def __radd__(self, other, context=None):
+    def __radd__(self, other):
         return TimeValue(Decimal.__radd__(self, other))
 
-    def __rdiv__(self, other, context=None):
+    def __rdiv__(self, other):
         return TimeValue(Decimal.__rdiv__(self, other))
 
-    def __rfloordiv__(self, other, context=None):
+    def __rfloordiv__(self, other):
         return TimeValue(Decimal.__rfloordiv__(self, other))
 
-    def __rmod__(self, other, context=None):
+    def __rmod__(self, other):
         return TimeValue(Decimal.__rmod__(self, other))
 
-    def __rmul__(self, other, context=None):
+    def __rmul__(self, other):
         return TimeValue(Decimal.__rmul__(self, other))
 
-    def __rsub__(self, other, context=None):
+    def __rsub__(self, other):
         return TimeValue(Decimal.__rsub__(self, other))
 
-    def __rtruediv__(self, other, context=None):
+    def __rtruediv__(self, other):
         return TimeValue(Decimal.__rtruediv__(self, other))
 
-    def __sub__(self, other, context=None):
+    def __sub__(self, other):
         return TimeValue(Decimal.__sub__(self, other))
 
-    def __truediv__(self, other, context=None):
+    def __truediv__(self, other):
         return TimeValue(Decimal.__truediv__(self, other))
 
 
