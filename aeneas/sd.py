@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 # aeneas is a Python/C library and a set of tools
 # to automagically synchronize audio and text (aka forced alignment)
 #
@@ -31,6 +29,7 @@ This module contains the following classes:
 """
 
 import decimal
+import tempfile
 
 import numpy
 
@@ -41,7 +40,6 @@ from aeneas.logger import Loggable
 from aeneas.runtimeconfiguration import RuntimeConfiguration
 from aeneas.synthesizer import Synthesizer
 from aeneas.textfile import TextFile
-import aeneas.globalfunctions as gf
 
 
 class SD(Loggable):
@@ -262,22 +260,20 @@ class SD(Loggable):
         self.log("Synthesizing query...")
         synt_duration = max_length * self.QUERY_FACTOR
         self.log(["Synthesizing at least %.3f seconds", synt_duration])
-        tmp_handler, tmp_file_path = gf.tmp_file(
-            suffix=".wav", root=self.rconf[RuntimeConfiguration.TMP_PATH]
-        )
-        synt = Synthesizer(rconf=self.rconf, logger=self.logger)
-        anchors, total_time, synthesized_chars = synt.synthesize(
-            self.text_file, tmp_file_path, quit_after=synt_duration, backwards=tail
-        )
-        self.log("Synthesizing query... done")
+        with tempfile.NamedTemporaryFile(
+            suffix=".wav", dir=self.rconf[RuntimeConfiguration.TMP_PATH]
+        ) as tmp_file:
+            synt = Synthesizer(rconf=self.rconf, logger=self.logger)
+            anchors, total_time, synthesized_chars = synt.synthesize(
+                self.text_file, tmp_file.name, quit_after=synt_duration, backwards=tail
+            )
+            self.log("Synthesizing query... done")
 
-        self.log("Extracting MFCCs for query...")
-        query_mfcc = AudioFileMFCC(tmp_file_path, rconf=self.rconf, logger=self.logger)
-        self.log("Extracting MFCCs for query... done")
-
-        self.log("Cleaning up...")
-        gf.delete_file(tmp_handler, tmp_file_path)
-        self.log("Cleaning up... done")
+            self.log("Extracting MFCCs for query...")
+            query_mfcc = AudioFileMFCC(
+                tmp_file.name, rconf=self.rconf, logger=self.logger
+            )
+            self.log("Extracting MFCCs for query... done")
 
         search_window = max_length * self.AUDIO_FACTOR
         search_window_end = min(
