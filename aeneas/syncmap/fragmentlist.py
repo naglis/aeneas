@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 # aeneas is a Python/C library and a set of tools
 # to automagically synchronize audio and text (aka forced alignment)
 #
@@ -20,11 +18,12 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from copy import deepcopy
-from bisect import insort
+import decimal
+import typing
+import copy
+import bisect
 
-from aeneas.exacttiming import TimeInterval
-from aeneas.exacttiming import TimeValue
+from aeneas.exacttiming import TimeInterval, TimeValue
 from aeneas.logger import Loggable
 from aeneas.syncmap.fragment import SyncMapFragment
 from aeneas.textfile import TextFragment
@@ -54,7 +53,8 @@ class SyncMapFragmentList(Loggable):
     .. versionadded:: 1.7.0
     """
 
-    ALLOWED_POSITIONS = [
+    # TODO: Mark as `typing.Final` once support for Python 3.12 is dropped.
+    ALLOWED_POSITIONS: typing.ClassVar[tuple[int, ...]] = (
         TimeInterval.RELATIVE_POSITION_PP_L,
         TimeInterval.RELATIVE_POSITION_PP_C,
         TimeInterval.RELATIVE_POSITION_PP_G,
@@ -70,12 +70,12 @@ class SyncMapFragmentList(Loggable):
         TimeInterval.RELATIVE_POSITION_II_LB,
         TimeInterval.RELATIVE_POSITION_II_EG,
         TimeInterval.RELATIVE_POSITION_II_GG,
-    ]
+    )
     """ Allowed positions for any pair of time intervals in the list """
 
     TAG = "SyncMapFragmentList"
 
-    def __init__(self, begin, end, rconf=None, logger=None):
+    def __init__(self, begin: TimeValue, end: TimeValue, rconf=None, logger=None):
         if not isinstance(begin, TimeValue):
             raise TypeError("begin is not an instance of TimeValue")
         if not isinstance(end, TimeValue):
@@ -88,18 +88,18 @@ class SyncMapFragmentList(Loggable):
         self.begin = begin
         self.end = end
         self.__sorted = True
-        self.__fragments = []
+        self.__fragments: list[SyncMapFragment] = []
 
     def __len__(self):
         return len(self.__fragments)
 
-    def __getitem__(self, index):
+    def __getitem__(self, index: int) -> SyncMapFragment:
         return self.__fragments[index]
 
     def __setitem__(self, index, value):
         self.__fragments[index] = value
 
-    def _is_valid_index(self, index):
+    def _is_valid_index(self, index: int | list[int]) -> bool:
         """
         Return ``True`` if and only if the given ``index``
         is valid.
@@ -113,7 +113,7 @@ class SyncMapFragmentList(Loggable):
             return valid
         return False
 
-    def _check_boundaries(self, fragment):
+    def _check_boundaries(self, fragment: SyncMapFragment):
         """
         Check that the interval of the given fragment
         is within the boundaries of the list.
@@ -129,7 +129,7 @@ class SyncMapFragmentList(Loggable):
         if (self.end is not None) and (interval.end > self.end):
             raise ValueError("interval.end is after self.end")
 
-    def _check_overlap(self, fragment):
+    def _check_overlap(self, fragment: SyncMapFragment):
         """
         Check that the interval of the given fragment does not overlap
         any existing interval in the list (except at its boundaries).
@@ -156,7 +156,9 @@ class SyncMapFragmentList(Loggable):
                     ValueError,
                 )
 
-    def _check_min_max_indices(self, min_index=None, max_index=None):
+    def _check_min_max_indices(
+        self, min_index: int | None = None, max_index: int | None = None
+    ) -> tuple[int, int]:
         """
         Ensure the given start/end fragment indices make sense:
         if one of them is ``None`` (i.e., not specified),
@@ -175,16 +177,16 @@ class SyncMapFragmentList(Loggable):
             )
         return min_index, max_index
 
-    def clone(self):
+    def clone(self) -> "SyncMapFragmentList":
         """
         Return a deep copy of this configuration object.
 
         :rtype: :class:`~aeneas.syncmap.fragmentlist.SyncMapFragmentList`
         """
-        return deepcopy(self)
+        return copy.deepcopy(self)
 
     @property
-    def is_guaranteed_sorted(self):
+    def is_guaranteed_sorted(self) -> bool:
         """
         Return ``True`` if the list is sorted,
         and ``False`` if it might not be sorted
@@ -196,7 +198,7 @@ class SyncMapFragmentList(Loggable):
         return self.__sorted
 
     @property
-    def fragments(self):
+    def fragments(self) -> typing.Iterator[SyncMapFragment]:
         """
         Iterates through the fragments in the list
         (which are sorted).
@@ -206,7 +208,7 @@ class SyncMapFragmentList(Loggable):
         yield from self.__fragments
 
     @property
-    def regular_fragments(self):
+    def regular_fragments(self) -> typing.Iterator[tuple[int, SyncMapFragment]]:
         """
         Iterates through the regular fragments in the list
         (which are sorted).
@@ -218,7 +220,7 @@ class SyncMapFragmentList(Loggable):
                 yield (i, fragment)
 
     @property
-    def nonspeech_fragments(self):
+    def nonspeech_fragments(self) -> typing.Iterator[tuple[int, SyncMapFragment]]:
         """
         Iterates through the nonspeech fragments in the list
         (which are sorted).
@@ -229,7 +231,7 @@ class SyncMapFragmentList(Loggable):
             if fragment.fragment_type == SyncMapFragment.NONSPEECH:
                 yield (i, fragment)
 
-    def remove(self, indices):
+    def remove(self, indices: list[int]) -> None:
         """
         Remove the fragments corresponding to the given list of indices.
 
@@ -256,7 +258,7 @@ class SyncMapFragmentList(Loggable):
             i += 1
         self.__fragments = new_fragments
 
-    def sort(self):
+    def sort(self) -> None:
         """
         Sort the fragments in the list.
 
@@ -289,7 +291,7 @@ class SyncMapFragmentList(Loggable):
         self.log("Checking relative positions... done")
         self.__sorted = True
 
-    def remove_nonspeech_fragments(self, zero_length_only=False):
+    def remove_nonspeech_fragments(self, zero_length_only: bool = False):
         """
         Remove ``NONSPEECH`` fragments from the list.
 
@@ -310,7 +312,9 @@ class SyncMapFragmentList(Loggable):
                 f.fragment_type = SyncMapFragment.REGULAR
         self.log("Removing nonspeech fragments... done")
 
-    def has_zero_length_fragments(self, min_index=None, max_index=None):
+    def has_zero_length_fragments(
+        self, min_index: int | None = None, max_index: int | None = None
+    ) -> bool:
         """
         Return ``True`` if the list has at least one interval
         with zero length withing ``min_index`` and ``max_index``.
@@ -320,12 +324,12 @@ class SyncMapFragmentList(Loggable):
         :param int max_index: examine fragments with index smaller than this index (i.e., excluded)
         :raises ValueError: if ``min_index`` is negative or ``max_index``
                             is bigger than the current number of fragments
-        :rtype: bool
         """
         min_index, max_index = self._check_min_max_indices(min_index, max_index)
-        zero = [i for i in range(min_index, max_index) if self[i].has_zero_length]
-        self.log(["Fragments with zero length: %s", zero])
-        return len(zero) > 0
+        return next(
+            (True for i in range(min_index, max_index) if self[i].has_zero_length),
+            False,
+        )
 
     def has_adjacent_fragments_only(self, min_index=None, max_index=None):
         """
@@ -349,7 +353,7 @@ class SyncMapFragmentList(Loggable):
                 return False
         return True
 
-    def add(self, fragment, sort=True):
+    def add(self, fragment: SyncMapFragment, *, sort: bool = True):
         """
         Add the given fragment to the list (and keep the latter sorted).
 
@@ -374,14 +378,14 @@ class SyncMapFragmentList(Loggable):
                     ValueError,
                 )
             self._check_overlap(fragment)
-            insort(self.__fragments, fragment)
+            bisect.insort(self.__fragments, fragment)
             # self.log(u"Inserted and kept sorted flag true")
         else:
             self.__fragments.append(fragment)
             self.__sorted = False
             # self.log(u"Appended at the end and invalidated sorted flag")
 
-    def offset(self, offset):
+    def offset(self, offset: TimeValue):
         """
         Move all the intervals in the list by the given ``offset``.
 
@@ -400,7 +404,7 @@ class SyncMapFragmentList(Loggable):
             )
         self.log("Applying offset to all fragments... done")
 
-    def move_transition_point(self, fragment_index, value):
+    def move_transition_point(self, fragment_index: int, value: TimeValue):
         """
         Change the transition point between fragment ``fragment_index``
         and the next fragment to the time value ``value``.
@@ -440,8 +444,8 @@ class SyncMapFragmentList(Loggable):
         self.log("Moved transition point")
 
     def fragments_ending_inside_nonspeech_intervals(
-        self, nonspeech_intervals, tolerance
-    ):
+        self, nonspeech_intervals: list[TimeInterval], tolerance: TimeValue
+    ) -> list[tuple[TimeInterval, int]]:
         """
         Determine a list of pairs (nonspeech interval, fragment index),
         such that the nonspeech interval contains exactly one fragment
@@ -453,7 +457,6 @@ class SyncMapFragmentList(Loggable):
         :param tolerance: the tolerance to be applied when checking if the end point
                           falls within a given nonspeech interval
         :type  tolerance: :class:`~aeneas.exacttiming.TimeValue`
-        :rtype: list of (:class:`~aeneas.exacttiming.TimeInterval`, int)
         """
         self.log("Called fragments_ending_inside_nonspeech_intervals")
         self.log(["  List begin: %.3f", self.begin])
@@ -532,7 +535,9 @@ class SyncMapFragmentList(Loggable):
         self.log(["Returning: %s", tbr])
         return tbr
 
-    def inject_long_nonspeech_fragments(self, pairs, replacement_string):
+    def inject_long_nonspeech_fragments(
+        self, pairs: typing.Sequence[tuple[TimeInterval, int]], replacement_string: str
+    ) -> None:
         """
         Inject nonspeech fragments corresponding to the given intervals
         in this fragment list.
@@ -582,11 +587,11 @@ class SyncMapFragmentList(Loggable):
 
     def fix_zero_length_fragments(
         self,
-        duration=TimeValue("0.001"),
-        min_index=None,
-        max_index=None,
-        ensure_adjacent=True,
-    ):
+        duration: TimeValue = TimeValue("0.001"),
+        min_index: int | None = None,
+        max_index: int | None = None,
+        ensure_adjacent: bool = True,
+    ) -> None:
         """
         Fix fragments with zero length,
         enlarging them to have length ``duration``,
@@ -605,12 +610,15 @@ class SyncMapFragmentList(Loggable):
         self.log("Called fix_zero_length_fragments")
         self.log(["  Duration %.3f", duration])
         min_index, max_index = self._check_min_max_indices(min_index, max_index)
+
         if len(self) < 1:
             self.log("The list has no fragments: returning")
             return
+
         if not self.has_adjacent_fragments_only(min_index, max_index):
             self.log_warn("There are non adjacent fragments: aborting")
             return
+
         original_first_begin = None
         if (
             (ensure_adjacent)
@@ -737,7 +745,9 @@ class SyncMapFragmentList(Loggable):
                 ["  %d => %.3f %.3f", i, fragment.interval.begin, fragment.interval.end]
             )
 
-    def fix_fragment_rate(self, fragment_index, max_rate, aggressive=False):
+    def fix_fragment_rate(
+        self, fragment_index: int, max_rate: decimal.Decimal, aggressive: bool = False
+    ):
         def fix_pair(current_index, donor_index):
             self.log("Called fix_pair")
             if (
