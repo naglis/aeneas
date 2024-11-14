@@ -93,7 +93,7 @@ class Container(Loggable):
 
     TAG = "Container"
 
-    def __init__(self, file_path, container_format=None, rconf=None, logger=None):
+    def __init__(self, file_path: str, container_format=None, rconf=None, logger=None):
         if file_path is None:
             raise TypeError("File path is None")
         if (container_format is not None) and (
@@ -107,16 +107,14 @@ class Container(Loggable):
         self._set_actual_container()
 
     @property
-    def file_path(self):
+    def file_path(self) -> str:
         """
         The path of this container.
-
-        :rtype: string
         """
         return self.__file_path
 
     @file_path.setter
-    def file_path(self, file_path):
+    def file_path(self, file_path: str):
         self.__file_path = file_path
 
     @property
@@ -317,7 +315,7 @@ class Container(Loggable):
             self.log_exc(
                 "The actual container object has not been set", None, True, TypeError
             )
-        if not gf.directory_exists(output_path):
+        if not os.path.isdir(output_path):
             self.log_exc(
                 "The output path is not an existing directory", None, True, ValueError
             )
@@ -345,7 +343,7 @@ class Container(Loggable):
             self.log_exc(
                 "The actual container object has not been set", None, True, TypeError
             )
-        if not gf.directory_exists(input_path):
+        if not os.path.isdir(input_path):
             self.log_exc(
                 "The input path is not an existing directory", None, True, ValueError
             )
@@ -359,7 +357,7 @@ class Container(Loggable):
 
         :rtype: boolean
         """
-        return gf.file_exists(self.file_path) or gf.directory_exists(self.file_path)
+        return os.path.isfile(self.file_path) or os.path.isdir(self.file_path)
 
     def _set_actual_container(self):
         """

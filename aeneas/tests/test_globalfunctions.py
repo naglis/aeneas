@@ -321,14 +321,14 @@ class TestGlobalFunctions(unittest.TestCase):
             tmp_path = os.path.join(orig, "foo.bar")
             tmp_parent = orig
             gf.ensure_parent_directory(tmp_path)
-            self.assertTrue(gf.directory_exists(tmp_parent))
+            self.assertTrue(os.path.isdir(tmp_parent))
             tmp_path = os.path.join(orig, "foo/bar.baz")
             tmp_parent = os.path.join(orig, "foo")
             gf.ensure_parent_directory(tmp_path)
-            self.assertTrue(gf.directory_exists(tmp_parent))
+            self.assertTrue(os.path.isdir(tmp_parent))
             tmp_path = os.path.join(orig, "bar")
             gf.ensure_parent_directory(tmp_path, ensure_parent=False)
-            self.assertTrue(gf.directory_exists(tmp_path))
+            self.assertTrue(os.path.isdir(tmp_path))
 
     def test_ensure_parent_directory_parent_error(self):
         with self.assertRaises(OSError):
@@ -526,14 +526,6 @@ class TestGlobalFunctions(unittest.TestCase):
         path = "/foo/bar/baz"
         self.assertFalse(gf.file_can_be_written(path))
 
-    def test_directory_exists_true(self):
-        with tempfile.TemporaryDirectory() as orig:
-            self.assertTrue(gf.directory_exists(orig))
-
-    def test_directory_exists_false(self):
-        orig = "/foo/bar/baz"
-        self.assertFalse(gf.directory_exists(orig))
-
     def test_file_exists_true(self):
         handler, path = gf.tmp_file()
         self.assertTrue(gf.file_exists(path))
@@ -561,15 +553,15 @@ class TestGlobalFunctions(unittest.TestCase):
 
     def test_delete_directory_existing(self):
         tmp_dir = tempfile.mkdtemp()
-        self.assertTrue(gf.directory_exists(tmp_dir))
+        self.assertTrue(os.path.isdir(tmp_dir))
         gf.delete_directory(tmp_dir)
-        self.assertFalse(gf.directory_exists(tmp_dir))
+        self.assertFalse(os.path.isdir(tmp_dir))
 
     def test_delete_directory_not_existing(self):
         orig = "/foo/bar/baz"
-        self.assertFalse(gf.directory_exists(orig))
+        self.assertFalse(os.path.isdir(orig))
         gf.delete_directory(orig)
-        self.assertFalse(gf.directory_exists(orig))
+        self.assertFalse(os.path.isdir(orig))
 
     def test_close_file_handler(self):
         handler, path = gf.tmp_file()

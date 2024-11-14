@@ -27,6 +27,8 @@ This module contains the following classes:
 * :class:`~aeneas.validator.ValidatorResult`, a record holding validation result and possibly messages.
 """
 
+import os.path
+
 from aeneas.analyzecontainer import AnalyzeContainer
 from aeneas.container import Container
 from aeneas.container import ContainerFormat
@@ -382,7 +384,10 @@ class Validator(Loggable):
         return self.result
 
     def check_container(
-        self, container_path, container_format=None, config_string=None
+        self,
+        container_path: str,
+        container_format=None,
+        config_string: str | None = None,
     ):
         """
         Check whether the given container is well-formed.
@@ -399,7 +404,7 @@ class Validator(Loggable):
         if self._are_safety_checks_disabled("check_container"):
             return self.result
 
-        if not (gf.file_exists(container_path) or gf.directory_exists(container_path)):
+        if not (os.path.isfile(container_path) or os.path.isdir(container_path)):
             self._failed("Container '%s' not found." % container_path)
             return self.result
 

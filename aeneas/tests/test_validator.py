@@ -421,9 +421,6 @@ class TestValidator(unittest.TestCase):
     def test_check_container_txt_valid(self):
         self.container("res/validator/job_txt_config", True)
 
-    def test_check_container_none(self):
-        self.container(None, False)
-
     def test_check_container_not_existing(self):
         self.container("res/validator/x/y/z/not_existing", False)
 

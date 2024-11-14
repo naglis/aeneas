@@ -887,19 +887,6 @@ def file_can_be_written(path):
     return False
 
 
-def directory_exists(path):
-    """
-    Return ``True`` if the given ``path`` string
-    points to an existing directory.
-
-    :param string path: the file path
-    :rtype: bool
-    """
-    if (path is None) or (not os.path.isdir(path)):
-        return False
-    return True
-
-
 def file_exists(path):
     """
     Return ``True`` if the given ``path`` string
