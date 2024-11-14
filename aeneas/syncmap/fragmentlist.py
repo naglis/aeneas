@@ -25,7 +25,7 @@ import bisect
 
 from aeneas.exacttiming import TimeInterval, TimeValue
 from aeneas.logger import Loggable
-from aeneas.syncmap.fragment import SyncMapFragment
+from aeneas.syncmap.fragment import SyncMapFragment, FragmentType
 from aeneas.textfile import TextFragment
 import aeneas.globalconstants as gc
 
@@ -216,7 +216,7 @@ class SyncMapFragmentList(Loggable):
         :rtype: generator of (int, :class:`~aeneas.syncmap.SyncMapFragment`)
         """
         for i, fragment in enumerate(self.__fragments):
-            if fragment.fragment_type == SyncMapFragment.REGULAR:
+            if fragment.fragment_type == FragmentType.REGULAR:
                 yield (i, fragment)
 
     @property
@@ -228,7 +228,7 @@ class SyncMapFragmentList(Loggable):
         :rtype: generator of (int, :class:`~aeneas.syncmap.SyncMapFragment`)
         """
         for i, fragment in enumerate(self.__fragments):
-            if fragment.fragment_type == SyncMapFragment.NONSPEECH:
+            if fragment.fragment_type == FragmentType.NONSPEECH:
                 yield (i, fragment)
 
     def remove(self, indices: list[int]) -> None:
@@ -309,7 +309,7 @@ class SyncMapFragmentList(Loggable):
         self.remove(nonspeech_indices)
         if zero_length_only:
             for i, f in list(self.nonspeech_fragments):
-                f.fragment_type = SyncMapFragment.REGULAR
+                f.fragment_type = FragmentType.REGULAR
         self.log("Removing nonspeech fragments... done")
 
     def has_zero_length_fragments(
@@ -576,7 +576,7 @@ class SyncMapFragmentList(Loggable):
                         filtered_lines=lines,
                     ),
                     interval=nsi,
-                    fragment_type=SyncMapFragment.NONSPEECH,
+                    fragment_type=FragmentType.NONSPEECH,
                 ),
                 sort=False,
             )

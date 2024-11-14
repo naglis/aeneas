@@ -36,7 +36,7 @@ from aeneas.idsortingalgorithm import IDSortingAlgorithm
 from aeneas.language import Language
 from aeneas.runtimeconfiguration import RuntimeConfiguration
 from aeneas.syncmap import SyncMapFormat
-from aeneas.syncmap import SyncMapFragment
+from aeneas.syncmap.fragment import FragmentType
 from aeneas.syncmap import SyncMapHeadTailFormat
 from aeneas.task import Task
 from aeneas.task import TaskConfiguration
@@ -684,7 +684,7 @@ class ExecuteTaskCLI(AbstractCLIProgram):
         if print_zero:
             zero_duration = [
                 leaf
-                for leaf in task.sync_map_leaves(SyncMapFragment.REGULAR)
+                for leaf in task.sync_map_leaves(FragmentType.REGULAR)
                 if leaf.begin == leaf.end
             ]
             if len(zero_duration) > 0:
@@ -694,7 +694,7 @@ class ExecuteTaskCLI(AbstractCLIProgram):
 
         if print_rates:
             self.print_info("Fragments with rates:")
-            for fragment in task.sync_map_leaves(SyncMapFragment.REGULAR):
+            for fragment in task.sync_map_leaves(FragmentType.REGULAR):
                 self.print_generic(
                     f"  {fragment.pretty_print}\t{fragment.rate or 0.0:.3f}"
                 )
@@ -704,7 +704,7 @@ class ExecuteTaskCLI(AbstractCLIProgram):
             if max_rate is not None:
                 faster = [
                     leaf
-                    for leaf in task.sync_map_leaves(SyncMapFragment.REGULAR)
+                    for leaf in task.sync_map_leaves(FragmentType.REGULAR)
                     if leaf.rate >= max_rate + Decimal("0.001")
                 ]
                 if len(faster) > 0:

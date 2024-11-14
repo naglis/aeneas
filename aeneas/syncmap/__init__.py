@@ -41,7 +41,7 @@ import itertools
 
 from aeneas.logger import Loggable
 from aeneas.syncmap.format import SyncMapFormat
-from aeneas.syncmap.fragment import SyncMapFragment
+from aeneas.syncmap.fragment import SyncMapFragment, FragmentType
 from aeneas.syncmap.fragmentlist import SyncMapFragmentList
 from aeneas.syncmap.headtailformat import SyncMapHeadTailFormat
 from aeneas.tree import Tree
@@ -476,7 +476,7 @@ class SyncMap(Loggable):
             tail = tree.get_child(-1)
             # mark HEAD as REGULAR if needed
             if head_tail_format == SyncMapHeadTailFormat.ADD:
-                head.value.fragment_type = SyncMapFragment.REGULAR
+                head.value.fragment_type = FragmentType.REGULAR
                 self.log("Marked HEAD as REGULAR")
             # stretch first and last fragment timings if needed
             if head_tail_format == SyncMapHeadTailFormat.STRETCH:
@@ -498,12 +498,12 @@ class SyncMap(Loggable):
                 last.value.end = tail.value.end
             # mark TAIL as REGULAR if needed
             if head_tail_format == SyncMapHeadTailFormat.ADD:
-                tail.value.fragment_type = SyncMapFragment.REGULAR
+                tail.value.fragment_type = FragmentType.REGULAR
                 self.log("Marked TAIL as REGULAR")
             # remove all fragments that are not REGULAR
             for node in list(tree.dfs):
                 if (node.value is not None) and (
-                    node.value.fragment_type != SyncMapFragment.REGULAR
+                    node.value.fragment_type != FragmentType.REGULAR
                 ):
                     node.remove()
 

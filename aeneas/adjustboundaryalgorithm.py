@@ -30,15 +30,15 @@ This module contains the following classes:
 .. warning:: This module is likely to be refactored in a future version
 """
 
+import decimal
+
 from aeneas.audiofilemfcc import AudioFileMFCC
-from aeneas.exacttiming import Decimal
 from aeneas.exacttiming import TimeValue
 from aeneas.logger import Loggable
 from aeneas.runtimeconfiguration import RuntimeConfiguration
-from aeneas.syncmap import SyncMapFragment
-from aeneas.syncmap import SyncMapFragmentList
-from aeneas.textfile import TextFile
-from aeneas.textfile import TextFragment
+from aeneas.syncmap.fragment import SyncMapFragment, FragmentType
+from aeneas.syncmap.fragmentlist import SyncMapFragmentList
+from aeneas.textfile import TextFile, TextFragment
 from aeneas.tree import Tree
 import aeneas.globalconstants as gc
 
@@ -349,7 +349,7 @@ class AdjustBoundaryAlgorithm(Loggable):
                 ),
                 begin=time_values[0],
                 end=time_values[1],
-                fragment_type=SyncMapFragment.HEAD,
+                fragment_type=FragmentType.HEAD,
             ),
             sort=False,
         )
@@ -365,7 +365,7 @@ class AdjustBoundaryAlgorithm(Loggable):
                     text_fragment=fragments[i - 1],
                     begin=time_values[i],
                     end=time_values[i + 1],
-                    fragment_type=SyncMapFragment.REGULAR,
+                    fragment_type=FragmentType.REGULAR,
                 ),
                 sort=False,
             )
@@ -381,7 +381,7 @@ class AdjustBoundaryAlgorithm(Loggable):
                 ),
                 begin=time_values[len(time_values) - 2],
                 end=end,
-                fragment_type=SyncMapFragment.TAIL,
+                fragment_type=FragmentType.TAIL,
             ),
             sort=False,
         )
@@ -506,7 +506,7 @@ class AdjustBoundaryAlgorithm(Loggable):
             The new boundary time value is ``percent``
             of the nonspeech interval ``nsi``.
             """
-            percent = Decimal(algo_parameters[0])
+            percent = decimal.Decimal(algo_parameters[0])
             return nsi.percent_value(percent)
 
         self.log("Called _adjust_percent")
@@ -649,7 +649,7 @@ class AdjustBoundaryAlgorithm(Loggable):
         faster_fragments = [
             (i, f)
             for i, f in regular_fragments
-            if (f.rate is not None) and (f.rate >= max_rate + Decimal("0.001"))
+            if (f.rate is not None) and (f.rate >= max_rate + decimal.Decimal("0.001"))
         ]
 
         if not faster_fragments:
@@ -665,7 +665,7 @@ class AdjustBoundaryAlgorithm(Loggable):
         faster_fragments = [
             (i, f)
             for i, f in regular_fragments
-            if (f.rate is not None) and (f.rate >= max_rate + Decimal("0.001"))
+            if (f.rate is not None) and (f.rate >= max_rate + decimal.Decimal("0.001"))
         ]
         if faster_fragments:
             self.log_warn("  Some fragments still have rate faster than max rate:")
