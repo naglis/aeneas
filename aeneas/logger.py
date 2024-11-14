@@ -35,7 +35,7 @@ from aeneas.runtimeconfiguration import RuntimeConfiguration
 import aeneas.globalfunctions as gf
 
 
-type Message = str | typing.Sequence[typing.Any]
+Message = str | typing.Sequence[typing.Any]
 
 
 class Logger:
