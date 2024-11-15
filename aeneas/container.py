@@ -33,6 +33,7 @@ This module contains the following classes:
 """
 
 import os
+import enum
 import tarfile
 import zipfile
 import sys
@@ -42,7 +43,8 @@ import aeneas.globalconstants as gc
 import aeneas.globalfunctions as gf
 
 
-class ContainerFormat:
+@enum.unique
+class ContainerFormat(enum.Enum):
     """
     Enumeration of the supported container formats.
     """
@@ -64,12 +66,6 @@ class ContainerFormat:
 
     ZIP = "zip"
     """ ZIP container """
-
-    ALLOWED_FILE_VALUES = [EPUB, TAR, TAR_GZ, TAR_BZ2, ZIP]
-    """ List of all the allowed values for a container file """
-
-    ALLOWED_VALUES = [EPUB, TAR, TAR_GZ, TAR_BZ2, UNPACKED, ZIP]
-    """ List of all the allowed values """
 
 
 class Container(Loggable):
@@ -93,11 +89,17 @@ class Container(Loggable):
 
     TAG = "Container"
 
-    def __init__(self, file_path: str, container_format=None, rconf=None, logger=None):
+    def __init__(
+        self,
+        file_path: str,
+        container_format: ContainerFormat | None = None,
+        rconf=None,
+        logger=None,
+    ):
         if file_path is None:
             raise TypeError("File path is None")
-        if (container_format is not None) and (
-            container_format not in ContainerFormat.ALLOWED_VALUES
+        if container_format is not None and not isinstance(
+            container_format, ContainerFormat
         ):
             raise ValueError("Container format not allowed")
         super().__init__(rconf=rconf, logger=logger)
@@ -118,7 +120,7 @@ class Container(Loggable):
         self.__file_path = file_path
 
     @property
-    def container_format(self):
+    def container_format(self) -> ContainerFormat | None:
         """
         The format of this container.
 
@@ -127,7 +129,7 @@ class Container(Loggable):
         return self.__container_format
 
     @container_format.setter
-    def container_format(self, container_format):
+    def container_format(self, container_format: ContainerFormat | None):
         self.__container_format = container_format
 
     @property
@@ -375,8 +377,11 @@ class Container(Loggable):
             path_lowercased = self.file_path.lower()
             self.log(["Lowercased file path: '%s'", path_lowercased])
             self.container_format = ContainerFormat.UNPACKED
-            for fmt in ContainerFormat.ALLOWED_FILE_VALUES:
-                if path_lowercased.endswith(fmt):
+            for fmt in ContainerFormat:
+                if fmt == ContainerFormat.UNPACKED:
+                    continue
+
+                if path_lowercased.endswith(fmt.value):
                     self.container_format = fmt
                     break
             self.log("Inferring actual container format... done")
