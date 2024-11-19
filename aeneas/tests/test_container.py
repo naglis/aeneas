@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 # aeneas is a Python/C library and a set of tools
 # to automagically synchronize audio and text (aka forced alignment)
 #
@@ -30,16 +28,18 @@ import aeneas.globalfunctions as gf
 
 
 class TestContainer(unittest.TestCase):
+    maxDiff = None
+
     NOT_EXISTING = gf.absolute_path("not_existing.zip", __file__)
-    EMPTY_FILES = [
+    EMPTY_FILES = (
         gf.absolute_path("res/container/empty_file.epub", __file__),
         gf.absolute_path("res/container/empty_file.tar", __file__),
         gf.absolute_path("res/container/empty_file.tar.bz2", __file__),
         gf.absolute_path("res/container/empty_file.tar.gz", __file__),
         gf.absolute_path("res/container/empty_file.zip", __file__),
-    ]
+    )
 
-    EXPECTED_ENTRIES = [
+    EXPECTED_ENTRIES = (
         "assets/p001.mp3",
         "assets/p001.xhtml",
         "assets/p002.mp3",
@@ -47,7 +47,7 @@ class TestContainer(unittest.TestCase):
         "assets/p003.mp3",
         "assets/p003.xhtml",
         "config.txt",
-    ]
+    )
 
     FILES = {
         "epub": {
@@ -96,28 +96,29 @@ class TestContainer(unittest.TestCase):
             Container(file_path=self.FILES["zip"]["path"], container_format="foo")
 
     def test_constructor(self):
-        for key in self.FILES:
-            f = self.FILES[key]
-            file_path = f["path"]
-            container_format = f["format"]
-            cont = Container(file_path, container_format)
-            self.assertEqual(cont.file_path, file_path)
-            self.assertEqual(cont.container_format, container_format)
+        for key, f in self.FILES.items():
+            with self.subTest(key=key):
+                file_path = f["path"]
+                container_format = f["format"]
+                cont = Container(file_path, container_format)
+                self.assertEqual(cont.file_path, file_path)
+                self.assertEqual(cont.container_format, container_format)
 
     def test_guess_container(self):
-        for key in self.FILES:
-            f = self.FILES[key]
-            cont = Container(f["path"])
-            self.assertEqual(cont.container_format, f["format"])
+        for key, f in self.FILES.items():
+            with self.subTest(key=key):
+                cont = Container(f["path"])
+                self.assertEqual(cont.container_format, f["format"])
 
     def test_exists_file_not_existing(self):
         cont = Container(self.NOT_EXISTING)
         self.assertFalse(cont.exists())
 
     def test_exists_empty_file(self):
-        for f in self.EMPTY_FILES:
-            cont = Container(f)
-            self.assertTrue(cont.exists())
+        for path in self.EMPTY_FILES:
+            with self.subTest(path=path):
+                cont = Container(path)
+                self.assertTrue(cont.exists())
 
     def test_exists_empty_directory(self):
         with tempfile.TemporaryDirectory() as output_path:
@@ -130,10 +131,11 @@ class TestContainer(unittest.TestCase):
             cont.entries
 
     def test_entries_empty_file(self):
-        for f in self.EMPTY_FILES:
-            cont = Container(f)
-            with self.assertRaises(OSError):
-                self.assertEqual(len(cont.entries), 0)
+        for path in self.EMPTY_FILES:
+            with self.subTest(path=path):
+                cont = Container(path)
+                with self.assertRaises(OSError):
+                    self.assertEqual(len(cont.entries), 0)
 
     def test_entries_empty_directory(self):
         with tempfile.TemporaryDirectory() as output_path:
@@ -141,20 +143,20 @@ class TestContainer(unittest.TestCase):
             self.assertEqual(len(cont.entries), 0)
 
     def test_entries(self):
-        for key in self.FILES:
-            f = self.FILES[key]
-            cont = Container(f["path"])
-            self.assertEqual(cont.entries, self.EXPECTED_ENTRIES)
+        for key, f in self.FILES.items():
+            with self.subTest(key=key):
+                cont = Container(f["path"])
+                self.assertSequenceEqual(cont.entries, self.EXPECTED_ENTRIES)
 
     def test_entries_unpacked_relative(self):
         f = self.FILES["unpacked"]
         cont = Container(f["path"])
-        self.assertEqual(cont.entries, self.EXPECTED_ENTRIES)
+        self.assertSequenceEqual(cont.entries, self.EXPECTED_ENTRIES)
 
     def test_entries_unpacked_absolute(self):
         f = self.FILES["unpacked"]
         cont = Container(os.path.abspath(f["path"]))
-        self.assertEqual(cont.entries, self.EXPECTED_ENTRIES)
+        self.assertSequenceEqual(cont.entries, self.EXPECTED_ENTRIES)
 
     def test_is_safe_not_existing(self):
         cont = Container(self.NOT_EXISTING)
@@ -162,10 +164,11 @@ class TestContainer(unittest.TestCase):
             self.assertTrue(cont.is_safe)
 
     def test_is_safe_empty_file(self):
-        for f in self.EMPTY_FILES:
-            cont = Container(f)
-            with self.assertRaises(OSError):
-                self.assertTrue(cont.is_safe)
+        for path in self.EMPTY_FILES:
+            with self.subTest(path=path):
+                cont = Container(path)
+                with self.assertRaises(OSError):
+                    self.assertTrue(cont.is_safe)
 
     def test_is_safe_empty_directory(self):
         with tempfile.TemporaryDirectory() as output_path:
@@ -173,10 +176,10 @@ class TestContainer(unittest.TestCase):
             self.assertTrue(cont.is_safe)
 
     def test_is_safe(self):
-        for key in self.FILES:
-            f = self.FILES[key]
-            cont = Container(f["path"])
-            self.assertTrue(cont.is_safe)
+        for key, f in self.FILES.items():
+            with self.subTest(key=key):
+                cont = Container(f["path"])
+                self.assertTrue(cont.is_safe)
 
     def test_is_entry_safe_false(self):
         cont = Container(self.FILES["unpacked"]["path"])
@@ -186,7 +189,8 @@ class TestContainer(unittest.TestCase):
             "foo/../../../../../../../../../../../../bar",
             "foo/../../../../../bar/../../../../../../baz",
         ]:
-            self.assertFalse(cont.is_entry_safe(entry))
+            with self.subTest(entry=entry):
+                self.assertFalse(cont.is_entry_safe(entry))
 
     def test_is_entry_safe_true(self):
         cont = Container(self.FILES["unpacked"]["path"])
@@ -200,7 +204,8 @@ class TestContainer(unittest.TestCase):
             "./foo/bar",
             "foo/./bar",
         ]:
-            self.assertTrue(cont.is_entry_safe(entry))
+            with self.subTest(entry=entry):
+                self.assertTrue(cont.is_entry_safe(entry))
 
     def test_read_entry_not_existing(self):
         cont = Container(self.NOT_EXISTING)
@@ -208,10 +213,11 @@ class TestContainer(unittest.TestCase):
             self.assertIsNone(cont.read_entry(self.EXPECTED_ENTRIES[0]))
 
     def test_read_entry_empty_file(self):
-        for f in self.EMPTY_FILES:
-            cont = Container(f)
-            with self.assertRaises(OSError):
-                self.assertIsNone(cont.read_entry(self.EXPECTED_ENTRIES[0]))
+        for path in self.EMPTY_FILES:
+            with self.subTest(path=path):
+                cont = Container(path)
+                with self.assertRaises(OSError):
+                    self.assertIsNone(cont.read_entry(self.EXPECTED_ENTRIES[0]))
 
     def test_read_entry_empty_directory(self):
         with tempfile.TemporaryDirectory() as output_path:
@@ -219,13 +225,12 @@ class TestContainer(unittest.TestCase):
             self.assertIsNone(cont.read_entry(self.EXPECTED_ENTRIES[0]))
 
     def test_read_entry_existing(self):
-        entry = "config.txt"
-        for key in self.FILES:
-            f = self.FILES[key]
-            cont = Container(f["path"])
-            result = cont.read_entry(entry)
-            self.assertIsNotNone(result)
-            self.assertEqual(len(result), f["config_size"])
+        for key, f in self.FILES.items():
+            with self.subTest(key=key):
+                cont = Container(f["path"])
+                result = cont.read_entry("config.txt")
+                self.assertIsNotNone(result)
+                self.assertEqual(len(result), f["config_size"])
 
     def test_find_entry_not_existing(self):
         cont = Container(self.NOT_EXISTING)
@@ -233,10 +238,11 @@ class TestContainer(unittest.TestCase):
             self.assertIsNone(cont.find_entry(self.EXPECTED_ENTRIES[0]))
 
     def test_find_entry_empty_file(self):
-        for f in self.EMPTY_FILES:
-            cont = Container(f)
-            with self.assertRaises(OSError):
-                self.assertIsNone(cont.find_entry(self.EXPECTED_ENTRIES[0]))
+        for path in self.EMPTY_FILES:
+            with self.subTest(path=path):
+                cont = Container(path)
+                with self.assertRaises(OSError):
+                    self.assertIsNone(cont.find_entry(self.EXPECTED_ENTRIES[0]))
 
     def test_find_entry_empty_directory(self):
         with tempfile.TemporaryDirectory() as output_path:
@@ -244,45 +250,42 @@ class TestContainer(unittest.TestCase):
             self.assertIsNone(cont.find_entry(self.EXPECTED_ENTRIES[0]))
 
     def test_find_entry_existing(self):
-        entry = "config.txt"
-        for key in self.FILES:
-            f = self.FILES[key]
-            cont = Container(f["path"])
-            self.assertTrue(cont.find_entry(entry, exact=True))
-            self.assertTrue(cont.find_entry(entry, exact=False))
+        for key, f in self.FILES.items():
+            with self.subTest(key=key):
+                cont = Container(f["path"])
+                self.assertTrue(cont.find_entry("config.txt", exact=True))
+                self.assertTrue(cont.find_entry("config.txt", exact=False))
 
     def test_find_entry_existing_not_exact(self):
-        entry = "p001.xhtml"
-        for key in self.FILES:
-            f = self.FILES[key]
-            cont = Container(f["path"])
-            self.assertFalse(cont.find_entry(entry, exact=True))
-            self.assertTrue(cont.find_entry(entry, exact=False))
+        for key, f in self.FILES.items():
+            with self.subTest(key=key):
+                cont = Container(f["path"])
+                self.assertFalse(cont.find_entry("p001.xhtml", exact=True))
+                self.assertTrue(cont.find_entry("p001.xhtml", exact=False))
 
     def test_read_entry_missing(self):
-        entry = "config_not_existing.txt"
-        for key in self.FILES:
-            f = self.FILES[key]
-            cont = Container(f["path"])
-            result = cont.read_entry(entry)
-            self.assertIsNone(result)
+        for key, f in self.FILES.items():
+            with self.subTest(key=key):
+                cont = Container(f["path"])
+                result = cont.read_entry("config_not_existing.txt")
+                self.assertIsNone(result)
 
     def test_find_entry_missing(self):
-        entry = "config_not_existing.txt"
-        for key in self.FILES:
-            f = self.FILES[key]
-            cont = Container(f["path"])
-            self.assertFalse(cont.find_entry(entry, exact=True))
-            self.assertFalse(cont.find_entry(entry, exact=False))
+        for key, f in self.FILES.items():
+            with self.subTest(key=key):
+                cont = Container(f["path"])
+                self.assertFalse(cont.find_entry("config_not_existing.txt", exact=True))
+                self.assertFalse(
+                    cont.find_entry("config_not_existing.txt", exact=False)
+                )
 
     def test_decompress(self):
-        for key in self.FILES:
-            with tempfile.TemporaryDirectory() as output_path:
-                f = self.FILES[key]
+        for key, f in self.FILES.items():
+            with self.subTest(key=key), tempfile.TemporaryDirectory() as output_path:
                 cont = Container(f["path"])
                 cont.decompress(output_path)
                 copy = Container(output_path, ContainerFormat.UNPACKED)
-                self.assertEqual(copy.entries, self.EXPECTED_ENTRIES)
+                self.assertSequenceEqual(copy.entries, self.EXPECTED_ENTRIES)
 
     def test_compress_unpacked(self):
         input_path = self.FILES["unpacked"]["path"]
@@ -291,18 +294,20 @@ class TestContainer(unittest.TestCase):
             cont.compress(input_path)
             self.assertFalse(os.path.isfile(output_path))
             copy = Container(output_path, ContainerFormat.UNPACKED)
-            self.assertEqual(copy.entries, self.EXPECTED_ENTRIES)
+            self.assertSequenceEqual(copy.entries, self.EXPECTED_ENTRIES)
 
     def test_compress_file(self):
         input_path = self.FILES["unpacked"]["path"]
-        for key in self.FILES:
-            fmt = self.FILES[key]["format"]
+        for key, f in self.FILES.items():
+            fmt = f["format"]
             if fmt == ContainerFormat.UNPACKED:
                 continue
 
-            with tempfile.NamedTemporaryFile(suffix=f".{fmt}") as output_path:
+            with self.subTest(key=key), tempfile.NamedTemporaryFile(
+                suffix=f".{fmt}"
+            ) as output_path:
                 cont = Container(output_path.name, fmt)
                 cont.compress(input_path)
                 self.assertTrue(os.path.isfile(output_path.name))
                 copy = Container(output_path.name, fmt)
-                self.assertEqual(copy.entries, self.EXPECTED_ENTRIES)
+                self.assertSequenceEqual(copy.entries, self.EXPECTED_ENTRIES)
