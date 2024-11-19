@@ -67,7 +67,7 @@ class Validator(Loggable):
         # COMMENTED ),
         #
         (gc.PPN_JOB_IS_HIERARCHY_TYPE, HierarchyType.ALLOWED_VALUES),
-        (gc.PPN_JOB_OS_CONTAINER_FORMAT, ContainerFormat.ALLOWED_VALUES),
+        (gc.PPN_JOB_OS_CONTAINER_FORMAT, [v.value for v in ContainerFormat]),
         (gc.PPN_JOB_OS_HIERARCHY_TYPE, HierarchyType.ALLOWED_VALUES),
         (gc.PPN_TASK_IS_TEXT_FILE_FORMAT, TextFileFormat.ALLOWED_VALUES),
         (gc.PPN_TASK_OS_FILE_FORMAT, SyncMapFormat.ALLOWED_VALUES),
