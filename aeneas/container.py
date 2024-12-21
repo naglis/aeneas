@@ -133,12 +133,11 @@ class Container(Loggable):
         self.__container_format = container_format
 
     @property
-    def has_config_xml(self):
+    def has_config_xml(self) -> bool:
         """
         Return ``True`` if there is an XML config file in this container,
         ``False`` otherwise.
 
-        :rtype: bool
         :raises: same as :func:`~aeneas.container.Container.entries`
         """
         return self.entry_config_xml is not None
@@ -156,12 +155,11 @@ class Container(Loggable):
         return self.find_entry(gc.CONFIG_XML_FILE_NAME, exact=False)
 
     @property
-    def has_config_txt(self):
+    def has_config_txt(self) -> bool:
         """
         Return ``True`` if there is a TXT config file in this container,
         ``False`` otherwise.
 
-        :rtype: bool
         :raises: same as :func:`~aeneas.container.Container.entries`
         """
         return self.entry_config_txt is not None
@@ -179,12 +177,11 @@ class Container(Loggable):
         return self.find_entry(gc.CONFIG_TXT_FILE_NAME, exact=False)
 
     @property
-    def is_safe(self):
+    def is_safe(self) -> bool:
         """
         Return ``True`` if the container can be safely extracted,
         that is, if all its entries are safe, ``False`` otherwise.
 
-        :rtype: bool
         :raises: same as :func:`~aeneas.container.Container.entries`
         """
         self.log("Checking if this container is safe")
@@ -195,13 +192,11 @@ class Container(Loggable):
         self.log("This container is safe")
         return True
 
-    def is_entry_safe(self, entry):
+    def is_entry_safe(self, entry) -> bool:
         """
         Return ``True`` if ``entry`` can be safely extracted,
         that is, if it does start with ``/`` or ``../``
         after path normalization, ``False`` otherwise.
-
-        :rtype: bool
         """
         normalized = os.path.normpath(entry)
         if normalized.startswith(os.sep) or normalized.startswith(".." + os.sep):
@@ -232,7 +227,7 @@ class Container(Loggable):
             )
         return self.actual_container.entries
 
-    def find_entry(self, entry, exact=True):
+    def find_entry(self, entry: str, exact: bool = True) -> str | None:
         """
         Return the full path to the first entry whose file name equals
         the given ``entry`` path.
@@ -271,7 +266,7 @@ class Container(Loggable):
         self.log(["Entry '%s' not found", entry])
         return None
 
-    def read_entry(self, entry):
+    def read_entry(self, entry: str) -> bytes | None:
         """
         Read the contents of an entry in this container,
         and return them as a byte string.
@@ -279,7 +274,6 @@ class Container(Loggable):
         Return ``None`` if the entry is not safe
         or it cannot be found.
 
-        :rtype: byte string
         :raises: same as :func:`~aeneas.container.Container.entries`
         """
         if not self.is_entry_safe(entry):
@@ -297,7 +291,7 @@ class Container(Loggable):
             self.log(["An error occurred while reading the contents of '%s'", entry])
             return None
 
-    def decompress(self, output_path):
+    def decompress(self, output_path: str):
         """
         Decompress the entire container into the given directory.
 
@@ -327,7 +321,7 @@ class Container(Loggable):
             )
         self.actual_container.decompress(output_path)
 
-    def compress(self, input_path):
+    def compress(self, input_path: str):
         """
         Compress the contents of the given directory.
 
@@ -352,7 +346,7 @@ class Container(Loggable):
         gf.ensure_parent_directory(input_path)
         self.actual_container.compress(input_path)
 
-    def exists(self):
+    def exists(self) -> bool:
         """
         Return ``True`` if the container has its path set and it exists,
         ``False`` otherwise.
