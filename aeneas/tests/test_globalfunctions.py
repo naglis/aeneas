@@ -307,7 +307,10 @@ class TestGlobalFunctions(unittest.TestCase):
             self.assertEqual(gf.pairs_to_dict(test[0]), test[1])
 
     def test_copytree(self):
-        with tempfile.TemporaryDirectory() as orig, tempfile.TemporaryDirectory() as dest:
+        with (
+            tempfile.TemporaryDirectory() as orig,
+            tempfile.TemporaryDirectory() as dest,
+        ):
             tmp_path = os.path.join(orig, "foo.bar")
             with open(tmp_path, "w", encoding="utf-8") as tmp_file:
                 tmp_file.write("Foo bar")

@@ -22,6 +22,8 @@
 
 from itertools import chain
 
+import lxml.etree as ET
+
 from aeneas.syncmap.smfbase import SyncMapFormatBase
 import aeneas.globalfunctions as gf
 
@@ -46,14 +48,13 @@ class SyncMapFormatGenericXML(SyncMapFormatBase):
         where the line separator is ``<br xmlns=... />``.
         """
         # TODO more robust parsing
-        from lxml import etree
 
         parts = (
             [node.text]
             + list(
                 chain(
                     *(
-                        [etree.tostring(c, with_tail=False), c.tail]
+                        [ET.tostring(c, with_tail=False), c.tail]
                         for c in node.getchildren()
                     )
                 )
@@ -69,18 +70,16 @@ class SyncMapFormatGenericXML(SyncMapFormatBase):
         return uparts
 
     @classmethod
-    def _tree_to_string(cls, root_element, xml_declaration=True, pretty_print=True):
+    def _tree_to_string(
+        cls, root_element, *, xml_declaration: bool = True, pretty_print: bool = True
+    ) -> str:
         """
-        Return an ``lxml`` tree as a Unicode string.
+        Return an ``lxml`` tree serialized as a string.
         """
-        from lxml import etree
-
-        return gf.safe_unicode(
-            etree.tostring(
-                root_element,
-                encoding="UTF-8",
-                method="xml",
-                xml_declaration=xml_declaration,
-                pretty_print=pretty_print,
-            )
-        )
+        return ET.tostring(
+            root_element,
+            encoding="UTF-8",
+            method="xml",
+            xml_declaration=xml_declaration,
+            pretty_print=pretty_print,
+        ).decode("utf-8")

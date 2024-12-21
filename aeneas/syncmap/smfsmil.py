@@ -20,6 +20,7 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+import lxml.etree as ET
 
 from aeneas.syncmap.missingparametererror import SyncMapMissingParameterError
 from aeneas.syncmap.smfgxml import SyncMapFormatGenericXML
@@ -60,10 +61,8 @@ class SyncMapFormatSMIL(SyncMapFormatGenericXML):
         2. timings must have ``hh:mm:ss.mmm`` or ``ss.mmm`` format (autodetected)
         3. both ``clipBegin`` and ``clipEnd`` attributes of ``<audio>`` must be populated
         """
-        from lxml import etree
-
         smil_ns = "{http://www.w3.org/ns/SMIL}"
-        root = etree.fromstring(gf.safe_bytes(input_text))
+        root = ET.fromstring(gf.safe_bytes(input_text))
         for par in root.iter(smil_ns + "par"):
             for child in par:
                 if child.tag == (smil_ns + "text"):
@@ -100,8 +99,6 @@ class SyncMapFormatSMIL(SyncMapFormatGenericXML):
                     SyncMapMissingParameterError,
                 )
 
-        from lxml import etree
-
         # we are sure we have them
         text_ref = self.parameters[gc.PPN_TASK_OS_FILE_SMIL_PAGE_REF]
         audio_ref = self.parameters[gc.PPN_TASK_OS_FILE_SMIL_AUDIO_REF]
@@ -112,41 +109,64 @@ class SyncMapFormatSMIL(SyncMapFormatGenericXML):
         ns_map = {None: smil_ns, "epub": epub_ns}
 
         # build tree
-        smil_elem = etree.Element("{%s}smil" % smil_ns, nsmap=ns_map)
-        smil_elem.attrib["version"] = "3.0"
-        body_elem = etree.SubElement(smil_elem, "{%s}body" % smil_ns)
-        seq_elem = etree.SubElement(body_elem, "{%s}seq" % smil_ns)
-        seq_elem.attrib["id"] = "seq000001"
-        seq_elem.attrib["{%s}textref" % epub_ns] = text_ref
+        smil_elem = ET.Element(
+            "{%s}smil" % smil_ns,
+            attrib={
+                "version": "3.0",
+            },
+            nsmap=ns_map,
+        )
+        body_elem = ET.SubElement(smil_elem, "{%s}body" % smil_ns)
+        seq_elem = ET.SubElement(
+            body_elem,
+            "{%s}seq" % smil_ns,
+            attrib={
+                "id": "seq000001",
+                "{%s}textref" % epub_ns: text_ref,
+            },
+        )
 
         if syncmap.is_single_level:
             # single level
             for i, fragment in enumerate(syncmap.fragments, 1):
                 text = fragment.text_fragment
-                par_elem = etree.SubElement(seq_elem, "{%s}par" % smil_ns)
-                par_elem.attrib["id"] = "par%06d" % (i)
-                text_elem = etree.SubElement(par_elem, "{%s}text" % smil_ns)
-                text_elem.attrib["src"] = f"{text_ref}#{text.identifier}"
-                audio_elem = etree.SubElement(par_elem, "{%s}audio" % smil_ns)
-                audio_elem.attrib["src"] = audio_ref
-                audio_elem.attrib["clipBegin"] = self.format_time_function(
-                    fragment.begin
+                par_elem = ET.SubElement(
+                    seq_elem,
+                    "{%s}par" % smil_ns,
+                    attrib={
+                        "id": "par%06d" % (i),
+                    },
                 )
-                audio_elem.attrib["clipEnd"] = self.format_time_function(fragment.end)
+                text_elem = ET.SubElement(
+                    par_elem,
+                    "{%s}text" % smil_ns,
+                    attrib={
+                        "src": f"{text_ref}#{text.identifier}",
+                    },
+                )
+                audio_elem = ET.SubElement(
+                    par_elem,
+                    "{%s}audio" % smil_ns,
+                    attrib={
+                        "src": audio_ref,
+                        "clipBegin": self.format_time_function(fragment.begin),
+                        "clipEnd": self.format_time_function(fragment.end),
+                    },
+                )
         else:
             # TODO support generic multiple levels
             # multiple levels
             for par_index, par_child in enumerate(
                 syncmap.fragments_tree.children_not_empty, 1
             ):
-                par_seq_elem = etree.SubElement(seq_elem, "{%s}seq" % smil_ns)
+                par_seq_elem = ET.SubElement(seq_elem, "{%s}seq" % smil_ns)
                 # COMMENTED par_seq_elem.attrib["id"] = "p%06d" % (par_index)
                 par_seq_elem.attrib["{%s}type" % epub_ns] = "paragraph"
                 par_seq_elem.attrib["{%s}textref" % epub_ns] = (
                     text_ref + "#" + par_child.value.text_fragment.identifier
                 )
                 for sen_index, sen_child in enumerate(par_child.children_not_empty, 1):
-                    sen_seq_elem = etree.SubElement(par_seq_elem, "{%s}seq" % smil_ns)
+                    sen_seq_elem = ET.SubElement(par_seq_elem, "{%s}seq" % smil_ns)
                     # COMMENTED sen_seq_elem.attrib["id"] = par_seq_elem.attrib["id"] + "s%06d" % (sen_index)
                     sen_seq_elem.attrib["{%s}type" % epub_ns] = "sentence"
                     sen_seq_elem.attrib["{%s}textref" % epub_ns] = (
@@ -157,24 +177,18 @@ class SyncMapFormatSMIL(SyncMapFormatGenericXML):
                     ):
                         fragment = wor_child.value
                         text = fragment.text_fragment
-                        wor_seq_elem = etree.SubElement(
-                            sen_seq_elem, "{%s}seq" % smil_ns
-                        )
+                        wor_seq_elem = ET.SubElement(sen_seq_elem, "{%s}seq" % smil_ns)
                         # COMMENTED wor_seq_elem.attrib["id"] = sen_seq_elem.attrib["id"] + "w%06d" % (wor_index)
                         wor_seq_elem.attrib["{%s}type" % epub_ns] = "word"
                         wor_seq_elem.attrib["{%s}textref" % epub_ns] = (
                             text_ref + "#" + text.identifier
                         )
-                        wor_par_elem = etree.SubElement(
-                            wor_seq_elem, "{%s}par" % smil_ns
-                        )
-                        text_elem = etree.SubElement(wor_par_elem, "{%s}text" % smil_ns)
+                        wor_par_elem = ET.SubElement(wor_seq_elem, "{%s}par" % smil_ns)
+                        text_elem = ET.SubElement(wor_par_elem, "{%s}text" % smil_ns)
                         text_elem.attrib["src"] = "{}#{}".format(
                             text_ref, text.identifier
                         )
-                        audio_elem = etree.SubElement(
-                            wor_par_elem, "{%s}audio" % smil_ns
-                        )
+                        audio_elem = ET.SubElement(wor_par_elem, "{%s}audio" % smil_ns)
                         audio_elem.attrib["src"] = audio_ref
                         audio_elem.attrib["clipBegin"] = self.format_time_function(
                             fragment.begin

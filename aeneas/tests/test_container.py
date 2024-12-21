@@ -303,9 +303,10 @@ class TestContainer(unittest.TestCase):
             if fmt == ContainerFormat.UNPACKED:
                 continue
 
-            with self.subTest(key=key), tempfile.NamedTemporaryFile(
-                suffix=f".{fmt}"
-            ) as output_path:
+            with (
+                self.subTest(key=key),
+                tempfile.NamedTemporaryFile(suffix=f".{fmt}") as output_path,
+            ):
                 cont = Container(output_path.name, fmt)
                 cont.compress(input_path)
                 self.assertTrue(os.path.isfile(output_path.name))

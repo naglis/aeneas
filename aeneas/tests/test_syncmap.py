@@ -21,12 +21,14 @@
 import unittest
 import tempfile
 import typing
+import os.path
 
 from aeneas.exacttiming import TimeInterval, TimeValue
 from aeneas.language import Language
 from aeneas.syncmap import SyncMap, SyncMapFormat, SyncMapFragment
 from aeneas.syncmap.missingparametererror import SyncMapMissingParameterError
 from aeneas.tree import Tree
+from aeneas.textfile import TextFragment
 import aeneas.globalconstants as gc
 import aeneas.globalfunctions as gf
 
@@ -323,6 +325,45 @@ class TestSyncMap(BaseSyncMapCase):
         parameters = {gc.PPN_TASK_OS_FILE_SMIL_PAGE_REF: "sonnet001.xhtml"}
         with self.assertRaises(SyncMapMissingParameterError):
             self.write(fmt, parameters=parameters)
+
+    def test_write_valid_smil(self):
+        intervals = [("0.000", "1.000", "foo"), ("1.000", "2.000", "bar")]
+        tree = Tree()
+        for begin, end, text_fragment in intervals:
+            smf = SyncMapFragment.from_begin_end(
+                begin=TimeValue(begin),
+                end=TimeValue(end),
+                text_fragment=TextFragment(text_fragment),
+            )
+            child = Tree(value=smf)
+            tree.add_child(child, as_last=True)
+        syn = SyncMap(tree=tree)
+
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            smil_path = os.path.join(tmp_dir, "test.smil")
+            syn.write(SyncMapFormat.SMIL, smil_path, parameters=self.PARAMETERS)
+
+            with open(smil_path, mode="rb") as f:
+                data = f.read().decode("utf-8").strip()
+
+        self.assertEqual(
+            data,
+            """
+<smil xmlns="http://www.w3.org/ns/SMIL" xmlns:epub="http://www.idpf.org/2007/ops" version="3.0">
+  <body>
+    <seq id="seq000001" epub:textref="sonnet001.xhtml">
+      <par id="par000001">
+        <text src="sonnet001.xhtml#foo"/>
+        <audio src="sonnet001.mp3" clipBegin="00:00:00.000" clipEnd="00:00:01.000"/>
+      </par>
+      <par id="par000002">
+        <text src="sonnet001.xhtml#bar"/>
+        <audio src="sonnet001.mp3" clipBegin="00:00:01.000" clipEnd="00:00:02.000"/>
+      </par>
+    </seq>
+  </body>
+</smil>""".strip(),
+        )
 
     def test_write_ttml_no_language(self):
         fmt = SyncMapFormat.TTML

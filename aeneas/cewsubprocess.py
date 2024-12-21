@@ -81,11 +81,10 @@ class CEWSubprocess(Loggable):
         self.log(["c_quit_after: '%.3f'", c_quit_after])
         self.log(["c_backwards: '%d'", c_backwards])
 
-        with tempfile.NamedTemporaryFile(
-            suffix=".text"
-        ) as tmp_text_file, tempfile.NamedTemporaryFile(
-            suffix=".data"
-        ) as tmp_data_file:
+        with (
+            tempfile.NamedTemporaryFile(suffix=".text") as tmp_text_file,
+            tempfile.NamedTemporaryFile(suffix=".data") as tmp_data_file,
+        ):
             text_file_path = tmp_text_file.name
             data_file_path = tmp_data_file.name
 
