@@ -63,19 +63,17 @@ class ReadTextCLI(AbstractCLIProgram):
         ],
         "examples": [
             "list 'From|fairest|creatures|we|desire|increase'",
-            "mplain %s" % (TEXT_FILE_MPLAIN),
-            "munparsed %s --l1-id-regex=p[0-9]+ --l2-id-regex=s[0-9]+ --l3-id-regex=w[0-9]+"
-            % (TEXT_FILE_MUNPARSED),
-            "parsed %s" % (TEXT_FILE_PARSED),
-            "plain %s" % (TEXT_FILE_PLAIN),
-            "plain %s --id-format=Word%%06d" % (TEXT_FILE_PLAIN),
-            "subtitles %s" % (TEXT_FILE_SUBTITLES),
-            "subtitles %s --id-format=Sub%%03d" % (TEXT_FILE_SUBTITLES),
-            "unparsed %s --id-regex=f[0-9]*" % (TEXT_FILE_UNPARSED),
-            "unparsed %s --class-regex=ra --sort=unsorted" % (TEXT_FILE_UNPARSED),
-            "unparsed %s --id-regex=f[0-9]* --sort=numeric" % (TEXT_FILE_UNPARSED),
-            "unparsed %s --id-regex=f[0-9]* --sort=lexicographic"
-            % (TEXT_FILE_UNPARSED),
+            f"mplain {TEXT_FILE_MPLAIN}",
+            f"munparsed {TEXT_FILE_MUNPARSED} --l1-id-regex=p[0-9]+ --l2-id-regex=s[0-9]+ --l3-id-regex=w[0-9]+",
+            f"parsed {TEXT_FILE_PARSED}",
+            f"plain {TEXT_FILE_PLAIN}",
+            f"plain {TEXT_FILE_PLAIN} --id-format=Word%06d",
+            f"subtitles {TEXT_FILE_SUBTITLES}",
+            f"subtitles {TEXT_FILE_SUBTITLES} --id-format=Sub%03d",
+            f"unparsed {TEXT_FILE_UNPARSED} --id-regex=f[0-9]*",
+            f"unparsed {TEXT_FILE_UNPARSED} --class-regex=ra --sort=unsorted",
+            f"unparsed {TEXT_FILE_UNPARSED} --id-regex=f[0-9]* --sort=numeric",
+            f"unparsed {TEXT_FILE_UNPARSED} --id-regex=f[0-9]* --sort=lexicographic",
         ],
         "parameters": [],
     }
@@ -137,7 +135,7 @@ class ReadTextCLI(AbstractCLIProgram):
                 id_format % 1
             except (TypeError, ValueError):
                 self.print_error(
-                    "The given string '%s' is not a valid id format" % id_format
+                    f"The given string '{id_format}' is not a valid id format"
                 )
                 return self.ERROR_EXIT_CODE
 
