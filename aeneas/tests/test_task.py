@@ -34,7 +34,6 @@ from aeneas.syncmap import (
 )
 from aeneas.task import Task, TaskConfiguration
 from aeneas.textfile import TextFileFormat, TextFragment
-from aeneas.tests.common import skipIfMissingImport
 import aeneas.globalfunctions as gf
 
 
@@ -75,7 +74,13 @@ class TestTask(unittest.TestCase):
             self.assertEqual(read_value, expected)
 
     def set_text_file(
-        self, path, fmt, expected, id_regex=None, class_regex=None, id_sort=None
+        self,
+        path: str,
+        fmt: str,
+        expected: int,
+        id_regex: str | None = None,
+        class_regex: str | None = None,
+        id_sort: str | None = None,
     ):
         task = Task()
         task.configuration = TaskConfiguration()
@@ -171,7 +176,6 @@ class TestTask(unittest.TestCase):
                 "not_existing.mp3", __file__
             )
 
-    @skipIfMissingImport("bs4")
     def test_set_text_file_unparsed_id(self):
         self.set_text_file(
             "res/inputtext/sonnet_unparsed_id.xhtml",
@@ -181,7 +185,6 @@ class TestTask(unittest.TestCase):
             id_sort=IDSortingAlgorithm.NUMERIC,
         )
 
-    @skipIfMissingImport("bs4")
     def test_set_text_file_unparsed_class(self):
         # NOTE this test fails because there are no id attributes in the html file
         self.set_text_file(
@@ -192,7 +195,6 @@ class TestTask(unittest.TestCase):
             id_sort=IDSortingAlgorithm.NUMERIC,
         )
 
-    @skipIfMissingImport("bs4")
     def test_set_text_file_unparsed_id_class(self):
         self.set_text_file(
             "res/inputtext/sonnet_unparsed_class_id.xhtml",
@@ -203,7 +205,6 @@ class TestTask(unittest.TestCase):
             id_sort=IDSortingAlgorithm.NUMERIC,
         )
 
-    @skipIfMissingImport("bs4")
     def test_set_text_file_unparsed_id_class_empty(self):
         # NOTE this test fails because there are no id attributes in the html file
         self.set_text_file(
