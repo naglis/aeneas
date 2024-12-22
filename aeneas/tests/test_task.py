@@ -38,6 +38,13 @@ import aeneas.globalfunctions as gf
 
 
 class TestTask(unittest.TestCase):
+    maxDiff = None
+
+    def assertTextFragmentsEqual(self, text_file, expected):
+        self.assertSequenceEqual(
+            [(f.identifier, f.text) for f in text_file.fragments], expected
+        )
+
     def dummy_sync_map(self):
         sync_map = SyncMap()
         frag = TextFragment("f001", Language.ENG, ["Fragment 1"])
@@ -95,6 +102,7 @@ class TestTask(unittest.TestCase):
         task.text_file_path_absolute = gf.absolute_path(path, __file__)
         self.assertIsNotNone(task.text_file)
         self.assertEqual(len(task.text_file), expected)
+        return task.text_file
 
     def tc_from_string(self, config_string, properties):
         taskconf = TaskConfiguration(config_string)
@@ -214,6 +222,56 @@ class TestTask(unittest.TestCase):
             id_regex="f[0-9]+",
             class_regex="ra",
             id_sort=IDSortingAlgorithm.NUMERIC,
+        )
+
+    def test_set_text_file_unparsed_img_id_img_alt(self):
+        text_file = self.set_text_file(
+            "res/inputtext/sonnet_unparsed_img_id.xhtml",
+            TextFileFormat.UNPARSED_IMG,
+            3,
+            id_regex="f[0-9]+",
+            id_sort=IDSortingAlgorithm.NUMERIC,
+        )
+        self.assertTextFragmentsEqual(
+            text_file,
+            [
+                ("f001", "I"),
+                ("f002", "From fairest creatures we desire increase,"),
+                ("f003", "This is the image description inside alt tag."),
+            ],
+        )
+
+    def test_set_text_file_unparsed_img_no_id(self):
+        text_file = self.set_text_file(
+            "res/inputtext/sonnet_unparsed_img_no_id.xhtml",
+            TextFileFormat.UNPARSED_IMG,
+            2,
+            id_regex="f[0-9]+",
+            id_sort=IDSortingAlgorithm.NUMERIC,
+        )
+        self.assertTextFragmentsEqual(
+            text_file,
+            [
+                ("f001", "I"),
+                ("f002", "From fairest creatures we desire increase,"),
+            ],
+        )
+
+    def test_set_text_file_unparsed_img_no_alt(self):
+        text_file = self.set_text_file(
+            "res/inputtext/sonnet_unparsed_img_no_alt.xhtml",
+            TextFileFormat.UNPARSED_IMG,
+            3,
+            id_regex="f[0-9]+",
+            id_sort=IDSortingAlgorithm.NUMERIC,
+        )
+        self.assertTextFragmentsEqual(
+            text_file,
+            [
+                ("f001", "I"),
+                ("f002", "From fairest creatures we desire increase,"),
+                ("f003", ""),
+            ],
         )
 
     def test_set_text_file_plain(self):

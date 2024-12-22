@@ -231,10 +231,68 @@ class TextFileFormat:
 
     """
 
+    UNPARSED_IMG = "unparsed_img"
+    """
+    The text file is a well-formed HTML/XHTML file,
+    where the text fragments have already been marked up.
+
+    This is same as the ``unparsed`` format, but additionally the text from
+    `<img>` `alt` is extracted.
+
+    The text fragments will be extracted by matching
+    the ``id`` and/or ``class`` attributes of each elements
+    with the provided regular expressions::
+
+        <?xml version="1.0" encoding="UTF-8"?>
+        <html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops" lang="en" xml:lang="en">
+         <head>
+          <meta charset="utf-8"/>
+          <link rel="stylesheet" href="../Styles/style.css" type="text/css"/>
+          <title>Sonnet I</title>
+         </head>
+         <body>
+          <div id="divTitle">
+           <h1><span class="ra" id="f001">I</span></h1>
+          </div>
+          <div id="divSonnet">
+           <p>
+            <span class="ra" id="f002">From fairest creatures we desire increase,</span><br/>
+            <span class="ra" id="f003">That thereby beauty’s rose might never die,</span><br/>
+            <span class="ra" id="f004">But as the riper should by time decease,</span><br/>
+            <span class="ra" id="f005">His tender heir might bear his memory:</span><br/>
+            <span class="ra" id="f006">But thou contracted to thine own bright eyes,</span><br/>
+            <span class="ra" id="f007">Feed’st thy light’s flame with self-substantial fuel,</span><br/>
+            <span class="ra" id="f008">Making a famine where abundance lies,</span><br/>
+            <span class="ra" id="f009">Thy self thy foe, to thy sweet self too cruel:</span><br/>
+            <span class="ra" id="f010">Thou that art now the world’s fresh ornament,</span><br/>
+            <span class="ra" id="f011">And only herald to the gaudy spring,</span><br/>
+            <span class="ra" id="f012">Within thine own bud buriest thy content,</span><br/>
+            <span class="ra" id="f013">And tender churl mak’st waste in niggarding:</span><br/>
+            <span class="ra" id="f014">Pity the world, or else this glutton be,</span><br/>
+            <span class="ra" id="f015">To eat the world’s due, by the grave and thee.</span>
+           </p>
+
+           <figure>
+            <img alt="This is an image description." src="img.png"/>
+           </figure>
+
+          </div>
+         </body>
+        </html>
+    """
+
     MULTILEVEL_VALUES = [MPLAIN, MUNPARSED]
     """ List of all multilevel formats """
 
-    ALLOWED_VALUES = [MPLAIN, MUNPARSED, PARSED, PLAIN, SUBTITLES, UNPARSED]
+    ALLOWED_VALUES = [
+        MPLAIN,
+        MUNPARSED,
+        PARSED,
+        PLAIN,
+        SUBTITLES,
+        UNPARSED,
+        UNPARSED_IMG,
+    ]
     """ List of all the allowed values """
 
 
@@ -671,6 +729,7 @@ class TextFile(Loggable):
             TextFileFormat.PLAIN: self._read_plain,
             TextFileFormat.SUBTITLES: self._read_subtitles,
             TextFileFormat.UNPARSED: self._read_unparsed,
+            TextFileFormat.UNPARSED_IMG: self._read_unparsed_img,
         }
         map_read_function[self.file_format](lines)
 
@@ -911,11 +970,25 @@ class TextFile(Loggable):
             (id_format % idx, [line.strip()]) for idx, line in enumerate(lines, start=1)
         )
 
-    def _read_unparsed(self, lines: typing.Sequence[str]):
+    @staticmethod
+    def _get_node_text(node, *, read_img_alt: bool) -> str:
+        if node.text:
+            return node.text
+        elif read_img_alt and node.name == "img":
+            alt = node.attrs.get("alt")
+            if alt is not None:
+                return alt
+
+        return ""
+
+    def _read_unparsed(
+        self, lines: typing.Sequence[str], *, read_img_alt: bool = False
+    ):
         """
         Read text fragments from an unparsed format text file.
 
         :param list lines: the lines of the unparsed text file
+        :param bool read_img_alt: if True, read text from `<img/>` tag `alt` attribute
         """
 
         def filter_attributes():
@@ -950,7 +1023,8 @@ class TextFile(Loggable):
         for node in nodes:
             try:
                 f_id = node["id"]
-                f_text = node.text
+                f_text = self._get_node_text(node, read_img_alt=read_img_alt)
+
                 text_from_id[f_id] = f_text
                 ids.append(f_id)
             except KeyError:
@@ -969,6 +1043,15 @@ class TextFile(Loggable):
         # append to fragments
         self.log("Appending fragments")
         self._create_text_fragments((key, [text_from_id[key]]) for key in sorted_ids)
+
+    def _read_unparsed_img(self, lines: typing.Sequence[str]):
+        """
+        Read text fragments from an unparsed format text file, additionally
+        extracting image descriptions.
+
+        :param list lines: the lines of the unparsed text file
+        """
+        return self._read_unparsed(lines, read_img_alt=True)
 
     def _get_id_format(self):
         """Return the id regex from the parameters"""

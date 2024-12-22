@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 # aeneas is a Python/C library and a set of tools
 # to automagically synchronize audio and text (aka forced alignment)
 #
@@ -24,12 +22,14 @@ import unittest
 
 from aeneas.idsortingalgorithm import IDSortingAlgorithm
 from aeneas.language import Language
-from aeneas.textfile import TextFile
-from aeneas.textfile import TextFileFormat
-from aeneas.textfile import TextFragment
-from aeneas.textfile import TextFilter
-from aeneas.textfile import TextFilterIgnoreRegex
-from aeneas.textfile import TextFilterTransliterate
+from aeneas.textfile import (
+    TextFile,
+    TextFileFormat,
+    TextFragment,
+    TextFilter,
+    TextFilterIgnoreRegex,
+    TextFilterTransliterate,
+)
 import aeneas.globalconstants as gc
 import aeneas.globalfunctions as gf
 
@@ -60,24 +60,25 @@ class TestTextFile(unittest.TestCase):
 
     def load(
         self,
-        input_file_path=PLAIN_FILE_PATH,
-        fmt=TextFileFormat.PLAIN,
-        expected_length=15,
-        parameters=None,
+        input_file_path: str = PLAIN_FILE_PATH,
+        fmt: str = TextFileFormat.PLAIN,
+        expected_length: int = 15,
+        parameters: dict | None = None,
     ):
         tfl = TextFile(gf.absolute_path(input_file_path, __file__), fmt, parameters)
         self.assertEqual(len(tfl), expected_length)
         return tfl
 
-    def load_and_sort_id(self, input_file_path, id_regex, id_sort, expected):
-        parameters = {}
-        parameters[gc.PPN_TASK_IS_TEXT_UNPARSED_ID_REGEX] = id_regex
-        parameters[gc.PPN_TASK_IS_TEXT_UNPARSED_ID_SORT] = id_sort
+    def load_and_sort_id(
+        self, input_file_path: str, id_regex: str, id_sort: str, expected: list[str]
+    ):
+        parameters = {
+            gc.PPN_TASK_IS_TEXT_UNPARSED_ID_REGEX: id_regex,
+            gc.PPN_TASK_IS_TEXT_UNPARSED_ID_SORT: id_sort,
+        }
         tfl = self.load(input_file_path, TextFileFormat.UNPARSED, 5, parameters)
-        i = 0
-        for e in expected:
+        for i, e in enumerate(expected):
             self.assertEqual(tfl.fragments[i].identifier, e)
-            i += 1
 
     def load_and_slice(self, expected, start=None, end=None):
         tfl = self.load()
