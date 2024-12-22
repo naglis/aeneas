@@ -1226,8 +1226,7 @@ class TransliterationMap(Loggable):
                 result.append(self.trans_map[char])
             except Exception:
                 result.append(char)
-        result = "".join(result)
-        return result
+        return "".join(result)
 
     def _build_map(self):
         """
@@ -1238,10 +1237,11 @@ class TransliterationMap(Loggable):
             contents = file_obj.read().replace("\t", " ")
             for line in contents.splitlines():
                 # ignore lines starting with "#" or blank (after stripping)
-                if not line.startswith("#"):
-                    line = line.strip()
-                    if len(line) > 0:
-                        self._process_map_rule(line)
+                if line.startswith("#"):
+                    continue
+
+                if line := line.strip():
+                    self._process_map_rule(line)
 
     def _process_map_rule(self, line):
         """
