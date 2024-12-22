@@ -431,7 +431,7 @@ class Tree(Loggable):
         levels = self.levels
         if (index < 0) or (index >= len(levels)):
             self.log_exc(
-                "The given level index '%d' is not valid" % (index),
+                ["The given level index '%d' is not valid", index],
                 None,
                 True,
                 ValueError,

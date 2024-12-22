@@ -237,11 +237,11 @@ class SD(Loggable):
                 value = TimeValue(value)
             except (TypeError, ValueError, decimal.InvalidOperation) as exc:
                 self.log_exc(
-                    "The value of %s is not a number" % (name), exc, True, TypeError
+                    ["The value of %s is not a number", name], exc, True, TypeError
                 )
             if value < 0:
                 self.log_exc(
-                    "The value of %s is negative" % (name), None, True, ValueError
+                    ["The value of %s is negative", name], None, True, ValueError
                 )
             return value
 

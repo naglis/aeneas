@@ -219,7 +219,7 @@ class Synthesizer(Loggable):
             )
         if not gf.file_can_be_written(audio_file_path):
             self.log_exc(
-                "Audio file path '%s' cannot be written" % (audio_file_path),
+                ["Audio file path '%s' cannot be written", audio_file_path],
                 None,
                 True,
                 OSError,
@@ -240,7 +240,7 @@ class Synthesizer(Loggable):
         # check that the output file has been written
         if not os.path.isfile(audio_file_path):
             self.log_exc(
-                "Audio file path '%s' cannot be read" % (audio_file_path),
+                ["Audio file path '%s' cannot be read", audio_file_path],
                 None,
                 True,
                 OSError,

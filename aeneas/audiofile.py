@@ -351,7 +351,7 @@ class AudioFile(Loggable):
         # check the file can be read
         if not gf.file_can_be_read(self.file_path):
             self.log_exc(
-                "File '%s' cannot be read" % (self.file_path), None, True, OSError
+                ["File '%s' cannot be read", self.file_path], None, True, OSError
             )
 
         # get the file size
@@ -416,7 +416,7 @@ class AudioFile(Loggable):
         # check the file can be read
         if not gf.file_can_be_read(self.file_path):
             self.log_exc(
-                "File '%s' cannot be read" % (self.file_path), None, True, OSError
+                ["File '%s' cannot be read", self.file_path], None, True, OSError
             )
 
         # determine if we need to convert the audio file
@@ -681,7 +681,7 @@ class AudioFile(Loggable):
             scipywavwrite(file_path, self.audio_sample_rate, data)
         except Exception as exc:
             self.log_exc(
-                "Error writing audio file to '%s'" % (file_path), exc, True, OSError
+                ["Error writing audio file to '%s'", file_path], exc, True, OSError
             )
         self.log(["Writing audio file '%s'... done", file_path])
 

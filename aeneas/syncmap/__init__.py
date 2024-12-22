@@ -314,7 +314,7 @@ class SyncMap(Loggable):
         """
         if not gf.file_can_be_written(output_file_path):
             self.log_exc(
-                "Cannot output HTML file '%s'. Wrong permissions?" % (output_file_path),
+                ["Cannot output HTML file '%s'. Wrong permissions?", output_file_path],
                 None,
                 True,
                 OSError,
@@ -386,15 +386,14 @@ class SyncMap(Loggable):
             self.log_exc("Sync map format is None", None, True, ValueError)
         if sync_map_format not in SyncMapFormat.CODE_TO_CLASS:
             self.log_exc(
-                "Sync map format '%s' is not allowed" % (sync_map_format),
+                ["Sync map format '%s' is not allowed", sync_map_format],
                 None,
                 True,
                 ValueError,
             )
         if not gf.file_can_be_read(input_file_path):
             self.log_exc(
-                "Cannot read sync map file '%s'. Wrong permissions?"
-                % (input_file_path),
+                ["Cannot read sync map file '%s'. Wrong permissions?", input_file_path],
                 None,
                 True,
                 OSError,
@@ -512,15 +511,17 @@ class SyncMap(Loggable):
             self.log_exc("Sync map format is None", None, True, ValueError)
         if sync_map_format not in SyncMapFormat.CODE_TO_CLASS:
             self.log_exc(
-                "Sync map format '%s' is not allowed" % (sync_map_format),
+                ["Sync map format '%s' is not allowed", sync_map_format],
                 None,
                 True,
                 ValueError,
             )
         if not gf.file_can_be_written(output_file_path):
             self.log_exc(
-                "Cannot write sync map file '%s'. Wrong permissions?"
-                % (output_file_path),
+                [
+                    "Cannot write sync map file '%s'. Wrong permissions?",
+                    output_file_path,
+                ],
                 None,
                 True,
                 OSError,

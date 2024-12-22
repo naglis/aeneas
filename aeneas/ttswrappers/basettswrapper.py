@@ -442,7 +442,7 @@ class BaseTTSWrapper(Loggable):
         # check that output_file_path can be written
         if not gf.file_can_be_written(output_file_path):
             self.log_exc(
-                "Cannot write to output file '%s'" % (output_file_path),
+                ["Cannot write to output file '%s'", output_file_path],
                 None,
                 True,
                 OSError,
@@ -709,7 +709,7 @@ class BaseTTSWrapper(Loggable):
             # check the file can be read
             if not gf.file_can_be_read(output_file_path):
                 self.log_exc(
-                    "Output file '%s' cannot be read" % (output_file_path),
+                    ["Output file '%s' cannot be read", output_file_path],
                     None,
                     True,
                     None,

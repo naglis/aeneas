@@ -121,7 +121,7 @@ class SyncMapFormatGenericSubtitles(SyncMapFormatBase):
             split = string.split(self.time_values_separator)
             if len(split) < 2:
                 self.log_exc(
-                    "The following timing string is malformed: '%s'" % (string),
+                    ["The following timing string is malformed: '%s'", string],
                     None,
                     True,
                     ValueError,

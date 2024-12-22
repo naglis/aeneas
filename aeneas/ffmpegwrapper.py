@@ -188,7 +188,7 @@ class FFMPEGWrapper(Loggable):
         # test if we can read the input file
         if not gf.file_can_be_read(input_file_path):
             self.log_exc(
-                "Input file '%s' cannot be read" % (input_file_path),
+                ["Input file '%s' cannot be read", input_file_path],
                 None,
                 True,
                 OSError,

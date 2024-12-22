@@ -180,7 +180,7 @@ class ExecuteJob(Loggable):
 
         if self.job is None:
             self.log_exc(
-                "The container '%s' does not contain a valid Job" % (container_path),
+                ["The container '%s' does not contain a valid Job", container_path],
                 None,
                 True,
                 ExecuteJobInputError,
@@ -244,7 +244,7 @@ class ExecuteJob(Loggable):
                 self.log(["Executing task '%s'... done", custom_id])
             except Exception as exc:
                 self.log_exc(
-                    "Error while executing task '%s'" % (custom_id),
+                    ["Error while executing task '%s'", custom_id],
                     exc,
                     True,
                     ExecuteJobExecutionError,
@@ -289,14 +289,14 @@ class ExecuteJob(Loggable):
             # check if the task has sync map and sync map file path
             if task.sync_map_file_path is None:
                 self.log_exc(
-                    "Task '%s' has sync_map_file_path not set" % (custom_id),
+                    ["Task '%s' has sync_map_file_path not set", custom_id],
                     None,
                     True,
                     ExecuteJobOutputError,
                 )
             if task.sync_map is None:
                 self.log_exc(
-                    "Task '%s' has sync_map not set" % (custom_id),
+                    ["Task '%s' has sync_map not set", custom_id],
                     None,
                     True,
                     ExecuteJobOutputError,
@@ -309,7 +309,7 @@ class ExecuteJob(Loggable):
                 self.log(["Outputting sync map for task '%s'... done", custom_id])
             except Exception:
                 self.log_exc(
-                    "Error while outputting sync map for task '%s'" % (custom_id),
+                    ["Error while outputting sync map for task '%s'", custom_id],
                     None,
                     True,
                     ExecuteJobOutputError,

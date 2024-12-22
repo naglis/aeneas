@@ -105,26 +105,26 @@ class ExecuteTask(Loggable):
         if log:
             self.step_label = label
             self.step_begin_time = self.log(
-                "STEP %d BEGIN (%s)" % (self.step_index, label)
+                ["STEP %d BEGIN (%s)", self.step_index, label]
             )
 
     def _step_end(self, log=True):
         """Log end of a step"""
         if log:
             step_end_time = self.log(
-                "STEP %d END (%s)" % (self.step_index, self.step_label)
+                ["STEP %d END (%s)", self.step_index, self.step_label]
             )
             diff = step_end_time - self.step_begin_time
             diff = float(diff.seconds + diff.microseconds / 1000000.0)
             self.step_total += diff
             self.log(
-                "STEP %d DURATION %.3f (%s)" % (self.step_index, diff, self.step_label)
+                ["STEP %d DURATION %.3f (%s)", self.step_index, diff, self.step_label]
             )
             self.step_index += 1
 
     def _step_failure(self, exc):
         """Log failure of a step"""
-        self.log_crit("STEP %d (%s) FAILURE" % (self.step_index, self.step_label))
+        self.log_crit(["STEP %d (%s) FAILURE", self.step_index, self.step_label])
         self.step_index += 1
         self.log_exc(
             "Unexpected error while executing task",
@@ -135,7 +135,7 @@ class ExecuteTask(Loggable):
 
     def _step_total(self):
         """Log total"""
-        self.log("STEP T DURATION %.3f" % (self.step_total))
+        self.log(["STEP T DURATION %.3f", self.step_total])
 
     def execute(self):
         """
