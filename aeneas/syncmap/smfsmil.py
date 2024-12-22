@@ -20,12 +20,21 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+import functools
+
 import lxml.etree as ET
 
+from aeneas.exacttiming import TimeValue
 from aeneas.syncmap.missingparametererror import SyncMapMissingParameterError
 from aeneas.syncmap.smfgxml import SyncMapFormatGenericXML
 import aeneas.globalconstants as gc
 import aeneas.globalfunctions as gf
+
+SMIL_NS = "http://www.w3.org/ns/SMIL"
+EPUB_NS = "http://www.idpf.org/2007/ops"
+
+with_smil_ns = functools.partial(gf.with_ns, ns=SMIL_NS)
+with_epub_ns = functools.partial(gf.with_ns, ns=EPUB_NS)
 
 
 class SyncMapFormatSMIL(SyncMapFormatGenericXML):
@@ -52,7 +61,14 @@ class SyncMapFormatSMIL(SyncMapFormatGenericXML):
         else:
             self.format_time_function = gf.time_to_hhmmssmmm
 
-    def parse(self, input_text, syncmap):
+    @staticmethod
+    def _autodetect_parse_duration(value: str) -> TimeValue:
+        if ":" in value:
+            return gf.time_from_hhmmssmmm(value)
+        else:
+            return gf.time_from_ssmmm(value)
+
+    def parse(self, input_text: str, syncmap):
         """
         Read from SMIL file.
 
@@ -61,29 +77,20 @@ class SyncMapFormatSMIL(SyncMapFormatGenericXML):
         2. timings must have ``hh:mm:ss.mmm`` or ``ss.mmm`` format (autodetected)
         3. both ``clipBegin`` and ``clipEnd`` attributes of ``<audio>`` must be populated
         """
-        smil_ns = "{http://www.w3.org/ns/SMIL}"
-        root = ET.fromstring(gf.safe_bytes(input_text))
-        for par in root.iter(smil_ns + "par"):
+        root = ET.fromstring(input_text)
+        for par in root.iter(with_smil_ns("par")):
             for child in par:
-                if child.tag == (smil_ns + "text"):
+                if child.tag == with_smil_ns("text"):
                     identifier = gf.safe_unicode(gf.split_url(child.get("src"))[1])
-                elif child.tag == (smil_ns + "audio"):
-                    begin_text = child.get("clipBegin")
-                    if ":" in begin_text:
-                        begin = gf.time_from_hhmmssmmm(begin_text)
-                    else:
-                        begin = gf.time_from_ssmmm(begin_text)
-                    end_text = child.get("clipEnd")
-                    if ":" in end_text:
-                        end = gf.time_from_hhmmssmmm(end_text)
-                    else:
-                        end = gf.time_from_ssmmm(end_text)
+                elif child.tag == with_smil_ns("audio"):
+                    begin = self._autodetect_parse_duration(child.get("clipBegin"))
+                    end = self._autodetect_parse_duration(child.get("clipEnd"))
             # TODO read text from additional text_file?
             self._add_fragment(
                 syncmap=syncmap, identifier=identifier, lines=[""], begin=begin, end=end
             )
 
-    def format(self, syncmap):
+    def format(self, syncmap) -> str:
         # check for required parameters
         for key in [
             gc.PPN_TASK_OS_FILE_SMIL_PAGE_REF,
@@ -104,25 +111,23 @@ class SyncMapFormatSMIL(SyncMapFormatGenericXML):
         audio_ref = self.parameters[gc.PPN_TASK_OS_FILE_SMIL_AUDIO_REF]
 
         # namespaces
-        smil_ns = "http://www.w3.org/ns/SMIL"
-        epub_ns = "http://www.idpf.org/2007/ops"
-        ns_map = {None: smil_ns, "epub": epub_ns}
+        ns_map = {None: SMIL_NS, "epub": EPUB_NS}
 
         # build tree
         smil_elem = ET.Element(
-            "{%s}smil" % smil_ns,
+            with_smil_ns("smil"),
             attrib={
                 "version": "3.0",
             },
             nsmap=ns_map,
         )
-        body_elem = ET.SubElement(smil_elem, "{%s}body" % smil_ns)
+        body_elem = ET.SubElement(smil_elem, with_smil_ns("body"))
         seq_elem = ET.SubElement(
             body_elem,
-            "{%s}seq" % smil_ns,
+            with_smil_ns("seq"),
             attrib={
                 "id": "seq000001",
-                "{%s}textref" % epub_ns: text_ref,
+                with_epub_ns("textref"): text_ref,
             },
         )
 
@@ -132,21 +137,21 @@ class SyncMapFormatSMIL(SyncMapFormatGenericXML):
                 text = fragment.text_fragment
                 par_elem = ET.SubElement(
                     seq_elem,
-                    "{%s}par" % smil_ns,
+                    with_smil_ns("par"),
                     attrib={
-                        "id": "par%06d" % (i),
+                        "id": f"par{i:06d}",
                     },
                 )
-                text_elem = ET.SubElement(
+                ET.SubElement(
                     par_elem,
-                    "{%s}text" % smil_ns,
+                    with_smil_ns("text"),
                     attrib={
                         "src": f"{text_ref}#{text.identifier}",
                     },
                 )
-                audio_elem = ET.SubElement(
+                ET.SubElement(
                     par_elem,
-                    "{%s}audio" % smil_ns,
+                    with_smil_ns("audio"),
                     attrib={
                         "src": audio_ref,
                         "clipBegin": self.format_time_function(fragment.begin),
@@ -159,41 +164,60 @@ class SyncMapFormatSMIL(SyncMapFormatGenericXML):
             for par_index, par_child in enumerate(
                 syncmap.fragments_tree.children_not_empty, 1
             ):
-                par_seq_elem = ET.SubElement(seq_elem, "{%s}seq" % smil_ns)
-                # COMMENTED par_seq_elem.attrib["id"] = "p%06d" % (par_index)
-                par_seq_elem.attrib["{%s}type" % epub_ns] = "paragraph"
-                par_seq_elem.attrib["{%s}textref" % epub_ns] = (
-                    text_ref + "#" + par_child.value.text_fragment.identifier
+                par_seq_elem = ET.SubElement(
+                    seq_elem,
+                    with_smil_ns("seq"),
+                    attrib={
+                        # COMMENTED "id": f"p{par_index:06d}",
+                        with_epub_ns("type"): "paragraph",
+                        with_epub_ns(
+                            "textref"
+                        ): f"{text_ref}#{par_child.value.text_fragment.identifier}",
+                    },
                 )
                 for sen_index, sen_child in enumerate(par_child.children_not_empty, 1):
-                    sen_seq_elem = ET.SubElement(par_seq_elem, "{%s}seq" % smil_ns)
-                    # COMMENTED sen_seq_elem.attrib["id"] = par_seq_elem.attrib["id"] + "s%06d" % (sen_index)
-                    sen_seq_elem.attrib["{%s}type" % epub_ns] = "sentence"
-                    sen_seq_elem.attrib["{%s}textref" % epub_ns] = (
-                        text_ref + "#" + sen_child.value.text_fragment.identifier
+                    sen_seq_elem = ET.SubElement(
+                        par_seq_elem,
+                        with_smil_ns("seq"),
+                        attrib={
+                            # COMMENTED "id": par_seq_elem.attrib["id"] + f"s{sen_index:06d}",
+                            with_epub_ns("type"): "sentence",
+                            with_epub_ns(
+                                "textref"
+                            ): f"{text_ref}#{sen_child.value.text_fragment.identifier}",
+                        },
                     )
                     for wor_index, wor_child in enumerate(
                         sen_child.children_not_empty, 1
                     ):
                         fragment = wor_child.value
                         text = fragment.text_fragment
-                        wor_seq_elem = ET.SubElement(sen_seq_elem, "{%s}seq" % smil_ns)
-                        # COMMENTED wor_seq_elem.attrib["id"] = sen_seq_elem.attrib["id"] + "w%06d" % (wor_index)
-                        wor_seq_elem.attrib["{%s}type" % epub_ns] = "word"
-                        wor_seq_elem.attrib["{%s}textref" % epub_ns] = (
-                            text_ref + "#" + text.identifier
+                        wor_seq_elem = ET.SubElement(
+                            sen_seq_elem,
+                            with_smil_ns("seq"),
+                            attrib={
+                                # COMMENTED "id": sen_seq_elem.attrib["id"] + f"w{wor_index:06d}",
+                                with_epub_ns("type"): "word",
+                                with_epub_ns(
+                                    "textref"
+                                ): f"{text_ref}#{text.identifier}",
+                            },
                         )
-                        wor_par_elem = ET.SubElement(wor_seq_elem, "{%s}par" % smil_ns)
-                        text_elem = ET.SubElement(wor_par_elem, "{%s}text" % smil_ns)
-                        text_elem.attrib["src"] = "{}#{}".format(
-                            text_ref, text.identifier
+                        wor_par_elem = ET.SubElement(wor_seq_elem, with_smil_ns("par"))
+                        ET.SubElement(
+                            wor_par_elem,
+                            with_smil_ns("text"),
+                            attrib={
+                                "src": f"{text_ref}#{text.identifier}",
+                            },
                         )
-                        audio_elem = ET.SubElement(wor_par_elem, "{%s}audio" % smil_ns)
-                        audio_elem.attrib["src"] = audio_ref
-                        audio_elem.attrib["clipBegin"] = self.format_time_function(
-                            fragment.begin
-                        )
-                        audio_elem.attrib["clipEnd"] = self.format_time_function(
-                            fragment.end
+                        ET.SubElement(
+                            wor_par_elem,
+                            with_smil_ns("audio"),
+                            attrib={
+                                "src": audio_ref,
+                                "clipBegin": self.format_time_function(fragment.begin),
+                                "clipEnd": self.format_time_function(fragment.end),
+                            },
                         )
         return self._tree_to_string(smil_elem, xml_declaration=False)

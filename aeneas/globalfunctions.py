@@ -1120,3 +1120,10 @@ def bundle_directory():
     if FROZEN:
         return sys._MEIPASS
     return None
+
+
+def with_ns(tag: str, ns: str) -> str:
+    """
+    Return tag nam with namespace applied.
+    """
+    return f"{{{ns}}}{tag}"
