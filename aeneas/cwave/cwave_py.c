@@ -147,8 +147,6 @@ static PyMethodDef cwave_methods[] = {
     }
 };
 
-// Python 2 and 3
-#if PY_MAJOR_VERSION >= 3
 static struct PyModuleDef moduledef = {
     PyModuleDef_HEAD_INIT,
     "cwave",        /* m_name */
@@ -160,32 +158,20 @@ static struct PyModuleDef moduledef = {
     NULL,           /* m_clear */
     NULL,           /* m_free */
 };
-#endif
 
 static PyObject *moduleinit(void) {
     PyObject *m;
 
-#if PY_MAJOR_VERSION >= 3
     m = PyModule_Create(&moduledef);
-#else
-    m = Py_InitModule("cwave", cwave_methods);
-#endif
 
     return m;
 }
 
-#if PY_MAJOR_VERSION >= 3
 PyMODINIT_FUNC PyInit_cwave(void) {
     PyObject *ret = moduleinit();
     import_array();
     return ret;
 }
-#else
-PyMODINIT_FUNC initcwave(void) {
-    moduleinit();
-    import_array();
-}
-#endif
 
 
 

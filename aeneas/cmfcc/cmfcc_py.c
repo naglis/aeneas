@@ -236,8 +236,6 @@ static PyMethodDef cmfcc_methods[] = {
     }
 };
 
-// Python 2 and 3
-#if PY_MAJOR_VERSION >= 3
 static struct PyModuleDef moduledef = {
     PyModuleDef_HEAD_INIT,
     "cmfcc",        /* m_name */
@@ -249,32 +247,20 @@ static struct PyModuleDef moduledef = {
     NULL,           /* m_clear */
     NULL,           /* m_free */
 };
-#endif
 
 static PyObject *moduleinit(void) {
     PyObject *m;
 
-#if PY_MAJOR_VERSION >= 3
     m = PyModule_Create(&moduledef);
-#else
-    m = Py_InitModule("cmfcc", cmfcc_methods);
-#endif
 
     return m;
 }
 
-#if PY_MAJOR_VERSION >= 3
 PyMODINIT_FUNC PyInit_cmfcc(void) {
     PyObject *ret = moduleinit();
     import_array();
     return ret;
 }
-#else
-PyMODINIT_FUNC initcmfcc(void) {
-    moduleinit();
-    import_array();
-}
-#endif
 
 
 
