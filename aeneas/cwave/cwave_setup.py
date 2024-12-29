@@ -26,25 +26,23 @@ Compile the Python C extension for reading WAVE files.
 .. versionadded:: 1.4.1
 """
 
-from numpy import get_include
-from numpy.distutils import misc_util
-from setuptools import Extension
-from setuptools import setup
 import sys
 
-CMODULE = Extension(
+import numpy
+import setuptools
+
+CMODULE = setuptools.Extension(
     name="cwave",
     sources=["cwave_py.c", "cwave_func.c", "../cint/cint.c"],
-    include_dirs=[get_include()],
+    include_dirs=[numpy.get_include()],
 )
 
-setup(
+setuptools.setup(
     name="cwave",
     version="1.7.3",
     description="Python C Extension for for reading WAVE files.",
     ext_modules=[CMODULE],
-    include_dirs=[misc_util.get_numpy_include_dirs()],
+    include_dirs=[numpy.get_include()],
 )
 
-print("\n[INFO] Module cwave successfully compiled\n")
-sys.exit(0)
+print("\n[INFO] Module cwave successfully compiled", file=sys.stderr)

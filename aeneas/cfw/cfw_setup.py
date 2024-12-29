@@ -26,12 +26,12 @@ Compile the Python C Extension for synthesizing text with Festival.
 .. versionadded:: 1.6.0
 """
 
-from setuptools import Extension
-from setuptools import setup
 import sys
 
+import setuptools
 
-CMODULE = Extension(
+
+CMODULE = setuptools.Extension(
     name="cfw",
     sources=["cfw_py.cc", "cfw_func.cc"],
     include_dirs=["festival", "speech_tools"],
@@ -43,12 +43,11 @@ CMODULE = Extension(
     ],
 )
 
-setup(
+setuptools.setup(
     name="cfw",
     version="1.7.3",
     description="Python C Extension for synthesizing text with Festival.",
     ext_modules=[CMODULE],
 )
 
-print("\n[INFO] Module cfw successfully compiled\n")
-sys.exit(0)
+print("\n[INFO] Module cfw successfully compiled", file=sys.stderr)

@@ -26,21 +26,20 @@ Compile the Python C Extension for synthesizing text with eSpeak.
 .. versionadded:: 1.3.0
 """
 
-from setuptools import Extension
-from setuptools import setup
 import sys
 
+import setuptools
 
-CMODULE = Extension(
+
+CMODULE = setuptools.Extension(
     name="cew", sources=["cew_py.c", "cew_func.c"], libraries=["espeak"]
 )
 
-setup(
+setuptools.setup(
     name="cew",
     version="1.7.3",
     description="Python C Extension for synthesizing text with eSpeak.",
     ext_modules=[CMODULE],
 )
 
-print("\n[INFO] Module cew successfully compiled\n")
-sys.exit(0)
+print("\n[INFO] Module cew successfully compiled", file=sys.stderr)

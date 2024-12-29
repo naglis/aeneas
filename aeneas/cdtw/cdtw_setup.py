@@ -26,25 +26,24 @@ Compile the Python C Extension for computing the DTW.
 .. versionadded:: 1.1.0
 """
 
-from numpy import get_include
-from numpy.distutils import misc_util
-from setuptools import Extension
-from setuptools import setup
 import sys
 
-CMODULE = Extension(
+import numpy
+import setuptools
+
+
+CMODULE = setuptools.Extension(
     name="cdtw",
     sources=["cdtw_py.c", "cdtw_func.c", "../cint/cint.c"],
-    include_dirs=[get_include()],
+    include_dirs=[numpy.get_include()],
 )
 
-setup(
+setuptools.setup(
     name="cdtw",
     version="1.7.3",
     description="Python C Extension for computing the DTW as fast as your bare metal allows.",
     ext_modules=[CMODULE],
-    include_dirs=[misc_util.get_numpy_include_dirs()],
+    include_dirs=[numpy.get_include()],
 )
 
-print("\n[INFO] Module cdtw successfully compiled\n")
-sys.exit(0)
+print("\n[INFO] Module cdtw successfully compiled", file=sys.stderr)
