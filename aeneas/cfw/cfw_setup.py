@@ -40,6 +40,9 @@ CMODULE = setuptools.Extension(
         "estools",
         "estbase",
         "eststring",
+        "asound",
+        "curses",
+        "gomp",
     ],
 )
 
