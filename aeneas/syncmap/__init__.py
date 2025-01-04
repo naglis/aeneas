@@ -34,7 +34,7 @@ This package contains the following classes:
 * :class:`~aeneas.syncmap.missingparametererror.SyncMapMissingParameterError`, an error raised when reading sync maps from file;
 """
 
-from copy import deepcopy
+import copy
 import json
 import os
 import itertools
@@ -77,6 +77,7 @@ class SyncMap(Loggable):
     FINETUNEAS_REPLACE_OUTPUT_FORMAT = "// AENEAS_REPLACE_OUTPUT_FORMAT"
     FINETUNEAS_REPLACE_SMIL_AUDIOREF = "// AENEAS_REPLACE_SMIL_AUDIOREF"
     FINETUNEAS_REPLACE_SMIL_PAGEREF = "// AENEAS_REPLACE_SMIL_PAGEREF"
+    FINETUNEAS_REPLACE_SUGGESTED_FILENAME = "// AENEAS_REPLACE_SUGGESTED_FILENAME"
     FINETUNEAS_ALLOWED_FORMATS = [
         "csv",
         "json",
@@ -143,7 +144,9 @@ class SyncMap(Loggable):
         """
         return self.fragments_tree.vchildren_not_empty
 
-    def leaves(self, fragment_type=None) -> list[SyncMapFragment]:
+    def leaves(
+        self, fragment_type: FragmentType | None = None
+    ) -> list[SyncMapFragment]:
         """
         The current list of sync map fragments
         which are (the values of) the leaves
@@ -295,7 +298,7 @@ class SyncMap(Loggable):
 
         :rtype: :class:`~aeneas.syncmap.SyncMap`
         """
-        return deepcopy(self)
+        return copy.deepcopy(self)
 
     def output_html_for_tuning(
         self,
@@ -319,28 +322,44 @@ class SyncMap(Loggable):
                 True,
                 OSError,
             )
+
         if parameters is None:
             parameters = {}
+
         audio_file_path_absolute = gf.fix_slash(os.path.abspath(audio_file_path))
         template_path_absolute = gf.absolute_path(self.FINETUNEAS_PATH, __file__)
+
         with open(template_path_absolute, encoding="utf-8") as file_obj:
             template = file_obj.read()
-        for repl in self.FINETUNEAS_REPLACEMENTS:
-            template = template.replace(repl[0], repl[1])
-        template = template.replace(
-            self.FINETUNEAS_REPLACE_AUDIOFILEPATH,
-            'audioFilePath = "file://%s";' % audio_file_path_absolute,
-        )
-        template = template.replace(
-            self.FINETUNEAS_REPLACE_FRAGMENTS,
-            "fragments = (%s).fragments;" % self.json_string,
-        )
+
+        # Remove the `.html` and the output format suffix (if any).
+        basename = os.path.splitext(
+            os.path.splitext(os.path.basename(output_file_path))[0]
+        )[0]
+
+        for search_string, replacement in (
+            *self.FINETUNEAS_REPLACEMENTS,
+            (
+                self.FINETUNEAS_REPLACE_AUDIOFILEPATH,
+                f'audioFilePath = "file://{audio_file_path_absolute}";',
+            ),
+            (
+                self.FINETUNEAS_REPLACE_FRAGMENTS,
+                f"fragments = ({self.json_string}).fragments;",
+            ),
+            (
+                self.FINETUNEAS_REPLACE_SUGGESTED_FILENAME,
+                f'suggestedFileName = "{basename}." + outputFormat;',
+            ),
+        ):
+            template = template.replace(search_string, replacement)
+
         if gc.PPN_TASK_OS_FILE_FORMAT in parameters:
             output_format = parameters[gc.PPN_TASK_OS_FILE_FORMAT]
             if output_format in self.FINETUNEAS_ALLOWED_FORMATS:
                 template = template.replace(
                     self.FINETUNEAS_REPLACE_OUTPUT_FORMAT,
-                    'outputFormat = "%s";' % output_format,
+                    f'outputFormat = "{output_format}";',
                 )
                 if output_format == "smil":
                     for key, placeholder, replacement in [
@@ -359,6 +378,7 @@ class SyncMap(Loggable):
                             template = template.replace(
                                 placeholder, replacement % parameters[key]
                             )
+
         with open(output_file_path, "w", encoding="utf-8") as file_obj:
             file_obj.write(template)
 

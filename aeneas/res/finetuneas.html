@@ -668,8 +668,11 @@ function downloadClick() {
     }
     var message = "The modified " + outputFormat.toUpperCase() + " file will be saved in your default Download directory. Please enter a file name:";
     var suggestedFileName = "tuned." + outputFormat;
+    // AENEAS_REPLACE_SUGGESTED_FILENAME
     var fileName = prompt(message, suggestedFileName);
-    triggerDownload(data, fileName);
+    if (!Object.is(fileName, null)) {
+        triggerDownload(data, fileName);
+    }
 }
 function downloadCSV() {
     var lines = [];
