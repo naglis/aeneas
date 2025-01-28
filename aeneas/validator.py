@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 # aeneas is a Python/C library and a set of tools
 # to automagically synchronize audio and text (aka forced alignment)
 #
@@ -30,15 +28,13 @@ This module contains the following classes:
 import os.path
 
 from aeneas.analyzecontainer import AnalyzeContainer
-from aeneas.container import Container
-from aeneas.container import ContainerFormat
+from aeneas.container import Container, ContainerFormat
 from aeneas.executetask import AdjustBoundaryAlgorithm
 from aeneas.hierarchytype import HierarchyType
 from aeneas.idsortingalgorithm import IDSortingAlgorithm
 from aeneas.logger import Loggable
 from aeneas.runtimeconfiguration import RuntimeConfiguration
-from aeneas.syncmap import SyncMapFormat
-from aeneas.syncmap import SyncMapHeadTailFormat
+from aeneas.syncmap import SyncMapFormat, SyncMapHeadTailFormat
 from aeneas.textfile import TextFileFormat
 import aeneas.globalconstants as gc
 import aeneas.globalfunctions as gf
@@ -76,7 +72,7 @@ class Validator(Loggable):
         (gc.PPN_TASK_OS_FILE_HEAD_TAIL_FORMAT, SyncMapHeadTailFormat.ALLOWED_VALUES),
     ]
 
-    IMPLIED_PARAMETERS = [
+    IMPLIED_PARAMETERS = (
         (
             # is_hierarchy_type=paged => is_task_dir_name_regex
             gc.PPN_JOB_IS_HIERARCHY_TYPE,
@@ -169,28 +165,28 @@ class Validator(Loggable):
             [AdjustBoundaryAlgorithm.OFFSET],
             [gc.PPN_TASK_ADJUST_BOUNDARY_OFFSET_VALUE],
         ),
-    ]
+    )
 
-    JOB_REQUIRED_PARAMETERS = [
+    JOB_REQUIRED_PARAMETERS = (
         gc.PPN_JOB_LANGUAGE,
         gc.PPN_JOB_OS_CONTAINER_FORMAT,
         gc.PPN_JOB_OS_FILE_NAME,
-    ]
+    )
 
-    TASK_REQUIRED_PARAMETERS = [
+    TASK_REQUIRED_PARAMETERS = (
         gc.PPN_TASK_IS_TEXT_FILE_FORMAT,
         gc.PPN_TASK_LANGUAGE,
         gc.PPN_TASK_OS_FILE_FORMAT,
         gc.PPN_TASK_OS_FILE_NAME,
-    ]
+    )
 
-    TASK_REQUIRED_PARAMETERS_EXTERNAL_NAME = [
+    TASK_REQUIRED_PARAMETERS_EXTERNAL_NAME = (
         gc.PPN_TASK_IS_TEXT_FILE_FORMAT,
         gc.PPN_TASK_LANGUAGE,
         gc.PPN_TASK_OS_FILE_FORMAT,
-    ]
+    )
 
-    TXT_REQUIRED_PARAMETERS = [
+    TXT_REQUIRED_PARAMETERS = (
         gc.PPN_JOB_IS_AUDIO_FILE_NAME_REGEX,
         gc.PPN_JOB_IS_AUDIO_FILE_RELATIVE_PATH,
         gc.PPN_JOB_IS_HIERARCHY_PREFIX,
@@ -205,23 +201,23 @@ class Validator(Loggable):
         gc.PPN_TASK_IS_TEXT_FILE_FORMAT,
         gc.PPN_TASK_OS_FILE_FORMAT,
         gc.PPN_TASK_OS_FILE_NAME,
-    ]
+    )
 
-    XML_JOB_REQUIRED_PARAMETERS = [
+    XML_JOB_REQUIRED_PARAMETERS = (
         gc.PPN_JOB_OS_CONTAINER_FORMAT,
         gc.PPN_JOB_OS_FILE_NAME,
         gc.PPN_JOB_OS_HIERARCHY_PREFIX,
         gc.PPN_JOB_OS_HIERARCHY_TYPE,
-    ]
+    )
 
-    XML_TASK_REQUIRED_PARAMETERS = [
+    XML_TASK_REQUIRED_PARAMETERS = (
         gc.PPN_TASK_IS_AUDIO_FILE_XML,
         gc.PPN_TASK_IS_TEXT_FILE_FORMAT,
         gc.PPN_TASK_IS_TEXT_FILE_XML,
         gc.PPN_TASK_LANGUAGE,
         gc.PPN_TASK_OS_FILE_FORMAT,
         gc.PPN_TASK_OS_FILE_NAME,
-    ]
+    )
 
     TAG = "Validator"
 
@@ -237,18 +233,23 @@ class Validator(Loggable):
         :rtype: :class:`~aeneas.validator.ValidatorResult`
         """
         self.log(["Checking encoding of file '%s'", input_file_path])
+
         self.result = ValidatorResult()
+
         if self._are_safety_checks_disabled("check_file_encoding"):
             return self.result
+
         if not os.path.isfile(input_file_path):
             self._failed(f"File '{input_file_path}' cannot be read.")
             return self.result
+
         with open(input_file_path, "rb") as file_object:
             bstring = file_object.read()
             self._check_utf8_encoding(bstring)
+
         return self.result
 
-    def check_raw_string(self, string, is_bstring=True):
+    def check_raw_string(self, string, is_bstring: bool = True):
         """
         Check whether the given string
         is properly UTF-8 encoded,
@@ -260,22 +261,29 @@ class Validator(Loggable):
         :rtype: :class:`~aeneas.validator.ValidatorResult`
         """
         self.log("Checking the given byte string")
+
         self.result = ValidatorResult()
+
         if self._are_safety_checks_disabled("check_raw_string"):
             return self.result
+
         if is_bstring:
             self._check_utf8_encoding(string)
             if not self.result.passed:
                 return self.result
             string = gf.safe_unicode(string)
+
         self._check_not_empty(string)
+
         if not self.result.passed:
             return self.result
+
         self._check_reserved_characters(string)
+
         return self.result
 
     def check_configuration_string(
-        self, config_string, is_job=True, external_name=False
+        self, config_string, is_job: bool = True, external_name: bool = False
     ):
         """
         Check whether the given job or task configuration string
@@ -293,15 +301,19 @@ class Validator(Loggable):
             self.log("Checking job configuration string")
         else:
             self.log("Checking task configuration string")
+
         self.result = ValidatorResult()
+
         if self._are_safety_checks_disabled("check_configuration_string"):
             return self.result
+
         if is_job:
             required_parameters = self.JOB_REQUIRED_PARAMETERS
         elif external_name:
             required_parameters = self.TASK_REQUIRED_PARAMETERS_EXTERNAL_NAME
         else:
             required_parameters = self.TASK_REQUIRED_PARAMETERS
+
         is_bstring = isinstance(config_string, bytes)
         if is_bstring:
             self.log("Checking that config_string is well formed")
@@ -309,13 +321,14 @@ class Validator(Loggable):
             if not self.result.passed:
                 return self.result
             config_string = gf.safe_unicode(config_string)
+
         self.log("Checking required parameters")
         parameters = gf.config_string_to_dict(config_string, self.result)
         self._check_required_parameters(required_parameters, parameters)
         self.log(["Checking config_string: returning %s", self.result.passed])
         return self.result
 
-    def check_config_txt(self, contents, is_config_string=False):
+    def check_config_txt(self, contents, is_config_string: bool = False):
         """
         Check whether the given TXT config file contents
         (if ``is_config_string`` is ``False``) or
@@ -327,9 +340,12 @@ class Validator(Loggable):
         :rtype: :class:`~aeneas.validator.ValidatorResult`
         """
         self.log("Checking contents TXT config file")
+
         self.result = ValidatorResult()
+
         if self._are_safety_checks_disabled("check_config_txt"):
             return self.result
+
         is_bstring = isinstance(contents, bytes)
         if is_bstring:
             self.log("Checking that contents is well formed")
@@ -455,7 +471,9 @@ class Validator(Loggable):
         """
         if self.rconf.safety_checks:
             return False
+
         self.log_warn(["Safety checks disabled => %s passed", caller])
+
         return True
 
     def _failed(self, msg):
@@ -488,7 +506,7 @@ class Validator(Loggable):
 
         :param string string: the byte string or Unicode string to be checked
         """
-        if len(string) == 0:
+        if not string:
             self._failed("The given string has zero length")
 
     def _check_reserved_characters(self, ustring):
@@ -498,7 +516,7 @@ class Validator(Loggable):
         :param string ustring: the string to be checked
         """
         forbidden = [c for c in gc.CONFIG_RESERVED_CHARACTERS if c in ustring]
-        if len(forbidden) > 0:
+        if forbidden:
             self._failed(
                 "The given string contains the reserved characters '%s'."
                 % " ".join(forbidden)
@@ -536,7 +554,7 @@ class Validator(Loggable):
         """
         for key, values, implied_keys in self.IMPLIED_PARAMETERS:
             self.log(["Checking implied parameters by '%s'='%s'", key, values])
-            if (key in parameters) and (parameters[key] in values):
+            if key in parameters and parameters[key] in values:
                 found = False
                 for implied_key in implied_keys:
                     if implied_key in parameters:
