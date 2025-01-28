@@ -511,15 +511,6 @@ class TestGlobalFunctions(unittest.TestCase):
         # TODO
         pass
 
-    def test_file_can_be_read_true(self):
-        handler, path = gf.tmp_file()
-        self.assertTrue(gf.file_can_be_read(path))
-        gf.delete_file(handler, path)
-
-    def test_file_can_be_read_false(self):
-        path = "/foo/bar/baz"
-        self.assertFalse(gf.file_can_be_read(path))
-
     def test_file_can_be_written_true(self):
         handler, path = gf.tmp_file()
         self.assertTrue(gf.file_can_be_written(path))

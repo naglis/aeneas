@@ -348,12 +348,6 @@ class AudioFile(Loggable):
         """
         self.log("Reading properties...")
 
-        # check the file can be read
-        if not gf.file_can_be_read(self.file_path):
-            self.log_exc(
-                ["File '%s' cannot be read", self.file_path], None, True, OSError
-            )
-
         # get the file size
         self.log(["Getting file size for '%s'", self.file_path])
         self.file_size = gf.file_size(self.file_path)
@@ -379,17 +373,19 @@ class AudioFile(Loggable):
             )
 
         # save relevant properties in results inside the audiofile object
-        self.audio_length = TimeValue(properties[FFPROBEWrapper.STDOUT_DURATION])
-        self.audio_format = properties[FFPROBEWrapper.STDOUT_CODEC_NAME]
-        self.audio_sample_rate = gf.safe_int(
-            properties[FFPROBEWrapper.STDOUT_SAMPLE_RATE]
+        self.audio_length = properties.duration
+        self.audio_format = properties.codec_name
+        self.audio_sample_rate = properties.sample_rate
+        self.audio_channels = properties.channels
+        self.log(
+            [
+                "Stored audio properties (audio_length: %r, audio_format: %r, audio_sample_rate: %r, audio_channels: %r",
+                self.audio_length,
+                self.audio_format,
+                self.audio_sample_rate,
+                self.audio_channels,
+            ]
         )
-        self.audio_channels = gf.safe_int(properties[FFPROBEWrapper.STDOUT_CHANNELS])
-        self.log(["Stored audio_length: '%s'", self.audio_length])
-        self.log(["Stored audio_format: '%s'", self.audio_format])
-        self.log(["Stored audio_sample_rate: '%s'", self.audio_sample_rate])
-        self.log(["Stored audio_channels: '%s'", self.audio_channels])
-        self.log("Reading properties... done")
 
     def read_samples_from_file(self):
         """
@@ -413,12 +409,6 @@ class AudioFile(Loggable):
         """
         self.log("Loading audio data...")
 
-        # check the file can be read
-        if not gf.file_can_be_read(self.file_path):
-            self.log_exc(
-                ["File '%s' cannot be read", self.file_path], None, True, OSError
-            )
-
         # determine if we need to convert the audio file
         convert_audio_file = (self.file_format is None) or (
             (self.rconf.safety_checks)
@@ -440,9 +430,9 @@ class AudioFile(Loggable):
                 tmp_file_path = tmp_file.name
 
                 self.log(["Temporary PCM16 mono WAVE file: '%s'", tmp_file_path])
+                converter = FFMPEGWrapper(rconf=self.rconf, logger=self.logger)
                 try:
                     self.log("Converting audio file to mono...")
-                    converter = FFMPEGWrapper(rconf=self.rconf, logger=self.logger)
                     converter.convert(self.file_path, tmp_file_path)
                     self.file_format = ("pcm_s16le", 1, self.rconf.sample_rate)
                     self.log("Converting audio file to mono... done")
@@ -453,6 +443,8 @@ class AudioFile(Loggable):
                         True,
                         AudioFileConverterError,
                     )
+                except FileNotFoundError:
+                    raise
                 except OSError:
                     self.log_exc(
                         "Audio file format not supported by ffmpeg",

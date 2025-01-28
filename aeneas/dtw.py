@@ -50,6 +50,8 @@ To align two wave files:
 .. warning:: This module might be refactored in a future version
 """
 
+import os.path
+
 import numpy
 
 from aeneas.audiofilemfcc import AudioFileMFCC
@@ -133,15 +135,15 @@ class DTWAligner(Loggable):
         rconf=None,
         logger=None,
     ):
-        if (real_wave_mfcc is not None) and (type(real_wave_mfcc) is not AudioFileMFCC):
+        if real_wave_mfcc is not None and type(real_wave_mfcc) is not AudioFileMFCC:
             raise ValueError("Real wave mfcc must be None or of type AudioFileMFCC")
-        if (synt_wave_mfcc is not None) and (type(synt_wave_mfcc) is not AudioFileMFCC):
+        if synt_wave_mfcc is not None and type(synt_wave_mfcc) is not AudioFileMFCC:
             raise ValueError("Synt wave mfcc must be None or of type AudioFileMFCC")
-        if (real_wave_path is not None) and (not gf.file_can_be_read(real_wave_path)):
-            raise ValueError("Real wave cannot be read")
-        if (synt_wave_path is not None) and (not gf.file_can_be_read(synt_wave_path)):
-            raise ValueError("Synt wave cannot be read")
-        if (rconf is not None) and (
+        if real_wave_path is not None and not os.path.isfile(real_wave_path):
+            raise ValueError("Real wave does not exist or is not a file")
+        if synt_wave_path is not None and not os.path.isfile(synt_wave_path):
+            raise ValueError("Synt wave does not exist or is not a file")
+        if rconf is not None and (
             rconf[RuntimeConfiguration.DTW_ALGORITHM] not in DTWAlgorithm.ALLOWED_VALUES
         ):
             raise ValueError("Algorithm value not allowed")

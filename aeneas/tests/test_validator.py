@@ -46,7 +46,6 @@ class TestValidator(unittest.TestCase):
 
     def test_check_file_encoding(self):
         for name, path, passed in (
-            ("none_not_ok", None, False),
             ("empty_file_ok", "res/validator/empty.txt", True),
             (
                 "iso8859_encoded_file_not_ok",

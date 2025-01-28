@@ -411,13 +411,6 @@ class SyncMap(Loggable):
                 True,
                 ValueError,
             )
-        if not gf.file_can_be_read(input_file_path):
-            self.log_exc(
-                ["Cannot read sync map file '%s'. Wrong permissions?", input_file_path],
-                None,
-                True,
-                OSError,
-            )
 
         self.log(["Input format:     '%s'", sync_map_format])
         self.log(["Input path:       '%s'", input_file_path])

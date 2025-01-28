@@ -109,8 +109,6 @@ class Synthesizer(Loggable):
                     self.log_exc(
                         "You must specify a value for tts_path", None, True, ValueError
                     )
-                if not gf.file_can_be_read(tts_path):
-                    self.log_exc("Cannot read tts_path", None, True, OSError)
                 try:
                     import imp
 

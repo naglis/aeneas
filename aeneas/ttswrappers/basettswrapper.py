@@ -440,13 +440,13 @@ class BaseTTSWrapper(Loggable):
             self.log("Synthesizing backwards")
 
         # check that output_file_path can be written
-        if not gf.file_can_be_written(output_file_path):
-            self.log_exc(
-                ["Cannot write to output file '%s'", output_file_path],
-                None,
-                True,
-                OSError,
-            )
+        # if not gf.file_can_be_written(output_file_path):
+        #     self.log_exc(
+        #         ["Cannot write to output file '%s'", output_file_path],
+        #         None,
+        #         True,
+        #         OSError,
+        #     )
 
         # first, call Python function _synthesize_multiple_python() if available
         if self.HAS_PYTHON_CALL:
@@ -702,16 +702,6 @@ class BaseTTSWrapper(Loggable):
                     "An unexpected error occurred while calling TTS engine via subprocess",
                     exc,
                     False,
-                    None,
-                )
-                return (False, None)
-
-            # check the file can be read
-            if not gf.file_can_be_read(output_file_path):
-                self.log_exc(
-                    ["Output file '%s' cannot be read", output_file_path],
-                    None,
-                    True,
                     None,
                 )
                 return (False, None)

@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 # aeneas is a Python/C library and a set of tools
 # to automagically synchronize audio and text (aka forced alignment)
 #
@@ -28,11 +26,9 @@ This module contains the following classes:
 """
 
 import subprocess
-import os.path
 
 from aeneas.logger import Loggable
 from aeneas.runtimeconfiguration import RuntimeConfiguration
-import aeneas.globalfunctions as gf
 
 
 class FFMPEGPathError(Exception):
@@ -41,8 +37,6 @@ class FFMPEGPathError(Exception):
 
     .. versionadded:: 1.4.1
     """
-
-    pass
 
 
 class FFMPEGWrapper(Loggable):
@@ -59,35 +53,35 @@ class FFMPEGWrapper(Loggable):
     :type  logger: :class:`~aeneas.logger.Logger`
     """
 
-    FFMPEG_SAMPLE_8000 = ["-ar", "8000"]
+    FFMPEG_SAMPLE_8000 = ("-ar", "8000")
     """ Single parameter for ``ffmpeg``: 8000 Hz sampling """
 
-    FFMPEG_SAMPLE_16000 = ["-ar", "16000"]
+    FFMPEG_SAMPLE_16000 = ("-ar", "16000")
     """ Single parameter for ``ffmpeg``: 16000 Hz sampling """
 
-    FFMPEG_SAMPLE_22050 = ["-ar", "22050"]
+    FFMPEG_SAMPLE_22050 = ("-ar", "22050")
     """ Single parameter for ``ffmpeg``: 22050 Hz sampling """
 
-    FFMPEG_SAMPLE_44100 = ["-ar", "44100"]
+    FFMPEG_SAMPLE_44100 = ("-ar", "44100")
     """ Single parameter for ``ffmpeg``: 44100 Hz sampling """
 
-    FFMPEG_SAMPLE_48000 = ["-ar", "48000"]
+    FFMPEG_SAMPLE_48000 = ("-ar", "48000")
     """ Single parameter for ``ffmpeg``: 48000 Hz sampling """
 
-    FFMPEG_MONO = ["-ac", "1"]
+    FFMPEG_MONO = ("-ac", "1")
     """ Single parameter for ``ffmpeg``: mono (1 channel) """
 
-    FFMPEG_STEREO = ["-ac", "2"]
+    FFMPEG_STEREO = ("-ac", "2")
     """ Single parameter for ``ffmpeg``: stereo (2 channels) """
 
-    FFMPEG_OVERWRITE = ["-y"]
+    FFMPEG_OVERWRITE = ("-y",)
     """ Single parameter for ``ffmpeg``: force overwriting output file """
 
-    FFMPEG_PLAIN_HEADER = ["-map_metadata", "-1", "-flags", "+bitexact"]
+    FFMPEG_PLAIN_HEADER = ("-map_metadata", "-1", "-flags", "+bitexact")
     """ Single parameter for ``ffmpeg``: generate WAVE header
     without extra chunks (e.g., the INFO chunk) """
 
-    FFMPEG_FORMAT_WAVE = ["-f", "wav"]
+    FFMPEG_FORMAT_WAVE = ("-f", "wav")
     """ Single parameter for ``ffmpeg``: produce output in ``wav`` format
     (must be the second to last argument to ``ffmpeg``,
     just before path of the output file) """
@@ -157,7 +151,11 @@ class FFMPEGWrapper(Loggable):
     TAG = "FFMPEGWrapper"
 
     def convert(
-        self, input_file_path, output_file_path, head_length=None, process_length=None
+        self,
+        input_file_path: str,
+        output_file_path: str,
+        head_length=None,
+        process_length=None,
     ):
         """
         Convert the audio file at ``input_file_path``
@@ -183,64 +181,61 @@ class FFMPEGWrapper(Loggable):
         :param float process_length: process these many seconds of the audio file
         :raises: :class:`~aeneas.ffmpegwrapper.FFMPEGPathError`: if the path to the ``ffmpeg`` executable cannot be called
         :raises: OSError: if ``input_file_path`` does not exist
-                          or ``output_file_path`` cannot be written
         """
-        # test if we can read the input file
-        if not gf.file_can_be_read(input_file_path):
-            self.log_exc(
-                ["Input file '%s' cannot be read", input_file_path],
-                None,
-                True,
-                OSError,
-            )
+        arguments = [
+            self.rconf[RuntimeConfiguration.FFMPEG_PATH],
+            "-i",
+            input_file_path,
+        ]
 
-        # call ffmpeg
-        arguments = [self.rconf[RuntimeConfiguration.FFMPEG_PATH]]
-        arguments.extend(["-i", input_file_path])
         if head_length is not None:
             arguments.extend(["-ss", head_length])
+
         if process_length is not None:
             arguments.extend(["-t", process_length])
+
         if self.rconf.sample_rate in self.FFMPEG_PARAMETERS_MAP:
             arguments.extend(self.FFMPEG_PARAMETERS_MAP[self.rconf.sample_rate])
         else:
             arguments.extend(self.FFMPEG_PARAMETERS_DEFAULT)
+
         arguments.append(output_file_path)
+
         self.log(["Calling with arguments '%s'", arguments])
         try:
-            proc = subprocess.run(
-                arguments,
-                capture_output=True,
-                stdin=subprocess.PIPE,
-                check=True,
-            )
+            subprocess.check_output(arguments, stderr=subprocess.PIPE, text=True)
         except OSError as exc:
             self.log_exc(
-                "Unable to call the '%s' ffmpeg executable"
-                % (self.rconf[RuntimeConfiguration.FFMPEG_PATH]),
+                [
+                    "Unable to call the '%s' ffmpeg executable",
+                    self.rconf[RuntimeConfiguration.FFMPEG_PATH],
+                ],
                 exc,
                 True,
                 FFMPEGPathError,
             )
-        except subprocess.CalledProcessError as e:
-            self.log_exc(
-                "ffmpeg returned non-zero status %r: %s"
-                % (e.returncode, e.stderr.decode("utf-8", "replace")),
-                critical=True,
-                raise_type=OSError,
-            )
+        except subprocess.CalledProcessError as exc:
+            stderr = exc.stderr.strip()
+            if stderr.endswith("No such file or directory"):
+                self.log_exc(
+                    [
+                        "Input file path %s does not exist",
+                        input_file_path,
+                    ],
+                    None,
+                    critical=True,
+                    raise_type=FileNotFoundError,
+                )
+            else:
+                self.log_exc(
+                    [
+                        "ffmpeg with non-zero status %r: %s",
+                        exc.returncode,
+                        exc.stderr,
+                    ],
+                    exc,
+                    critical=True,
+                    raise_type=OSError,
+                )
 
-        self.log("Call completed")
-
-        # check if the output file exists
-        if not os.path.isfile(output_file_path):
-            self.log_exc(
-                f"Output file {output_file_path!r} was not written",
-                None,
-                True,
-                OSError,
-            )
-
-        # returning the output file path
-        self.log(["Returning output file path '%s'", output_file_path])
         return output_file_path

@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 # aeneas is a Python/C library and a set of tools
 # to automagically synchronize audio and text (aka forced alignment)
 #
@@ -22,67 +20,53 @@
 
 import unittest
 
-from aeneas.ffprobewrapper import FFPROBEUnsupportedFormatError
-from aeneas.ffprobewrapper import FFPROBEWrapper
+from aeneas.exacttiming import TimeValue
+from aeneas.ffprobewrapper import FFPROBEUnsupportedFormatError, FFPROBEWrapper
 import aeneas.globalfunctions as gf
 
 
 class TestFFPROBEWrapper(unittest.TestCase):
-    FILES = [
-        {
-            "path": "res/audioformats/p001.aac",
-        },
-        {
-            "path": "res/audioformats/p001.aiff",
-        },
-        {
-            "path": "res/audioformats/p001.flac",
-        },
-        {
-            "path": "res/audioformats/p001.mp3",
-        },
-        {
-            "path": "res/audioformats/p001.mp4",
-        },
-        {
-            "path": "res/audioformats/p001.ogg",
-        },
-        {
-            "path": "res/audioformats/p001.wav",
-        },
-        {
-            "path": "res/audioformats/p001.webm",
-        },
-    ]
+    FILES = (
+        "res/audioformats/p001.aac",
+        "res/audioformats/p001.aiff",
+        "res/audioformats/p001.flac",
+        "res/audioformats/p001.mp3",
+        "res/audioformats/p001.mp4",
+        "res/audioformats/p001.ogg",
+        "res/audioformats/p001.wav",
+        "res/audioformats/p001.webm",
+    )
 
     NOT_EXISTING_PATH = "this_file_does_not_exist.mp3"
     EMPTY_FILE_PATH = "res/audioformats/p001.empty"
 
-    def load(self, input_file_path):
-        prober = FFPROBEWrapper()
-        return prober.read_properties(gf.absolute_path(input_file_path, __file__))
+    def read_properties(self, input_file_path):
+        return FFPROBEWrapper().read_properties(
+            gf.absolute_path(input_file_path, __file__)
+        )
 
     def test_mp3_properties(self):
-        properties = self.load("res/audioformats/p001.mp3")
-        self.assertIsNotNone(properties["bit_rate"])
-        self.assertIsNotNone(properties["channels"])
-        self.assertIsNotNone(properties["codec_name"])
-        self.assertIsNotNone(properties["duration"])
-        self.assertIsNotNone(properties["sample_rate"])
+        properties = self.read_properties("res/audioformats/p001.mp3")
+        self.assertAlmostEqual(properties.duration, TimeValue("9.038"), places=2)
+        self.assertEqual(properties.codec_name, "mp3")
+        self.assertEqual(properties.sample_rate, 44_100)
+        self.assertEqual(properties.channels, 2)
+        self.assertEqual(properties.bit_rate, 64_000)
 
     def test_path_none(self):
         with self.assertRaises(TypeError):
-            self.load(None)
+            self.read_properties(None)
 
     def test_path_not_existing(self):
         with self.assertRaises(OSError):
-            self.load(self.NOT_EXISTING_PATH)
+            self.read_properties(self.NOT_EXISTING_PATH)
 
     def test_file_empty(self):
         with self.assertRaises(FFPROBEUnsupportedFormatError):
-            self.load(self.EMPTY_FILE_PATH)
+            self.read_properties(self.EMPTY_FILE_PATH)
 
     def test_formats(self):
-        for f in self.FILES:
-            properties = self.load(f["path"])
-            self.assertIsNotNone(properties["duration"])
+        for path in self.FILES:
+            with self.subTest(path=path):
+                properties = self.read_properties(path)
+                self.assertIsNotNone(properties.duration)

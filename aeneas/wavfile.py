@@ -171,7 +171,7 @@ def read(filename, mmap=False):
                 size, comp, noc, rate, sbytes, ba, bits = _read_fmt_chunk(fid)
                 if bits == 24:
                     raise ValueError(
-                        "Unsupported bit depth: the wav file " "has 24 bit data."
+                        "Unsupported bit depth: the wav file has 24 bit data."
                     )
             elif chunk_id == b"fact":
                 _skip_unknown_chunk(fid)

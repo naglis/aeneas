@@ -34,6 +34,7 @@ This module contains the following classes:
 
 import re
 import typing
+import os.path
 
 from bs4 import BeautifulSoup
 
@@ -529,9 +530,12 @@ class TextFile(Loggable):
 
     @file_path.setter
     def file_path(self, file_path):
-        if file_path is not None and not gf.file_can_be_read(file_path):
+        if file_path is not None and not os.path.isfile(file_path):
             self.log_exc(
-                ["Text file '%s' cannot be read", file_path], None, True, OSError
+                ["Text file '%s' does not exist or is not a file", file_path],
+                None,
+                True,
+                OSError,
             )
         self.__file_path = file_path
 
@@ -699,12 +703,6 @@ class TextFile(Loggable):
         """
         Read text fragments from file.
         """
-        # test if we can read the given file
-        if not gf.file_can_be_read(self.file_path):
-            self.log_exc(
-                ["File '%s' cannot be read", self.file_path], None, True, OSError
-            )
-
         if self.file_format not in TextFileFormat.ALLOWED_VALUES:
             self.log_exc(
                 ["Text file format '%s' is not supported.", self.file_format],
@@ -1287,9 +1285,12 @@ class TransliterationMap(Loggable):
 
     @file_path.setter
     def file_path(self, file_path):
-        if (file_path is not None) and (not gf.file_can_be_read(file_path)):
+        if file_path is not None and not os.path.exists(file_path):
             self.log_exc(
-                ["Map file '%s' cannot be read", file_path], None, True, OSError
+                ["Map file '%s' does not exist or is not a file", file_path],
+                None,
+                True,
+                OSError,
             )
         self.__file_path = file_path
         self._build_map()

@@ -843,26 +843,6 @@ def run_c_extension_with_fallback(
     return result
 
 
-def file_can_be_read(path):
-    """
-    Return ``True`` if the file at the given ``path`` can be read.
-
-    :param string path: the file path
-    :rtype: bool
-
-    .. versionadded:: 1.4.0
-    """
-    if path is None:
-        return False
-    try:
-        with open(path, "rb"):
-            pass
-        return True
-    except OSError:
-        pass
-    return False
-
-
 def file_can_be_written(path):
     """
     Return ``True`` if a file can be written at the given ``path``.

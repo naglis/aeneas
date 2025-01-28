@@ -240,8 +240,8 @@ class Validator(Loggable):
         self.result = ValidatorResult()
         if self._are_safety_checks_disabled("check_file_encoding"):
             return self.result
-        if not gf.file_can_be_read(input_file_path):
-            self._failed("File '%s' cannot be read." % (input_file_path))
+        if not os.path.isfile(input_file_path):
+            self._failed(f"File '{input_file_path}' cannot be read.")
             return self.result
         with open(input_file_path, "rb") as file_object:
             bstring = file_object.read()

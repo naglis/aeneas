@@ -485,11 +485,8 @@ class AbstractCLIProgram(Loggable):
         :type  path: string (path)
         :rtype: bool
         """
-        if (not gf.file_can_be_read(path)) and (not os.path.isdir(path)):
-            self.print_error("Unable to read file or directory '%s'" % (path))
-            self.print_error(
-                "Make sure the path is written/escaped correctly and that you have read permission on it"
-            )
+        if not os.path.isfile(path):
+            self.print_error(f"Path '{path}' does not exist or is not a file")
             return False
         return True
 
@@ -502,11 +499,8 @@ class AbstractCLIProgram(Loggable):
         :type  path: string (path)
         :rtype: bool
         """
-        if not gf.file_can_be_read(path):
-            self.print_error("Unable to read file '%s'" % (path))
-            self.print_error(
-                "Make sure the file path is written/escaped correctly and that you have read permission on it"
-            )
+        if not os.path.isfile(path):
+            self.print_error(f"Path '{path}' does not exist or is not a file")
             return False
         return True
 

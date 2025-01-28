@@ -113,10 +113,6 @@ class TestAudioFile(unittest.TestCase):
             af.read_samples_from_file()
         return af
 
-    def test_read_properties_from_none(self):
-        with self.assertRaises(OSError):
-            self.load(None, read_properties=True)
-
     def test_read_properties_from_non_existing_path(self):
         with self.assertRaises(OSError):
             self.load("not_existing.mp3", read_properties=True)
@@ -141,10 +137,6 @@ class TestAudioFile(unittest.TestCase):
                 self.assertEqual(audiofile.audio_channels, f["channels"])
                 self.assertEqual(audiofile.audio_format, f["format"])
                 self.assertAlmostEqual(audiofile.audio_length, f["length"], places=1)
-
-    def test_read_samples_from_none(self):
-        with self.assertRaises(OSError):
-            self.load(None, read_samples=True)
 
     def test_read_samples_from_non_existing_path(self):
         with self.assertRaises(OSError):

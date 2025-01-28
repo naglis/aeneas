@@ -22,6 +22,7 @@
 
 import unittest
 import importlib.util
+import os.path
 
 from aeneas.downloader import Downloader
 from aeneas.downloader import DownloadError
@@ -66,7 +67,7 @@ class TestDownloader(unittest.TestCase):
             download_format=download_format,
             largest_audio=largest_audio,
         )
-        self.assertTrue(gf.file_can_be_read(path))
+        self.assertTrue(os.path.isfile(path))
         self.assertEqual(gf.file_size(path), expected_size)
         gf.delete_file(None, path)
 

@@ -30,21 +30,27 @@ This module contains the following classes:
   representing errors while reading the properties of audio files.
 """
 
-import re
+import json
 import subprocess
+import typing
 
 from aeneas.exacttiming import TimeValue
 from aeneas.logger import Loggable
 from aeneas.runtimeconfiguration import RuntimeConfiguration
-import aeneas.globalfunctions as gf
+
+
+class Properties(typing.NamedTuple):
+    duration: TimeValue
+    codec_name: str | None
+    sample_rate: int | None
+    channels: int | None
+    bit_rate: int | None
 
 
 class FFPROBEParsingError(Exception):
     """
-    Error raised when the call to ``ffprobe`` does not produce any output.
+    Error raised when the call to ``ffprobe`` does not produce any output or parsing the output as JSON fails.
     """
-
-    pass
 
 
 class FFPROBEPathError(Exception):
@@ -54,15 +60,11 @@ class FFPROBEPathError(Exception):
     .. versionadded:: 1.4.1
     """
 
-    pass
-
 
 class FFPROBEUnsupportedFormatError(Exception):
     """
     Error raised when ``ffprobe`` cannot decode the format of the given file.
     """
-
-    pass
 
 
 class FFPROBEWrapper(Loggable):
@@ -122,185 +124,129 @@ class FFPROBEWrapper(Loggable):
     :type  logger: :class:`~aeneas.logger.Logger`
     """
 
-    FFPROBE_PARAMETERS = ["-select_streams", "a", "-show_streams"]
-    """ ``ffprobe`` parameters """
-
-    STDERR_DURATION_REGEX = re.compile(
-        r"Duration: ([0-9]*):([0-9]*):([0-9]*)\.([0-9]*)"
+    FFPROBE_PARAMETERS = (
+        "-hide_banner",
+        "-select_streams",
+        "a",
+        "-show_streams",
+        "-show_format",
+        "-print_format",
+        "json",
     )
-    """ Regex to match ``ffprobe`` stderr duration values """
-
-    STDOUT_BEGIN_STREAM = "[STREAM]"
-    """ ``ffprobe`` stdout begin stream tag """
-
-    STDOUT_CHANNELS = "channels"
-    """ ``ffprobe`` stdout channels keyword """
-
-    STDOUT_CODEC_NAME = "codec_name"
-    """ ``ffprobe`` stdout codec name (format) keyword """
-
-    STDOUT_END_STREAM = "[/STREAM]"
-    """ ``ffprobe`` stdout end stream tag """
-
-    STDOUT_DURATION = "duration"
-    """ ``ffprobe`` stdout duration keyword """
-
-    STDOUT_SAMPLE_RATE = "sample_rate"
-    """ ``ffprobe`` stdout sample rate keyword """
+    """ ``ffprobe`` parameters """
 
     TAG = "FFPROBEWrapper"
 
-    def read_properties(self, audio_file_path):
+    def read_properties(self, audio_file_path: str) -> Properties:
         """
         Read the properties of an audio file
-        and return them as a dictionary.
-
-        Example: ::
-
-            d["index"]=0
-            d["codec_name"]=mp3
-            d["codec_long_name"]=MP3 (MPEG audio layer 3)
-            d["profile"]=unknown
-            d["codec_type"]=audio
-            d["codec_time_base"]=1/44100
-            d["codec_tag_string"]=[0][0][0][0]
-            d["codec_tag"]=0x0000
-            d["sample_fmt"]=s16p
-            d["sample_rate"]=44100
-            d["channels"]=1
-            d["channel_layout"]=mono
-            d["bits_per_sample"]=0
-            d["id"]=N/A
-            d["r_frame_rate"]=0/0
-            d["avg_frame_rate"]=0/0
-            d["time_base"]=1/14112000
-            d["start_pts"]=0
-            d["start_time"]=0.000000
-            d["duration_ts"]=1545083190
-            d["duration"]=109.487188
-            d["bit_rate"]=128000
-            d["max_bit_rate"]=N/A
-            d["bits_per_raw_sample"]=N/A
-            d["nb_frames"]=N/A
-            d["nb_read_frames"]=N/A
-            d["nb_read_packets"]=N/A
-            d["DISPOSITION:default"]=0
-            d["DISPOSITION:dub"]=0
-            d["DISPOSITION:original"]=0
-            d["DISPOSITION:comment"]=0
-            d["DISPOSITION:lyrics"]=0
-            d["DISPOSITION:karaoke"]=0
-            d["DISPOSITION:forced"]=0
-            d["DISPOSITION:hearing_impaired"]=0
-            d["DISPOSITION:visual_impaired"]=0
-            d["DISPOSITION:clean_effects"]=0
-            d["DISPOSITION:attached_pic"]=0
+        and return them as a Properties named tuple.
 
         :param string audio_file_path: the path of the audio file to analyze
         :rtype: dict
-        :raises: TypeError: if ``audio_file_path`` is None
-        :raises: OSError: if the file at ``audio_file_path`` cannot be read
         :raises: FFPROBEParsingError: if the call to ``ffprobe`` does not produce any output
         :raises: FFPROBEPathError: if the path to the ``ffprobe`` executable cannot be called
         :raises: FFPROBEUnsupportedFormatError: if the file has a format not supported by ``ffprobe``
         """
-
-        # test if we can read the file at audio_file_path
-        if audio_file_path is None:
-            self.log_exc("The audio file path is None", None, True, TypeError)
-        if not gf.file_can_be_read(audio_file_path):
-            self.log_exc(
-                ["Input file '%s' cannot be read", audio_file_path],
-                None,
-                True,
-                OSError,
-            )
-
         # call ffprobe
-        arguments = [self.rconf[RuntimeConfiguration.FFPROBE_PATH]]
-        arguments.extend(self.FFPROBE_PARAMETERS)
-        arguments.append(audio_file_path)
+        arguments = [
+            self.rconf[RuntimeConfiguration.FFPROBE_PATH],
+            *self.FFPROBE_PARAMETERS,
+            audio_file_path,
+        ]
         self.log(["Calling with arguments '%s'", arguments])
         try:
-            proc = subprocess.Popen(
+            output = subprocess.check_output(
                 arguments,
-                stdout=subprocess.PIPE,
-                stdin=subprocess.PIPE,
+                text=True,
                 stderr=subprocess.PIPE,
             )
-            (stdoutdata, stderrdata) = proc.communicate()
-            proc.stdout.close()
-            proc.stdin.close()
-            proc.stderr.close()
         except OSError as exc:
             self.log_exc(
-                "Unable to call the '%s' ffprobe executable"
-                % (self.rconf[RuntimeConfiguration.FFPROBE_PATH]),
+                [
+                    "Unable to call the '%s' ffprobe executable",
+                    self.rconf[RuntimeConfiguration.FFPROBE_PATH],
+                ],
                 exc,
                 True,
                 FFPROBEPathError,
             )
+        except subprocess.CalledProcessError as exc:
+            stderr = exc.stderr.strip()
+            if stderr.endswith("No such file or directory"):
+                self.log_exc(
+                    ["Path %s does not exist", audio_file_path], exc, True, OSError
+                )
+            else:
+                self.log_exc(
+                    [
+                        "ffprobe exited with status %d: %s",
+                        exc.returncode,
+                        stderr,
+                    ],
+                    exc,
+                    True,
+                    FFPROBEUnsupportedFormatError,
+                )
         self.log("Call completed")
 
         # check there is some output
-        if (stdoutdata is None) or (len(stderrdata) == 0):
+        if not output:
             self.log_exc("ffprobe produced no output", None, True, FFPROBEParsingError)
 
-        # decode stdoutdata and stderrdata to Unicode string
+        return self._parse_properties_json(output)
+
+    def _parse_properties_json(self, data: str) -> Properties:
+        duration = codec_name = sample_rate = channels = bit_rate = None
         try:
-            stdoutdata = gf.safe_unicode(stdoutdata)
-            stderrdata = gf.safe_unicode(stderrdata)
-        except UnicodeDecodeError as exc:
+            json_data = json.loads(data)
+        except json.JSONDecodeError as exc:
             self.log_exc(
-                "Unable to decode ffprobe out/err", exc, True, FFPROBEParsingError
+                ["Failed to parse ffprobe output %r as JSON", data],
+                exc,
+                True,
+                FFPROBEParsingError,
             )
 
-        # dictionary for the results
-        results = {
-            self.STDOUT_CHANNELS: None,
-            self.STDOUT_CODEC_NAME: None,
-            self.STDOUT_DURATION: None,
-            self.STDOUT_SAMPLE_RATE: None,
-        }
-
-        # scan the first audio stream the ffprobe stdout output
-        # TODO more robust parsing
-        # TODO deal with multiple audio streams
-        for line in stdoutdata.splitlines():
-            if line == self.STDOUT_END_STREAM:
-                self.log("Reached end of the stream")
-                break
-            elif len(line.split("=")) == 2:
-                key, value = line.split("=")
-                results[key] = value
-                self.log(["Found property '%s'='%s'", key, value])
-
         try:
-            self.log(["Duration found in stdout: '%s'", results[self.STDOUT_DURATION]])
-            results[self.STDOUT_DURATION] = TimeValue(results[self.STDOUT_DURATION])
-            self.log("Valid duration")
-        except Exception:
-            self.log_warn("Invalid duration")
-            results[self.STDOUT_DURATION] = None
-            # try scanning ffprobe stderr output
-            for line in stderrdata.splitlines():
-                match = self.STDERR_DURATION_REGEX.search(line)
-                if match is not None:
-                    self.log(["Found matching line '%s'", line])
-                    results[self.STDOUT_DURATION] = gf.time_from_hhmmssmmm(line)
-                    self.log(
-                        ["Extracted duration '%.3f'", results[self.STDOUT_DURATION]]
-                    )
-                    break
-
-        if results[self.STDOUT_DURATION] is None:
+            stream = (json_data.get("streams") or [])[0]
+        except IndexError:
             self.log_exc(
-                "No duration found in stdout or stderr. Unsupported audio file format?",
+                "No streams could be detected",
                 None,
                 True,
                 FFPROBEUnsupportedFormatError,
             )
 
-        # return dictionary
-        self.log("Returning dict")
-        return results
+        def analyze_dict(d: dict):
+            nonlocal duration, codec_name, sample_rate, channels, bit_rate
+            for k, v in d.items():
+                if k == "duration" and duration is None:
+                    duration = TimeValue(v)
+                elif k == "codec_name" and codec_name is None:
+                    codec_name = v
+                elif k == "sample_rate" and sample_rate is None:
+                    sample_rate = int(v)
+                elif k == "channels" and channels is None:
+                    channels = int(v)
+                elif k == "bit_rate" and bit_rate is None:
+                    bit_rate = int(v)
+
+        analyze_dict(stream)
+        analyze_dict(json_data.get("format") or {})
+
+        if duration is None:
+            self.log_exc(
+                "No duration could be detected. Unsupported audio file format?",
+                None,
+                True,
+                FFPROBEUnsupportedFormatError,
+            )
+
+        return Properties(
+            duration=duration,
+            codec_name=codec_name,
+            sample_rate=sample_rate,
+            channels=channels,
+            bit_rate=bit_rate,
+        )
