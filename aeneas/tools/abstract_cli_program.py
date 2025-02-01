@@ -325,11 +325,13 @@ class AbstractCLIProgram(Configurable):
 
         # set verbosity, if requested
         loglevel = logging.WARNING
+        logformat = "%(levelname)s %(name)s %(message)s"
         for flag in {"-v", "--verbose"} & set_args:
             loglevel = logging.INFO
             args.remove(flag)
         for flag in {"-vv", "--very-verbose"} & set_args:
             loglevel = logging.DEBUG
+            logformat = "%(asctime)s %(levelname)s %(name)s %(message)s"
             args.remove(flag)
 
         # set RuntimeConfiguration string, if specified
@@ -355,10 +357,7 @@ class AbstractCLIProgram(Configurable):
 
                 args.remove(flag)
 
-        if log_path is not None:
-            logging.basicConfig(filename=log_path, level=loglevel)
-        else:
-            logging.basicConfig(level=loglevel)
+        logging.basicConfig(filename=log_path, level=loglevel, format=logformat)
 
         # if no actual arguments left, print help
         if not args and show_help:
