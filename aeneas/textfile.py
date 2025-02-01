@@ -1146,8 +1146,6 @@ class TextFilterIgnoreRegex(TextFilter):
     :param regex regex: the regular expression to be applied
     :param rconf: a runtime configuration
     :type  rconf: :class:`~aeneas.runtimeconfiguration.RuntimeConfiguration`
-    :param logger: the logger object
-    :type  logger: :class:`~aeneas.logger.Logger`
     :raises: ValueError: if ``regex`` is not a valid regex
     """
 
@@ -1181,8 +1179,6 @@ class TextFilterTransliterate(TextFilter):
     :param string map_file_path: the path to a map file
     :param rconf: a runtime configuration
     :type  rconf: :class:`~aeneas.runtimeconfiguration.RuntimeConfiguration`
-    :param logger: the logger object
-    :type  logger: :class:`~aeneas.logger.Logger`
     :raises: OSError: if ``map_file_path`` cannot be read
     :raises: TypeError: if ``map_object`` is not an instance
                         of :class:`~aeneas.textfile.TransliterationMap`

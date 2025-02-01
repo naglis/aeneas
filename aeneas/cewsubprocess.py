@@ -60,8 +60,6 @@ class CEWSubprocess(Configurable):
 
     :param rconf: a runtime configuration
     :type  rconf: :class:`~aeneas.runtimeconfiguration.RuntimeConfiguration`
-    :param logger: the logger object
-    :type  logger: :class:`~aeneas.logger.Logger`
     """
 
     def synthesize_multiple(self, audio_file_path, c_quit_after, c_backwards, u_text):
