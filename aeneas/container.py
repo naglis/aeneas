@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 # aeneas is a Python/C library and a set of tools
 # to automagically synchronize audio and text (aka forced alignment)
 #
@@ -32,15 +30,19 @@ This module contains the following classes:
   is an enumeration of the supported container formats.
 """
 
-import os
 import enum
+import logging
+import os
+import sys
 import tarfile
 import zipfile
-import sys
 
-from aeneas.logger import Loggable
+from aeneas.logger import Configurable
 import aeneas.globalconstants as gc
 import aeneas.globalfunctions as gf
+
+
+logger = logging.getLogger(__name__)
 
 
 @enum.unique
@@ -68,7 +70,7 @@ class ContainerFormat(enum.Enum):
     """ ZIP container """
 
 
-class Container(Loggable):
+class Container(Configurable):
     """
     An abstraction for different archive formats like ZIP or TAR,
     exposing common functions like extracting all entries or
@@ -81,20 +83,15 @@ class Container(Loggable):
     :type  container_format: :class:`~aeneas.container.ContainerFormat`
     :param rconf: a runtime configuration
     :type  rconf: :class:`~aeneas.runtimeconfiguration.RuntimeConfiguration`
-    :param logger: the logger object
-    :type  logger: :class:`~aeneas.logger.Logger`
     :raises: TypeError: if ``file_path`` is ``None``
     :raises: ValueError: if ``container_format`` is not ``None`` and is not an allowed value
     """
-
-    TAG = "Container"
 
     def __init__(
         self,
         file_path: str,
         container_format: ContainerFormat | None = None,
         rconf=None,
-        logger=None,
     ):
         if file_path is None:
             raise TypeError("File path is None")
@@ -102,7 +99,7 @@ class Container(Loggable):
             container_format, ContainerFormat
         ):
             raise ValueError("Container format not allowed")
-        super().__init__(rconf=rconf, logger=logger)
+        super().__init__(rconf=rconf)
         self.file_path = file_path
         self.container_format = container_format
         self.actual_container = None
@@ -184,12 +181,12 @@ class Container(Loggable):
 
         :raises: same as :func:`~aeneas.container.Container.entries`
         """
-        self.log("Checking if this container is safe")
+        logger.debug("Checking if this container is safe")
         for entry in self.entries:
             if not self.is_entry_safe(entry):
-                self.log(["This container is not safe: found unsafe entry '%s'", entry])
+                logger.debug("This container is not safe: found unsafe entry %r", entry)
                 return False
-        self.log("This container is safe")
+        logger.debug("This container is safe")
         return True
 
     def is_entry_safe(self, entry) -> bool:
@@ -200,9 +197,9 @@ class Container(Loggable):
         """
         normalized = os.path.normpath(entry)
         if normalized.startswith(os.sep) or normalized.startswith(".." + os.sep):
-            self.log(["Entry '%s' is not safe", entry])
+            logger.debug("Entry %r is not safe", entry)
             return False
-        self.log(["Entry '%s' is safe", entry])
+        logger.debug("Entry %r is safe", entry)
         return True
 
     @property
@@ -216,15 +213,11 @@ class Container(Loggable):
         :raises: OSError: if an error occurred reading the given container
                           (e.g., empty file, damaged file, etc.)
         """
-        self.log("Getting entries")
+        logger.debug("Getting entries")
         if not self.exists():
-            self.log_exc(
-                "This container does not exist. Wrong path?", None, True, TypeError
-            )
+            raise TypeError("This container does not exist. Wrong path?")
         if self.actual_container is None:
-            self.log_exc(
-                "The actual container object has not been set", None, True, TypeError
-            )
+            raise TypeError("The actual container object has not been set")
         return self.actual_container.entries
 
     def find_entry(self, entry: str, exact: bool = True) -> str | None:
@@ -253,17 +246,17 @@ class Container(Loggable):
         :raises: same as :func:`~aeneas.container.Container.entries`
         """
         if exact:
-            self.log(["Finding entry '%s' with exact=True", entry])
+            logger.debug("Finding entry %r with exact=True", entry)
             if entry in self.entries:
-                self.log(["Found entry '%s'", entry])
+                logger.debug("Found entry %r", entry)
                 return entry
         else:
-            self.log(["Finding entry '%s' with exact=False", entry])
+            logger.debug("Finding entry %r with exact=False", entry)
             for ent in self.entries:
                 if os.path.basename(ent) == entry:
-                    self.log(["Found entry '%s'", ent])
+                    logger.debug("Found entry %r", ent)
                     return ent
-        self.log(["Entry '%s' not found", entry])
+        logger.debug("Entry %r not found", entry)
         return None
 
     def read_entry(self, entry: str) -> bytes | None:
@@ -277,18 +270,18 @@ class Container(Loggable):
         :raises: same as :func:`~aeneas.container.Container.entries`
         """
         if not self.is_entry_safe(entry):
-            self.log(["Accessing entry '%s' is not safe", entry])
+            logger.debug("Accessing entry %r is not safe", entry)
             return None
 
         if entry not in self.entries:
-            self.log(["Entry '%s' not found in this container", entry])
+            logger.debug("Entry %r not found in this container", entry)
             return None
 
-        self.log(["Reading contents of entry '%s'", entry])
+        logger.debug("Reading contents of entry %r", entry)
         try:
             return self.actual_container.read_entry(entry)
         except Exception:
-            self.log(["An error occurred while reading the contents of '%s'", entry])
+            logger.debug("An error occurred while reading the contents of %r", entry)
             return None
 
     def decompress(self, output_path: str):
@@ -302,23 +295,15 @@ class Container(Loggable):
         :raises: OSError: if an error occurred decompressing the given container
                           (e.g., empty file, damaged file, etc.)
         """
-        self.log(["Decompressing the container into '%s'", output_path])
+        logger.debug("Decompressing the container into %r", output_path)
         if not self.exists():
-            self.log_exc(
-                "This container does not exist. Wrong path?", None, True, TypeError
-            )
+            raise TypeError("This container does not exist. Wrong path?")
         if self.actual_container is None:
-            self.log_exc(
-                "The actual container object has not been set", None, True, TypeError
-            )
+            raise TypeError("The actual container object has not been set")
         if not os.path.isdir(output_path):
-            self.log_exc(
-                "The output path is not an existing directory", None, True, ValueError
-            )
+            raise ValueError("The output path is not an existing directory")
         if not self.is_safe:
-            self.log_exc(
-                "This container contains unsafe entries", None, True, ValueError
-            )
+            raise ValueError("This container contains unsafe entries")
         self.actual_container.decompress(output_path)
 
     def compress(self, input_path: str):
@@ -331,18 +316,14 @@ class Container(Loggable):
         :raises: OSError: if an error occurred compressing the given container
                           (e.g., empty file, damaged file, etc.)
         """
-        self.log(["Compressing '%s' into this container", input_path])
+        logger.debug("Compressing %r into this container", input_path)
 
         if self.file_path is None:
-            self.log_exc("The container path has not been set", None, True, TypeError)
+            raise TypeError("The container path has not been set")
         if self.actual_container is None:
-            self.log_exc(
-                "The actual container object has not been set", None, True, TypeError
-            )
+            raise TypeError("The actual container object has not been set")
         if not os.path.isdir(input_path):
-            self.log_exc(
-                "The input path is not an existing directory", None, True, ValueError
-            )
+            raise ValueError("The input path is not an existing directory")
         gf.ensure_parent_directory(input_path)
         self.actual_container.compress(input_path)
 
@@ -367,9 +348,9 @@ class Container(Loggable):
         """
         # infer container format
         if self.container_format is None:
-            self.log("Inferring actual container format...")
+            logger.debug("Inferring actual container format...")
             path_lowercased = self.file_path.lower()
-            self.log(["Lowercased file path: '%s'", path_lowercased])
+            logger.debug("Lowercased file path: '%s'", path_lowercased)
             self.container_format = ContainerFormat.UNPACKED
             for fmt in ContainerFormat:
                 if fmt == ContainerFormat.UNPACKED:
@@ -378,11 +359,11 @@ class Container(Loggable):
                 if path_lowercased.endswith(fmt.value):
                     self.container_format = fmt
                     break
-            self.log("Inferring actual container format... done")
-            self.log(["Inferred format: '%s'", self.container_format])
+            logger.debug("Inferring actual container format... done")
+            logger.debug("Inferred format: '%s'", self.container_format)
 
         # set the actual container
-        self.log("Setting actual container...")
+        logger.debug("Setting actual container...")
         class_map = {
             ContainerFormat.ZIP: (_ContainerZIP, None),
             ContainerFormat.EPUB: (_ContainerZIP, None),
@@ -396,21 +377,18 @@ class Container(Loggable):
             file_path=self.file_path,
             variant=variant,
             rconf=self.rconf,
-            logger=self.logger,
         )
-        self.log(["Actual container format: '%s'", self.container_format])
-        self.log("Setting actual container... done")
+        logger.debug("Actual container format: '%s'", self.container_format)
+        logger.debug("Setting actual container... done")
 
 
-class _ContainerTAR(Loggable):
+class _ContainerTAR(Configurable):
     """
     A TAR container.
     """
 
-    TAG = "ContainerTAR"
-
-    def __init__(self, file_path, variant, rconf=None, logger=None):
-        super().__init__(rconf=rconf, logger=logger)
+    def __init__(self, file_path, variant, rconf=None):
+        super().__init__(rconf=rconf)
         self.file_path = file_path
         self.variant = variant
 
@@ -422,7 +400,7 @@ class _ContainerTAR(Loggable):
                 result = [e.name for e in tar_file.getmembers() if e.isfile()]
             return sorted(result)
         except Exception as exc:
-            self.log_exc("Cannot read entries from TAR file", exc, True, OSError)
+            raise OSError("Cannot read entries from TAR file") from exc
 
     def read_entry(self, entry):
         try:
@@ -433,7 +411,7 @@ class _ContainerTAR(Loggable):
                 tar_entry.close()
             return result
         except Exception as exc:
-            self.log_exc("Cannot read entry from TAR file", exc, True, OSError)
+            raise OSError("Cannot read entry from TAR file") from exc
 
     def decompress(self, output_path):
         try:
@@ -445,7 +423,7 @@ class _ContainerTAR(Loggable):
                 else:
                     tar_file.extractall(output_path, filter="data")
         except Exception as exc:
-            self.log_exc("Cannot decompress TAR file", exc, True, OSError)
+            raise OSError("Cannot decompress TAR file") from exc
 
     def compress(self, input_path):
         try:
@@ -459,18 +437,16 @@ class _ContainerTAR(Loggable):
                         archive_name = os.path.join(archive_root, f)
                         tar_file.add(name=fullpath, arcname=archive_name)
         except Exception as exc:
-            self.log_exc("Cannot compress TAR File", exc, True, OSError)
+            raise OSError("Cannot compress TAR File") from exc
 
 
-class _ContainerZIP(Loggable):
+class _ContainerZIP(Configurable):
     """
     A ZIP container.
     """
 
-    TAG = "ContainerZIP"
-
-    def __init__(self, file_path, variant=None, rconf=None, logger=None):
-        super().__init__(rconf=rconf, logger=logger)
+    def __init__(self, file_path, variant=None, rconf=None):
+        super().__init__(rconf=rconf)
         self.file_path = file_path
 
     @property
@@ -480,7 +456,7 @@ class _ContainerZIP(Loggable):
                 result = [e for e in zip_file.namelist() if not e.endswith("/")]
             return sorted(result)
         except Exception as exc:
-            self.log_exc("Cannot read entries from ZIP file", exc, True, OSError)
+            raise OSError("Cannot read entries from ZIP file") from exc
 
     def read_entry(self, entry):
         try:
@@ -490,14 +466,14 @@ class _ContainerZIP(Loggable):
                 zip_entry.close()
             return result
         except Exception as exc:
-            self.log_exc("Cannot read entry from ZIP file", exc, True, OSError)
+            raise OSError("Cannot read entry from ZIP file") from exc
 
     def decompress(self, output_path):
         try:
             with zipfile.ZipFile(self.file_path) as zip_file:
                 zip_file.extractall(output_path)
         except Exception as exc:
-            self.log_exc("Cannot decompress ZIP file", exc, True, OSError)
+            raise OSError("Cannot decompress ZIP file") from exc
 
     def compress(self, input_path):
         try:
@@ -510,18 +486,16 @@ class _ContainerZIP(Loggable):
                         archive_name = os.path.join(archive_root, f)
                         zip_file.write(fullpath, archive_name)
         except Exception as exc:
-            self.log_exc("Cannot compress ZIP file", exc, True, OSError)
+            raise OSError("Cannot compress ZIP file") from exc
 
 
-class _ContainerUnpacked(Loggable):
+class _ContainerUnpacked(Configurable):
     """
     An unpacked container.
     """
 
-    TAG = "ContainerUnpacked"
-
-    def __init__(self, file_path, variant=None, rconf=None, logger=None):
-        super().__init__(rconf=rconf, logger=logger)
+    def __init__(self, file_path, variant=None, rconf=None):
+        super().__init__(rconf=rconf)
         self.file_path = file_path
 
     @property
@@ -536,7 +510,7 @@ class _ContainerUnpacked(Loggable):
                     result.append(relative_path)
             return sorted(result)
         except Exception as exc:
-            self.log_exc("Cannot read entries from unpacked", exc, True, OSError)
+            raise OSError("Cannot read entries from unpacked") from exc
 
     def read_entry(self, entry):
         try:
@@ -544,7 +518,7 @@ class _ContainerUnpacked(Loggable):
                 result = unpacked_entry.read()
             return result
         except Exception as exc:
-            self.log_exc("Cannot read entry from unpacked", exc, True, OSError)
+            raise OSError("Cannot read entry from unpacked") from exc
 
     def decompress(self, output_path):
         try:
@@ -552,7 +526,7 @@ class _ContainerUnpacked(Loggable):
                 return
             gf.copytree(self.file_path, output_path)
         except Exception as exc:
-            self.log_exc("Cannot decompress unpacked", exc, True, OSError)
+            raise OSError("Cannot decompress unpacked") from exc
 
     def compress(self, input_path):
         try:
@@ -560,4 +534,4 @@ class _ContainerUnpacked(Loggable):
                 return
             gf.copytree(input_path, self.file_path)
         except Exception as exc:
-            self.log_exc("Cannot compress unpacked", exc, True, OSError)
+            raise OSError("Cannot compress unpacked") from exc

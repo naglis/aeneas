@@ -31,8 +31,6 @@ class SyncMapFormatJSON(SyncMapFormatBase):
     Handler for JSON I/O format.
     """
 
-    TAG = "SyncMapFormatJSON"
-
     DEFAULT = "json"
 
     def parse(self, input_text, syncmap):

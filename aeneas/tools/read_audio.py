@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 # aeneas is a Python/C library and a set of tools
 # to automagically synchronize audio and text (aka forced alignment)
 #
@@ -62,27 +60,26 @@ class ReadAudioCLI(AbstractCLIProgram):
         audio_file_path = self.actual_arguments[0]
 
         try:
-            audiofile = AudioFile(audio_file_path, rconf=self.rconf, logger=self.logger)
+            audiofile = AudioFile(audio_file_path, rconf=self.rconf)
             audiofile.read_properties()
             if self.has_option(["-f", "--full"]):
                 audiofile.read_samples_from_file()
             self.print_generic(str(audiofile))
             return self.NO_ERROR_EXIT_CODE
         except OSError:
-            self.print_error("Cannot read file '%s'" % (audio_file_path))
             self.print_error(
-                "Make sure the input file path is written/escaped correctly"
+                f"Cannot read file {audio_file_path!r}. "
+                "Make sure the input file path is written/escaped correctly."
             )
         except AudioFileProbeError:
             self.print_error(
-                "Unable to call the ffprobe executable '%s'"
-                % (self.rconf[RuntimeConfiguration.FFPROBE_PATH])
+                f"Unable to call the ffprobe executable {self.rconf[RuntimeConfiguration.FFPROBE_PATH]!r}. "
+                "Make sure the path to ffprobe is correct."
             )
-            self.print_error("Make sure the path to ffprobe is correct")
         except AudioFileUnsupportedFormatError:
-            self.print_error("Cannot read properties of file '%s'" % (audio_file_path))
             self.print_error(
-                "Make sure the input file has a format supported by ffprobe"
+                "Cannot read properties of file {audio_file_path!r}. "
+                "Make sure the input file has a format supported by ffprobe."
             )
 
         return self.ERROR_EXIT_CODE

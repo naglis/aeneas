@@ -25,7 +25,6 @@ from aeneas.adjustboundaryalgorithm import AdjustBoundaryAlgorithm
 from aeneas.exacttiming import TimeValue
 from aeneas.idsortingalgorithm import IDSortingAlgorithm
 from aeneas.language import Language
-from aeneas.logger import Logger
 from aeneas.syncmap import (
     SyncMap,
     SyncMapFormat,
@@ -119,9 +118,6 @@ class TestTask(unittest.TestCase):
             ["description", expected_description],
         ]
         self.tc_from_string(config_string, properties)
-
-    def test_task_logger(self):
-        Task(logger=Logger())
 
     def test_task_identifier(self):
         task = Task()

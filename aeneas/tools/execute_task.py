@@ -536,15 +536,13 @@ class ExecuteTaskCLI(AbstractCLIProgram):
         if download_from_youtube:
             youtube_url = gf.safe_unicode(audio_file_path)
 
-        if (not download_from_youtube) and (not self.check_input_file(audio_file_path)):
+        if not download_from_youtube and not self.check_input_file(audio_file_path):
             return self.ERROR_EXIT_CODE
         if not self.check_input_file(text_file_path):
             return self.ERROR_EXIT_CODE
         if not self.check_output_file(sync_map_file_path):
             return self.ERROR_EXIT_CODE
-        if (html_file_path is not None) and (
-            not self.check_output_file(html_file_path)
-        ):
+        if html_file_path is not None and not self.check_output_file(html_file_path):
             return self.ERROR_EXIT_CODE
 
         self.check_c_extensions()
@@ -567,83 +565,75 @@ class ExecuteTaskCLI(AbstractCLIProgram):
             self.print_info(
                 "Validating config string (specify --skip-validator to bypass)..."
             )
-            validator = Validator(logger=self.logger)
+            validator = Validator()
             result = validator.check_configuration_string(
                 config_string, is_job=False, external_name=True
             )
             if not result.passed:
-                self.print_error("The given config string is not valid:")
-                self.print_generic(result.pretty_print())
+                self.print_error(
+                    f"The given config string is not valid: {result.pretty_print()}"
+                )
                 return self.ERROR_EXIT_CODE
-            self.print_info("Validating config string... done")
 
         if download_from_youtube:
             try:
-                self.print_info("Downloading audio from '%s' ..." % youtube_url)
-                downloader = Downloader(logger=self.logger)
+                self.print_info(f"Downloading audio from {youtube_url!r} ...")
+                downloader = Downloader()
                 audio_file_path = downloader.audio_from_youtube(
                     youtube_url,
                     download=True,
                     output_file_path=None,
                     largest_audio=largest_audio,
                 )
-                self.print_info("Downloading audio from '%s' ... done" % youtube_url)
+                self.print_info(f"Downloading audio from {youtube_url!r} ... done")
             except ImportError:
                 self.print_no_dependency_error()
                 return self.ERROR_EXIT_CODE
             except Exception as exc:
                 self.print_error(
-                    "An unexpected error occurred while downloading audio from YouTube:"
+                    f"An unexpected error occurred while downloading audio from YouTube: {exc}"
                 )
-                self.print_error("%s" % exc)
                 return self.ERROR_EXIT_CODE
         else:
             audio_extension = gf.file_extension(audio_file_path)
             if audio_extension.lower() not in AudioFile.FILE_EXTENSIONS:
                 self.print_warning(
-                    "Your audio file path has extension '%s', which is uncommon for an audio file."
-                    % audio_extension
-                )
-                self.print_warning("Attempting at executing your Task anyway.")
-                self.print_warning(
-                    "If it fails, you might have swapped the first two arguments."
-                )
-                self.print_warning(
+                    f"Your audio file path has extension {audio_extension}, which is uncommon for an audio file. "
+                    "Attempting at executing your Task anyway. "
+                    "If it fails, you might have swapped the first two arguments. "
                     "The audio file path should be the first argument, the text file path the second."
                 )
 
         try:
             self.print_info("Creating task...")
-            task = Task(config_string, logger=self.logger)
+            task = Task(config_string)
             task.audio_file_path_absolute = audio_file_path
             task.text_file_path_absolute = text_file_path
             task.sync_map_file_path_absolute = sync_map_file_path
-            self.print_info("Creating task... done")
         except Exception as exc:
-            self.print_error("An unexpected error occurred while creating the task:")
-            self.print_error("%s" % exc)
+            self.print_error(
+                f"An unexpected error occurred while creating the task: {exc}"
+            )
             return self.ERROR_EXIT_CODE
 
         try:
             self.print_info("Executing task...")
-            executor = ExecuteTask(task=task, rconf=self.rconf, logger=self.logger)
+            executor = ExecuteTask(task=task, rconf=self.rconf)
             executor.execute()
-            self.print_info("Executing task... done")
         except Exception as exc:
-            self.print_error("An unexpected error occurred while executing the task:")
-            self.print_error("%s" % exc)
+            self.print_error(
+                f"An unexpected error occurred while executing the task: {exc}"
+            )
             return self.ERROR_EXIT_CODE
 
         try:
             self.print_info("Creating output sync map file...")
             path = task.output_sync_map_file()
-            self.print_info("Creating output sync map file... done")
-            self.print_success("Created file '%s'" % path)
+            self.print_info(f"Created file {path!r}")
         except Exception as exc:
             self.print_error(
-                "An unexpected error occurred while writing the sync map file:"
+                f"An unexpected error occurred while writing the sync map file: {exc}"
             )
-            self.print_error("%s" % exc)
             return self.ERROR_EXIT_CODE
 
         if output_html:
@@ -663,20 +653,17 @@ class ExecuteTaskCLI(AbstractCLIProgram):
                 task.sync_map.output_html_for_tuning(
                     audio_file_path, html_file_path, parameters
                 )
-                self.print_info("Creating output HTML file... done")
-                self.print_success("Created file '%s'" % html_file_path)
+                self.print_info(f"Created file {html_file_path!r}")
             except Exception as exc:
                 self.print_error(
-                    "An unexpected error occurred while writing the HTML file:"
+                    f"An unexpected error occurred while writing the HTML file: {exc}"
                 )
-                self.print_error("%s" % exc)
                 return self.ERROR_EXIT_CODE
 
         if download_from_youtube:
             if keep_audio:
                 self.print_info(
-                    "Option --keep-audio set: keeping downloaded file '%s'"
-                    % audio_file_path
+                    f"Option --keep-audio set: keeping downloaded file {audio_file_path!r}"
                 )
             else:
                 gf.delete_file(None, audio_file_path)

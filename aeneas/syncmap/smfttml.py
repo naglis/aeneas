@@ -30,8 +30,6 @@ class SyncMapFormatTTML(SyncMapFormatGenericXML):
     Handler for TTML I/O format.
     """
 
-    TAG = "SyncMapFormatTTML"
-
     TTML = "ttml"
 
     DFXP = "dfxp"

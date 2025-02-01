@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 # aeneas is a Python/C library and a set of tools
 # to automagically synchronize audio and text (aka forced alignment)
 #
@@ -30,18 +28,14 @@ class SyncMapFormatSUB(SyncMapFormatGenericSubtitles):
     Handler for SubViewer (SUB) I/O format.
     """
 
-    TAG = "SyncMapFormatSUB"
-
     SUB = "sub"
 
     SBV = "sbv"
 
     DEFAULT = SUB
 
-    def __init__(self, variant=DEFAULT, parameters=None, rconf=None, logger=None):
-        super().__init__(
-            variant=variant, parameters=parameters, rconf=rconf, logger=logger
-        )
+    def __init__(self, variant=DEFAULT, parameters=None, rconf=None):
+        super().__init__(variant=variant, parameters=parameters, rconf=rconf)
         self.header_string = "[SUBTITLE]"
         self.header_might_not_have_trailing_blank_line = True
         self.footer_string = "[END SUBTITLE]"

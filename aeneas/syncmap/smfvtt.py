@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 # aeneas is a Python/C library and a set of tools
 # to automagically synchronize audio and text (aka forced alignment)
 #
@@ -30,14 +28,10 @@ class SyncMapFormatVTT(SyncMapFormatGenericSubtitles):
     Handler for WebVTT (VTT) I/O format.
     """
 
-    TAG = "SyncMapFormatVTT"
-
     DEFAULT = "vtt"
 
-    def __init__(self, variant=DEFAULT, parameters=None, rconf=None, logger=None):
-        super().__init__(
-            variant=variant, parameters=parameters, rconf=rconf, logger=logger
-        )
+    def __init__(self, variant=DEFAULT, parameters=None, rconf=None):
+        super().__init__(variant=variant, parameters=parameters, rconf=rconf)
         self.header_string = "WEBVTT"
         self.header_might_not_have_trailing_blank_line = False
         self.footer_string = None
@@ -49,8 +43,8 @@ class SyncMapFormatVTT(SyncMapFormatGenericSubtitles):
         self.format_time_function = gf.time_to_hhmmssmmm
 
     def ignore_block(self, block_lines):
-        return (len(block_lines) > 0) and (
-            (block_lines[0].startswith("NOTE"))
-            or (block_lines[0].startswith("REGION"))
-            or (block_lines[0].startswith("STYLE"))
+        return len(block_lines) > 0 and (
+            block_lines[0].startswith("NOTE")
+            or block_lines[0].startswith("REGION")
+            or block_lines[0].startswith("STYLE")
         )

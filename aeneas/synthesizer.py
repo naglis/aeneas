@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 # aeneas is a Python/C library and a set of tools
 # to automagically synchronize audio and text (aka forced alignment)
 #
@@ -31,9 +29,10 @@ This module contains the following classes:
 """
 
 import importlib.util
+import logging
 import os.path
 
-from aeneas.logger import Loggable
+from aeneas.logger import Configurable
 from aeneas.runtimeconfiguration import RuntimeConfiguration
 from aeneas.textfile import TextFile
 from aeneas.ttswrappers.awsttswrapper import AWSTTSWrapper
@@ -44,8 +43,10 @@ from aeneas.ttswrappers.macosttswrapper import MacOSTTSWrapper
 from aeneas.ttswrappers.nuancettswrapper import NuanceTTSWrapper
 import aeneas.globalfunctions as gf
 
+logger = logging.getLogger(__name__)
 
-class Synthesizer(Loggable):
+
+class Synthesizer(Configurable):
     """
     A class to synthesize text fragments into
     an audio file,
@@ -87,10 +88,8 @@ class Synthesizer(Loggable):
     ALLOWED_VALUES = [AWS, CUSTOM, ESPEAK, ESPEAKNG, FESTIVAL, MACOS, NUANCE]
     """ List of all the allowed values """
 
-    TAG = "Synthesizer"
-
-    def __init__(self, rconf=None, logger=None):
-        super().__init__(rconf=rconf, logger=logger)
+    def __init__(self, rconf=None):
+        super().__init__(rconf=rconf)
         self.tts_engine = None
         self._select_tts_engine()
 
@@ -98,48 +97,42 @@ class Synthesizer(Loggable):
         """
         Select the TTS engine to be used by looking at the rconf object.
         """
-        self.log("Selecting TTS engine...")
+        logger.debug("Selecting TTS engine...")
         requested_tts_engine = self.rconf[RuntimeConfiguration.TTS]
         tts_cls = None
         match requested_tts_engine:
             case self.CUSTOM:
-                self.log("TTS engine: custom")
+                logger.debug("TTS engine: custom")
                 tts_path = self.rconf[RuntimeConfiguration.TTS_PATH]
                 if tts_path is None:
-                    self.log_exc(
-                        "You must specify a value for tts_path", None, True, ValueError
-                    )
+                    raise ValueError("You must specify a value for tts_path")
                 try:
                     import imp
 
-                    self.log(["Loading CustomTTSWrapper module from '%s'...", tts_path])
-                    imp.load_source("CustomTTSWrapperModule", tts_path)
-                    self.log(
-                        ["Loading CustomTTSWrapper module from '%s'... done", tts_path]
+                    logger.debug(
+                        "Loading CustomTTSWrapper module from '%s'...", tts_path
                     )
-                    self.log("Importing CustomTTSWrapper...")
+                    imp.load_source("CustomTTSWrapperModule", tts_path)
+                    logger.debug(
+                        "Loading CustomTTSWrapper module from '%s'... done", tts_path
+                    )
+                    logger.debug("Importing CustomTTSWrapper...")
                     from CustomTTSWrapperModule import CustomTTSWrapper
 
-                    self.log("Importing CustomTTSWrapper... done")
+                    logger.debug("Importing CustomTTSWrapper... done")
                     tts_cls = CustomTTSWrapper
                 except Exception as exc:
-                    self.log_exc(
-                        "Unable to load custom TTS wrapper", exc, True, OSError
-                    )
+                    raise OSError("Unable to load custom TTS wrapper") from exc
             case self.AWS:
                 if importlib.util.find_spec("boto3") is None:
-                    self.log_exc(
-                        "Unable to import boto3 for AWS Polly TTS API wrapper",
-                        critical=True,
-                        raise_type=ImportError,
+                    raise ImportError(
+                        "Unable to import boto3 for AWS Polly TTS API wrapper"
                     )
                 tts_cls = AWSTTSWrapper
             case self.NUANCE:
                 if importlib.util.find_spec("requests") is None:
-                    self.log_exc(
-                        "Unable to import requests for Nuance TTS API wrapper",
-                        critical=True,
-                        raise_type=ImportError,
+                    raise ImportError(
+                        "Unable to import requests for Nuance TTS API wrapper"
                     )
                 tts_cls = NuanceTTSWrapper
             case self.ESPEAK:
@@ -151,16 +144,12 @@ class Synthesizer(Loggable):
             case self.MACOS:
                 tts_cls = MacOSTTSWrapper
             case _ as other:
-                self.log_exc(
-                    f"Invalid TTS engine type {other!r}",
-                    critical=True,
-                    raise_type=ValueError,
-                )
+                raise ValueError(f"Invalid TTS engine type {other!r}")
 
-        self.log(f"Creating {type(tts_cls)} instance...")
-        self.tts_engine = tts_cls(rconf=self.rconf, logger=self.logger)
-        self.log(f"Creating {type(tts_cls)} instance... done")
-        self.log("Selecting TTS engine... done")
+        logger.debug("Creating %r instance...", type(tts_cls))
+        self.tts_engine = tts_cls(rconf=self.rconf)
+        logger.debug("Creating %r instance... done", type(tts_cls))
+        logger.debug("Selecting TTS engine... done")
 
     @property
     def output_audio_format(self):
@@ -210,38 +199,26 @@ class Synthesizer(Loggable):
         :raises: ValueError: if the TTS engine has not been set yet
         """
         if text_file is None:
-            self.log_exc("text_file is None", None, True, TypeError)
+            raise TypeError("`text_file` is None")
         if not isinstance(text_file, TextFile):
-            self.log_exc(
-                "text_file is not an instance of TextFile", None, True, TypeError
-            )
+            raise TypeError("`text_file` is not an instance of TextFile")
         if not gf.file_can_be_written(audio_file_path):
-            self.log_exc(
-                ["Audio file path '%s' cannot be written", audio_file_path],
-                None,
-                True,
-                OSError,
-            )
+            raise OSError(f"Audio file path {audio_file_path!r} cannot be written")
         if self.tts_engine is None:
-            self.log_exc("Cannot select the TTS engine", None, True, ValueError)
+            raise ValueError("Cannot select the TTS engine")
 
         # synthesize
-        self.log("Synthesizing text...")
+        logger.debug("Synthesizing text...")
         result = self.tts_engine.synthesize_multiple(
             text_file=text_file,
             output_file_path=audio_file_path,
             quit_after=quit_after,
             backwards=backwards,
         )
-        self.log("Synthesizing text... done")
+        logger.debug("Synthesizing text... done")
 
         # check that the output file has been written
         if not os.path.isfile(audio_file_path):
-            self.log_exc(
-                ["Audio file path '%s' cannot be read", audio_file_path],
-                None,
-                True,
-                OSError,
-            )
+            raise OSError(f"Audio file path {audio_file_path!r} cannot be read")
 
         return result

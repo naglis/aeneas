@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 # aeneas is a Python/C library and a set of tools
 # to automagically synchronize audio and text (aka forced alignment)
 #
@@ -30,8 +28,6 @@ class SyncMapFormatSRT(SyncMapFormatGenericSubtitles):
     Handler for SubRip (SRT) I/O format.
     """
 
-    TAG = "SyncMapFormatSRT"
-
     DEFAULT = "srt"
 
     #
@@ -39,10 +35,8 @@ class SyncMapFormatSRT(SyncMapFormatGenericSubtitles):
     #      has these values set to those needed by SRT
     #      but for clarity we repeat them here
     #
-    def __init__(self, variant=DEFAULT, parameters=None, rconf=None, logger=None):
-        super().__init__(
-            variant=variant, parameters=parameters, rconf=rconf, logger=logger
-        )
+    def __init__(self, variant=DEFAULT, parameters=None, rconf=None):
+        super().__init__(variant=variant, parameters=parameters, rconf=rconf)
         self.header_string = None
         self.header_might_not_have_trailing_blank_line = False
         self.footer_string = None

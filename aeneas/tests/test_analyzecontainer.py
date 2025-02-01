@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 # aeneas is a Python/C library and a set of tools
 # to automagically synchronize audio and text (aka forced alignment)
 #
@@ -28,7 +26,7 @@ import aeneas.globalfunctions as gf
 
 
 class TestAnalyzeContainer(unittest.TestCase):
-    FILES = [
+    FILES = (
         {"path": "res/validator/job_txt_config", "length": 3},
         {"path": "res/validator/job_txt_config_not_root", "length": 3},
         {"path": "res/validator/job_txt_config_not_root_nested", "length": 3},
@@ -38,20 +36,20 @@ class TestAnalyzeContainer(unittest.TestCase):
         {"path": "res/validator/job_xml_config", "length": 3},
         {"path": "res/validator/job_xml_config_not_root", "length": 3},
         {"path": "res/validator/job_xml_config_not_root_nested", "length": 3},
-    ]
+    )
 
     CONFIG_STRING = r"is_hierarchy_type=flat|is_hierarchy_prefix=assets/|is_text_file_relative_path=.|is_text_file_name_regex=.*\.xhtml|is_text_type=unparsed|is_audio_file_relative_path=.|is_audio_file_name_regex=.*\.mp3|is_text_unparsed_id_regex=f[0-9]+|is_text_unparsed_id_sort=numeric|os_job_file_name=demo_sync_job_output|os_job_file_container=zip|os_job_file_hierarchy_type=flat|os_job_file_hierarchy_prefix=assets/|os_task_file_name=$PREFIX.xhtml.smil|os_task_file_format=smil|os_task_file_smil_page_ref=$PREFIX.xhtml|os_task_file_smil_audio_ref=../Audio/$PREFIX.mp3|job_language=eng|job_description=Demo Sync Job"
 
-    EMPTY_CONTAINERS = [
+    EMPTY_CONTAINERS = (
         "res/container/empty_dir",
         "res/container/empty_file.epub",
         "res/container/empty_file.tar",
         "res/container/empty_file.tar.bz2",
         "res/container/empty_file.tar.gz",
         "res/container/empty_file.zip",
-    ]
+    )
 
-    INVALID_CONTAINERS = [
+    INVALID_CONTAINERS = (
         "res/validator/job_empty",
         "res/validator/job_no_config",
         "res/validator/job_no_task_assets",
@@ -62,7 +60,7 @@ class TestAnalyzeContainer(unittest.TestCase):
         "res/validator/job_xml_config_bad_2",
         "res/validator/job_xml_config_bad_3",
         "res/validator/job_xml_config_bad_4",
-    ]
+    )
 
     NOT_EXISTING_PATH = gf.absolute_path("res/validator/x/y/z/not_existing", __file__)
 
@@ -82,7 +80,7 @@ class TestAnalyzeContainer(unittest.TestCase):
     def test_analyze_empty_container(self):
         for path in self.EMPTY_CONTAINERS:
             with self.subTest(path=path):
-                analyzer = AnalyzeContainer(Container(path))
+                analyzer = AnalyzeContainer(Container(gf.absolute_path(path, __file__)))
                 job = analyzer.analyze()
                 self.assertIsNone(job)
 

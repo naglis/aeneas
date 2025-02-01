@@ -30,8 +30,6 @@ class SyncMapFormatXMLLegacy(SyncMapFormatGenericXML):
     Handler for XML (legacy) I/O format. Deprecated.
     """
 
-    TAG = "SyncMapFormatXMLLegacy"
-
     DEFAULT = "xml_legacy"
 
     def parse(self, input_text, syncmap):

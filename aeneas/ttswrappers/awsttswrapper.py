@@ -47,13 +47,17 @@ for further details.
 .. versionadded:: 1.7.0
 """
 
-import numpy
+import logging
 import time
+
+import numpy
 
 from aeneas.exacttiming import TimeValue
 from aeneas.language import Language
 from aeneas.runtimeconfiguration import RuntimeConfiguration
 from aeneas.ttswrappers.basettswrapper import BaseTTSWrapper
+
+logger = logging.getLogger(__name__)
 
 
 class AWSTTSWrapper(BaseTTSWrapper):
@@ -93,8 +97,6 @@ class AWSTTSWrapper(BaseTTSWrapper):
 
     :param rconf: a runtime configuration
     :type  rconf: :class:`~aeneas.runtimeconfiguration.RuntimeConfiguration`
-    :param logger: the logger object
-    :type  logger: :class:`~aeneas.logger.Logger`
     """
 
     CYM = Language.CYM
@@ -256,18 +258,16 @@ class AWSTTSWrapper(BaseTTSWrapper):
     SAMPLE_RATE = 16000
     """ Synthesize 16kHz PCM16 mono """
 
-    TAG = "AWSTTSWrapper"
-
-    def __init__(self, rconf=None, logger=None):
-        super().__init__(rconf=rconf, logger=logger)
+    def __init__(self, rconf=None):
+        super().__init__(rconf=rconf)
 
     def _synthesize_single_python_helper(
         self, text, voice_code, output_file_path=None, return_audio_data=True
     ):
-        self.log("Importing boto3...")
+        logger.debug("Importing boto3...")
         import boto3
 
-        self.log("Importing boto3... done")
+        logger.debug("Importing boto3... done")
 
         # prepare client
         polly_client = boto3.client("polly")
@@ -275,14 +275,14 @@ class AWSTTSWrapper(BaseTTSWrapper):
         # post request
         sleep_delay = self.rconf[RuntimeConfiguration.TTS_API_SLEEP]
         attempts = self.rconf[RuntimeConfiguration.TTS_API_RETRY_ATTEMPTS]
-        self.log(["Sleep delay:    %.3f", sleep_delay])
-        self.log(["Retry attempts: %d", attempts])
+        logger.debug("Sleep delay:    %.3f", sleep_delay)
+        logger.debug("Retry attempts: %d", attempts)
 
         while attempts > 0:
-            self.log("Sleeping to throttle API usage...")
+            logger.debug("Sleeping to throttle API usage...")
             time.sleep(sleep_delay)
-            self.log("Sleeping to throttle API usage... done")
-            self.log("Posting...")
+            logger.debug("Sleeping to throttle API usage... done")
+            logger.debug("Posting...")
             try:
                 response = polly_client.synthesize_speech(
                     Text=text,
@@ -291,42 +291,37 @@ class AWSTTSWrapper(BaseTTSWrapper):
                     VoiceId=voice_code,
                 )
             except Exception as exc:
-                self.log_exc(
-                    "Unexpected exception on HTTP POST. Are you offline?",
-                    exc,
-                    True,
-                    ValueError,
-                )
-            self.log("Posting... done")
-            self.log("Reading response...")
+                raise ValueError(
+                    "Unexpected exception on HTTP POST. Are you offline?"
+                ) from exc
+            logger.debug("Posting... done")
+            logger.debug("Reading response...")
             try:
                 status_code = response["ResponseMetadata"]["HTTPStatusCode"]
                 response_content = response["AudioStream"].read()
-            except Exception as exc:
-                self.log_warn(
-                    "Error while reading the response status code or the response content: %s"
-                    % exc
+            except Exception:
+                logger.warning(
+                    "Error while reading the response status code or the response content",
+                    exc_info=True,
                 )
                 status_code = 999
-            self.log("Reading response... done")
-            self.log(["Status code: %d", status_code])
+            logger.debug("Reading response... done")
+            logger.debug("Status code: %d", status_code)
             if status_code == 200:
-                self.log("Got status code 200, break")
+                logger.debug("Got status code 200, break")
                 break
             else:
-                self.log_warn("Got status code other than 200, retry")
+                logger.warning("Got status code other than 200, retry")
                 attempts -= 1
 
         if attempts <= 0:
-            self.log_exc(
-                "All API requests returned status code != 200", None, True, ValueError
-            )
+            raise ValueError("All API requests returned status code != 200")
 
         # save to file if requested
         if output_file_path is None:
-            self.log("output_file_path is None => not saving to file")
+            logger.debug("output_file_path is None => not saving to file")
         else:
-            self.log("output_file_path is not None => saving to file...")
+            logger.debug("output_file_path is not None => saving to file...")
             import wave
 
             output_file = wave.open(output_file_path, "wb")
@@ -335,15 +330,15 @@ class AWSTTSWrapper(BaseTTSWrapper):
             output_file.setsampwidth(2)  # 16 bit/sample, i.e. 2 bytes/sample
             output_file.writeframes(response_content)
             output_file.close()
-            self.log("output_file_path is not None => saving to file... done")
+            logger.debug("output_file_path is not None => saving to file... done")
 
         # get length and data
         audio_sample_rate = self.SAMPLE_RATE
         number_of_frames = len(response_content) / 2
         audio_length = TimeValue(number_of_frames / audio_sample_rate)
-        self.log(["Response (bytes): %d", len(response_content)])
-        self.log(["Number of frames: %d", number_of_frames])
-        self.log(["Audio length (s): %.3f", audio_length])
+        logger.debug("Response (bytes): %d", len(response_content))
+        logger.debug("Number of frames: %d", number_of_frames)
+        logger.debug("Audio length (s): %.3f", audio_length)
         audio_format = "pcm16"
         audio_samples = (
             numpy.fromstring(response_content, dtype=numpy.int16).astype("float64")

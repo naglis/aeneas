@@ -87,7 +87,7 @@ class DownloadCLI(AbstractCLIProgram):
         try:
             if download:
                 self.print_info("Downloading audio stream from '%s' ..." % source_url)
-                downloader = Downloader(logger=self.logger)
+                downloader = Downloader()
                 result = downloader.audio_from_youtube(
                     source_url,
                     download=True,
@@ -96,16 +96,14 @@ class DownloadCLI(AbstractCLIProgram):
                     largest_audio=largest_audio,
                 )
                 self.print_info(
-                    "Downloading audio stream from '%s' ... done" % source_url
+                    f"Downloading audio stream from {source_url!r} ... done"
                 )
-                self.print_success("Downloaded file '%s'" % result)
+                self.print_info(f"Downloaded file {result!r}")
             else:
-                self.print_info("Downloading stream info from '%s' ..." % source_url)
-                downloader = Downloader(logger=self.logger)
+                self.print_info(f"Downloading stream info from {source_url!r} ...")
+                downloader = Downloader()
                 result = downloader.audio_from_youtube(source_url, download=False)
-                self.print_info(
-                    "Downloading stream info from '%s' ... done" % source_url
-                )
+                self.print_info(f"Downloading stream info from {source_url!r} ... done")
                 msg = []
                 msg.append(
                     "{}\t{}\t{}\t{}".format("Format", "Extension", "Bitrate", "Size")
@@ -117,16 +115,14 @@ class DownloadCLI(AbstractCLIProgram):
                             r["format"], r["ext"], r["abr"], filesize
                         )
                     )
-                self.print_generic("Available audio streams:")
-                self.print_generic("\n".join(msg))
+                self.print_generic(f"Available audio streams:\n{'\n'.join(msg)}")
             return self.NO_ERROR_EXIT_CODE
         except ImportError:
             self.print_no_dependency_error()
         except Exception as exc:
             self.print_error(
-                "An unexpected error occurred while downloading audio from YouTube:"
+                f"An unexpected error occurred while downloading audio from YouTube: {exc}"
             )
-            self.print_error("%s" % exc)
 
         return self.ERROR_EXIT_CODE
 

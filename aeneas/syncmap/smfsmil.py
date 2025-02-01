@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 # aeneas is a Python/C library and a set of tools
 # to automagically synchronize audio and text (aka forced alignment)
 #
@@ -42,8 +40,6 @@ class SyncMapFormatSMIL(SyncMapFormatGenericXML):
     Handler for SMIL for EPUB 3 I/O format.
     """
 
-    TAG = "SyncMapFormatSMIL"
-
     DEFAULT = "smil"
 
     HUMAN = "smilh"
@@ -52,10 +48,8 @@ class SyncMapFormatSMIL(SyncMapFormatGenericXML):
 
     MACHINE_ALIASES = [MACHINE]
 
-    def __init__(self, variant=DEFAULT, parameters=None, rconf=None, logger=None):
-        super().__init__(
-            variant=variant, parameters=parameters, rconf=rconf, logger=logger
-        )
+    def __init__(self, variant=DEFAULT, parameters=None, rconf=None):
+        super().__init__(variant=variant, parameters=parameters, rconf=rconf)
         if self.variant in self.MACHINE_ALIASES:
             self.format_time_function = gf.time_to_ssmmm
         else:
@@ -97,13 +91,8 @@ class SyncMapFormatSMIL(SyncMapFormatGenericXML):
             gc.PPN_TASK_OS_FILE_SMIL_AUDIO_REF,
         ]:
             if gf.safe_get(self.parameters, key, None) is None:
-                self.log_exc(
-                    "Parameter {} must be specified for format {}".format(
-                        key, self.variant
-                    ),
-                    None,
-                    True,
-                    SyncMapMissingParameterError,
+                raise SyncMapMissingParameterError(
+                    f"Parameter {key!r} must be specified for format {self.variant!r}"
                 )
 
         # we are sure we have them

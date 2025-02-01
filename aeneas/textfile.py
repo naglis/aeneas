@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 # aeneas is a Python/C library and a set of tools
 # to automagically synchronize audio and text (aka forced alignment)
 #
@@ -32,18 +30,21 @@ This module contains the following classes:
 * :class:`~aeneas.textfile.TransliterationMap`, a full transliteration map.
 """
 
+import logging
+import os.path
 import re
 import typing
-import os.path
 
 from bs4 import BeautifulSoup
 
 from aeneas.idsortingalgorithm import IDSortingAlgorithm
-from aeneas.logger import Loggable
+from aeneas.logger import Configurable
 from aeneas.tree import Tree
 from aeneas.language import Language
 import aeneas.globalconstants as gc
 import aeneas.globalfunctions as gf
+
+logger = logging.getLogger(__name__)
 
 
 class TextFileFormat:
@@ -314,8 +315,6 @@ class TextFragment:
                         it contains an element which is not a Unicode string
     """
 
-    TAG = "TextFragment"
-
     def __init__(
         self,
         identifier: str | None = None,
@@ -440,7 +439,7 @@ class TextFragment:
         return len(self.filtered_text)
 
 
-class TextFile(Loggable):
+class TextFile(Configurable):
     """
     A tree of text fragments, representing a text file.
 
@@ -452,8 +451,6 @@ class TextFile(Loggable):
     :param dict parameters: additional parameters used to parse the text file
     :param rconf: a runtime configuration
     :type  rconf: :class:`~aeneas.runtimeconfiguration.RuntimeConfiguration`
-    :param logger: the logger object
-    :type  logger: :class:`~aeneas.logger.Logger`
     :raises: OSError: if ``file_path`` cannot be read
     :raises: TypeError: if ``parameters`` is not an instance of ``dict``
     :raises: ValueError: if ``file_format`` value is not allowed
@@ -461,17 +458,14 @@ class TextFile(Loggable):
 
     DEFAULT_ID_FORMAT = "f%06d"
 
-    TAG = "TextFile"
-
     def __init__(
         self,
         file_path: str | None = None,
         file_format: str | None = None,
         parameters: dict | None = None,
         rconf=None,
-        logger=None,
     ):
-        super().__init__(rconf=rconf, logger=logger)
+        super().__init__(rconf=rconf)
         self.file_path = file_path
         self.file_format = file_format
         self.parameters = {} if parameters is None else parameters
@@ -531,12 +525,7 @@ class TextFile(Loggable):
     @file_path.setter
     def file_path(self, file_path):
         if file_path is not None and not os.path.isfile(file_path):
-            self.log_exc(
-                ["Text file '%s' does not exist or is not a file", file_path],
-                None,
-                True,
-                OSError,
-            )
+            raise OSError(f"Text file '{file_path}' does not exist or is not a file")
         self.__file_path = file_path
 
     @property
@@ -551,12 +540,7 @@ class TextFile(Loggable):
     @file_format.setter
     def file_format(self, file_format):
         if file_format is not None and file_format not in TextFileFormat.ALLOWED_VALUES:
-            self.log_exc(
-                ["Text file format '%s' is not allowed", file_format],
-                None,
-                True,
-                ValueError,
-            )
+            raise ValueError(f"Text file format {file_format!r} is not allowed")
         self.__file_format = file_format
 
     @property
@@ -571,7 +555,7 @@ class TextFile(Loggable):
     @parameters.setter
     def parameters(self, parameters: dict | None):
         if parameters is not None and not isinstance(parameters, dict):
-            self.log_exc("parameters is not an instance of dict", None, True, TypeError)
+            raise TypeError("parameters is not an instance of dict")
         self.__parameters = parameters
 
     @property
@@ -614,9 +598,7 @@ class TextFile(Loggable):
         :param bool as_last: if ``True`` append fragment, otherwise prepend it
         """
         if not isinstance(fragment, TextFragment):
-            self.log_exc(
-                "fragment is not an instance of TextFragment", None, True, TypeError
-            )
+            raise TypeError("fragment is not an instance of TextFragment")
         self.fragments_tree.add_child(Tree(value=fragment), as_last=as_last)
 
     def get_subtree(self, root: Tree):
@@ -629,7 +611,7 @@ class TextFile(Loggable):
         :rtype: :class:`~aeneas.textfile.TextFile`
         """
         if not isinstance(root, Tree):
-            self.log_exc("root is not an instance of Tree", None, True, TypeError)
+            raise TypeError("root is not an instance of Tree")
         new_text_file = TextFile()
         new_text_file.fragments_tree = root
         return new_text_file
@@ -664,7 +646,7 @@ class TextFile(Loggable):
         :param language: the language of the text fragments
         :type  language: :class:`~aeneas.language.Language`
         """
-        self.log(["Setting language: '%s'", language])
+        logger.debug("Setting language: '%s'", language)
         for fragment in self.fragments:
             fragment.language = language
 
@@ -672,7 +654,7 @@ class TextFile(Loggable):
         """
         Clear the text file, removing all the current fragments.
         """
-        self.log("Clearing text fragments")
+        logger.debug("Clearing text fragments")
         self.fragments_tree = Tree()
 
     def read_from_list(self, lines: typing.Sequence[str]):
@@ -683,7 +665,7 @@ class TextFile(Loggable):
 
         :param list lines: the text fragments
         """
-        self.log("Reading text fragments from list")
+        logger.debug("Reading text fragments from list")
         self._read_plain(lines)
 
     def read_from_list_with_ids(self, lines: typing.Sequence[tuple[str, str]]):
@@ -694,7 +676,7 @@ class TextFile(Loggable):
 
         :param list lines: the list of ``[id, text]`` fragments (see above)
         """
-        self.log("Reading text fragments from list with ids")
+        logger.debug("Reading text fragments from list with ids")
         self._create_text_fragments(
             (line_id, [line_text]) for line_id, line_text in lines
         )
@@ -704,15 +686,10 @@ class TextFile(Loggable):
         Read text fragments from file.
         """
         if self.file_format not in TextFileFormat.ALLOWED_VALUES:
-            self.log_exc(
-                ["Text file format '%s' is not supported.", self.file_format],
-                None,
-                True,
-                ValueError,
-            )
+            raise ValueError(f"Text file format {self.file_format!r} is not supported.")
 
         # read the contents of the file
-        self.log(["Reading contents of file '%s'", self.file_path])
+        logger.debug("Reading contents of file '%s'", self.file_path)
         with open(self.file_path, encoding="utf-8") as text_file:
             lines = text_file.readlines()
 
@@ -732,7 +709,7 @@ class TextFile(Loggable):
         map_read_function[self.file_format](lines)
 
         # log the number of fragments
-        self.log(["Parsed %d fragments", len(self.fragments)])
+        logger.debug("Parsed %d fragments", len(self.fragments))
 
     def _mplain_word_separator(self):
         """
@@ -759,9 +736,9 @@ class TextFile(Loggable):
 
         :param list lines: the lines of the subtitles text file
         """
-        self.log("Parsing fragments from subtitles text format")
+        logger.debug("Parsing fragments from subtitles text format")
         word_separator = self._mplain_word_separator()
-        self.log(["Word separator is: '%s'", word_separator])
+        logger.debug("Word separator is: '%s'", word_separator)
         lines = [line.strip() for line in lines]
         i = 1
         current = 0
@@ -787,7 +764,7 @@ class TextFile(Loggable):
                 )
                 paragraph_node = Tree(value=paragraph_fragment)
                 tree.add_child(paragraph_node)
-                self.log(["Paragraph %s", paragraph_identifier])
+                logger.debug("Paragraph %s", paragraph_identifier)
 
                 # create sentences nodes
                 for j, s in enumerate(sentences, start=1):
@@ -800,7 +777,7 @@ class TextFile(Loggable):
                     )
                     sentence_node = Tree(value=sentence_fragment)
                     paragraph_node.add_child(sentence_node)
-                    self.log(["  Sentence %s", sentence_identifier])
+                    logger.debug("  Sentence %s", sentence_identifier)
 
                     # create words nodes
                     for k, w in enumerate(
@@ -815,13 +792,13 @@ class TextFile(Loggable):
                         )
                         word_node = Tree(value=word_fragment)
                         sentence_node.add_child(word_node)
-                        self.log(["    Word %s", word_identifier])
+                        logger.debug("    Word %s", word_identifier)
 
                 # keep iterating
                 current = following
                 i += 1
             current += 1
-        self.log("Storing tree")
+        logger.debug("Storing tree")
         self.fragments_tree = tree
 
     def _read_munparsed(self, lines: typing.Sequence[str]):
@@ -842,37 +819,37 @@ class TextFile(Loggable):
             attribute_name = "id"
             regex_string = self.parameters[LEVEL_TO_REGEX_MAP[level]]
             indent = " " * 2 * (level - 1)
-            self.log(["%sRegex for %s: '%s'", indent, attribute_name, regex_string])
+            logger.debug("%sRegex for %s: '%s'", indent, attribute_name, regex_string)
             regex = re.compile(rf".*\b{regex_string}\b.*")
             return root.findAll(attrs={attribute_name: regex})
 
         # TODO better and/or parametric parsing,
         #      for example, removing tags but keeping text, etc.
-        self.log("Parsing fragments from munparsed text format")
+        logger.debug("Parsing fragments from munparsed text format")
         # transform text in a soup object
-        self.log("Creating soup")
+        logger.debug("Creating soup")
         soup = BeautifulSoup("\n".join(lines), "lxml")
         # extract according to class_regex and id_regex
-        self.log("Finding l1 elements")
+        logger.debug("Finding l1 elements")
         tree = Tree()
         for l1_node in nodes_at_level(soup, 1):
             has_word = False
             try:
                 l1_id = l1_node["id"]
-                self.log(["Found l1 node with id:   '%s'", l1_id])
+                logger.debug("Found l1 node with id:   '%s'", l1_id)
                 paragraph_node = Tree()
                 paragraph_text_parts = []
                 for l2_node in nodes_at_level(l1_node, 2):
                     l2_id = l2_node["id"]
-                    self.log(["  Found l2 node with id:   '%s'", l2_id])
+                    logger.debug("  Found l2 node with id:   '%s'", l2_id)
                     sentence_node = Tree()
                     paragraph_node.add_child(sentence_node)
                     sentence_text_parts = []
                     for l3_node in nodes_at_level(l2_node, 3):
                         l3_id = l3_node["id"]
                         l3_text = l3_node.text
-                        self.log(["    Found l3 node with id:   '%s'", l3_id])
-                        self.log(["    Found l3 node with text: '%s'", l3_text])
+                        logger.debug("    Found l3 node with id:   '%s'", l3_id)
+                        logger.debug("    Found l3 node with text: '%s'", l3_text)
                         word_fragment = TextFragment(
                             identifier=l3_id, lines=[l3_text], filtered_lines=[l3_text]
                         )
@@ -887,7 +864,7 @@ class TextFile(Loggable):
                         lines=[sentence_text],
                         filtered_lines=[sentence_text],
                     )
-                    self.log(["  Found l2 node with text: '%s'", sentence_text])
+                    logger.debug("  Found l2 node with text: '%s'", sentence_text)
                 if has_word:
                     paragraph_text = " ".join(paragraph_text_parts)
                     paragraph_node.value = TextFragment(
@@ -896,13 +873,13 @@ class TextFile(Loggable):
                         filtered_lines=[paragraph_text],
                     )
                     tree.add_child(paragraph_node)
-                    self.log(["Found l1 node with text: '%s'", paragraph_text])
+                    logger.debug("Found l1 node with text: '%s'", paragraph_text)
                 else:
-                    self.log("Found l1 node but it has no words, skipping")
+                    logger.debug("Found l1 node but it has no words, skipping")
             except KeyError:
-                self.log_warn("KeyError while parsing a l1 node")
+                logger.warning("KeyError while parsing a l1 node")
         # append to fragments
-        self.log("Storing tree")
+        logger.debug("Storing tree")
         self.fragments_tree = tree
 
     def _read_subtitles(self, lines: typing.Sequence[str]):
@@ -912,7 +889,7 @@ class TextFile(Loggable):
         :param list lines: the lines of the subtitles text file
         :raises: ValueError: if the id regex is not valid
         """
-        self.log("Parsing fragments from subtitles text format")
+        logger.debug("Parsing fragments from subtitles text format")
         id_format = self._get_id_format()
         lines = [line.strip() for line in lines]
         pairs = []
@@ -941,7 +918,7 @@ class TextFile(Loggable):
         :param dict parameters: additional parameters for parsing
                                 (e.g., class/id regex strings)
         """
-        self.log("Parsing fragments from parsed text format")
+        logger.debug("Parsing fragments from parsed text format")
         pairs = []
         for line in lines:
             pieces = line.split(gc.PARSED_TEXT_SEPARATOR)
@@ -962,7 +939,7 @@ class TextFile(Loggable):
                                 (e.g., class/id regex strings)
         :raises: ValueError: if the id regex is not valid
         """
-        self.log("Parsing fragments from plain text format")
+        logger.debug("Parsing fragments from plain text format")
         id_format = self._get_id_format()
         self._create_text_fragments(
             (id_format % idx, [line.strip()]) for idx, line in enumerate(lines, start=1)
@@ -999,24 +976,24 @@ class TextFile(Loggable):
                 if filter_name not in self.parameters:
                     continue
                 if (regex_string := self.parameters[filter_name]) is not None:
-                    self.log(["Regex for %s: '%s'", attribute_name, regex_string])
+                    logger.debug("Regex for %s: '%s'", attribute_name, regex_string)
                     attributes[attribute_name] = re.compile(rf".*\b{regex_string}\b.*")
 
             return attributes
 
         # TODO better and/or parametric parsing,
         #      for example, removing tags but keeping text, etc.
-        self.log("Parsing fragments from unparsed text format")
+        logger.debug("Parsing fragments from unparsed text format")
 
         # transform text in a soup object
-        self.log("Creating soup")
+        logger.debug("Creating soup")
         soup = BeautifulSoup("\n".join(lines), "lxml")
 
         # extract according to class_regex and id_regex
         text_from_id = {}
         ids = []
         filter_attributes = filter_attributes()
-        self.log(["Finding elements matching attributes '%s'", filter_attributes])
+        logger.debug("Finding elements matching attributes '%s'", filter_attributes)
         nodes = soup.findAll(attrs=filter_attributes)
         for node in nodes:
             try:
@@ -1026,7 +1003,7 @@ class TextFile(Loggable):
                 text_from_id[f_id] = f_text
                 ids.append(f_id)
             except KeyError:
-                self.log_warn("KeyError while parsing a node")
+                logger.warning("KeyError while parsing a node")
 
         # sort by ID as requested
         id_sort = gf.safe_get(
@@ -1035,11 +1012,11 @@ class TextFile(Loggable):
             default_value=IDSortingAlgorithm.UNSORTED,
             can_return_none=False,
         )
-        self.log(["Sorting text fragments using '%s'", id_sort])
+        logger.debug("Sorting text fragments using '%s'", id_sort)
         sorted_ids = IDSortingAlgorithm(id_sort).sort(ids)
 
         # append to fragments
-        self.log("Appending fragments")
+        logger.debug("Appending fragments")
         self._create_text_fragments((key, [text_from_id[key]]) for key in sorted_ids)
 
     def _read_unparsed_img(self, lines: typing.Sequence[str]):
@@ -1062,12 +1039,7 @@ class TextFile(Loggable):
         try:
             id_format % 1
         except (TypeError, ValueError) as exc:
-            self.log_exc(
-                ["String '%s' is not a valid id format", id_format],
-                exc,
-                True,
-                ValueError,
-            )
+            raise ValueError("String '%s' is not a valid id format", id_format) from exc
         return id_format
 
     def _create_text_fragments(self, pairs: typing.Iterable[tuple[str, list[str]]]):
@@ -1076,7 +1048,7 @@ class TextFile(Loggable):
 
         :param list pairs: a list of pairs, each pair being (id, [line_1, ..., line_n])
         """
-        self.log("Creating TextFragment objects")
+        logger.debug("Creating TextFragment objects")
         text_filter = self._build_text_filter()
         for identifier, lines in pairs:
             self.add_fragment(
@@ -1091,8 +1063,8 @@ class TextFile(Loggable):
         """
         Build a suitable TextFilter object.
         """
-        text_filter = TextFilter(logger=self.logger)
-        self.log("Created TextFilter object")
+        text_filter = TextFilter()
+        logger.debug("Created TextFilter object")
         for key, cls, param_name in [
             (gc.PPN_TASK_IS_TEXT_FILE_IGNORE_REGEX, TextFilterIgnoreRegex, "regex"),
             (
@@ -1104,20 +1076,21 @@ class TextFile(Loggable):
             cls_name = cls.__name__
             param_value = gf.safe_get(self.parameters, key, None)
             if param_value is not None:
-                self.log(["Creating %s object...", cls_name])
-                params = {param_name: param_value, "logger": self.logger}
+                logger.debug("Creating %s object...", cls_name)
+                params = {param_name: param_value}
                 try:
                     inner_filter = cls(**params)
                     text_filter.add_filter(inner_filter)
-                    self.log(["Creating %s object... done", cls_name])
-                except ValueError as exc:
-                    self.log_exc(
-                        ["Creating %s object failed", cls_name], exc, False, None
+                    logger.debug("Creating %s object... done", cls_name)
+                except ValueError:
+                    logger.exception(
+                        "Creating %s object failed",
+                        cls_name,
                     )
         return text_filter
 
 
-class TextFilter(Loggable):
+class TextFilter(Configurable):
     """
     A text filter is a function acting on a list of strings,
     and returning a new list of strings derived from the former
@@ -1130,16 +1103,12 @@ class TextFilter(Loggable):
 
     :param rconf: a runtime configuration
     :type  rconf: :class:`~aeneas.runtimeconfiguration.RuntimeConfiguration`
-    :param logger: the logger object
-    :type  logger: :class:`~aeneas.logger.Logger`
     """
 
-    SPACES_REGEX = re.compile(" [ ]+")
+    SPACES_REGEX = re.compile(r" [ ]+")
 
-    TAG = "TextFilter"
-
-    def __init__(self, rconf=None, logger=None):
-        super().__init__(rconf=rconf, logger=logger)
+    def __init__(self, rconf=None):
+        super().__init__(rconf=rconf)
         self.filters = []
 
     def add_filter(self, new_filter, as_last=True):
@@ -1164,7 +1133,7 @@ class TextFilter(Loggable):
         result = strings
         for filt in self.filters:
             result = filt.apply_filter(result)
-        self.log(["Applying regex: '%s' => '%s'", strings, result])
+        logger.debug("Applying regex: '%s' => '%s'", strings, result)
         return result
 
 
@@ -1182,14 +1151,12 @@ class TextFilterIgnoreRegex(TextFilter):
     :raises: ValueError: if ``regex`` is not a valid regex
     """
 
-    TAG = "TextFilterIgnoreRegex"
-
-    def __init__(self, regex: str, rconf=None, logger=None):
+    def __init__(self, regex: str, rconf=None):
         try:
             self.regex = re.compile(regex)
         except Exception:
-            raise ValueError(f"String '{regex}' is not a valid regular expression")
-        TextFilter.__init__(self, rconf=rconf, logger=logger)
+            raise ValueError(f"String {regex!r} is not a valid regular expression")
+        TextFilter.__init__(self, rconf=rconf)
 
     def apply_filter(self, strings):
         return [self._apply_single(s) for s in strings]
@@ -1221,16 +1188,14 @@ class TextFilterTransliterate(TextFilter):
                         of :class:`~aeneas.textfile.TransliterationMap`
     """
 
-    TAG = "TextFilterTransliterate"
-
-    def __init__(self, map_file_path=None, map_object=None, rconf=None, logger=None):
+    def __init__(self, map_file_path=None, map_object=None, rconf=None):
         if map_object is not None:
             if not isinstance(map_object, TransliterationMap):
                 raise TypeError("map_object is not an instance of TransliterationMap")
             self.trans_map = map_object
         elif map_file_path is not None:
-            self.trans_map = TransliterationMap(file_path=map_file_path, logger=logger)
-        TextFilter.__init__(self, rconf=rconf, logger=logger)
+            self.trans_map = TransliterationMap(file_path=map_file_path)
+        TextFilter.__init__(self, rconf=rconf)
 
     def apply_filter(self, strings):
         return [self._apply_single(s) for s in strings]
@@ -1244,7 +1209,7 @@ class TextFilterTransliterate(TextFilter):
         return result
 
 
-class TransliterationMap(Loggable):
+class TransliterationMap(Configurable):
     """
     A transliteration map is a dictionary that maps Unicode characters
     to their equivalent Unicode characters or strings (character sequences).
@@ -1258,8 +1223,6 @@ class TransliterationMap(Loggable):
     :param string file_path: the path to the map file to be read
     :param rconf: a runtime configuration
     :type  rconf: :class:`~aeneas.runtimeconfiguration.RuntimeConfiguration`
-    :param logger: the logger object
-    :type  logger: :class:`~aeneas.logger.Logger`
     :raises: OSError: if ``file_path`` cannot be read
     """
 
@@ -1267,10 +1230,8 @@ class TransliterationMap(Loggable):
     DELETE_REGEX = re.compile(r"^([^ ]+)$")
     REPLACE_REGEX = re.compile(r"^([^ ]+) ([^ ]+)$")
 
-    TAG = "TransliterationMap"
-
-    def __init__(self, file_path, rconf=None, logger=None):
-        super().__init__(rconf=rconf, logger=logger)
+    def __init__(self, file_path, rconf=None):
+        super().__init__(rconf=rconf)
         self.trans_map = {}
         self.file_path = file_path
 
@@ -1286,12 +1247,7 @@ class TransliterationMap(Loggable):
     @file_path.setter
     def file_path(self, file_path):
         if file_path is not None and not os.path.exists(file_path):
-            self.log_exc(
-                ["Map file '%s' does not exist or is not a file", file_path],
-                None,
-                True,
-                OSError,
-            )
+            raise OSError(f"Map file {file_path!r} does not exist or is not a file")
         self.__file_path = file_path
         self._build_map()
 
@@ -1329,14 +1285,14 @@ class TransliterationMap(Loggable):
             replacement = self._process_second_group(result.group(2))
             for char in what:
                 self.trans_map[char] = replacement
-                self.log(["Adding rule: replace '%s' with '%s'", char, replacement])
+                logger.debug("Adding rule: replace '%s' with '%s'", char, replacement)
         else:
             result = self.DELETE_REGEX.match(line)
             if result is not None:
                 what = self._process_first_group(result.group(1))
                 for char in what:
                     self.trans_map[char] = ""
-                    self.log(["Adding rule: delete '%s'", char])
+                    logger.debug("Adding rule: delete '%s'", char)
 
     def _process_first_group(self, group):
         """

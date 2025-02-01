@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 # aeneas is a Python/C library and a set of tools
 # to automagically synchronize audio and text (aka forced alignment)
 #
@@ -35,23 +33,23 @@ and ``False`` where nonspeech occurs.
 .. versionadded:: 1.0.4
 """
 
+import logging
+
 import numpy
 
-from aeneas.logger import Loggable
+from aeneas.logger import Configurable
 from aeneas.runtimeconfiguration import RuntimeConfiguration
 
+logger = logging.getLogger(__name__)
 
-class VAD(Loggable):
+
+class VAD(Configurable):
     """
     The voice activity detector (VAD).
 
     :param rconf: a runtime configuration
     :type  rconf: :class:`~aeneas.runtimeconfiguration.RuntimeConfiguration`
-    :param logger: the logger object
-    :type  logger: :class:`~aeneas.logger.Logger`
     """
-
-    TAG = "VAD"
 
     def run_vad(
         self,
@@ -78,70 +76,64 @@ class VAD(Loggable):
         :param int extend_after: extend each speech interval by this number of frames to the right (after)
         :rtype: :class:`numpy.ndarray` (1D)
         """
-        self.log("Computing VAD for wave")
+        logger.debug("Computing VAD for wave")
         mfcc_window_shift = self.rconf.mws
-        self.log(["MFCC window shift (s):         %.3f", mfcc_window_shift])
+        logger.debug("MFCC window shift (s):         %.3f", mfcc_window_shift)
         if log_energy_threshold is None:
             log_energy_threshold = self.rconf[
                 RuntimeConfiguration.VAD_LOG_ENERGY_THRESHOLD
             ]
-            self.log(["Log energy threshold:          %.3f", log_energy_threshold])
+            logger.debug("Log energy threshold:          %.3f", log_energy_threshold)
         if min_nonspeech_length is None:
             min_nonspeech_length = int(
                 self.rconf[RuntimeConfiguration.VAD_MIN_NONSPEECH_LENGTH]
                 / mfcc_window_shift
             )
-            self.log(
-                [
-                    "Min nonspeech length (s):      %.3f",
-                    self.rconf[RuntimeConfiguration.VAD_MIN_NONSPEECH_LENGTH],
-                ]
+            logger.debug(
+                "Min nonspeech length (s):      %.3f",
+                self.rconf[RuntimeConfiguration.VAD_MIN_NONSPEECH_LENGTH],
             )
         if extend_before is None:
             extend_before = int(
                 self.rconf[RuntimeConfiguration.VAD_EXTEND_SPEECH_INTERVAL_BEFORE]
                 / mfcc_window_shift
             )
-            self.log(
-                [
-                    "Extend speech before (s):      %.3f",
-                    self.rconf[RuntimeConfiguration.VAD_EXTEND_SPEECH_INTERVAL_BEFORE],
-                ]
+            logger.debug(
+                "Extend speech before (s):      %.3f",
+                self.rconf[RuntimeConfiguration.VAD_EXTEND_SPEECH_INTERVAL_BEFORE],
             )
         if extend_after is None:
             extend_after = int(
                 self.rconf[RuntimeConfiguration.VAD_EXTEND_SPEECH_INTERVAL_AFTER]
                 / mfcc_window_shift
             )
-            self.log(
-                [
-                    "Extend speech after (s):       %.3f",
-                    self.rconf[RuntimeConfiguration.VAD_EXTEND_SPEECH_INTERVAL_AFTER],
-                ]
+            logger.debug(
+                "Extend speech after (s):       %.3f",
+                self.rconf[RuntimeConfiguration.VAD_EXTEND_SPEECH_INTERVAL_AFTER],
             )
         energy_length = len(wave_energy)
         energy_threshold = numpy.min(wave_energy) + log_energy_threshold
-        self.log(["Min nonspeech length (frames): %d", min_nonspeech_length])
-        self.log(["Extend speech before (frames): %d", extend_before])
-        self.log(["Extend speech after (frames):  %d", extend_after])
-        self.log(["Energy vector length (frames): %d", energy_length])
-        self.log(["Energy threshold (log):        %.3f", energy_threshold])
+        logger.debug("Min nonspeech length (frames): %d", min_nonspeech_length)
+        logger.debug("Extend speech before (frames): %d", extend_before)
+        logger.debug("Extend speech after (frames):  %d", extend_after)
+        logger.debug("Energy vector length (frames): %d", energy_length)
+        logger.debug("Energy threshold (log):        %.3f", energy_threshold)
 
         # using windows to be sure we have at least
         # min_nonspeech_length consecutive frames with nonspeech
-        self.log("Determining initial labels...")
+        logger.debug("Determining initial labels...")
         mask = wave_energy >= energy_threshold
         windows = self._rolling_window(mask, min_nonspeech_length)
         nonspeech_runs = self._compute_runs(
             (numpy.where(numpy.sum(windows, axis=1) == 0))[0]
         )
-        self.log("Determining initial labels... done")
+        logger.debug("Determining initial labels... done")
 
         # initially, everything is marked as speech
         # we remove the nonspeech intervals as needed,
         # possibly extending the adjacent speech interval
         # if requested by the user
-        self.log("Determining final labels...")
+        logger.debug("Determining final labels...")
         mask = numpy.ones(energy_length, dtype="bool")
         for ns in nonspeech_runs:
             start = ns[0]
@@ -151,7 +143,7 @@ class VAD(Loggable):
             if (extend_before > 0) and (stop < energy_length - 1):
                 stop -= extend_before
             mask[start:stop] = 0
-        self.log("Determining final labels... done")
+        logger.debug("Determining final labels... done")
         return mask
 
     @classmethod

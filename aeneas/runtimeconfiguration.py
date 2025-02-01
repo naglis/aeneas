@@ -1087,8 +1087,6 @@ class RuntimeConfiguration(Configuration):
         ),
     ]
 
-    TAG = "RuntimeConfiguration"
-
     def __init__(self, config_string=None):
         super().__init__(config_string)
 

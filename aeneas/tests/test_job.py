@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 # aeneas is a Python/C library and a set of tools
 # to automagically synchronize audio and text (aka forced alignment)
 #
@@ -27,7 +25,6 @@ from aeneas.hierarchytype import HierarchyType
 from aeneas.job import Job
 from aeneas.job import JobConfiguration
 from aeneas.language import Language
-from aeneas.logger import Logger
 from aeneas.task import Task
 
 
@@ -40,12 +37,6 @@ class TestJob(unittest.TestCase):
             self.assertIsNone(read_value)
         else:
             self.assertEqual(read_value, value)
-
-    def test_job_logger(self):
-        try:
-            Job(logger=Logger())
-        except Exception as e:
-            self.fail("Failed to initialize Job with logger: %s" % e)
 
     def test_job_identifier(self):
         job = Job()

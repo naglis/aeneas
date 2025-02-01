@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 # aeneas is a Python/C library and a set of tools
 # to automagically synchronize audio and text (aka forced alignment)
 #
@@ -31,10 +29,14 @@ http://www.cstr.ed.ac.uk/projects/festival/
 for further details.
 """
 
+import logging
+
 from aeneas.exacttiming import TimeValue
 from aeneas.language import Language
 from aeneas.ttswrappers.basettswrapper import BaseTTSWrapper
 import aeneas.globalfunctions as gf
+
+logger = logging.getLogger(__name__)
 
 
 class FESTIVALTTSWrapper(BaseTTSWrapper):
@@ -67,8 +69,6 @@ class FESTIVALTTSWrapper(BaseTTSWrapper):
 
     :param rconf: a runtime configuration
     :type  rconf: :class:`~aeneas.runtimeconfiguration.RuntimeConfiguration`
-    :param logger: the logger object
-    :type  logger: :class:`~aeneas.logger.Logger`
     """
 
     CES = Language.CES
@@ -153,10 +153,8 @@ class FESTIVALTTSWrapper(BaseTTSWrapper):
 
     C_EXTENSION_NAME = "cfw"
 
-    TAG = "FESTIVALTTSWrapper"
-
-    def __init__(self, rconf=None, logger=None):
-        super().__init__(rconf=rconf, logger=logger)
+    def __init__(self, rconf=None):
+        super().__init__(rconf=rconf)
         self.set_subprocess_arguments(
             [
                 self.tts_path,
@@ -180,7 +178,7 @@ class FESTIVALTTSWrapper(BaseTTSWrapper):
 
         :rtype: (bool, (list, :class:`~aeneas.exacttiming.TimeValue`, int))
         """
-        self.log("Synthesizing using C extension...")
+        logger.debug("Synthesizing using C extension...")
 
         # convert parameters from Python values to C values
         try:
@@ -190,10 +188,10 @@ class FESTIVALTTSWrapper(BaseTTSWrapper):
         c_backwards = 0
         if backwards:
             c_backwards = 1
-        self.log(["output_file_path: %s", output_file_path])
-        self.log(["c_quit_after:     %.3f", c_quit_after])
-        self.log(["c_backwards:      %d", c_backwards])
-        self.log("Preparing u_text...")
+        logger.debug("output_file_path: %s", output_file_path)
+        logger.debug("c_quit_after:     %.3f", c_quit_after)
+        logger.debug("c_backwards:      %d", c_backwards)
+        logger.debug("Preparing u_text...")
         u_text = []
         fragments = text_file.fragments
         for fragment in fragments:
@@ -207,36 +205,34 @@ class FESTIVALTTSWrapper(BaseTTSWrapper):
             if f_text is None:
                 f_text = ""
             u_text.append((f_voice_code, f_text))
-        self.log("Preparing u_text... done")
+        logger.debug("Preparing u_text... done")
 
         # call C extension
         sr = None
         sf = None
         intervals = None
 
-        self.log("Preparing c_text...")
+        logger.debug("Preparing c_text...")
         c_text = [(gf.safe_unicode(t[0]), gf.safe_unicode(t[1])) for t in u_text]
-        self.log("Preparing c_text... done")
+        logger.debug("Preparing c_text... done")
 
-        self.log("Calling aeneas.cfw directly")
+        logger.debug("Calling aeneas.cfw directly")
         try:
-            self.log("Importing aeneas.cfw...")
+            logger.debug("Importing aeneas.cfw...")
             import aeneas.cfw.cfw
 
-            self.log("Importing aeneas.cfw... done")
-            self.log("Calling aeneas.cfw...")
+            logger.debug("Importing aeneas.cfw... done")
+            logger.debug("Calling aeneas.cfw...")
             sr, sf, intervals = aeneas.cfw.cfw.synthesize_multiple(
                 output_file_path, c_quit_after, c_backwards, c_text
             )
-            self.log("Calling aeneas.cfw... done")
-        except Exception as exc:
-            self.log_exc(
-                "An unexpected error occurred while running cfw", exc, False, None
-            )
+            logger.debug("Calling aeneas.cfw... done")
+        except Exception:
+            logger.exception("An unexpected error occurred while running cfw")
             return (False, None)
 
-        self.log(["sr: %d", sr])
-        self.log(["sf: %d", sf])
+        logger.debug("sr: %d", sr)
+        logger.debug("sf: %d", sf)
 
         # create output
         anchors = []
@@ -262,8 +258,8 @@ class FESTIVALTTSWrapper(BaseTTSWrapper):
 
         # return output
         # NOTE anchors do not make sense if backwards == True
-        self.log(["Returning %d time anchors", len(anchors)])
-        self.log(["Current time %.3f", current_time])
-        self.log(["Synthesized %d characters", num_chars])
-        self.log("Synthesizing using C extension... done")
+        logger.debug("Returning %d time anchors", len(anchors))
+        logger.debug("Current time %.3f", current_time)
+        logger.debug("Synthesized %d characters", num_chars)
+        logger.debug("Synthesizing using C extension... done")
         return (True, (anchors, current_time, num_chars))

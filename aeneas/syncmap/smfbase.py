@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 # aeneas is a Python/C library and a set of tools
 # to automagically synchronize audio and text (aka forced alignment)
 #
@@ -23,7 +21,7 @@
 import abc
 import typing
 
-from aeneas.logger import Loggable
+from aeneas.logger import Configurable
 from aeneas.language import Language
 from aeneas.exacttiming import TimeValue
 from aeneas.syncmap.fragment import SyncMapFragment
@@ -35,19 +33,16 @@ if typing.TYPE_CHECKING:
     from aeneas.syncmap import SyncMap
 
 
-class SyncMapFormatBase(Loggable, abc.ABC):
+class SyncMapFormatBase(Configurable, abc.ABC):
     """
     Base class for I/O handlers.
     """
-
-    TAG = "SyncMapFormatBase"
 
     def __init__(
         self,
         variant: str | None = None,
         parameters: dict | None = None,
         rconf=None,
-        logger=None,
     ):
         """
         TBW
@@ -57,7 +52,7 @@ class SyncMapFormatBase(Loggable, abc.ABC):
         :param parameters: additional parameters to read or write
         :type parameters: ``None`` or ``dict``
         """
-        super().__init__(rconf=rconf, logger=logger)
+        super().__init__(rconf=rconf)
         self.variant = variant
         self.parameters = parameters
 

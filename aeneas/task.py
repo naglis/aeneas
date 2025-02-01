@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 # aeneas is a Python/C library and a set of tools
 # to automagically synchronize audio and text (aka forced alignment)
 #
@@ -27,21 +25,23 @@ This module contains the following classes:
 * :class:`~aeneas.task.TaskConfiguration`, representing a task configuration.
 """
 
+import logging
 import os
 
 from aeneas.adjustboundaryalgorithm import AdjustBoundaryAlgorithm
 from aeneas.audiofile import AudioFile
 from aeneas.configuration import Configuration
-from aeneas.exacttiming import Decimal
-from aeneas.exacttiming import TimeValue
-from aeneas.logger import Loggable
+from aeneas.exacttiming import Decimal, TimeValue
+from aeneas.logger import Configurable
 from aeneas.language import Language
 from aeneas.textfile import TextFile
 import aeneas.globalconstants as gc
 import aeneas.globalfunctions as gf
 
+logger = logging.getLogger(__name__)
 
-class Task(Loggable):
+
+class Task(Configurable):
     """
     A structure representing a task, that is,
     an audio file and an ordered set of text fragments
@@ -50,16 +50,12 @@ class Task(Loggable):
     :param string config_string: the task configuration string
     :param rconf: a runtime configuration
     :type  rconf: :class:`~aeneas.runtimeconfiguration.RuntimeConfiguration`
-    :param logger: the logger object
-    :type  logger: :class:`~aeneas.logger.Logger`
     :raises: TypeError: if ``config_string`` is not ``None`` and
                         it is not a Unicode string
     """
 
-    TAG = "Task"
-
-    def __init__(self, config_string=None, rconf=None, logger=None):
-        super().__init__(rconf=rconf, logger=logger)
+    def __init__(self, config_string=None, rconf=None):
+        super().__init__(rconf=rconf)
         self.identifier = gf.uuid_string()
         self.configuration = None
         self.audio_file_path = None  # relative to input container root
@@ -185,20 +181,15 @@ class Task(Loggable):
         :rtype: string
         """
         if self.sync_map is None:
-            self.log_exc("The sync_map object has not been set", None, True, TypeError)
+            raise TypeError("The sync_map object has not been set")
 
-        if (container_root_path is not None) and (self.sync_map_file_path is None):
-            self.log_exc(
-                "The (internal) path of the sync map has been set",
-                None,
-                True,
-                TypeError,
-            )
+        if container_root_path is not None and self.sync_map_file_path is None:
+            raise TypeError("The (internal) path of the sync map has been set")
 
-        self.log(["container_root_path is %s", container_root_path])
-        self.log(["self.sync_map_file_path is %s", self.sync_map_file_path])
-        self.log(
-            ["self.sync_map_file_path_absolute is %s", self.sync_map_file_path_absolute]
+        logger.debug("container_root_path is %s", container_root_path)
+        logger.debug("self.sync_map_file_path is %s", self.sync_map_file_path)
+        logger.debug(
+            "self.sync_map_file_path_absolute is %s", self.sync_map_file_path_absolute
         )
 
         if (container_root_path is not None) and (self.sync_map_file_path is not None):
@@ -206,7 +197,7 @@ class Task(Loggable):
         elif self.sync_map_file_path_absolute:
             path = self.sync_map_file_path_absolute
         gf.ensure_parent_directory(path)
-        self.log(["Output sync map to %s", path])
+        logger.debug("Output sync map to %s", path)
 
         eaf_audio_ref = self.configuration["o_eaf_audio_ref"]
         head_tail_format = self.configuration["o_h_t_format"]
@@ -215,14 +206,14 @@ class Task(Loggable):
         smil_page_ref = self.configuration["o_smil_page_ref"]
         sync_map_format = self.configuration["o_format"]
 
-        self.log(["eaf_audio_ref is %s", eaf_audio_ref])
-        self.log(["head_tail_format is %s", head_tail_format])
-        self.log(["levels is %s", levels])
-        self.log(["smil_audio_ref is %s", smil_audio_ref])
-        self.log(["smil_page_ref is %s", smil_page_ref])
-        self.log(["sync_map_format is %s", sync_map_format])
+        logger.debug("eaf_audio_ref is %s", eaf_audio_ref)
+        logger.debug("head_tail_format is %s", head_tail_format)
+        logger.debug("levels is %s", levels)
+        logger.debug("smil_audio_ref is %s", smil_audio_ref)
+        logger.debug("smil_page_ref is %s", smil_page_ref)
+        logger.debug("sync_map_format is %s", sync_map_format)
 
-        self.log("Calling sync_map.write...")
+        logger.debug("Calling sync_map.write...")
         parameters = {
             gc.PPN_TASK_OS_FILE_EAF_AUDIO_REF: eaf_audio_ref,
             gc.PPN_TASK_OS_FILE_HEAD_TAIL_FORMAT: head_tail_format,
@@ -231,7 +222,7 @@ class Task(Loggable):
             gc.PPN_TASK_OS_FILE_SMIL_PAGE_REF: smil_page_ref,
         }
         self.sync_map.write(sync_map_format, path, parameters)
-        self.log("Calling sync_map.write... done")
+        logger.debug("Calling sync_map.write... done")
         return path
 
     def _populate_audio_file(self):
@@ -239,25 +230,23 @@ class Task(Loggable):
         Create the ``self.audio_file`` object by reading
         the audio file at ``self.audio_file_path_absolute``.
         """
-        self.log("Populate audio file...")
+        logger.debug("Populate audio file...")
         if self.audio_file_path_absolute is not None:
-            self.log(
-                ["audio_file_path_absolute is '%s'", self.audio_file_path_absolute]
+            logger.debug(
+                "audio_file_path_absolute is '%s'", self.audio_file_path_absolute
             )
-            self.audio_file = AudioFile(
-                file_path=self.audio_file_path_absolute, logger=self.logger
-            )
+            self.audio_file = AudioFile(file_path=self.audio_file_path_absolute)
             self.audio_file.read_properties()
         else:
-            self.log("audio_file_path_absolute is None")
-        self.log("Populate audio file... done")
+            logger.debug("audio_file_path_absolute is None")
+        logger.debug("Populate audio file... done")
 
     def _populate_text_file(self):
         """
         Create the ``self.text_file`` object by reading
         the text file at ``self.text_file_path_absolute``.
         """
-        self.log("Populate text file...")
+        logger.debug("Populate text file...")
         if (self.text_file_path_absolute is not None) and (
             self.configuration["language"] is not None
         ):
@@ -296,12 +285,11 @@ class Task(Loggable):
                 file_path=self.text_file_path_absolute,
                 file_format=self.configuration["i_t_format"],
                 parameters=parameters,
-                logger=self.logger,
             )
             self.text_file.set_language(self.configuration["language"])
         else:
-            self.log("text_file_path_absolute and/or language is None")
-        self.log("Populate text file... done")
+            logger.debug("text_file_path_absolute and/or language is None")
+        logger.debug("Populate text file... done")
 
 
 class TaskConfiguration(Configuration):
@@ -601,8 +589,6 @@ class TaskConfiguration(Configuration):
             (None, None, ["o_smil_page_ref"], "text ref value (smil, smilh, smilm)"),
         ),
     ]
-
-    TAG = "TaskConfiguration"
 
     def __init__(self, config_string=None):
         super().__init__(config_string)

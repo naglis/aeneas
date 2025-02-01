@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 # aeneas is a Python/C library and a set of tools
 # to automagically synchronize audio and text (aka forced alignment)
 #
@@ -25,18 +23,19 @@ An "abstract" class containing functions common
 to the CLI programs in aeneas.tools.
 """
 
+import logging
 import os
 import sys
-import typing
 import tempfile
+import typing
 
 from aeneas import __version__ as aeneas_version
-from aeneas.logger import Loggable
-from aeneas.logger import Logger
+from aeneas.logger import Configurable
 from aeneas.runtimeconfiguration import RuntimeConfiguration
-from aeneas.textfile import TextFile
-from aeneas.textfile import TextFileFormat
+from aeneas.textfile import TextFile, TextFileFormat
 import aeneas.globalfunctions as gf
+
+logger = logging.getLogger(__name__)
 
 
 class CLIHelp(typing.TypedDict):
@@ -47,7 +46,7 @@ class CLIHelp(typing.TypedDict):
     examples: typing.Sequence[str]
 
 
-class AbstractCLIProgram(Loggable):
+class AbstractCLIProgram(Configurable):
     """
     This class is an "abstract" CLI program.
 
@@ -87,10 +86,8 @@ class AbstractCLIProgram(Loggable):
 
     RCONF_PARAMETERS = RuntimeConfiguration.parameters(sort=True, as_strings=True)
 
-    TAG = "CLI"
-
-    def __init__(self, use_sys=True, invoke=None, rconf=None, logger=None):
-        super().__init__(rconf=rconf, logger=logger)
+    def __init__(self, use_sys=True, invoke=None, rconf=None):
+        super().__init__(rconf=rconf)
         self.invoke = (
             "python -m aeneas.tools.%s" % (self.NAME) if (invoke is None) else invoke
         )
@@ -98,17 +95,13 @@ class AbstractCLIProgram(Loggable):
         self.formal_arguments_raw = []
         self.formal_arguments = []
         self.actual_arguments = []
-        self.log_file_path = None
-        self.verbose = False
-        self.very_verbose = False
 
     PREFIX_TO_PRINT_FUNCTION = {
-        Logger.CRITICAL: gf.print_error,
-        Logger.DEBUG: gf.print_info,
-        Logger.ERROR: gf.print_error,
-        Logger.INFO: gf.print_info,
-        Logger.SUCCESS: gf.print_success,
-        Logger.WARNING: gf.print_warning,
+        logging.CRITICAL: gf.print_error,
+        logging.DEBUG: gf.print_info,
+        logging.ERROR: gf.print_error,
+        logging.INFO: gf.print_info,
+        logging.WARNING: gf.print_warning,
     }
 
     def print_generic(self, msg, prefix=None):
@@ -121,9 +114,9 @@ class AbstractCLIProgram(Loggable):
         :type  prefix: Unicode string
         """
         if prefix is None:
-            self._log(msg, Logger.INFO)
+            logger.info(msg)
         else:
-            self._log(msg, prefix)
+            logger.debug(f"{prefix}{msg}")
         if self.use_sys:
             if (prefix is not None) and (prefix in self.PREFIX_TO_PRINT_FUNCTION):
                 self.PREFIX_TO_PRINT_FUNCTION[prefix](msg)
@@ -136,7 +129,7 @@ class AbstractCLIProgram(Loggable):
 
         :param string msg: the message
         """
-        self.print_generic(msg, Logger.ERROR)
+        self.print_generic(msg, logging.ERROR)
 
     def print_info(self, msg):
         """
@@ -144,15 +137,7 @@ class AbstractCLIProgram(Loggable):
 
         :param string msg: the message
         """
-        self.print_generic(msg, Logger.INFO)
-
-    def print_success(self, msg):
-        """
-        Print a success message and log it.
-
-        :param string msg: the message
-        """
-        self.print_generic(msg, Logger.SUCCESS)
+        self.print_generic(msg, logging.INFO)
 
     def print_warning(self, msg):
         """
@@ -160,7 +145,7 @@ class AbstractCLIProgram(Loggable):
 
         :param string msg: the message
         """
-        self.print_generic(msg, Logger.WARNING)
+        self.print_generic(msg, logging.WARNING)
 
     def exit(self, code):
         """
@@ -339,12 +324,12 @@ class AbstractCLIProgram(Loggable):
         set_args = set(args)
 
         # set verbosity, if requested
+        loglevel = logging.WARNING
         for flag in {"-v", "--verbose"} & set_args:
-            self.verbose = True
+            loglevel = logging.INFO
             args.remove(flag)
         for flag in {"-vv", "--very-verbose"} & set_args:
-            self.verbose = True
-            self.very_verbose = True
+            loglevel = logging.DEBUG
             args.remove(flag)
 
         # set RuntimeConfiguration string, if specified
@@ -369,33 +354,28 @@ class AbstractCLIProgram(Loggable):
                     log_path = tmp_file.name
 
                 args.remove(flag)
-            if log_path is not None:
-                self.log_file_path = log_path
+
+        if log_path is not None:
+            logging.basicConfig(filename=log_path, level=loglevel)
+        else:
+            logging.basicConfig(level=loglevel)
 
         # if no actual arguments left, print help
-        if (len(args) < 1) and (show_help):
+        if len(args) < 1 and show_help:
             return self.print_help(short=True)
 
         # store actual arguments
         self.actual_arguments = args
 
         # create logger
-        self.logger = Logger(tee=self.verbose, tee_show_datetime=self.very_verbose)
-        self.log(["Running aeneas %s", aeneas_version])
-        self.log(["Formal arguments: %s", self.formal_arguments])
-        self.log(["Actual arguments: %s", self.actual_arguments])
-        self.log(["Runtime configuration: '%s'", self.rconf.config_string])
+        logger.debug("Running aeneas %s", aeneas_version)
+        logger.debug("Formal arguments: %s", self.formal_arguments)
+        logger.debug("Actual arguments: %s", self.actual_arguments)
+        logger.debug("Runtime configuration: %r", self.rconf.config_string)
 
         # perform command
         exit_code = self.perform_command()
-        self.log(["Execution completed with code %d", exit_code])
-
-        # output log if requested
-        if self.log_file_path is not None:
-            self.log(["User requested saving log to file '%s'", self.log_file_path])
-            self.logger.write(self.log_file_path)
-            if self.use_sys:
-                self.print_info("Log written to file '%s'" % self.log_file_path)
+        logger.debug("Execution completed with code %d", exit_code)
 
         return self.exit(exit_code)
 
@@ -449,8 +429,8 @@ class AbstractCLIProgram(Loggable):
 
         :rtype: int
         """
-        self.log("This function should be overloaded in derived classes")
-        self.log(["Invoked with %s", self.actual_arguments])
+        logger.debug("This function should be overloaded in derived classes")
+        logger.debug("Invoked with %s", self.actual_arguments)
         return self.NO_ERROR_EXIT_CODE
 
     def check_c_extensions(self, name: str | None = None) -> bool:
@@ -544,7 +524,7 @@ class AbstractCLIProgram(Loggable):
 
     def get_text_file(self, text_format: str, text, parameters):
         if text_format == "list":
-            text_file = TextFile(logger=self.logger)
+            text_file = TextFile()
             text_file.read_from_list(text.split("|"))
             return text_file
         else:
@@ -556,7 +536,7 @@ class AbstractCLIProgram(Loggable):
                 )
                 return None
             try:
-                return TextFile(text, text_format, parameters, logger=self.logger)
+                return TextFile(text, text_format, parameters)
             except OSError:
                 self.print_error("Cannot read file '%s'" % (text))
             return None

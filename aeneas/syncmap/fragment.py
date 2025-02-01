@@ -56,8 +56,6 @@ class SyncMapFragment:
     :param float confidence: the confidence of the audio timing
     """
 
-    TAG = "SyncMapFragment"
-
     NOT_REGULAR_TYPES = [FragmentType.HEAD, FragmentType.TAIL, FragmentType.NONSPEECH]
     """ Types of fragment different than ``REGULAR`` """
 

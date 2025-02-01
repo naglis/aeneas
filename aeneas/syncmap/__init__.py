@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 # aeneas is a Python/C library and a set of tools
 # to automagically synchronize audio and text (aka forced alignment)
 #
@@ -35,11 +33,12 @@ This package contains the following classes:
 """
 
 import copy
-import json
-import os
 import itertools
+import json
+import logging
+import os
 
-from aeneas.logger import Loggable
+from aeneas.logger import Configurable
 from aeneas.syncmap.format import SyncMapFormat
 from aeneas.syncmap.fragment import SyncMapFragment, FragmentType
 from aeneas.syncmap.fragmentlist import SyncMapFragmentList
@@ -48,8 +47,10 @@ from aeneas.tree import Tree
 import aeneas.globalconstants as gc
 import aeneas.globalfunctions as gf
 
+logger = logging.getLogger(__name__)
 
-class SyncMap(Loggable):
+
+class SyncMap(Configurable):
     """
     A synchronization map, that is, a tree of
     :class:`~aeneas.syncmap.fragment.SyncMapFragment`
@@ -92,12 +93,10 @@ class SyncMap(Loggable):
     ]
     FINETUNEAS_PATH = "../res/finetuneas.html"
 
-    TAG = "SyncMap"
-
-    def __init__(self, tree: Tree | None = None, rconf=None, logger=None):
+    def __init__(self, tree: Tree | None = None, rconf=None):
         if tree is not None and not isinstance(tree, Tree):
             raise TypeError("tree is not an instance of Tree")
-        super().__init__(rconf=rconf, logger=logger)
+        super().__init__(rconf=rconf)
         if tree is None:
             tree = Tree()
         self.fragments_tree = tree
@@ -206,32 +205,30 @@ class SyncMap(Loggable):
 
         .. versionadded:: 1.7.0
         """
-        self.log("Checking if leaves are consistent")
+        logger.debug("Checking if leaves are consistent")
         leaves = self.leaves()
         if not leaves:
-            self.log("Empty leaves => return True")
+            logger.debug("Empty leaves => return True")
             return True
         min_time = min(leaf.interval.begin for leaf in leaves)
-        self.log(["  Min time: %.3f", min_time])
+        logger.debug("  Min time: %.3f", min_time)
         max_time = max(leaf.interval.end for leaf in leaves)
-        self.log(["  Max time: %.3f", max_time])
-        self.log("  Creating SyncMapFragmentList...")
-        smf = SyncMapFragmentList(
-            begin=min_time, end=max_time, rconf=self.rconf, logger=self.logger
-        )
-        self.log("  Creating SyncMapFragmentList... done")
-        self.log("  Sorting SyncMapFragmentList...")
+        logger.debug("  Max time: %.3f", max_time)
+        logger.debug("  Creating SyncMapFragmentList...")
+        smf = SyncMapFragmentList(begin=min_time, end=max_time, rconf=self.rconf)
+        logger.debug("  Creating SyncMapFragmentList... done")
+        logger.debug("  Sorting SyncMapFragmentList...")
         result = True
         not_head_tail = [leaf for leaf in leaves if not leaf.is_head_or_tail]
         for leaf in not_head_tail:
             smf.add(leaf, sort=False)
         try:
             smf.sort()
-            self.log("  Sorting completed => return True")
+            logger.debug("  Sorting completed => return True")
         except ValueError:
-            self.log("  Exception while sorting => return False")
+            logger.debug("  Exception while sorting => return False")
             result = False
-        self.log("  Sorting SyncMapFragmentList... done")
+        logger.debug("  Sorting SyncMapFragmentList... done")
         return result
 
     @property
@@ -278,16 +275,14 @@ class SyncMap(Loggable):
                             it is not an instance of :class:`~aeneas.syncmap.fragment.SyncMapFragment`
         """
         if not isinstance(fragment, SyncMapFragment):
-            self.log_exc(
-                "fragment is not an instance of SyncMapFragment", None, True, TypeError
-            )
+            raise TypeError("fragment is not an instance of SyncMapFragment")
         self.fragments_tree.add_child(Tree(value=fragment), as_last=as_last)
 
     def clear(self):
         """
         Clear the sync map, removing all the current fragments.
         """
-        self.log("Clearing sync map")
+        logger.debug("Clearing sync map")
         self.fragments_tree = Tree()
 
     def clone(self):
@@ -316,11 +311,8 @@ class SyncMap(Loggable):
         .. versionadded:: 1.3.1
         """
         if not gf.file_can_be_written(output_file_path):
-            self.log_exc(
-                ["Cannot output HTML file '%s'. Wrong permissions?", output_file_path],
-                None,
-                True,
-                OSError,
+            raise OSError(
+                f"Cannot output HTML file {output_file_path!r}. Wrong permissions?"
             )
 
         if parameters is None:
@@ -403,37 +395,31 @@ class SyncMap(Loggable):
         :raises: OSError: if ``input_file_path`` does not exist
         """
         if sync_map_format is None:
-            self.log_exc("Sync map format is None", None, True, ValueError)
+            raise ValueError("Sync map format is None")
         if sync_map_format not in SyncMapFormat.CODE_TO_CLASS:
-            self.log_exc(
-                ["Sync map format '%s' is not allowed", sync_map_format],
-                None,
-                True,
-                ValueError,
-            )
+            raise ValueError(f"Sync map format {sync_map_format!r} is not allowed")
 
-        self.log(["Input format:     '%s'", sync_map_format])
-        self.log(["Input path:       '%s'", input_file_path])
-        self.log(["Input parameters: '%s'", parameters])
+        logger.debug("Input format:     '%s'", sync_map_format)
+        logger.debug("Input path:       '%s'", input_file_path)
+        logger.debug("Input parameters: '%s'", parameters)
 
         reader = (SyncMapFormat.CODE_TO_CLASS[sync_map_format])(
             variant=sync_map_format,
             parameters=parameters,
             rconf=self.rconf,
-            logger=self.logger,
         )
 
         # open file for reading
-        self.log("Reading input file...")
+        logger.debug("Reading input file...")
         with open(input_file_path, encoding="utf-8") as input_file:
             input_text = input_file.read()
         reader.parse(input_text=input_text, syncmap=self)
-        self.log("Reading input file... done")
+        logger.debug("Reading input file... done")
 
         # overwrite language if requested
         language = gf.safe_get(parameters, gc.PPN_SYNCMAP_LANGUAGE, None)
         if language is not None:
-            self.log(["Overwriting language to '%s'", language])
+            logger.debug("Overwriting language to '%s'", language)
             for fragment in self.fragments:
                 if fragment.text_fragment is not None:
                     fragment.text_fragment.language = language
@@ -464,15 +450,15 @@ class SyncMap(Loggable):
             Select the given levels of the fragments tree,
             modifying the given syncmap (always pass a copy of it!).
             """
-            self.log(["Levels: '%s'", levels])
+            logger.debug("Levels: '%s'", levels)
             if levels is None:
                 return
             try:
                 levels = [int(level) for level in levels if int(level) > 0]
                 syncmap.fragments_tree.keep_levels(levels)
-                self.log(["Selected levels: %s", levels])
+                logger.debug("Selected levels: %s", levels)
             except ValueError:
-                self.log_warn(
+                logger.warning(
                     "Cannot convert levels to list of int, returning unchanged"
                 )
 
@@ -481,7 +467,7 @@ class SyncMap(Loggable):
             Set the appropriate head/tail nodes of the fragments tree,
             modifying the given syncmap (always pass a copy of it!).
             """
-            self.log(["Head/tail format: '%s'", str(head_tail_format)])
+            logger.debug("Head/tail format: '%s'", head_tail_format)
             tree = syncmap.fragments_tree
             head = tree.get_child(0)
             first = tree.get_child(1)
@@ -490,29 +476,25 @@ class SyncMap(Loggable):
             # mark HEAD as REGULAR if needed
             if head_tail_format == SyncMapHeadTailFormat.ADD:
                 head.value.fragment_type = FragmentType.REGULAR
-                self.log("Marked HEAD as REGULAR")
+                logger.debug("Marked HEAD as REGULAR")
             # stretch first and last fragment timings if needed
             if head_tail_format == SyncMapHeadTailFormat.STRETCH:
-                self.log(
-                    [
-                        "Stretched first.begin: %.3f => %.3f (head)",
-                        first.value.begin,
-                        head.value.begin,
-                    ]
+                logger.debug(
+                    "Stretched first.begin: %.3f => %.3f (head)",
+                    first.value.begin,
+                    head.value.begin,
                 )
-                self.log(
-                    [
-                        "Stretched last.end:    %.3f => %.3f (tail)",
-                        last.value.end,
-                        tail.value.end,
-                    ]
+                logger.debug(
+                    "Stretched last.end:    %.3f => %.3f (tail)",
+                    last.value.end,
+                    tail.value.end,
                 )
                 first.value.begin = head.value.begin
                 last.value.end = tail.value.end
             # mark TAIL as REGULAR if needed
             if head_tail_format == SyncMapHeadTailFormat.ADD:
                 tail.value.fragment_type = FragmentType.REGULAR
-                self.log("Marked TAIL as REGULAR")
+                logger.debug("Marked TAIL as REGULAR")
             # remove all fragments that are not REGULAR
             for node in list(tree.dfs):
                 if (node.value is not None) and (
@@ -521,42 +503,31 @@ class SyncMap(Loggable):
                     node.remove()
 
         if sync_map_format is None:
-            self.log_exc("Sync map format is None", None, True, ValueError)
+            raise ValueError("Sync map format is None")
         if sync_map_format not in SyncMapFormat.CODE_TO_CLASS:
-            self.log_exc(
-                ["Sync map format '%s' is not allowed", sync_map_format],
-                None,
-                True,
-                ValueError,
-            )
+            raise ValueError(f"Sync map format {sync_map_format!r} is not allowed")
         if not gf.file_can_be_written(output_file_path):
-            self.log_exc(
-                [
-                    "Cannot write sync map file '%s'. Wrong permissions?",
-                    output_file_path,
-                ],
-                None,
-                True,
-                OSError,
+            raise OSError(
+                f"Cannot write sync map file {output_file_path!r}. Wrong permissions?"
             )
 
-        self.log(["Output format:     '%s'", sync_map_format])
-        self.log(["Output path:       '%s'", output_file_path])
-        self.log(["Output parameters: '%s'", parameters])
+        logger.debug("Output format:     '%s'", sync_map_format)
+        logger.debug("Output path:       '%s'", output_file_path)
+        logger.debug("Output parameters: '%s'", parameters)
 
         # select levels and head/tail format
         pruned_syncmap = self.clone()
         try:
             select_levels(pruned_syncmap, parameters[gc.PPN_TASK_OS_FILE_LEVELS])
         except Exception:
-            self.log_warn(["No %s parameter specified", gc.PPN_TASK_OS_FILE_LEVELS])
+            logger.warning("No %s parameter specified", gc.PPN_TASK_OS_FILE_LEVELS)
         try:
             set_head_tail_format(
                 pruned_syncmap, parameters[gc.PPN_TASK_OS_FILE_HEAD_TAIL_FORMAT]
             )
         except Exception:
-            self.log_warn(
-                ["No %s parameter specified", gc.PPN_TASK_OS_FILE_HEAD_TAIL_FORMAT]
+            logger.warning(
+                "No %s parameter specified", gc.PPN_TASK_OS_FILE_HEAD_TAIL_FORMAT
             )
 
         # create writer
@@ -566,14 +537,13 @@ class SyncMap(Loggable):
             variant=sync_map_format,
             parameters=parameters,
             rconf=self.rconf,
-            logger=self.logger,
         )
 
         # create dir hierarchy, if needed
         gf.ensure_parent_directory(output_file_path)
 
         # open file for writing
-        self.log("Writing output file...")
+        logger.debug("Writing output file...")
         with open(output_file_path, "w", encoding="utf-8") as output_file:
             output_file.write(writer.format(syncmap=pruned_syncmap))
-        self.log("Writing output file... done")
+        logger.debug("Writing output file... done")

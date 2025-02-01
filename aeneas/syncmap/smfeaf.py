@@ -31,8 +31,6 @@ class SyncMapFormatEAF(SyncMapFormatGenericXML):
     Handler for ELAN I/O format (EAF).
     """
 
-    TAG = "SyncMapFormatEAF"
-
     DEFAULT = "eaf"
 
     def parse(self, input_text, syncmap):

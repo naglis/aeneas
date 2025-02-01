@@ -27,9 +27,11 @@ Extract MFCCs from a given audio file.
 import sys
 import numpy
 
-from aeneas.audiofile import AudioFileConverterError
-from aeneas.audiofile import AudioFileNotInitializedError
-from aeneas.audiofile import AudioFileUnsupportedFormatError
+from aeneas.audiofile import (
+    AudioFileConverterError,
+    AudioFileNotInitializedError,
+    AudioFileUnsupportedFormatError,
+)
 from aeneas.audiofilemfcc import AudioFileMFCC
 from aeneas.runtimeconfiguration import RuntimeConfiguration
 from aeneas.tools.abstract_cli_program import AbstractCLIProgram
@@ -88,9 +90,7 @@ class ExtractMFCCCLI(AbstractCLIProgram):
             return self.ERROR_EXIT_CODE
 
         try:
-            mfccs = AudioFileMFCC(
-                input_file_path, rconf=self.rconf, logger=self.logger
-            ).all_mfcc
+            mfccs = AudioFileMFCC(input_file_path, rconf=self.rconf).all_mfcc
             if delete_first:
                 mfccs = mfccs[1:, :]
             if transpose:
@@ -117,19 +117,20 @@ class ExtractMFCCCLI(AbstractCLIProgram):
                 #       hence, converting back to bytes, which works in Python 3 too
                 numpy.savetxt(output_file_path, mfccs, fmt=output_text_format)
             self.print_info("MFCCs shape: %d %d" % (mfccs.shape))
-            self.print_success("MFCCs saved to '%s'" % (output_file_path))
+            self.print_info(f"MFCCs saved to {output_file_path!r}")
             return self.NO_ERROR_EXIT_CODE
         except AudioFileConverterError:
             self.print_error(
-                "Unable to call the ffmpeg executable '%s'"
-                % (self.rconf[RuntimeConfiguration.FFMPEG_PATH])
+                f"Unable to call the ffmpeg executable {self.rconf[RuntimeConfiguration.FFMPEG_PATH]!r}. "
+                "Make sure the path to ffmpeg is correct."
             )
-            self.print_error("Make sure the path to ffmpeg is correct")
         except (AudioFileUnsupportedFormatError, AudioFileNotInitializedError):
-            self.print_error("Cannot read file '%s'" % (input_file_path))
-            self.print_error("Check that its format is supported by ffmpeg")
-        except OSError:
-            self.print_error("Cannot write file '%s'" % (output_file_path))
+            self.print_error(
+                f"Cannot read file {input_file_path!r}. "
+                "Check that its format is supported by ffmpeg."
+            )
+        except OSError as exc:
+            self.print_error(f"Cannot write file {output_file_path!r}: {exc}")
 
         return self.ERROR_EXIT_CODE
 

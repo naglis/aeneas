@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 # aeneas is a Python/C library and a set of tools
 # to automagically synchronize audio and text (aka forced alignment)
 #
@@ -30,18 +28,14 @@ class SyncMapFormatGenericSubtitles(SyncMapFormatBase):
     Base class for subtitles-like I/O format handlers.
     """
 
-    TAG = "SyncMapFormatGenericSubtitles"
-
     DEFAULT = "subtitles"
     """
     The code for the default variant
     associated with this format.
     """
 
-    def __init__(self, variant=DEFAULT, parameters=None, rconf=None, logger=None):
-        super().__init__(
-            variant=variant, parameters=parameters, rconf=rconf, logger=logger
-        )
+    def __init__(self, variant=DEFAULT, parameters=None, rconf=None):
+        super().__init__(variant=variant, parameters=parameters, rconf=rconf)
 
         #
         # NOTE since we store functions (parse_..., format_...)
@@ -107,10 +101,10 @@ class SyncMapFormatGenericSubtitles(SyncMapFormatBase):
             (i.e., the line where the next block starts).
             """
             acc = []
-            while (i < len(input_lines)) and (input_lines[i] != ""):
+            while i < len(input_lines) and input_lines[i] != "":
                 acc.append(input_lines[i])
                 i += 1
-            while (i < len(input_lines)) and (input_lines[i] == ""):
+            while i < len(input_lines) and input_lines[i] == "":
                 i += 1
             return (acc, i)
 
@@ -120,11 +114,8 @@ class SyncMapFormatGenericSubtitles(SyncMapFormatBase):
             """
             split = string.split(self.time_values_separator)
             if len(split) < 2:
-                self.log_exc(
-                    ["The following timing string is malformed: '%s'", string],
-                    None,
-                    True,
-                    ValueError,
+                raise ValueError(
+                    f"The following timing string is malformed: {string!r}"
                 )
             #
             # certain formats might have time lines like:
@@ -158,7 +149,7 @@ class SyncMapFormatGenericSubtitles(SyncMapFormatBase):
                 i += 1
 
         # skip any blank lines after the header
-        while (i < len(input_lines)) and (input_lines[i] == ""):
+        while i < len(input_lines) and input_lines[i] == "":
             i += 1
 
         # input_lines[i] is not empty
@@ -169,9 +160,7 @@ class SyncMapFormatGenericSubtitles(SyncMapFormatBase):
                 # no block => break
                 break
 
-            if (self.footer_string is not None) and (
-                acc[0].startswith(self.footer_string)
-            ):
+            if self.footer_string is not None and acc[0].startswith(self.footer_string):
                 # we reached the footer => break
                 break
 

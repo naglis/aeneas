@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 # aeneas is a Python/C library and a set of tools
 # to automagically synchronize audio and text (aka forced alignment)
 #
@@ -28,13 +26,13 @@ This module contains the following classes:
 """
 
 from aeneas.configuration import Configuration
-from aeneas.logger import Loggable
+from aeneas.logger import Configurable
 from aeneas.language import Language
 import aeneas.globalconstants as gc
 import aeneas.globalfunctions as gf
 
 
-class Job(Loggable):
+class Job(Configurable):
     """
     A structure representing a job, that is,
     a collection of related Tasks.
@@ -42,16 +40,12 @@ class Job(Loggable):
     :param string config_string: the job configuration string
     :param rconf: a runtime configuration
     :type  rconf: :class:`~aeneas.runtimeconfiguration.RuntimeConfiguration`
-    :param logger: the logger object
-    :type  logger: :class:`~aeneas.logger.Logger`
     :raises: TypeError: if ``config_string`` is not ``None`` and
                         not a Unicode string
     """
 
-    TAG = "Job"
-
-    def __init__(self, config_string=None, rconf=None, logger=None):
-        super().__init__(rconf=rconf, logger=logger)
+    def __init__(self, config_string=None, rconf=None):
+        super().__init__(rconf=rconf)
         self.tasks = []
         self.identifier = gf.uuid_string()
         self.configuration = (
@@ -65,10 +59,10 @@ class Job(Loggable):
         i = 0
         msg = []
         msg.append(f"{gc.RPN_JOB_IDENTIFIER}: '{self.identifier}'")
-        msg.append("Configuration:\n%s" % self.configuration)
+        msg.append(f"Configuration:\n{self.configuration}")
         msg.append("Tasks:")
         for task in self.tasks:
-            msg.append("Task %d %s" % (i, task.identifier))
+            msg.append(f"Task {i:d} {task.identifier}")
             i += 1
         return "\n".join(msg)
 
@@ -173,8 +167,6 @@ class JobConfiguration(Configuration):
             (None, None, ["o_hierarchy_type"], "type of output container hierarchy"),
         ),
     ]
-
-    TAG = "JobConfiguration"
 
     def __init__(self, config_string=None):
         super().__init__(config_string)

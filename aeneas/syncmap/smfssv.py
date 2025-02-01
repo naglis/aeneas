@@ -29,8 +29,6 @@ class SyncMapFormatSSV(SyncMapFormatGenericTabular):
     Handler for space-separated plain text (SSV) I/O format.
     """
 
-    TAG = "SyncMapFormatSSV"
-
     DEFAULT = "ssv"
 
     HUMAN = "ssvh"

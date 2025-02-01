@@ -24,6 +24,8 @@
 A wrapper for the ``speect`` TTS engine.
 """
 
+import logging
+
 import numpy
 import speect
 import speect.audio
@@ -33,6 +35,8 @@ from aeneas.language import Language
 from aeneas.exacttiming import TimeValue
 from aeneas.ttswrappers.basettswrapper import BaseTTSWrapper
 import aeneas.globalfunctions as gf
+
+logger = logging.getLogger(__name__)
 
 
 class CustomTTSWrapper(BaseTTSWrapper):
@@ -76,10 +80,8 @@ class CustomTTSWrapper(BaseTTSWrapper):
     #
     HAS_PYTHON_CALL = True
 
-    TAG = "CustomTTSWrapperSPEECT"
-
-    def __init__(self, rconf=None, logger=None):
-        super().__init__(rconf=rconf, logger=logger)
+    def __init__(self, rconf=None):
+        super().__init__(rconf=rconf)
 
     def _synthesize_single_python_helper(
         self, text, voice_code, output_file_path=None, return_audio_data=True
@@ -93,14 +95,14 @@ class CustomTTSWrapper(BaseTTSWrapper):
         :rtype: tuple (result, (duration, sample_rate, encoding, data))
         """
         # return zero if text is the empty string
-        if len(text) == 0:
+        if not text:
             #
             # NOTE values of sample_rate, encoding, data
             #      do not matter if the duration is 0.000,
             #      so set them to None instead of the more precise:
             #      return (True, (TimeValue("0.000"), 16000, "pcm_s16le", numpy.array([])))
             #
-            self.log("len(text) is zero: returning 0.000")
+            logger.debug("text is empty: returning 0.000")
             return (True, (TimeValue("0.000"), None, None, None))
 
         #
@@ -122,20 +124,20 @@ class CustomTTSWrapper(BaseTTSWrapper):
         utt = voice.synth(text)
         audio = utt.features["audio"]
         if output_file_path is None:
-            self.log("output_file_path is None => not saving to file")
+            logger.debug("output_file_path is None => not saving to file")
         else:
-            self.log("output_file_path is not None => saving to file...")
+            logger.debug("output_file_path is not None => saving to file...")
             # NOTE apparently, save_riff needs the path to be a byte string
             audio.save_riff(output_file_path.encode("utf-8"))
-            self.log("output_file_path is not None => saving to file... done")
+            logger.debug("output_file_path is not None => saving to file... done")
 
         # return immediately if returning audio data is not needed
         if not return_audio_data:
-            self.log("return_audio_data is True => return immediately")
+            logger.debug("return_audio_data is True => return immediately")
             return (True, None)
 
         # get length and data using speect Python API
-        self.log("return_audio_data is True => read and return audio data")
+        logger.debug("return_audio_data is True => read and return audio data")
         waveform = audio.get_audio_waveform()
         audio_sample_rate = int(waveform["samplerate"])
         audio_length = TimeValue(audio.num_samples() / audio_sample_rate)

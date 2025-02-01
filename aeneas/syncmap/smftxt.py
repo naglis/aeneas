@@ -29,8 +29,6 @@ class SyncMapFormatTXT(SyncMapFormatGenericTabular):
     Handler for space-separated plain text (TXT) I/O format.
     """
 
-    TAG = "SyncMapFormatTXT"
-
     DEFAULT = "txt"
 
     HUMAN = "txth"

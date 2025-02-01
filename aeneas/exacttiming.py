@@ -41,8 +41,6 @@ class TimeValue(Decimal):
     A numeric type to represent time values with arbitrary precision.
     """
 
-    TAG = "TimeValue"
-
     def __repr__(self):
         return super().__repr__().replace("Decimal", "TimeValue")
 
@@ -271,8 +269,6 @@ class TimeInterval:
         RELATIVE_POSITION_II_EG: RELATIVE_POSITION_II_LB,
         RELATIVE_POSITION_II_GG: RELATIVE_POSITION_II_LL,
     }
-
-    TAG = "TimeInterval"
 
     def __init__(self, begin, end):
         if not isinstance(begin, TimeValue):

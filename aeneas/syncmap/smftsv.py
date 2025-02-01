@@ -29,8 +29,6 @@ class SyncMapFormatTSV(SyncMapFormatGenericTabular):
     Handler for tab-separated plain text (TSV) I/O format.
     """
 
-    TAG = "SyncMapFormatTSV"
-
     DEFAULT = "tsv"
 
     HUMAN = "tsvh"

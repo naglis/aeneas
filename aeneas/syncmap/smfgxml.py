@@ -33,8 +33,6 @@ class SyncMapFormatGenericXML(SyncMapFormatBase):
     Base class for XML-like I/O format handlers.
     """
 
-    TAG = "SyncMapFormatGenericTabular"
-
     DEFAULT = "genericxml"
     """
     The code for the default variant

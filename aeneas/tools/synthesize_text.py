@@ -136,17 +136,17 @@ class SynthesizeTextCLI(AbstractCLIProgram):
             gc.PPN_TASK_IS_TEXT_UNPARSED_ID_REGEX: id_regex,
             gc.PPN_TASK_IS_TEXT_UNPARSED_ID_SORT: sort,
         }
-        if (text_format == TextFileFormat.MUNPARSED) and (
-            (l1_id_regex is None) or (l2_id_regex is None) or (l3_id_regex is None)
+        if text_format == TextFileFormat.MUNPARSED and (
+            l1_id_regex is None or l2_id_regex is None or l3_id_regex is None
         ):
             self.print_error(
                 "You must specify --l1-id-regex and --l2-id-regex and --l3-id-regex for munparsed format"
             )
             return self.ERROR_EXIT_CODE
         if (
-            (text_format == TextFileFormat.UNPARSED)
-            and (id_regex is None)
-            and (class_regex is None)
+            text_format == TextFileFormat.UNPARSED
+            and id_regex is None
+            and class_regex is None
         ):
             self.print_error(
                 "You must specify --id-regex and/or --class-regex for unparsed format"
@@ -167,25 +167,23 @@ class SynthesizeTextCLI(AbstractCLIProgram):
             self.print_error("No text fragments found")
             return self.ERROR_EXIT_CODE
         text_file.set_language(language)
-        self.print_info("Read input text with %d fragments" % (len(text_file)))
+        self.print_info(f"Read input text with {len(text_file):d} fragments")
         if start_fragment is not None:
-            self.print_info("Slicing from index %d" % (start_fragment))
+            self.print_info(f"Slicing from index {start_fragment:d}")
         if end_fragment is not None:
-            self.print_info("Slicing to index %d" % (end_fragment))
+            self.print_info(f"Slicing to index {end_fragment:d}")
         text_slice = text_file.get_slice(start_fragment, end_fragment)
-        self.print_info("Synthesizing %d fragments" % (len(text_slice)))
+        self.print_info(f"Synthesizing {len(text_slice):d} fragments")
 
         if quit_after is not None:
-            self.print_info(
-                "Stop synthesizing upon reaching %.3f seconds" % (quit_after)
-            )
+            self.print_info(f"Stop synthesizing upon reaching {quit_after:.3f} seconds")
 
         try:
-            synt = Synthesizer(rconf=self.rconf, logger=self.logger)
+            synt = Synthesizer(rconf=self.rconf)
             synt.synthesize(
                 text_slice, output_file_path, quit_after=quit_after, backwards=backwards
             )
-            self.print_success("Created file '%s'" % output_file_path)
+            self.print_info(f"Created file {output_file_path!r}")
             synt.clear_cache()
             return self.NO_ERROR_EXIT_CODE
         except ImportError as exc:
@@ -193,25 +191,31 @@ class SynthesizeTextCLI(AbstractCLIProgram):
             if tts == Synthesizer.AWS:
                 self.print_error(
                     "You need to install Python module boto3 to use the AWS Polly TTS API wrapper. Run:"
+                    "\n"
+                    "$ pip install boto3"
+                    "\n"
+                    "or, to install for all users:"
+                    "\n"
+                    "$ sudo pip install boto3"
                 )
-                self.print_error("$ pip install boto3")
-                self.print_error("or, to install for all users:")
-                self.print_error("$ sudo pip install boto3")
             elif tts == Synthesizer.NUANCE:
                 self.print_error(
                     "You need to install Python module requests to use the Nuance TTS API wrapper. Run:"
+                    "\n"
+                    "$ pip install requests"
+                    "\n"
+                    "or, to install for all users:"
+                    "\n"
+                    "$ sudo pip install requests"
                 )
-                self.print_error("$ pip install requests")
-                self.print_error("or, to install for all users:")
-                self.print_error("$ sudo pip install requests")
             else:
                 self.print_error(
-                    "An unexpected error occurred while synthesizing text:"
+                    f"An unexpected error occurred while synthesizing text: {exc}"
                 )
-                self.print_error("%s" % exc)
         except Exception as exc:
-            self.print_error("An unexpected error occurred while synthesizing text:")
-            self.print_error("%s" % exc)
+            self.print_error(
+                f"An unexpected error occurred while synthesizing text: {exc}"
+            )
 
         return self.ERROR_EXIT_CODE
 

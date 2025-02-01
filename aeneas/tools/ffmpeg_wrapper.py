@@ -68,26 +68,19 @@ class FFMPEGWrapperCLI(AbstractCLIProgram):
             return self.ERROR_EXIT_CODE
 
         try:
-            converter = FFMPEGWrapper(rconf=self.rconf, logger=self.logger)
+            converter = FFMPEGWrapper(rconf=self.rconf)
             converter.convert(input_file_path, output_file_path)
-            self.print_success(
-                f"Converted '{input_file_path}' into '{output_file_path}'"
-            )
+            self.print_info(f"Converted {input_file_path!r} into {output_file_path!r}")
             return self.NO_ERROR_EXIT_CODE
         except FFMPEGPathError:
             self.print_error(
-                "Unable to call the ffmpeg executable '%s'"
-                % (self.rconf[RuntimeConfiguration.FFMPEG_PATH])
+                f"Unable to call the ffmpeg executable {self.rconf[RuntimeConfiguration.FFMPEG_PATH]!r}. "
+                "Make sure the path to ffmpeg is correct."
             )
-            self.print_error("Make sure the path to ffmpeg is correct")
         except OSError:
             self.print_error(
-                "Cannot convert file '{}' into '{}'".format(
-                    input_file_path, output_file_path
-                )
-            )
-            self.print_error(
-                "Make sure the input file has a format supported by ffmpeg"
+                f"Cannot convert file {input_file_path!r} into {output_file_path!r}. "
+                "Make sure the input file has a format supported by ffmpeg."
             )
 
         return self.ERROR_EXIT_CODE

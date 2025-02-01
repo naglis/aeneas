@@ -91,9 +91,7 @@ class RunVADCLI(AbstractCLIProgram):
 
         self.print_info("Reading audio...")
         try:
-            audio_file_mfcc = AudioFileMFCC(
-                audio_file_path, rconf=self.rconf, logger=self.logger
-            )
+            audio_file_mfcc = AudioFileMFCC(audio_file_path, rconf=self.rconf)
         except AudioFileConverterError:
             self.print_error(
                 "Unable to call the ffmpeg executable '%s'"
@@ -165,7 +163,8 @@ class RunVADCLI(AbstractCLIProgram):
         else:
             with open(output_file_path, "w", encoding="utf-8") as output_file:
                 output_file.write("\n".join(msg))
-                self.print_success("Created file '%s'" % output_file_path)
+
+            self.print_info(f"Created file {output_file_path!r}")
 
 
 def main():

@@ -30,8 +30,6 @@ class SyncMapFormatXML(SyncMapFormatGenericXML):
     Handler for XML I/O format.
     """
 
-    TAG = "SyncMapFormatXML"
-
     DEFAULT = "xml"
 
     def parse(self, input_text, syncmap):

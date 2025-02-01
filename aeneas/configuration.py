@@ -98,8 +98,6 @@ class Configuration:
     Aliases for a ``True`` value for ``bool`` fields
     """
 
-    TAG = "Configuration"
-
     def __init__(self, config_string=None):
         if (config_string is not None) and (not isinstance(config_string, str)):
             raise TypeError("config_string is not a string")

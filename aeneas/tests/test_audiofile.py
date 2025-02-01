@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 # aeneas is a Python/C library and a set of tools
 # to automagically synchronize audio and text (aka forced alignment)
 #
@@ -25,9 +23,11 @@ import tempfile
 
 import numpy
 
-from aeneas.audiofile import AudioFile
-from aeneas.audiofile import AudioFileNotInitializedError
-from aeneas.audiofile import AudioFileUnsupportedFormatError
+from aeneas.audiofile import (
+    AudioFile,
+    AudioFileNotInitializedError,
+    AudioFileUnsupportedFormatError,
+)
 from aeneas.exacttiming import TimeValue
 import aeneas.globalfunctions as gf
 
@@ -38,7 +38,7 @@ class TestAudioFile(unittest.TestCase):
     AUDIO_FILE_NOT_WAVE = "res/audioformats/p001.mp3"
     AUDIO_FILE_EXACT = "res/audioformats/exact.5600.16000.wav"
     NOT_EXISTING_FILE = "res/audioformats/x/y/z/not_existing.wav"
-    FILES = [
+    FILES = (
         {
             "path": "res/audioformats/p001.aac",
             "size": 72196,
@@ -103,7 +103,7 @@ class TestAudioFile(unittest.TestCase):
             "format": "vorbis",
             "length": TimeValue("9.0"),  # 9.0
         },
-    ]
+    )
 
     def load(self, path, *, read_properties: bool = False, read_samples: bool = False):
         af = AudioFile(gf.absolute_path(path, __file__))

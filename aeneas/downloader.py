@@ -28,12 +28,15 @@ This module contains the following classes:
 .. note:: This module requires Python module ``youtube-dl`` (``pip install youtube-dl``).
 """
 
+import logging
 import time
 import tempfile
 
-from aeneas.logger import Loggable
+from aeneas.logger import Configurable
 from aeneas.runtimeconfiguration import RuntimeConfiguration
 import aeneas.globalfunctions as gf
+
+logger = logging.getLogger(__name__)
 
 
 class DownloadError(Exception):
@@ -43,10 +46,8 @@ class DownloadError(Exception):
     network issues.
     """
 
-    pass
 
-
-class Downloader(Loggable):
+class Downloader(Configurable):
     """
     Download files from various Web sources.
     At the moment, only YouTube videos
@@ -57,8 +58,6 @@ class Downloader(Loggable):
     :param logger: the logger object
     :type  logger: :class:`~aeneas.logger.Logger`
     """
-
-    TAG = "Downloader"
 
     def audio_from_youtube(
         self,
@@ -111,7 +110,7 @@ class Downloader(Loggable):
             Return a list of dicts, each describing
             an available audiostream for the given ``source_url``.
             """
-            self.log("Getting audiostreams...")
+            logger.debug("Getting audiostreams...")
             audiostreams = []
             options = {
                 "download": False,
@@ -134,7 +133,7 @@ class Downloader(Loggable):
                             "abr": a["abr"],
                         }
                     )
-            self.log("Getting audiostreams... done")
+            logger.debug("Getting audiostreams... done")
             return audiostreams
 
         def _select_audiostream(
@@ -148,7 +147,7 @@ class Downloader(Loggable):
             of the available audiostreams, then just act
             according to ``largest_audio``.
             """
-            self.log("Selecting best-matching audiostream...")
+            logger.debug("Selecting best-matching audiostream...")
             selected = None
             if download_format is not None:
                 matching = [a for a in audiostreams if a["format"] == download_format]
@@ -157,7 +156,7 @@ class Downloader(Loggable):
             if selected is None:
                 sa = sorted(audiostreams, key=lambda x: x["filesize"])
                 selected = sa[-1] if largest_audio else sa[0]
-            self.log("Selecting best-matching audiostream... done")
+            logger.debug("Selecting best-matching audiostream... done")
             return selected
 
         def _compose_output_file_path(self, extension, output_file_path=None):
@@ -166,32 +165,28 @@ class Downloader(Loggable):
             Otherwise (``output_file_path`` is ``None``),
             create a temporary file with the correct extension.
             """
-            self.log("Determining output file path...")
+            logger.debug("Determining output file path...")
             if output_file_path is None:
-                self.log("output_file_path is None: creating temp file")
+                logger.debug("output_file_path is None: creating temp file")
                 with tempfile.NamedTemporaryFile(
                     suffix=f".{extension}",
                     dir=self.rconf[RuntimeConfiguration.TMP_PATH],
                 ) as tmp_file:
                     output_file_path = tmp_file.name
             else:
-                self.log(
+                logger.debug(
                     "output_file_path is not None: cheking that file can be written"
                 )
                 if not gf.file_can_be_written(output_file_path):
-                    self.log_exc(
-                        "Path '%s' cannot be written. Wrong permissions?"
-                        % (output_file_path),
-                        None,
-                        True,
-                        OSError,
+                    raise OSError(
+                        f"Path {output_file_path!r} cannot be written. Wrong permissions?"
                     )
-            self.log("Determining output file path... done")
-            self.log(["Output file path is '%s'", output_file_path])
+            logger.debug("Determining output file path... done")
+            logger.debug("Output file path is %r", output_file_path)
             return output_file_path
 
         def _download_audiostream(self, source_url, fmt, output_path):
-            self.log("Downloading audiostream...")
+            logger.debug("Downloading audiostream...")
             options = {
                 "download": True,
                 "format": fmt,
@@ -201,50 +196,43 @@ class Downloader(Loggable):
             }
             with youtube_dl.YoutubeDL(options) as ydl:
                 ydl.download([source_url])
-            self.log("Downloading audiostream... done")
+            logger.debug("Downloading audiostream... done")
 
         try:
             import youtube_dl
         except ImportError as exc:
-            self.log_exc(
-                "Python module youtube-dl is not installed", exc, True, ImportError
-            )
+            raise ImportError("Python module youtube-dl is not installed") from exc
 
         # retry parameters
         sleep_delay = self.rconf[RuntimeConfiguration.DOWNLOADER_SLEEP]
         attempts = self.rconf[RuntimeConfiguration.DOWNLOADER_RETRY_ATTEMPTS]
-        self.log(["Sleep delay:    %.3f", sleep_delay])
-        self.log(["Retry attempts: %d", attempts])
+        logger.debug("Sleep delay:    %.3f", sleep_delay)
+        logger.debug("Retry attempts: %d", attempts)
 
         # get audiostreams
         att = attempts
         while att > 0:
-            self.log("Sleeping to throttle API usage...")
+            logger.debug("Sleeping to throttle API usage...")
             time.sleep(sleep_delay)
-            self.log("Sleeping to throttle API usage... done")
+            logger.debug("Sleeping to throttle API usage... done")
             try:
                 audiostreams = _list_audiostreams(self, source_url)
                 break
             except Exception:
-                self.log_warn("Unable to list audio streams, retry")
+                logger.warning("Unable to list audio streams, retry")
                 att -= 1
         if att <= 0:
-            self.log_exc(
-                "All downloader requests failed: wrong URL or you are offline",
-                None,
-                True,
-                DownloadError,
+            raise DownloadError(
+                "All downloader requests failed: wrong URL or you are offline?"
             )
 
         if not download:
-            self.log("Returning list of audiostreams")
+            logger.debug("Returning list of audiostreams")
             return audiostreams
 
         # download the best-matching audiostream
         if len(audiostreams) == 0:
-            self.log_exc(
-                "No audiostreams available for the provided URL", None, True, OSError
-            )
+            raise OSError("No audiostreams available for the provided URL")
         audiostream = _select_audiostream(
             self, audiostreams, download_format, largest_audio
         )
@@ -253,23 +241,20 @@ class Downloader(Loggable):
         )
         att = attempts
         while att > 0:
-            self.log("Sleeping to throttle API usage...")
+            logger.debug("Sleeping to throttle API usage...")
             time.sleep(sleep_delay)
-            self.log("Sleeping to throttle API usage... done")
+            logger.debug("Sleeping to throttle API usage... done")
             try:
                 _download_audiostream(
                     self, source_url, audiostream["format"], output_path
                 )
                 break
             except Exception:
-                self.log_warn("Unable to download audio streams, retry")
+                logger.warning("Unable to download audio streams, retry", exc_info=True)
                 att -= 1
         if att <= 0:
-            self.log_exc(
-                "All downloader requests failed: wrong URL or you are offline",
-                None,
-                True,
-                DownloadError,
+            raise DownloadError(
+                "All downloader requests failed: wrong URL or you are offline?"
             )
 
         return output_path

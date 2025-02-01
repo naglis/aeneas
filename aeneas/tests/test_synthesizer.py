@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 # aeneas is a Python/C library and a set of tools
 # to automagically synchronize audio and text (aka forced alignment)
 #
@@ -26,7 +24,6 @@ import tempfile
 
 from aeneas.exacttiming import TimeValue
 from aeneas.language import Language
-from aeneas.logger import Logger
 from aeneas.runtimeconfiguration import RuntimeConfiguration
 from aeneas.synthesizer import Synthesizer
 from aeneas.textfile import TextFile, TextFileFormat
@@ -42,14 +39,13 @@ class TestSynthesizer(unittest.TestCase):
         expected_anchors: int,
         *,
         expected_total_time: TimeValue | None = None,
-        logger: Logger | None = None,
         quit_after: TimeValue | None = None,
         backwards: bool = False,
     ):
         def inner(c_ext: bool, cew_subprocess: bool, tts_cache: bool):
             tfl = TextFile(gf.absolute_path(path, __file__), TextFileFormat.PLAIN)
             tfl.set_language(Language.ENG)
-            synth = Synthesizer(logger=logger)
+            synth = Synthesizer()
             synth.rconf[RuntimeConfiguration.C_EXTENSIONS] = c_ext
             synth.rconf[RuntimeConfiguration.CEW_SUBPROCESS_ENABLED] = cew_subprocess
             synth.rconf[RuntimeConfiguration.TTS_CACHE] = tts_cache
@@ -88,10 +84,6 @@ class TestSynthesizer(unittest.TestCase):
 
     def test_synthesize(self):
         self.perform("res/inputtext/sonnet_plain.txt", 15)
-
-    def test_synthesize_logger(self):
-        logger = Logger()
-        self.perform("res/inputtext/sonnet_plain.txt", 15, logger=logger)
 
     def test_synthesize_unicode(self):
         self.perform("res/inputtext/sonnet_plain_utf8.txt", 15)

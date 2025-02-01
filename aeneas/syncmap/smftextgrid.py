@@ -20,7 +20,6 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-
 from aeneas.exacttiming import TimeValue
 from aeneas.syncmap.smfbase import SyncMapFormatBase
 import aeneas.globalfunctions as gf
@@ -30,8 +29,6 @@ class SyncMapFormatTextGrid(SyncMapFormatBase):
     """
     Handler for TextGrid I/O format.
     """
-
-    TAG = "SyncMapFormatTextGrid"
 
     DEFAULT = "textgrid"
 
@@ -43,7 +40,7 @@ class SyncMapFormatTextGrid(SyncMapFormatBase):
         try:
             import tgt
         except ImportError as exc:
-            self.log_exc("Python module tgt is not installed", exc, True, ImportError)
+            raise ImportError("Python module tgt is not installed") from exc
 
         # from https://github.com/hbuschme/TextGridTools/blob/master/tgt/io.py
         # get all non-empty lines
@@ -74,7 +71,7 @@ class SyncMapFormatTextGrid(SyncMapFormatBase):
         try:
             import tgt
         except ImportError as exc:
-            self.log_exc("Python module tgt is not installed", exc, True, ImportError)
+            raise ImportError("Python module tgt is not installed") from exc
         # from https://github.com/hbuschme/TextGridTools/blob/master/tgt/io.py
         textgrid = tgt.TextGrid()
         tier = tgt.IntervalTier(name="Token")

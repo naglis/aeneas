@@ -234,14 +234,9 @@ Concepts
 
 Except for "enumeration" classes (e.g., :class:`~aeneas.textfile.TextFileFormat`) and
 "data-only" classes (e.g., :class:`~aeneas.textfile.TextFragment`), most classes
-are subclasses of :class:`~aeneas.logger.Loggable`,
-which provides the ability to log events using a shared
-:class:`~aeneas.logger.Logger` object (``logger``),
-and to inject runtime execution parameters using a shared
+are subclasses of :class:`~aeneas.logger.Configurable`,
+which provides the ability to inject runtime execution parameters using a shared
 :class:`~aeneas.runtimeconfiguration.RuntimeConfiguration` object (``rconf``).
-
-The ``logger`` can tee (i.e., store messages and print them to stdout)
-or dump to file.
 
 The ``rconf`` provides a way to fine tune ``aeneas``
 by changing its internal behavior.
@@ -250,12 +245,9 @@ and they do not require explicitly passing an ``rconf`` object.
 
 .. Topic:: Example
 
-    Process a task with custom parameters, and log messages: 
+    Process a task with custom parameters: 
     
     .. code-block:: python
-
-        # create Logger which logs and tees
-        logger = Logger(tee=True)
 
         # create RuntimeConfiguration object, with custom MFCC length and shift
         rconf = RuntimeConfiguration()
@@ -266,7 +258,7 @@ and they do not require explicitly passing an ``rconf`` object.
         task = ...
 
         # process Task with custom parameters
-        ExecuteTask(task, rconf=rconf, logger=logger).execute()
+        ExecuteTask(task, rconf=rconf).execute()
 
 If you read from/write to file, you should be fine
 interacting only with :class:`~aeneas.task.Task` functions.
@@ -386,7 +378,6 @@ and the following modules:
     idsortingalgorithm
     job
     language
-    logger
     mfcc
     plotter
     runtimeconfiguration

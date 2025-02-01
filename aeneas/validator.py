@@ -25,6 +25,7 @@ This module contains the following classes:
 * :class:`~aeneas.validator.ValidatorResult`, a record holding validation result and possibly messages.
 """
 
+import logging
 import os.path
 
 from aeneas.analyzecontainer import AnalyzeContainer
@@ -32,22 +33,22 @@ from aeneas.container import Container, ContainerFormat
 from aeneas.executetask import AdjustBoundaryAlgorithm
 from aeneas.hierarchytype import HierarchyType
 from aeneas.idsortingalgorithm import IDSortingAlgorithm
-from aeneas.logger import Loggable
+from aeneas.logger import Configurable
 from aeneas.runtimeconfiguration import RuntimeConfiguration
 from aeneas.syncmap import SyncMapFormat, SyncMapHeadTailFormat
 from aeneas.textfile import TextFileFormat
 import aeneas.globalconstants as gc
 import aeneas.globalfunctions as gf
 
+logger = logging.getLogger(__name__)
 
-class Validator(Loggable):
+
+class Validator(Configurable):
     """
     A validator to assess whether user input is well-formed.
 
     :param rconf: a runtime configuration
     :type  rconf: :class:`~aeneas.runtimeconfiguration.RuntimeConfiguration`
-    :param logger: the logger object
-    :type  logger: :class:`~aeneas.logger.Logger`
     """
 
     ALLOWED_VALUES = [
@@ -219,10 +220,8 @@ class Validator(Loggable):
         gc.PPN_TASK_OS_FILE_NAME,
     )
 
-    TAG = "Validator"
-
-    def __init__(self, rconf=None, logger=None):
-        super().__init__(rconf=rconf, logger=logger)
+    def __init__(self, rconf=None):
+        super().__init__(rconf=rconf)
         self.result = None
 
     def check_file_encoding(self, input_file_path):
@@ -232,7 +231,7 @@ class Validator(Loggable):
         :param string input_file_path: the path of the file to be checked
         :rtype: :class:`~aeneas.validator.ValidatorResult`
         """
-        self.log(["Checking encoding of file '%s'", input_file_path])
+        logger.debug("Checking encoding of file '%s'", input_file_path)
 
         self.result = ValidatorResult()
 
@@ -260,7 +259,7 @@ class Validator(Loggable):
         :param bool is_bstring: if True, string is a byte string
         :rtype: :class:`~aeneas.validator.ValidatorResult`
         """
-        self.log("Checking the given byte string")
+        logger.debug("Checking the given byte string")
 
         self.result = ValidatorResult()
 
@@ -298,9 +297,9 @@ class Validator(Loggable):
         :rtype: :class:`~aeneas.validator.ValidatorResult`
         """
         if is_job:
-            self.log("Checking job configuration string")
+            logger.debug("Checking job configuration string")
         else:
-            self.log("Checking task configuration string")
+            logger.debug("Checking task configuration string")
 
         self.result = ValidatorResult()
 
@@ -316,16 +315,16 @@ class Validator(Loggable):
 
         is_bstring = isinstance(config_string, bytes)
         if is_bstring:
-            self.log("Checking that config_string is well formed")
+            logger.debug("Checking that config_string is well formed")
             self.check_raw_string(config_string, is_bstring=True)
             if not self.result.passed:
                 return self.result
             config_string = gf.safe_unicode(config_string)
 
-        self.log("Checking required parameters")
+        logger.debug("Checking required parameters")
         parameters = gf.config_string_to_dict(config_string, self.result)
         self._check_required_parameters(required_parameters, parameters)
-        self.log(["Checking config_string: returning %s", self.result.passed])
+        logger.debug("Checking config_string: returning %s", self.result.passed)
         return self.result
 
     def check_config_txt(self, contents, is_config_string: bool = False):
@@ -339,7 +338,7 @@ class Validator(Loggable):
         :param bool is_config_string: if ``True``, contents is a config string
         :rtype: :class:`~aeneas.validator.ValidatorResult`
         """
-        self.log("Checking contents TXT config file")
+        logger.debug("Checking contents TXT config file")
 
         self.result = ValidatorResult()
 
@@ -348,19 +347,19 @@ class Validator(Loggable):
 
         is_bstring = isinstance(contents, bytes)
         if is_bstring:
-            self.log("Checking that contents is well formed")
+            logger.debug("Checking that contents is well formed")
             self.check_raw_string(contents, is_bstring=True)
             if not self.result.passed:
                 return self.result
             contents = gf.safe_unicode(contents)
         if not is_config_string:
-            self.log("Converting file contents to config string")
+            logger.debug("Converting file contents to config string")
             contents = gf.config_txt_to_string(contents)
-        self.log("Checking required parameters")
+        logger.debug("Checking required parameters")
         required_parameters = self.TXT_REQUIRED_PARAMETERS
         parameters = gf.config_string_to_dict(contents, self.result)
         self._check_required_parameters(required_parameters, parameters)
-        self.log(["Checking contents: returning %s", self.result.passed])
+        logger.debug("Checking contents: returning %s", self.result.passed)
         return self.result
 
     def check_config_xml(self, contents):
@@ -372,26 +371,26 @@ class Validator(Loggable):
         :param bool is_config_string: if ``True``, contents is a config string
         :rtype: :class:`~aeneas.validator.ValidatorResult`
         """
-        self.log("Checking contents XML config file")
+        logger.debug("Checking contents XML config file")
         self.result = ValidatorResult()
         if self._are_safety_checks_disabled("check_config_xml"):
             return self.result
         contents = gf.safe_bytes(contents)
-        self.log("Checking that contents is well formed")
+        logger.debug("Checking that contents is well formed")
         self.check_raw_string(contents, is_bstring=True)
         if not self.result.passed:
             return self.result
-        self.log("Checking required parameters for job")
+        logger.debug("Checking required parameters for job")
         job_parameters = gf.config_xml_to_dict(contents, self.result, parse_job=True)
         self._check_required_parameters(
             self.XML_JOB_REQUIRED_PARAMETERS, job_parameters
         )
         if not self.result.passed:
             return self.result
-        self.log("Checking required parameters for task")
+        logger.debug("Checking required parameters for task")
         tasks_parameters = gf.config_xml_to_dict(contents, self.result, parse_job=False)
         for parameters in tasks_parameters:
-            self.log(["Checking required parameters for task: '%s'", parameters])
+            logger.debug("Checking required parameters for task: '%s'", parameters)
             self._check_required_parameters(
                 self.XML_TASK_REQUIRED_PARAMETERS, parameters
             )
@@ -414,7 +413,7 @@ class Validator(Loggable):
         :param string config_string: the configuration string generated by the wizard
         :rtype: :class:`~aeneas.validator.ValidatorResult`
         """
-        self.log(["Checking container '%s'", container_path])
+        logger.debug("Checking container '%s'", container_path)
         self.result = ValidatorResult()
 
         if self._are_safety_checks_disabled("check_container"):
@@ -426,19 +425,19 @@ class Validator(Loggable):
 
         container = Container(container_path, container_format)
         try:
-            self.log("Checking container has config file")
+            logger.debug("Checking container has config file")
             if config_string is not None:
-                self.log("Container with config string from wizard")
+                logger.debug("Container with config string from wizard")
                 self.check_config_txt(config_string, is_config_string=True)
             elif container.has_config_xml:
-                self.log("Container has XML config file")
+                logger.debug("Container has XML config file")
                 contents = container.read_entry(container.entry_config_xml)
                 if contents is None:
                     self._failed("Unable to read the contents of XML config file.")
                     return self.result
                 self.check_config_xml(contents)
             elif container.has_config_txt:
-                self.log("Container has TXT config file")
+                logger.debug("Container has TXT config file")
                 contents = container.read_entry(container.entry_config_txt)
                 if contents is None:
                     self._failed("Unable to read the contents of TXT config file.")
@@ -447,10 +446,10 @@ class Validator(Loggable):
             else:
                 self._failed("Container does not have a TXT or XML configuration file.")
 
-            self.log("Checking we have a valid job in the container")
+            logger.debug("Checking we have a valid job in the container")
             if not self.result.passed:
                 return self.result
-            self.log("Analyze the contents of the container")
+            logger.debug("Analyze the contents of the container")
             analyzer = AnalyzeContainer(container)
             if config_string is not None:
                 job = analyzer.analyze(config_string=config_string)
@@ -472,7 +471,7 @@ class Validator(Loggable):
         if self.rconf.safety_checks:
             return False
 
-        self.log_warn(["Safety checks disabled => %s passed", caller])
+        logger.warning("Safety checks disabled => %s passed", caller)
 
         return True
 
@@ -482,10 +481,10 @@ class Validator(Loggable):
 
         :param string msg: the error message
         """
-        self.log(msg)
+        logger.debug(msg)
         self.result.passed = False
         self.result.add_error(msg)
-        self.log("Failed")
+        logger.debug("Failed")
 
     def _check_utf8_encoding(self, bstring):
         """
@@ -530,17 +529,15 @@ class Validator(Loggable):
         :param dict parameters: the given parameters
         """
         for key, allowed_values in self.ALLOWED_VALUES:
-            self.log(["Checking allowed values for parameter '%s'", key])
+            logger.debug("Checking allowed values for parameter '%s'", key)
             if key in parameters:
                 value = parameters[key]
                 if value not in allowed_values:
                     self._failed(
-                        "Parameter '{}' has value '{}' which is not allowed.".format(
-                            key, value
-                        )
+                        f"Parameter {key!r} has value {value!r} which is not allowed."
                     )
                     return
-        self.log("Passed")
+        logger.debug("Passed")
 
     def _check_implied_parameters(self, parameters):
         """
@@ -553,7 +550,7 @@ class Validator(Loggable):
         :param dict parameters: the given parameters
         """
         for key, values, implied_keys in self.IMPLIED_PARAMETERS:
-            self.log(["Checking implied parameters by '%s'='%s'", key, values])
+            logger.debug("Checking implied parameters by '%s'='%s'", key, values)
             if key in parameters and parameters[key] in values:
                 found = False
                 for implied_key in implied_keys:
@@ -570,7 +567,7 @@ class Validator(Loggable):
                         )
                     self._failed(msg)
                     return
-        self.log("Passed")
+        logger.debug("Passed")
 
     def _check_required_parameters(self, required_parameters, parameters):
         """
@@ -581,19 +578,19 @@ class Validator(Loggable):
         :param list required_parameters: required parameters
         :param dict parameters: parameters specified by the user
         """
-        self.log(["Checking required parameters '%s'", required_parameters])
-        self.log("Checking input parameters are not empty")
+        logger.debug("Checking required parameters '%s'", required_parameters)
+        logger.debug("Checking input parameters are not empty")
         if (parameters is None) or (len(parameters) == 0):
             self._failed("No parameters supplied.")
             return
-        self.log("Checking no required parameter is missing")
+        logger.debug("Checking no required parameter is missing")
         for req_param in required_parameters:
             if req_param not in parameters:
                 self._failed("Required parameter '%s' not set." % req_param)
                 return
-        self.log("Checking all parameter values are allowed")
+        logger.debug("Checking all parameter values are allowed")
         self._check_allowed_values(parameters)
-        self.log("Checking all implied parameters are present")
+        logger.debug("Checking all implied parameters are present")
         self._check_implied_parameters(parameters)
         return self.result
 
@@ -609,20 +606,20 @@ class Validator(Loggable):
         :param container: the Container object
         :type  container: :class:`~aeneas.container.Container`
         """
-        self.log("Checking the Job object generated from container")
+        logger.debug("Checking the Job object generated from container")
 
-        self.log("Checking that the Job is not None")
+        logger.debug("Checking that the Job is not None")
         if job is None:
             self._failed("Unable to create a Job from the container.")
             return
 
-        self.log("Checking that the Job has at least one Task")
+        logger.debug("Checking that the Job has at least one Task")
         if len(job) == 0:
             self._failed("Unable to create at least one Task from the container.")
             return
 
         if self.rconf[RuntimeConfiguration.JOB_MAX_TASKS] > 0:
-            self.log("Checking that the Job does not have too many Tasks")
+            logger.debug("Checking that the Job does not have too many Tasks")
             if len(job) > self.rconf[RuntimeConfiguration.JOB_MAX_TASKS]:
                 self._failed(
                     "The Job has %d Tasks, more than the maximum allowed (%d)."
@@ -630,11 +627,11 @@ class Validator(Loggable):
                 )
                 return
 
-        self.log("Checking that each Task text file is well formed")
+        logger.debug("Checking that each Task text file is well formed")
         for task in job.tasks:
-            self.log(["Checking Task text file '%s'", task.text_file_path])
+            logger.debug("Checking Task text file '%s'", task.text_file_path)
             text_file_bstring = container.read_entry(task.text_file_path)
-            if (text_file_bstring is None) or (len(text_file_bstring) == 0):
+            if text_file_bstring is None or len(text_file_bstring) == 0:
                 self._failed("Text file '%s' is empty" % task.text_file_path)
                 return
             self._check_utf8_encoding(text_file_bstring)
@@ -647,16 +644,14 @@ class Validator(Loggable):
             if not self.result.passed:
                 self._failed("Text file '%s' is empty" % task.text_file_path)
                 return
-            self.log(["Checking Task text file '%s': passed", task.text_file_path])
-        self.log("Checking each Task text file is well formed: passed")
+            logger.debug("Checking Task text file '%s': passed", task.text_file_path)
+        logger.debug("Checking each Task text file is well formed: passed")
 
 
 class ValidatorResult:
     """
     A structure to contain the result of a validation.
     """
-
-    TAG = "ValidatorResult"
 
     def __init__(self):
         self.passed = True

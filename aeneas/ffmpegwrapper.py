@@ -25,10 +25,13 @@ This module contains the following classes:
 * :class:`~aeneas.ffmpegwrapper.FFMPEGPathError`, representing a failure to locate the ``ffmpeg`` executable.
 """
 
+import logging
 import subprocess
 
-from aeneas.logger import Loggable
+from aeneas.logger import Configurable
 from aeneas.runtimeconfiguration import RuntimeConfiguration
+
+logger = logging.getLogger(__name__)
 
 
 class FFMPEGPathError(Exception):
@@ -39,7 +42,7 @@ class FFMPEGPathError(Exception):
     """
 
 
-class FFMPEGWrapper(Loggable):
+class FFMPEGWrapper(Configurable):
     """
     A wrapper around ``ffmpeg`` to convert audio files.
 
@@ -49,8 +52,6 @@ class FFMPEGWrapper(Loggable):
 
     :param rconf: a runtime configuration
     :type  rconf: :class:`~aeneas.runtimeconfiguration.RuntimeConfiguration`
-    :param logger: the logger object
-    :type  logger: :class:`~aeneas.logger.Logger`
     """
 
     FFMPEG_SAMPLE_8000 = ("-ar", "8000")
@@ -148,8 +149,6 @@ class FFMPEGWrapper(Loggable):
     FFMPEG_PARAMETERS_DEFAULT = FFMPEG_PARAMETERS_SAMPLE_16000
     """ Default set of parameters for ``ffmpeg`` """
 
-    TAG = "FFMPEGWrapper"
-
     def convert(
         self,
         input_file_path: str,
@@ -201,41 +200,23 @@ class FFMPEGWrapper(Loggable):
 
         arguments.append(output_file_path)
 
-        self.log(["Calling with arguments '%s'", arguments])
+        logger.debug("Calling with arguments '%s'", arguments)
         try:
             subprocess.check_output(arguments, stderr=subprocess.PIPE, text=True)
         except OSError as exc:
-            self.log_exc(
-                [
-                    "Unable to call the '%s' ffmpeg executable",
-                    self.rconf[RuntimeConfiguration.FFMPEG_PATH],
-                ],
-                exc,
-                True,
-                FFMPEGPathError,
-            )
+            raise FFMPEGPathError(
+                "Unable to call the '%s' ffmpeg executable"
+                % self.rconf[RuntimeConfiguration.FFMPEG_PATH]
+            ) from exc
         except subprocess.CalledProcessError as exc:
             stderr = exc.stderr.strip()
             if stderr.endswith("No such file or directory"):
-                self.log_exc(
-                    [
-                        "Input file path %s does not exist",
-                        input_file_path,
-                    ],
-                    None,
-                    critical=True,
-                    raise_type=FileNotFoundError,
-                )
+                raise FileNotFoundError(
+                    f"Input file path {input_file_path} does not exist",
+                ) from exc
             else:
-                self.log_exc(
-                    [
-                        "ffmpeg with non-zero status %r: %s",
-                        exc.returncode,
-                        exc.stderr,
-                    ],
-                    exc,
-                    critical=True,
-                    raise_type=OSError,
-                )
+                raise OSError(
+                    f"ffmpeg with non-zero status {exc.returncode}: {exc.stderr}",
+                ) from exc
 
         return output_file_path

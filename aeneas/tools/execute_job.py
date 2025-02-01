@@ -106,53 +106,50 @@ class ExecuteJobCLI(AbstractCLIProgram):
                 self.print_info(
                     "Validating the container (specify --skip-validator to bypass)..."
                 )
-                validator = Validator(rconf=self.rconf, logger=self.logger)
+                validator = Validator(rconf=self.rconf)
                 result = validator.check_container(
                     container_path, config_string=config_string
                 )
                 if not result.passed:
-                    self.print_error("The given container is not valid:")
-                    self.print_error(result.pretty_print())
+                    self.print_error(
+                        f"The given container is not valid: {result.pretty_print()}"
+                    )
                     return self.ERROR_EXIT_CODE
-                self.print_info("Validating the container... done")
             except Exception as exc:
                 self.print_error(
-                    "An unexpected error occurred while validating the container:"
+                    f"An unexpected error occurred while validating the container: {exc}"
                 )
-                self.print_error("%s" % exc)
                 return self.ERROR_EXIT_CODE
 
         try:
             self.print_info("Loading job from container...")
-            executor = ExecuteJob(rconf=self.rconf, logger=self.logger)
+            executor = ExecuteJob(rconf=self.rconf)
             executor.load_job_from_container(container_path, config_string)
-            self.print_info("Loading job from container... done")
         except Exception as exc:
-            self.print_error("An unexpected error occurred while loading the job:")
-            self.print_error("%s" % exc)
+            self.print_error(
+                f"An unexpected error occurred while loading the job: {exc}"
+            )
             return self.ERROR_EXIT_CODE
 
         try:
             self.print_info("Executing...")
             executor.execute()
-            self.print_info("Executing... done")
         except Exception as exc:
-            self.print_error("An unexpected error occurred while executing the job:")
-            self.print_error("%s" % exc)
+            self.print_error(
+                f"An unexpected error occurred while executing the job: {exc}"
+            )
             return self.ERROR_EXIT_CODE
 
         try:
             self.print_info("Creating output container...")
             path = executor.write_output_container(output_directory_path)
-            self.print_info("Creating output container... done")
-            self.print_success("Created output file '%s'" % path)
+            self.print_info(f"Created output file {path!r}")
             executor.clean(True)
             return self.NO_ERROR_EXIT_CODE
         except Exception as exc:
             self.print_error(
-                "An unexpected error occurred while writing the output container:"
+                f"An unexpected error occurred while writing the output container: {exc}"
             )
-            self.print_error("%s" % exc)
 
         return self.ERROR_EXIT_CODE
 

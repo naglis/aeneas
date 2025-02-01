@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 # aeneas is a Python/C library and a set of tools
 # to automagically synchronize audio and text (aka forced alignment)
 #
@@ -26,13 +24,16 @@ A generic rooted, ordered, levelled tree.
 .. versionadded:: 1.5.0
 """
 
-from copy import deepcopy
+import copy
+import logging
 
-from aeneas.logger import Loggable
+from aeneas.logger import Configurable
 import aeneas.globalfunctions as gf
 
+logger = logging.getLogger(__name__)
 
-class Tree(Loggable):
+
+class Tree(Configurable):
     """
     A generic rooted, ordered, levelled tree.
 
@@ -56,14 +57,10 @@ class Tree(Loggable):
 
     :param rconf: a runtime configuration
     :type  rconf: :class:`~aeneas.runtimeconfiguration.RuntimeConfiguration`
-    :param logger: the logger object
-    :type  logger: :class:`~aeneas.logger.Logger`
     """
 
-    TAG = "Tree"
-
-    def __init__(self, value=None, rconf=None, logger=None):
-        super().__init__(rconf=rconf, logger=logger)
+    def __init__(self, value=None, rconf=None):
+        super().__init__(rconf=rconf)
         self.value = value
         self.__children = []
         self.__parent = None
@@ -86,7 +83,7 @@ class Tree(Loggable):
 
         :rtype: :class:`~aeneas.tree.Tree`
         """
-        return deepcopy(self)
+        return copy.deepcopy(self)
 
     @property
     def value(self):
@@ -228,7 +225,7 @@ class Tree(Loggable):
         :raises: TypeError if ``node`` is not an instance of :class:`~aeneas.tree.Tree`
         """
         if not isinstance(node, Tree):
-            self.log_exc("node is not an instance of Tree", None, True, TypeError)
+            raise TypeError("node is not an instance of Tree")
         if as_last:
             self.__children.append(node)
         else:
@@ -361,7 +358,7 @@ class Tree(Loggable):
 
         :rtype: int
         """
-        return max([n.level for n in self.subtree]) - self.level + 1
+        return max(n.level for n in self.subtree) - self.level + 1
 
     @property
     def dfs(self):
@@ -427,15 +424,10 @@ class Tree(Loggable):
         :raises: ValueError if the given ``index`` is not valid
         """
         if not isinstance(index, int):
-            self.log_exc("Index is not an integer", None, True, TypeError)
+            raise TypeError("Index is not an integer")
         levels = self.levels
-        if (index < 0) or (index >= len(levels)):
-            self.log_exc(
-                ["The given level index '%d' is not valid", index],
-                None,
-                True,
-                ValueError,
-            )
+        if index < 0 or index >= len(levels):
+            raise ValueError(f"The given level index '{index}' is not valid")
         return self.levels[index]
 
     def vlevel_at_index(self, index):
@@ -464,9 +456,9 @@ class Tree(Loggable):
         :raises: ValueError if ``index`` is negative
         """
         if not isinstance(index, int):
-            self.log_exc("index is not an integer", None, True, TypeError)
+            raise TypeError("index is not an integer")
         if index < 0:
-            self.log_exc("index cannot be negative", None, True, ValueError)
+            raise ValueError("index cannot be negative")
         parent_node = self
         for i in range(index):
             if parent_node is None:
@@ -498,14 +490,10 @@ class Tree(Loggable):
                  it contains an element which is not an int
         """
         if not isinstance(level_indices, list):
-            self.log_exc(
-                "level_indices is not an instance of list", None, True, TypeError
-            )
+            raise TypeError("level_indices is not an instance of list")
         for level in level_indices:
             if not isinstance(level, int):
-                self.log_exc(
-                    "level_indices contains an element not int", None, True, TypeError
-                )
+                raise TypeError("level_indices contains an element not int")
         prev_levels = self.levels
         level_indices = set(level_indices)
         if 0 not in level_indices:

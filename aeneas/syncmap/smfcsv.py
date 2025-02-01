@@ -29,8 +29,6 @@ class SyncMapFormatCSV(SyncMapFormatGenericTabular):
     Handler for comma-separated values (CSV) I/O format.
     """
 
-    TAG = "SyncMapFormatCSV"
-
     DEFAULT = "csv"
 
     HUMAN = "csvh"

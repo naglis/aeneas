@@ -29,8 +29,6 @@ class SyncMapFormatAudacity(SyncMapFormatGenericTabular):
     Handler for Audacity I/O format.
     """
 
-    TAG = "SyncMapFormatAudacity"
-
     DEFAULT = "aud"
 
     HUMAN = "audh"

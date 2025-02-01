@@ -33,8 +33,6 @@ class SyncMapFormatRBSE(SyncMapFormatBase):
     I/O format.
     """
 
-    TAG = "SyncMapFormatRBSE"
-
     DEFAULT = "rbse"
 
     def parse(self, input_text, syncmap):

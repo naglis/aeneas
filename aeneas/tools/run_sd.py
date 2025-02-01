@@ -145,35 +145,31 @@ class RunSDCLI(AbstractCLIProgram):
             self.print_error("No text fragments found")
             return self.ERROR_EXIT_CODE
         text_file.set_language(language)
-        self.print_info("Read input text with %d fragments" % (len(text_file)))
+        self.print_info(f"Read input text with {len(text_file):d} fragments")
 
         self.print_info("Reading audio...")
         try:
-            audio_file_mfcc = AudioFileMFCC(
-                audio_file_path, rconf=self.rconf, logger=self.logger
-            )
+            audio_file_mfcc = AudioFileMFCC(audio_file_path, rconf=self.rconf)
         except AudioFileConverterError:
             self.print_error(
-                "Unable to call the ffmpeg executable '%s'"
-                % (self.rconf[RuntimeConfiguration.FFMPEG_PATH])
+                f"Unable to call the ffmpeg executable {self.rconf[RuntimeConfiguration.FFMPEG_PATH]!r}. "
+                "Make sure the path to ffmpeg is correct"
             )
-            self.print_error("Make sure the path to ffmpeg is correct")
             return self.ERROR_EXIT_CODE
         except (AudioFileUnsupportedFormatError, AudioFileNotInitializedError):
-            self.print_error("Cannot read file '%s'" % (audio_file_path))
-            self.print_error("Check that its format is supported by ffmpeg")
+            self.print_error(
+                f"Cannot read file {audio_file_path!r}. "
+                "Check that its format is supported by ffmpeg."
+            )
             return self.ERROR_EXIT_CODE
         except Exception as exc:
             self.print_error(
-                "An unexpected error occurred while reading the audio file:"
+                f"An unexpected error occurred while reading the audio file: {exc}"
             )
-            self.print_error("%s" % exc)
             return self.ERROR_EXIT_CODE
-        self.print_info("Reading audio... done")
 
         self.print_info("Running VAD...")
         audio_file_mfcc.run_vad()
-        self.print_info("Running VAD... done")
 
         min_head = gf.safe_float(self.has_option_with_value("--min-head"), None)
         max_head = gf.safe_float(self.has_option_with_value("--max-head"), None)
@@ -181,9 +177,7 @@ class RunSDCLI(AbstractCLIProgram):
         max_tail = gf.safe_float(self.has_option_with_value("--max-tail"), None)
 
         self.print_info("Detecting audio interval...")
-        start_detector = SD(
-            audio_file_mfcc, text_file, rconf=self.rconf, logger=self.logger
-        )
+        start_detector = SD(audio_file_mfcc, text_file, rconf=self.rconf)
         start, end = start_detector.detect_interval(
             min_head, max_head, min_tail, max_tail
         )

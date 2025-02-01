@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 # aeneas is a Python/C library and a set of tools
 # to automagically synchronize audio and text (aka forced alignment)
 #
@@ -33,18 +31,16 @@ You can find the original file in the ``thirdparty/`` directory.
 import math
 import numpy
 
-from aeneas.logger import Loggable
+from aeneas.logger import Configurable
 from aeneas.runtimeconfiguration import RuntimeConfiguration
 
 
-class MFCC(Loggable):
+class MFCC(Configurable):
     """
     A class for computing Mel-frequency cepstral coefficients (MFCCs).
 
     :param rconf: a runtime configuration
     :type  rconf: :class:`~aeneas.runtimeconfiguration.RuntimeConfiguration`
-    :param logger: the logger object
-    :type  logger: :class:`~aeneas.logger.Logger`
     """
 
     CUTOFF = 0.00001
@@ -53,10 +49,8 @@ class MFCC(Loggable):
     MEL_10 = 2595.0
     """ Base Mel frequency """
 
-    TAG = "MFCC"
-
-    def __init__(self, rconf=None, logger=None):
-        super().__init__(rconf=rconf, logger=logger)
+    def __init__(self, rconf=None):
+        super().__init__(rconf=rconf)
 
         # store parameters in local attributes
         self.filter_bank_size = self.rconf[RuntimeConfiguration.MFCC_FILTERS]
@@ -126,13 +120,8 @@ class MFCC(Loggable):
         dfreq = float(self.sample_rate) / self.fft_order
         nyquist_frequency = self.sample_rate / 2
         if self.upper_frequency > nyquist_frequency:
-            self.log_exc(
-                "Upper frequency {:f} exceeds Nyquist frequency {:f}".format(
-                    self.upper_frequency, nyquist_frequency
-                ),
-                None,
-                True,
-                ValueError,
+            raise ValueError(
+                f"Upper frequency {self.upper_frequency:f} exceeds Nyquist frequency {nyquist_frequency:f}"
             )
         melmax = MFCC._hz2mel(self.upper_frequency)
         melmin = MFCC._hz2mel(self.lower_frequency)
@@ -215,14 +204,9 @@ class MFCC(Loggable):
             )
 
         if len(data.shape) != 1:
-            self.log_exc(
-                "The audio data must be a 1D numpy array (mono).",
-                None,
-                True,
-                ValueError,
-            )
+            raise ValueError("The audio data must be a 1D numpy array (mono)")
         if len(data) < 1:
-            self.log_exc("The audio data must not be empty.", None, True, ValueError)
+            raise ValueError("The audio data must not be empty")
 
         self.data = data
         self.sample_rate = sample_rate

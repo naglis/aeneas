@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 # aeneas is a Python/C library and a set of tools
 # to automagically synchronize audio and text (aka forced alignment)
 #
@@ -31,11 +29,15 @@ http://espeak.sourceforge.net/
 for further details.
 """
 
+import logging
+
 from aeneas.exacttiming import TimeValue
 from aeneas.language import Language
 from aeneas.runtimeconfiguration import RuntimeConfiguration
 from aeneas.ttswrappers.basettswrapper import BaseTTSWrapper
 import aeneas.globalfunctions as gf
+
+logger = logging.getLogger(__name__)
 
 
 class ESPEAKTTSWrapper(BaseTTSWrapper):
@@ -75,8 +77,6 @@ class ESPEAKTTSWrapper(BaseTTSWrapper):
 
     :param rconf: a runtime configuration
     :type  rconf: :class:`~aeneas.runtimeconfiguration.RuntimeConfiguration`
-    :param logger: the logger object
-    :type  logger: :class:`~aeneas.logger.Logger`
     """
 
     AFR = Language.AFR
@@ -783,10 +783,8 @@ class ESPEAKTTSWrapper(BaseTTSWrapper):
 
     C_EXTENSION_NAME = "cew"
 
-    TAG = "ESPEAKTTSWrapper"
-
-    def __init__(self, rconf=None, logger=None):
-        super().__init__(rconf=rconf, logger=logger)
+    def __init__(self, rconf=None):
+        super().__init__(rconf=rconf)
         self.set_subprocess_arguments(
             [
                 self.tts_path,
@@ -808,7 +806,7 @@ class ESPEAKTTSWrapper(BaseTTSWrapper):
 
         :rtype: (bool, (list, :class:`~aeneas.exacttiming.TimeValue`, int))
         """
-        self.log("Synthesizing using C extension...")
+        logger.debug("Synthesizing using C extension...")
 
         # convert parameters from Python values to C values
         try:
@@ -818,10 +816,10 @@ class ESPEAKTTSWrapper(BaseTTSWrapper):
         c_backwards = 0
         if backwards:
             c_backwards = 1
-        self.log(["output_file_path: %s", output_file_path])
-        self.log(["c_quit_after:     %.3f", c_quit_after])
-        self.log(["c_backwards:      %d", c_backwards])
-        self.log("Preparing u_text...")
+        logger.debug("output_file_path: %s", output_file_path)
+        logger.debug("c_quit_after:     %.3f", c_quit_after)
+        logger.debug("c_backwards:      %d", c_backwards)
+        logger.debug("Preparing u_text...")
         u_text = []
         fragments = text_file.fragments
         for fragment in fragments:
@@ -833,59 +831,54 @@ class ESPEAKTTSWrapper(BaseTTSWrapper):
             if f_text is None:
                 f_text = ""
             u_text.append((f_voice_code, f_text))
-        self.log("Preparing u_text... done")
+        logger.debug("Preparing u_text... done")
 
         # call C extension
         sr = None
         sf = None
         intervals = None
         if self.rconf[RuntimeConfiguration.CEW_SUBPROCESS_ENABLED]:
-            self.log("Using cewsubprocess to call aeneas.cew")
+            logger.debug("Using cewsubprocess to call aeneas.cew")
             try:
-                self.log("Importing aeneas.cewsubprocess...")
+                logger.debug("Importing aeneas.cewsubprocess...")
                 from aeneas.cewsubprocess import CEWSubprocess
 
-                self.log("Importing aeneas.cewsubprocess... done")
-                self.log("Calling aeneas.cewsubprocess...")
-                cewsub = CEWSubprocess(rconf=self.rconf, logger=self.logger)
+                logger.debug("Importing aeneas.cewsubprocess... done")
+                logger.debug("Calling aeneas.cewsubprocess...")
+                cewsub = CEWSubprocess(rconf=self.rconf)
                 sr, sf, intervals = cewsub.synthesize_multiple(
                     output_file_path, c_quit_after, c_backwards, u_text
                 )
-                self.log("Calling aeneas.cewsubprocess... done")
-            except Exception as exc:
-                self.log_exc(
+                logger.debug("Calling aeneas.cewsubprocess... done")
+            except Exception:
+                logger.exception(
                     "An unexpected error occurred while running cewsubprocess",
-                    exc,
-                    False,
-                    None,
                 )
                 # NOTE not critical, try calling aeneas.cew directly
                 # COMMENTED return (False, None)
 
         if sr is None:
-            self.log("Preparing c_text...")
+            logger.debug("Preparing c_text...")
             c_text = [(gf.safe_unicode(t[0]), gf.safe_unicode(t[1])) for t in u_text]
-            self.log("Preparing c_text... done")
+            logger.debug("Preparing c_text... done")
 
-            self.log("Calling aeneas.cew directly")
+            logger.debug("Calling aeneas.cew directly")
             try:
-                self.log("Importing aeneas.cew...")
+                logger.debug("Importing aeneas.cew...")
                 import aeneas.cew.cew
 
-                self.log("Importing aeneas.cew... done")
-                self.log("Calling aeneas.cew...")
+                logger.debug("Importing aeneas.cew... done")
+                logger.debug("Calling aeneas.cew...")
                 sr, sf, intervals = aeneas.cew.cew.synthesize_multiple(
                     output_file_path, c_quit_after, c_backwards, c_text
                 )
-                self.log("Calling aeneas.cew... done")
-            except Exception as exc:
-                self.log_exc(
-                    "An unexpected error occurred while running cew", exc, False, None
-                )
+                logger.debug("Calling aeneas.cew... done")
+            except Exception:
+                logger.exception("An unexpected error occurred while running cew")
                 return (False, None)
 
-        self.log(["sr: %d", sr])
-        self.log(["sf: %d", sf])
+        logger.debug("sr: %d", sr)
+        logger.debug("sf: %d", sf)
 
         # create output
         anchors = []
@@ -911,8 +904,8 @@ class ESPEAKTTSWrapper(BaseTTSWrapper):
 
         # return output
         # NOTE anchors do not make sense if backwards == True
-        self.log(["Returning %d time anchors", len(anchors)])
-        self.log(["Current time %.3f", current_time])
-        self.log(["Synthesized %d characters", num_chars])
-        self.log("Synthesizing using C extension... done")
+        logger.debug("Returning %d time anchors", len(anchors))
+        logger.debug("Current time %.3f", current_time)
+        logger.debug("Synthesized %d characters", num_chars)
+        logger.debug("Synthesizing using C extension... done")
         return (True, (anchors, current_time, num_chars))

@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 # aeneas is a Python/C library and a set of tools
 # to automagically synchronize audio and text (aka forced alignment)
 #
@@ -30,12 +28,15 @@ This module contains the following classes:
 .. warning:: This module is likely to be refactored in a future version
 """
 
+import logging
 import re
 
-from aeneas.logger import Loggable
+from aeneas.logger import Configurable
+
+logger = logging.getLogger(__name__)
 
 
-class IDSortingAlgorithm(Loggable):
+class IDSortingAlgorithm(Configurable):
     """
     Enumeration of the available algorithms to sort
     a list of XML ``id`` attributes.
@@ -44,8 +45,6 @@ class IDSortingAlgorithm(Loggable):
     :type  algorithm: :class:`~aeneas.idsortingalgorithm.IDSortingAlgorithm`
     :param rconf: a runtime configuration
     :type  rconf: :class:`~aeneas.runtimeconfiguration.RuntimeConfiguration`
-    :param logger: the logger object
-    :type  logger: :class:`~aeneas.logger.Logger`
     :raises: ValueError: if the value of ``algorithm`` is not allowed
     """
 
@@ -65,12 +64,10 @@ class IDSortingAlgorithm(Loggable):
     ALLOWED_VALUES = [LEXICOGRAPHIC, NUMERIC, UNSORTED]
     """ List of all the allowed values """
 
-    TAG = "IDSortingAlgorithm"
-
-    def __init__(self, algorithm, rconf=None, logger=None):
+    def __init__(self, algorithm, rconf=None):
         if algorithm not in self.ALLOWED_VALUES:
             raise ValueError("Algorithm value not allowed")
-        super().__init__(rconf=rconf, logger=logger)
+        super().__init__(rconf=rconf)
         self.algorithm = algorithm
 
     def sort(self, ids):
@@ -93,20 +90,17 @@ class IDSortingAlgorithm(Loggable):
 
         tmp = list(ids)
         if self.algorithm == IDSortingAlgorithm.UNSORTED:
-            self.log("Sorting using UNSORTED")
+            logger.debug("Sorting using UNSORTED")
         elif self.algorithm == IDSortingAlgorithm.LEXICOGRAPHIC:
-            self.log("Sorting using LEXICOGRAPHIC")
+            logger.debug("Sorting using LEXICOGRAPHIC")
             tmp = sorted(ids)
         elif self.algorithm == IDSortingAlgorithm.NUMERIC:
-            self.log("Sorting using NUMERIC")
+            logger.debug("Sorting using NUMERIC")
             tmp = ids
             try:
                 tmp = sorted(tmp, key=extract_int)
-            except (ValueError, TypeError) as exc:
-                self.log_exc(
+            except (ValueError, TypeError):
+                logger.exception(
                     "Not all id values contain a numeric part. Returning the id list unchanged.",
-                    exc,
-                    False,
-                    None,
                 )
         return tmp

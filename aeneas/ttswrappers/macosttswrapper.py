@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 # aeneas is a Python/C library and a set of tools
 # to automagically synchronize audio and text (aka forced alignment)
 #
@@ -61,8 +59,6 @@ class MacOSTTSWrapper(BaseTTSWrapper):
 
     :param rconf: a runtime configuration
     :type  rconf: :class:`~aeneas.runtimeconfiguration.RuntimeConfiguration`
-    :param logger: the logger object
-    :type  logger: :class:`~aeneas.logger.Logger`
     """
 
     ARA = Language.ARA
@@ -218,10 +214,8 @@ class MacOSTTSWrapper(BaseTTSWrapper):
 
     HAS_SUBPROCESS_CALL = True
 
-    TAG = "MacOSTTSWrapper"
-
-    def __init__(self, rconf=None, logger=None):
-        super().__init__(rconf=rconf, logger=logger)
+    def __init__(self, rconf=None):
+        super().__init__(rconf=rconf)
 
         self.set_subprocess_arguments(
             [

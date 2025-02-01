@@ -99,15 +99,13 @@ class PlotWaveformCLI(AbstractCLIProgram):
 
             # create plotter object
             self.print_info("Plotting to file...")
-            plotter = Plotter(rconf=self.rconf, logger=self.logger)
+            plotter = Plotter(rconf=self.rconf)
 
             # add waveform
-            afm = AudioFile(input_file_path, rconf=self.rconf, logger=self.logger)
+            afm = AudioFile(input_file_path, rconf=self.rconf)
             afm.read_samples_from_file()
             plotter.add_waveform(
-                PlotWaveform(
-                    afm, label=label, fast=fast, rconf=self.rconf, logger=self.logger
-                )
+                PlotWaveform(afm, label=label, fast=fast, rconf=self.rconf)
             )
 
             # add time scale, if requested
@@ -117,7 +115,6 @@ class PlotWaveformCLI(AbstractCLIProgram):
                         afm.audio_length,
                         time_step=time_step,
                         rconf=self.rconf,
-                        logger=self.logger,
                     )
                 )
 
@@ -136,7 +133,6 @@ class PlotWaveformCLI(AbstractCLIProgram):
                             labelset,
                             parameters=None,
                             rconf=self.rconf,
-                            logger=self.logger,
                         )
                         ls.parameters["labels"] = False
                         ls.parameters["begin_time"] = begin_times
@@ -152,7 +148,6 @@ class PlotWaveformCLI(AbstractCLIProgram):
                             labelset,
                             parameters=None,
                             rconf=self.rconf,
-                            logger=self.logger,
                         )
                         ls.parameters["labels"] = labels
                         ls.parameters["begin_time"] = begin_times
@@ -163,27 +158,28 @@ class PlotWaveformCLI(AbstractCLIProgram):
 
             # output to file
             plotter.draw_png(output_file_path, h_zoom=h_zoom, v_zoom=v_zoom)
-            self.print_info("Plotting to file... done")
-            self.print_success("Created file '%s'" % output_file_path)
+            self.print_info(f"Created file {output_file_path!r}")
             return self.NO_ERROR_EXIT_CODE
         except ImportError:
             self.print_error(
-                "You need to install Python module Pillow to output image to file. Run:"
+                "You need to install Python module Pillow to output image to file. Run: "
+                "\n"
+                "$ pip install Pillow"
+                "\n"
+                "or, to install for all users:"
+                "\n"
+                "$ sudo pip install Pillow"
             )
-            self.print_error("$ pip install Pillow")
-            self.print_error("or, to install for all users:")
-            self.print_error("$ sudo pip install Pillow")
         except Exception as exc:
             self.print_error(
-                "An unexpected error occurred while generating the image file:"
+                f"An unexpected error occurred while generating the image file: {exc}"
             )
-            self.print_error("%s" % exc)
 
         return self.ERROR_EXIT_CODE
 
     def _read_syncmap_file(self, path, extension, text=False):
         """Read labels from a SyncMap file"""
-        syncmap = SyncMap(logger=self.logger)
+        syncmap = SyncMap()
         syncmap.read(extension, path, parameters=None)
         if text:
             return [

@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 # aeneas is a Python/C library and a set of tools
 # to automagically synchronize audio and text (aka forced alignment)
 #
@@ -92,7 +90,7 @@ class ValidateCLI(AbstractCLIProgram):
             return self.print_help()
         mode = self.actual_arguments[0]
 
-        validator = Validator(rconf=self.rconf, logger=self.logger)
+        validator = Validator(rconf=self.rconf)
         if mode == "config":
             config_file_path = self.actual_arguments[1]
             config_txt = None
@@ -144,14 +142,14 @@ class ValidateCLI(AbstractCLIProgram):
             return self.print_help()
 
         if result.passed:
-            self.print_success("Valid %s" % msg)
+            self.print_info(f"Valid {msg}")
             for warning in result.warnings:
-                self.print_warning("%s" % warning)
+                self.print_warning(str(warning))
             return self.NO_ERROR_EXIT_CODE
         else:
-            self.print_error("Invalid %s" % msg)
+            self.print_error(f"Invalid {msg}")
             for error in result.errors:
-                self.print_error("%s" % error)
+                self.print_error(str(error))
 
         return self.ERROR_EXIT_CODE
 

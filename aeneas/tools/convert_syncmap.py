@@ -126,20 +126,15 @@ class ConvertSyncMapCLI(AbstractCLIProgram):
 
         try:
             self.print_info(
-                "Reading sync map in '{}' format from file '{}'".format(
-                    input_sm_format, input_file_path
-                )
+                f"Reading sync map in {input_sm_format!r} format from file {input_file_path!r}"
             )
-            self.print_info("Reading sync map...")
-            syncmap = SyncMap(logger=self.logger)
+            syncmap = SyncMap()
             syncmap.read(input_sm_format, input_file_path, parameters)
-            self.print_info("Reading sync map... done")
-            self.print_info("Read %d sync map fragments" % (len(syncmap)))
+            self.print_info(f"Read {len(syncmap)} sync map fragments")
         except Exception as exc:
             self.print_error(
-                "An unexpected error occurred while reading the input sync map:"
+                f"An unexpected error occurred while reading the input sync map: {exc}"
             )
-            self.print_error("%s" % (exc))
             return self.ERROR_EXIT_CODE
 
         if output_html:
@@ -148,30 +143,24 @@ class ConvertSyncMapCLI(AbstractCLIProgram):
                 syncmap.output_html_for_tuning(
                     audio_file_path, output_file_path, parameters
                 )
-                self.print_info("Writing HTML file... done")
-                self.print_success("Created HTML file '%s'" % (output_file_path))
+                self.print_info(f"Created HTML file {output_file_path!r}")
                 return self.NO_ERROR_EXIT_CODE
             except Exception as exc:
                 self.print_error(
-                    "An unexpected error occurred while writing the output HTML file:"
+                    f"An unexpected error occurred while writing the output HTML file: {exc}"
                 )
-                self.print_error("%s" % (exc))
         else:
             try:
                 self.print_info("Writing sync map...")
                 syncmap.write(output_sm_format, output_file_path, parameters)
-                self.print_info("Writing sync map... done")
-                self.print_success(
-                    "Created '{}' sync map file '{}'".format(
-                        output_sm_format, output_file_path
-                    )
+                self.print_info(
+                    f"Created {output_sm_format!r} sync map file {output_file_path!r}"
                 )
                 return self.NO_ERROR_EXIT_CODE
             except Exception as exc:
                 self.print_error(
-                    "An unexpected error occurred while writing the output sync map:"
+                    f"An unexpected error occurred while writing the output sync map: {exc}"
                 )
-                self.print_error("%s" % (exc))
 
         return self.ERROR_EXIT_CODE
 
@@ -185,9 +174,10 @@ class ConvertSyncMapCLI(AbstractCLIProgram):
         :rtype: bool
         """
         if sm_format not in SyncMapFormat.ALLOWED_VALUES:
-            self.print_error("Sync map format '%s' is not allowed" % (sm_format))
-            self.print_info("Allowed formats:")
-            self.print_generic(" ".join(SyncMapFormat.ALLOWED_VALUES))
+            self.print_error(
+                f"Sync map format {sm_format!r} is not allowed. "
+                f"Allowed formats: {' '.join(SyncMapFormat.ALLOWED_VALUES)}"
+            )
             return False
         return True
 

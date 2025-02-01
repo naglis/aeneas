@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 # aeneas is a Python/C library and a set of tools
 # to automagically synchronize audio and text (aka forced alignment)
 #
@@ -40,17 +38,20 @@ See the following discussions for details:
 .. versionadded:: 1.5.0
 """
 
+import logging
 import subprocess
 import sys
 import tempfile
 
 from aeneas.exacttiming import TimeValue
-from aeneas.logger import Loggable
+from aeneas.logger import Configurable
 from aeneas.runtimeconfiguration import RuntimeConfiguration
 import aeneas.globalfunctions as gf
 
+logger = logging.getLogger(__name__)
 
-class CEWSubprocess(Loggable):
+
+class CEWSubprocess(Configurable):
     """
     This helper class executes the ``aeneas.cew`` C extension
     in a separate process by running
@@ -62,8 +63,6 @@ class CEWSubprocess(Loggable):
     :param logger: the logger object
     :type  logger: :class:`~aeneas.logger.Logger`
     """
-
-    TAG = "CEWSubprocess"
 
     def synthesize_multiple(self, audio_file_path, c_quit_after, c_backwards, u_text):
         """
@@ -77,9 +76,9 @@ class CEWSubprocess(Loggable):
         :param object u_text: a list of ``(voice_code, text)`` tuples
         :rtype: tuple ``(sample_rate, synthesized, intervals)``
         """
-        self.log(["Audio file path: '%s'", audio_file_path])
-        self.log(["c_quit_after: '%.3f'", c_quit_after])
-        self.log(["c_backwards: '%d'", c_backwards])
+        logger.debug("Audio file path: %r", audio_file_path)
+        logger.debug("c_quit_after: '%.3f'", c_quit_after)
+        logger.debug("c_backwards: '%d'", c_backwards)
 
         with (
             tempfile.NamedTemporaryFile(suffix=".text") as tmp_text_file,
@@ -88,14 +87,14 @@ class CEWSubprocess(Loggable):
             text_file_path = tmp_text_file.name
             data_file_path = tmp_data_file.name
 
-            self.log(["Temporary text file path: '%s'", text_file_path])
-            self.log(["Temporary data file path: '%s'", data_file_path])
+            logger.debug("Temporary text file path: %r", text_file_path)
+            logger.debug("Temporary data file path: %r", data_file_path)
 
-            self.log("Populating the text file...")
+            logger.debug("Populating the text file...")
             with open(text_file_path, "w", encoding="utf-8") as tmp_text_file:
                 for f_voice_code, f_text in u_text:
                     tmp_text_file.write(f"{f_voice_code} {f_text}\n")
-            self.log("Populating the text file... done")
+            logger.debug("Populating the text file... done")
 
             arguments = [
                 self.rconf[RuntimeConfiguration.CEW_SUBPROCESS_PATH],
@@ -107,7 +106,7 @@ class CEWSubprocess(Loggable):
                 audio_file_path,
                 data_file_path,
             ]
-            self.log(["Calling with arguments '%s'", " ".join(arguments)])
+            logger.debug("Calling with arguments: '%s'", " ".join(arguments))
             proc = subprocess.Popen(
                 arguments,
                 stdout=subprocess.PIPE,
@@ -117,7 +116,7 @@ class CEWSubprocess(Loggable):
             )
             proc.communicate()
 
-            self.log("Reading output data...")
+            logger.debug("Reading output data...")
             with open(data_file_path, encoding="utf-8") as data_file:
                 lines = data_file.read().splitlines()
                 sr = int(lines[0])
@@ -127,7 +126,7 @@ class CEWSubprocess(Loggable):
                     values = line.split(" ")
                     if len(values) == 2:
                         intervals.append((TimeValue(values[0]), TimeValue(values[1])))
-            self.log("Reading output data... done")
+            logger.debug("Reading output data... done")
 
         return (sr, sf, intervals)
 

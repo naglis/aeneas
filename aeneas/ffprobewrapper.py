@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 # aeneas is a Python/C library and a set of tools
 # to automagically synchronize audio and text (aka forced alignment)
 #
@@ -31,12 +29,15 @@ This module contains the following classes:
 """
 
 import json
+import logging
 import subprocess
 import typing
 
 from aeneas.exacttiming import TimeValue
-from aeneas.logger import Loggable
+from aeneas.logger import Configurable
 from aeneas.runtimeconfiguration import RuntimeConfiguration
+
+logger = logging.getLogger(__name__)
 
 
 class Properties(typing.NamedTuple):
@@ -67,7 +68,7 @@ class FFPROBEUnsupportedFormatError(Exception):
     """
 
 
-class FFPROBEWrapper(Loggable):
+class FFPROBEWrapper(Configurable):
     """
     Wrapper around ``ffprobe`` to read the properties of an audio file.
 
@@ -120,8 +121,6 @@ class FFPROBEWrapper(Loggable):
 
     :param rconf: a runtime configuration
     :type  rconf: :class:`~aeneas.runtimeconfiguration.RuntimeConfiguration`
-    :param logger: the logger object
-    :type  logger: :class:`~aeneas.logger.Logger`
     """
 
     FFPROBE_PARAMETERS = (
@@ -134,8 +133,6 @@ class FFPROBEWrapper(Loggable):
         "json",
     )
     """ ``ffprobe`` parameters """
-
-    TAG = "FFPROBEWrapper"
 
     def read_properties(self, audio_file_path: str) -> Properties:
         """
@@ -154,7 +151,7 @@ class FFPROBEWrapper(Loggable):
             *self.FFPROBE_PARAMETERS,
             audio_file_path,
         ]
-        self.log(["Calling with arguments '%s'", arguments])
+        logger.debug("Calling with arguments '%s'", arguments)
         try:
             output = subprocess.check_output(
                 arguments,
@@ -162,37 +159,23 @@ class FFPROBEWrapper(Loggable):
                 stderr=subprocess.PIPE,
             )
         except OSError as exc:
-            self.log_exc(
-                [
-                    "Unable to call the '%s' ffprobe executable",
-                    self.rconf[RuntimeConfiguration.FFPROBE_PATH],
-                ],
-                exc,
-                True,
-                FFPROBEPathError,
-            )
+            raise FFPROBEPathError(
+                "Unable to call the '%s' ffprobe executable"
+                % self.rconf[RuntimeConfiguration.FFPROBE_PATH]
+            ) from exc
         except subprocess.CalledProcessError as exc:
             stderr = exc.stderr.strip()
             if stderr.endswith("No such file or directory"):
-                self.log_exc(
-                    ["Path %s does not exist", audio_file_path], exc, True, OSError
-                )
+                raise OSError(f"Path {audio_file_path!r} does not exist") from exc
             else:
-                self.log_exc(
-                    [
-                        "ffprobe exited with status %d: %s",
-                        exc.returncode,
-                        stderr,
-                    ],
-                    exc,
-                    True,
-                    FFPROBEUnsupportedFormatError,
-                )
-        self.log("Call completed")
+                raise FFPROBEUnsupportedFormatError(
+                    f"ffprobe exited with status {exc.returncode!r}: {stderr}"
+                ) from exc
+        logger.debug("Call completed")
 
         # check there is some output
         if not output:
-            self.log_exc("ffprobe produced no output", None, True, FFPROBEParsingError)
+            raise FFPROBEParsingError("ffprobe produced no output")
 
         return self._parse_properties_json(output)
 
@@ -201,21 +184,15 @@ class FFPROBEWrapper(Loggable):
         try:
             json_data = json.loads(data)
         except json.JSONDecodeError as exc:
-            self.log_exc(
-                ["Failed to parse ffprobe output %r as JSON", data],
-                exc,
-                True,
-                FFPROBEParsingError,
-            )
+            raise FFPROBEParsingError(
+                f"Failed to parse ffprobe output {data!r} as JSON"
+            ) from exc
 
         try:
             stream = (json_data.get("streams") or [])[0]
         except IndexError:
-            self.log_exc(
+            raise FFPROBEUnsupportedFormatError(
                 "No streams could be detected",
-                None,
-                True,
-                FFPROBEUnsupportedFormatError,
             )
 
         def analyze_dict(d: dict):
@@ -236,11 +213,8 @@ class FFPROBEWrapper(Loggable):
         analyze_dict(json_data.get("format") or {})
 
         if duration is None:
-            self.log_exc(
+            raise FFPROBEUnsupportedFormatError(
                 "No duration could be detected. Unsupported audio file format?",
-                None,
-                True,
-                FFPROBEUnsupportedFormatError,
             )
 
         return Properties(

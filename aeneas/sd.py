@@ -29,6 +29,7 @@ This module contains the following classes:
 """
 
 import decimal
+import logging
 import tempfile
 
 import numpy
@@ -36,13 +37,15 @@ import numpy
 from aeneas.audiofilemfcc import AudioFileMFCC
 from aeneas.dtw import DTWAligner
 from aeneas.exacttiming import TimeValue
-from aeneas.logger import Loggable
+from aeneas.logger import Configurable
 from aeneas.runtimeconfiguration import RuntimeConfiguration
 from aeneas.synthesizer import Synthesizer
 from aeneas.textfile import TextFile
 
+logger = logging.getLogger(__name__)
 
-class SD(Loggable):
+
+class SD(Configurable):
     """
     The SD ("start detector").
 
@@ -70,8 +73,6 @@ class SD(Loggable):
     :type  text_file: :class:`~aeneas.textfile.TextFile`
     :param rconf: a runtime configuration
     :type  rconf: :class:`~aeneas.runtimeconfiguration.RuntimeConfiguration`
-    :param logger: the logger object
-    :type  logger: :class:`~aeneas.logger.Logger`
     """
 
     QUERY_FACTOR = decimal.Decimal("1.0")
@@ -110,16 +111,13 @@ class SD(Loggable):
     .. versionadded:: 1.2.0
     """
 
-    TAG = "SD"
-
     def __init__(
         self,
         real_wave_mfcc: AudioFileMFCC,
         text_file: TextFile,
         rconf=None,
-        logger=None,
     ):
-        super().__init__(rconf=rconf, logger=logger)
+        super().__init__(rconf=rconf)
         self.real_wave_mfcc = real_wave_mfcc
         self.text_file = text_file
 
@@ -158,15 +156,15 @@ class SD(Loggable):
         tail = self.detect_tail(min_tail_length, max_tail_length)
         begin = head
         end = self.real_wave_mfcc.audio_length - tail
-        self.log(["Audio length: %.3f", self.real_wave_mfcc.audio_length])
-        self.log(["Head length:  %.3f", head])
-        self.log(["Tail length:  %.3f", tail])
-        self.log(["Begin:        %.3f", begin])
-        self.log(["End:          %.3f", end])
+        logger.debug("Audio length: %.3f", self.real_wave_mfcc.audio_length)
+        logger.debug("Head length:  %.3f", head)
+        logger.debug("Tail length:  %.3f", tail)
+        logger.debug("Begin:        %.3f", begin)
+        logger.debug("End:          %.3f", end)
         if (begin >= TimeValue("0.000")) and (end > begin):
-            self.log(["Returning %.3f %.3f", begin, end])
+            logger.debug("Returning %.3f %.3f", begin, end)
             return (begin, end)
-        self.log("Returning (0.000, 0.000)")
+        logger.debug("Returning (0.000, 0.000)")
         return (TimeValue("0.000"), TimeValue("0.000"))
 
     def detect_head(
@@ -236,13 +234,9 @@ class SD(Loggable):
             try:
                 value = TimeValue(value)
             except (TypeError, ValueError, decimal.InvalidOperation) as exc:
-                self.log_exc(
-                    ["The value of %s is not a number", name], exc, True, TypeError
-                )
+                raise TypeError(f"The value of {name} is not a number") from exc
             if value < 0:
-                self.log_exc(
-                    ["The value of %s is negative", name], None, True, ValueError
-                )
+                raise ValueError(f"The value of {name} is negative")
             return value
 
         min_length = _sanitize(min_length, self.MIN_LENGTH, "min_length")
@@ -250,49 +244,50 @@ class SD(Loggable):
         mws = self.rconf.mws
         min_length_frames = int(min_length / mws)
         max_length_frames = int(max_length / mws)
-        self.log(["MFCC window shift s:     %.3f", mws])
-        self.log(["Min start length s:      %.3f", min_length])
-        self.log(["Min start length frames: %d", min_length_frames])
-        self.log(["Max start length s:      %.3f", max_length])
-        self.log(["Max start length frames: %d", max_length_frames])
-        self.log(["Tail?:                   %s", str(tail)])
+        logger.debug("MFCC window shift s:     %.3f", mws)
+        logger.debug("Min start length s:      %.3f", min_length)
+        logger.debug("Min start length frames: %d", min_length_frames)
+        logger.debug("Max start length s:      %.3f", max_length)
+        logger.debug("Max start length frames: %d", max_length_frames)
+        logger.debug("Tail?:                   %s", tail)
 
-        self.log("Synthesizing query...")
+        logger.debug("Synthesizing query...")
         synt_duration = max_length * self.QUERY_FACTOR
-        self.log(["Synthesizing at least %.3f seconds", synt_duration])
+        logger.debug("Synthesizing at least %.3f seconds", synt_duration)
         with tempfile.NamedTemporaryFile(
             suffix=".wav", dir=self.rconf[RuntimeConfiguration.TMP_PATH]
         ) as tmp_file:
-            synt = Synthesizer(rconf=self.rconf, logger=self.logger)
+            synt = Synthesizer(rconf=self.rconf)
             anchors, total_time, synthesized_chars = synt.synthesize(
                 self.text_file, tmp_file.name, quit_after=synt_duration, backwards=tail
             )
-            self.log("Synthesizing query... done")
+            logger.debug("Synthesizing query... done")
 
-            self.log("Extracting MFCCs for query...")
+            logger.debug("Extracting MFCCs for query...")
             query_mfcc = AudioFileMFCC(
-                tmp_file.name, rconf=self.rconf, logger=self.logger
+                tmp_file.name,
+                rconf=self.rconf,
             )
-            self.log("Extracting MFCCs for query... done")
+            logger.debug("Extracting MFCCs for query... done")
 
         search_window = max_length * self.AUDIO_FACTOR
         search_window_end = min(
             int(search_window / mws), self.real_wave_mfcc.all_length
         )
-        self.log(["Query MFCC length (frames): %d", query_mfcc.all_length])
-        self.log(["Real MFCC length (frames):  %d", self.real_wave_mfcc.all_length])
-        self.log(["Search window end (s):      %.3f", search_window])
-        self.log(["Search window end (frames): %d", search_window_end])
+        logger.debug("Query MFCC length (frames): %d", query_mfcc.all_length)
+        logger.debug("Real MFCC length (frames):  %d", self.real_wave_mfcc.all_length)
+        logger.debug("Search window end (s):      %.3f", search_window)
+        logger.debug("Search window end (frames): %d", search_window_end)
 
         if tail:
-            self.log("Tail => reversing real_wave_mfcc and query_mfcc")
+            logger.debug("Tail => reversing real_wave_mfcc and query_mfcc")
             self.real_wave_mfcc.reverse()
             query_mfcc.reverse()
 
         # NOTE: VAD will be run here, if not done before
         speech_intervals = self.real_wave_mfcc.intervals(speech=True, time=False)
         if len(speech_intervals) < 1:
-            self.log("No speech intervals, hence no start found")
+            logger.debug("No speech intervals, hence no start found")
             if tail:
                 self.real_wave_mfcc.reverse()
             return TimeValue("0.000")
@@ -316,12 +311,10 @@ class SD(Loggable):
         # against a portion of the real wave
         candidates = []
         for candidate_begin in candidates_begin:
-            self.log(
-                [
-                    "Candidate interval starting at %d == %.3f",
-                    candidate_begin,
-                    candidate_begin * mws,
-                ]
+            logger.debug(
+                "Candidate interval starting at %d == %.3f",
+                candidate_begin,
+                candidate_begin * mws,
             )
             try:
                 rwm = AudioFileMFCC(
@@ -329,57 +322,48 @@ class SD(Loggable):
                         :, candidate_begin:search_end
                     ],
                     rconf=self.rconf,
-                    logger=self.logger,
                 )
                 dtw = DTWAligner(
                     real_wave_mfcc=rwm,
                     synt_wave_mfcc=query_mfcc,
                     rconf=self.rconf,
-                    logger=self.logger,
                 )
                 acm = dtw.compute_accumulated_cost_matrix()
                 last_column = acm[:, -1]
                 min_value = numpy.min(last_column)
                 min_index = numpy.argmin(last_column)
-                self.log(
-                    [
-                        "Candidate interval: %d %d == %.3f %.3f",
-                        candidate_begin,
-                        search_end,
-                        candidate_begin * mws,
-                        search_end * mws,
-                    ]
+                logger.debug(
+                    "Candidate interval: %d %d == %.3f %.3f",
+                    candidate_begin,
+                    search_end,
+                    candidate_begin * mws,
+                    search_end * mws,
                 )
-                self.log(["  Min value: %.6f", min_value])
-                self.log(["  Min index: %d == %.3f", min_index, min_index * mws])
+                logger.debug("  Min value: %.6f", min_value)
+                logger.debug("  Min index: %d == %.3f", min_index, min_index * mws)
                 candidates.append((min_value, candidate_begin, min_index))
-            except Exception as exc:
-                self.log_exc(
+            except Exception:
+                logger.exception(
                     "An unexpected error occurred while running _detect",
-                    exc,
-                    False,
-                    None,
                 )
 
         # reverse again the real wave
         if tail:
-            self.log("Tail => reversing real_wave_mfcc again")
+            logger.debug("Tail => reversing real_wave_mfcc again")
             self.real_wave_mfcc.reverse()
 
         # return
         if len(candidates) < 1:
-            self.log("No candidates found")
+            logger.debug("No candidates found")
             return TimeValue("0.000")
-        self.log("Candidates:")
+        logger.debug("Candidates:")
         for candidate in candidates:
-            self.log(
-                [
-                    "  Value: %.6f Begin Time: %.3f Min Index: %d",
-                    candidate[0],
-                    candidate[1] * mws,
-                    candidate[2],
-                ]
+            logger.debug(
+                "  Value: %.6f Begin Time: %.3f Min Index: %d",
+                candidate[0],
+                candidate[1] * mws,
+                candidate[2],
             )
         best = sorted(candidates)[0][1]
-        self.log(["Best candidate: %d == %.3f", best, best * mws])
+        logger.debug("Best candidate: %d == %.3f", best, best * mws)
         return best * mws

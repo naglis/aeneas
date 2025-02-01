@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 # aeneas is a Python/C library and a set of tools
 # to automagically synchronize audio and text (aka forced alignment)
 #
@@ -37,11 +35,15 @@ This module contains the following classes:
 .. versionadded:: 1.5.0
 """
 
+import logging
+
 from PIL import Image, ImageDraw, ImageFont
 import numpy
 
-from aeneas.logger import Loggable
+from aeneas.logger import Configurable
 import aeneas.globalfunctions as gf
+
+logger = logging.getLogger(__name__)
 
 
 class PlotterColors:
@@ -74,20 +76,16 @@ class PlotterColors:
     """ White """
 
 
-class Plotter(Loggable):
+class Plotter(Configurable):
     """
     Plot waveforms and labels to image files.
 
     :param rconf: a runtime configuration
     :type  rconf: :class:`~aeneas.runtimeconfiguration.RuntimeConfiguration`
-    :param logger: the logger object
-    :type  logger: :class:`~aeneas.logger.Logger`
     """
 
-    TAG = "Plotter"
-
-    def __init__(self, rconf=None, logger=None):
-        super().__init__(rconf=rconf, logger=logger)
+    def __init__(self, rconf=None):
+        super().__init__(rconf=rconf)
         self.waveform = None
         self.timescale = None
         self.labelsets = []
@@ -101,11 +99,9 @@ class Plotter(Loggable):
         :raises: TypeError: if ``waveform`` is not an instance of :class:`~aeneas.plotter.PlotWaveform`
         """
         if not isinstance(waveform, PlotWaveform):
-            self.log_exc(
-                "waveform must be an instance of PlotWaveform", None, True, TypeError
-            )
+            raise TypeError("waveform must be an instance of PlotWaveform")
         self.waveform = waveform
-        self.log("Added waveform")
+        logger.debug("Added waveform")
 
     def add_timescale(self, timescale):
         """
@@ -116,11 +112,9 @@ class Plotter(Loggable):
         :raises: TypeError: if ``timescale`` is not an instance of :class:`~aeneas.plotter.PlotTimeScale`
         """
         if not isinstance(timescale, PlotTimeScale):
-            self.log_exc(
-                "timescale must be an instance of PlotTimeScale", None, True, TypeError
-            )
+            raise TypeError("timescale must be an instance of PlotTimeScale")
         self.timescale = timescale
-        self.log("Added timescale")
+        logger.debug("Added timescale")
 
     def add_labelset(self, labelset):
         """
@@ -131,11 +125,9 @@ class Plotter(Loggable):
         :raises: TypeError: if ``labelset`` is not an instance of :class:`~aeneas.plotter.PlotLabelset`
         """
         if not isinstance(labelset, PlotLabelset):
-            self.log_exc(
-                "labelset must be an instance of PlotLabelset", None, True, TypeError
-            )
+            raise TypeError("labelset must be an instance of PlotLabelset")
         self.labelsets.append(labelset)
-        self.log("Added labelset")
+        logger.debug("Added labelset")
 
     def draw_png(self, output_file_path, h_zoom=5, v_zoom=30):
         """
@@ -149,12 +141,7 @@ class Plotter(Loggable):
         """
         # check that output_file_path can be written
         if not gf.file_can_be_written(output_file_path):
-            self.log_exc(
-                ["Cannot write to output file '%s'", output_file_path],
-                None,
-                True,
-                OSError,
-            )
+            raise OSError(f"Cannot write to output file {output_file_path!r}")
 
         # get widths and cumulative height, in modules
         widths = [ls.width for ls in self.labelsets]
@@ -172,15 +159,13 @@ class Plotter(Loggable):
         image_height_px = image_height * v_zoom
 
         # build image object
-        self.log(
-            ["Building image with size (modules): %d %d", image_width, image_height]
+        logger.debug(
+            "Building image with size (modules): %d %d", image_width, image_height
         )
-        self.log(
-            [
-                "Building image with size (px):      %d %d",
-                image_width_px,
-                image_height_px,
-            ]
+        logger.debug(
+            "Building image with size (px):      %d %d",
+            image_width_px,
+            image_height_px,
         )
         image_obj = Image.new(
             "RGB",
@@ -189,34 +174,32 @@ class Plotter(Loggable):
         )
         current_y = 0
         if self.waveform is not None:
-            self.log("Drawing waveform")
+            logger.debug("Drawing waveform")
             self.waveform.draw_png(image_obj, h_zoom, v_zoom, current_y)
             current_y += self.waveform.height
         timescale_y = current_y
         if self.timescale is not None:
             # NOTE draw as the last thing
-            # COMMENTED self.log(u"Drawing timescale")
+            # COMMENTED logger.debug(u"Drawing timescale")
             # COMMENTED self.timescale.draw_png(image_obj, h_zoom, v_zoom, current_y)
             current_y += self.timescale.height
         for labelset in self.labelsets:
-            self.log("Drawing labelset")
+            logger.debug("Drawing labelset")
             labelset.draw_png(image_obj, h_zoom, v_zoom, current_y)
             current_y += labelset.height
         if self.timescale is not None:
-            self.log("Drawing timescale")
+            logger.debug("Drawing timescale")
             self.timescale.draw_png(image_obj, h_zoom, v_zoom, timescale_y)
-        self.log(["Saving to file '%s'", output_file_path])
+        logger.debug("Saving to file %r", output_file_path)
         image_obj.save(output_file_path)
 
 
-class PlotElement(Loggable):
+class PlotElement(Configurable):
     """
     A generic element of a Plot.
 
     :param rconf: a runtime configuration
     :type  rconf: :class:`~aeneas.runtimeconfiguration.RuntimeConfiguration`
-    :param logger: the logger object
-    :type  logger: :class:`~aeneas.logger.Logger`
     """
 
     FONT_PATH = gf.absolute_path("res/LiberationMono-Regular.ttf", __file__)
@@ -228,10 +211,8 @@ class PlotElement(Loggable):
     TEXT_MARGIN = 2
     """ Margin between text and anchor point, in pixels """
 
-    TAG = "PlotElement"
-
-    def __init__(self, label=None, rconf=None, logger=None):
-        super().__init__(rconf=rconf, logger=logger)
+    def __init__(self, label=None, rconf=None):
+        super().__init__(rconf=rconf)
         self.label = label
 
     @property
@@ -281,19 +262,15 @@ class PlotTimeScale(PlotElement):
     :param int time_step: the step of the time scale numbers
     :param rconf: a runtime configuration
     :type  rconf: :class:`~aeneas.runtimeconfiguration.RuntimeConfiguration`
-    :param logger: the logger object
-    :type  logger: :class:`~aeneas.logger.Logger`
     """
 
-    TAG = "PlotTimeScale"
-
-    def __init__(self, max_time, time_step=1, rconf=None, logger=None):
-        super().__init__(rconf=rconf, logger=logger)
+    def __init__(self, max_time, time_step=1, rconf=None):
+        super().__init__(rconf=rconf)
         self.max_time = max_time
         self.time_step = time_step
-        self.log("Created time scale with")
-        self.log(["  max_time:  %.3f", self.max_time])
-        self.log(["  time_step: %d", self.time_step])
+        logger.debug("Created time scale with")
+        logger.debug("  max_time:  %.3f", self.max_time)
+        logger.debug("  time_step: %d", self.time_step)
 
     @property
     def height(self):
@@ -377,8 +354,6 @@ class PlotLabelset(PlotElement):
     :param dict parameters: a dictionary holding drawing parameters
     :param rconf: a runtime configuration
     :type  rconf: :class:`~aeneas.runtimeconfiguration.RuntimeConfiguration`
-    :param logger: the logger object
-    :type  logger: :class:`~aeneas.logger.Logger`
     """
 
     DEFAULT_PARAMETERS = {
@@ -390,18 +365,16 @@ class PlotLabelset(PlotElement):
         "color": PlotterColors.BLACK,
     }
 
-    TAG = "PlotLabelset"
-
-    def __init__(self, labelset, label=None, parameters=None, rconf=None, logger=None):
-        super().__init__(label=label, rconf=rconf, logger=logger)
+    def __init__(self, labelset, label=None, parameters=None, rconf=None):
+        super().__init__(label=label, rconf=rconf)
         self.labelset = labelset
         self.parameters = (
             dict(self.DEFAULT_PARAMETERS) if parameters is None else parameters
         )
-        self.log("Created label set with")
-        self.log(["  label:            %s", self.label])
-        self.log(["  number of labels: %d", len(self.labelset)])
-        self.log(["  parameters:       %s", self.parameters])
+        logger.debug("Created label set with")
+        logger.debug("  label:            %s", self.label)
+        logger.debug("  number of labels: %d", len(self.labelset))
+        logger.debug("  parameters:       %s", self.parameters)
 
     @property
     def height(self):
@@ -550,20 +523,16 @@ class PlotWaveform(PlotElement):
     :param bool fast: if ``True``, plot fast (only max, mirrored)
     :param rconf: a runtime configuration
     :type  rconf: :class:`~aeneas.runtimeconfiguration.RuntimeConfiguration`
-    :param logger: the logger object
-    :type  logger: :class:`~aeneas.logger.Logger`
     """
 
-    TAG = "PlotWaveform"
-
-    def __init__(self, audio_file, label=None, fast=False, rconf=None, logger=None):
-        super().__init__(label=label, rconf=rconf, logger=logger)
+    def __init__(self, audio_file, label=None, fast=False, rconf=None):
+        super().__init__(label=label, rconf=rconf)
         self.audio_file = audio_file
         self.fast = fast
-        self.log("Created waveform with")
-        self.log(["  label:        %s", self.label])
-        self.log(["  audio_length: %.3f", self.audio_file.audio_length])
-        self.log(["  fast:         %s", str(self.fast)])
+        logger.debug("Created waveform with")
+        logger.debug("  label:        %s", self.label)
+        logger.debug("  audio_length: %.3f", self.audio_file.audio_length)
+        logger.debug("  fast:         %s", self.fast)
 
     @property
     def height(self):

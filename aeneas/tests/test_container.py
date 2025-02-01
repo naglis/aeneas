@@ -133,7 +133,7 @@ class TestContainer(unittest.TestCase):
     def test_entries_empty_file(self):
         for path in self.EMPTY_FILES:
             with self.subTest(path=path):
-                cont = Container(path)
+                cont = Container(gf.absolute_path(path, __file__))
                 with self.assertRaises(OSError):
                     self.assertEqual(len(cont.entries), 0)
 
@@ -215,7 +215,7 @@ class TestContainer(unittest.TestCase):
     def test_read_entry_empty_file(self):
         for path in self.EMPTY_FILES:
             with self.subTest(path=path):
-                cont = Container(path)
+                cont = Container(gf.absolute_path(path, __file__))
                 with self.assertRaises(OSError):
                     self.assertIsNone(cont.read_entry(self.EXPECTED_ENTRIES[0]))
 

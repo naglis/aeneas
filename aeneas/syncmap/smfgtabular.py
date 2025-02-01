@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 # aeneas is a Python/C library and a set of tools
 # to automagically synchronize audio and text (aka forced alignment)
 #
@@ -37,8 +35,6 @@ class SyncMapFormatGenericTabular(SyncMapFormatBase):
     """
     Base class for tabular-like I/O format handlers.
     """
-
-    TAG = "SyncMapFormatGenericTabular"
 
     DEFAULT = "tabular"
     """
@@ -86,10 +82,8 @@ class SyncMapFormatGenericTabular(SyncMapFormatBase):
     Otherwise, use the specified character.
     """
 
-    def __init__(self, variant=DEFAULT, parameters=None, rconf=None, logger=None):
-        super().__init__(
-            variant=variant, parameters=parameters, rconf=rconf, logger=logger
-        )
+    def __init__(self, variant=DEFAULT, parameters=None, rconf=None):
+        super().__init__(variant=variant, parameters=parameters, rconf=rconf)
         # store parse/format time functions
         if self.variant in self.MACHINE_ALIASES:
             self.parse_time_function = gf.time_from_ssmmm
