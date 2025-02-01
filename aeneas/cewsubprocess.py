@@ -38,6 +38,7 @@ See the following discussions for details:
 .. versionadded:: 1.5.0
 """
 
+import argparse
 import logging
 import subprocess
 import sys
@@ -46,7 +47,6 @@ import tempfile
 from aeneas.exacttiming import TimeValue
 from aeneas.logger import Configurable
 from aeneas.runtimeconfiguration import RuntimeConfiguration
-import aeneas.globalfunctions as gf
 
 logger = logging.getLogger(__name__)
 
@@ -98,27 +98,26 @@ class CEWSubprocess(Configurable):
                 self.rconf[RuntimeConfiguration.CEW_SUBPROCESS_PATH],
                 "-m",
                 "aeneas.cewsubprocess",
-                "%.3f" % c_quit_after,
-                "%d" % c_backwards,
+                f"{c_quit_after:.3f}",
+                f"{c_backwards:d}",
                 text_file_path,
                 audio_file_path,
                 data_file_path,
             ]
             logger.debug("Calling with arguments: '%s'", " ".join(arguments))
-            proc = subprocess.Popen(
+            subprocess.check_call(
                 arguments,
                 stdout=subprocess.PIPE,
                 stdin=subprocess.PIPE,
                 stderr=subprocess.PIPE,
                 universal_newlines=True,
             )
-            proc.communicate()
 
             logger.debug("Reading output data...")
             with open(data_file_path, encoding="utf-8") as data_file:
                 lines = data_file.read().splitlines()
-                sr = int(lines[0])
-                sf = int(lines[1])
+                sample_rate = int(lines[0])
+                synthesized_frames = int(lines[1])
                 intervals = []
                 for line in lines[2:]:
                     values = line.split(" ")
@@ -126,31 +125,25 @@ class CEWSubprocess(Configurable):
                         intervals.append((TimeValue(values[0]), TimeValue(values[1])))
             logger.debug("Reading output data... done")
 
-        return (sr, sf, intervals)
+        return (sample_rate, synthesized_frames, intervals)
 
 
-def main():
+def main() -> int:
     """
     Run ``aeneas.cew``, reading input text from file and writing audio and interval data to file.
     """
 
-    # make sure we have enough parameters
-    if len(sys.argv) < 6:
-        print(
-            "You must pass five arguments: QUIT_AFTER BACKWARDS TEXT_FILE_PATH AUDIO_FILE_PATH DATA_FILE_PATH"
-        )
-        return 1
-
-    # read parameters
-    c_quit_after = float(sys.argv[1])  # NOTE: cew needs float, not TimeValue
-    c_backwards = int(sys.argv[2])
-    text_file_path = sys.argv[3]
-    audio_file_path = sys.argv[4]
-    data_file_path = sys.argv[5]
+    parser = argparse.ArgumentParser()
+    parser.add_argument("quit_after", type=float)
+    parser.add_argument("backwards", type=int)
+    parser.add_argument("text_file_path")
+    parser.add_argument("audio_file_path")
+    parser.add_argument("data_file_path")
+    args = parser.parse_args()
 
     # read (voice_code, text) from file
-    s_text = []
-    with open(text_file_path, encoding="utf-8") as text:
+    c_text = []
+    with open(args.text_file_path, encoding="utf-8") as text:
         for line in text.readlines():
             # NOTE: not using strip() to avoid removing trailing blank characters
             line = line.replace("\n", "").replace("\r", "")
@@ -158,26 +151,20 @@ def main():
             if idx > 0:
                 f_voice_code = line[:idx]
                 f_text = line[(idx + 1) :]
-                s_text.append((f_voice_code, f_text))
+                c_text.append((f_voice_code, f_text))
 
-    # convert to bytes/unicode as required by subprocess
-    c_text = []
-    for f_voice_code, f_text in s_text:
-        c_text.append((gf.safe_unicode(f_voice_code), gf.safe_unicode(f_text)))
+    import aeneas.cew.cew as cew
 
-    try:
-        import aeneas.cew.cew
+    sample_rate, synthesized_frames, intervals = cew.synthesize_multiple(
+        args.audio_file_path, args.quit_after, args.backwards, c_text
+    )
+    with open(args.data_file_path, mode="w", encoding="utf-8") as data:
+        data.write(f"{sample_rate}\n")
+        data.write(f"{synthesized_frames}\n")
+        data.write("\n".join([f"{begin:.3f} {end:.3f}" for begin, end in intervals]))
 
-        sr, sf, intervals = aeneas.cew.cew.synthesize_multiple(
-            audio_file_path, c_quit_after, c_backwards, c_text
-        )
-        with open(data_file_path, "w", encoding="utf-8") as data:
-            data.write("%d\n" % (sr))
-            data.write("%d\n" % (sf))
-            data.write("\n".join([f"{i[0]:.3f} {i[1]:.3f}" for i in intervals]))
-    except Exception as exc:
-        print("Unexpected error: %s" % str(exc))
+    return 0
 
 
 if __name__ == "__main__":
-    main()
+    raise SystemExit(main())
