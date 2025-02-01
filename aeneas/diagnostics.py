@@ -33,10 +33,12 @@ This module can be executed from command line with::
 .. versionadded:: 1.4.1
 """
 
+import contextlib
 import sys
 import tempfile
 
 import aeneas.globalfunctions as gf
+import aeneas.globalconstants as gc
 
 
 class Diagnostics:
@@ -53,13 +55,9 @@ class Diagnostics:
 
         :rtype: bool
         """
-        is_in_utf8 = True
-        is_out_utf8 = True
-        if sys.stdin.encoding not in ["UTF-8", "UTF8", "utf-8", "utf8"]:
-            is_in_utf8 = False
-        if sys.stdout.encoding not in ["UTF-8", "UTF8", "utf-8", "utf8"]:
-            is_out_utf8 = False
-        if (is_in_utf8) and (is_out_utf8):
+        is_in_utf8 = sys.stdin.encoding in gc.UTF8_ENCODING_VARIANTS
+        is_out_utf8 = sys.stdout.encoding in gc.UTF8_ENCODING_VARIANTS
+        if is_in_utf8 and is_out_utf8:
             gf.print_success("shell encoding OK")
         else:
             gf.print_warning("shell encoding WARNING")
@@ -117,7 +115,7 @@ class Diagnostics:
 
         :rtype: bool
         """
-        try:
+        with contextlib.suppress(Exception):
             from aeneas.ffmpegwrapper import FFMPEGWrapper
 
             input_file_path = gf.absolute_path("tools/res/audio.mp3", __file__)
@@ -129,8 +127,6 @@ class Diagnostics:
             if result:
                 gf.print_success("ffmpeg         OK")
                 return False
-        except Exception:
-            pass
         gf.print_error("ffmpeg         ERROR")
         gf.print_info("  Please make sure you have ffmpeg installed correctly")
         gf.print_info("  and that its path is in your PATH environment variable")

@@ -25,6 +25,8 @@ Global constants, mostly default values,
 public parameter names, and executable paths.
 """
 
+UTF8_ENCODING_VARIANTS = frozenset(("UTF-8", "UTF8", "utf-8", "utf8"))
+
 
 # CONSTANTS
 
