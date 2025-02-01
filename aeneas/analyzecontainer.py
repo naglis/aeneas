@@ -103,18 +103,16 @@ class AnalyzeContainer(Configurable):
         if config_string is None:
             logger.debug("Analyzing container with TXT config file")
             config_entry = self.container.entry_config_txt
-            logger.debug("Found TXT config entry '%s'", config_entry)
+            logger.debug("Found TXT config entry %r", config_entry)
             config_dir = os.path.dirname(config_entry)
-            logger.debug("Directory of TXT config entry: '%s'", config_dir)
-            logger.debug("Reading TXT config entry: '%s'", config_entry)
+            logger.debug("Directory of TXT config entry: %r", config_dir)
+            logger.debug("Reading TXT config entry: %r", config_entry)
             config_contents = self.container.read_entry(config_entry)
             logger.debug("Converting config contents to config string")
             config_contents = gf.safe_unicode(config_contents)
             config_string = gf.config_txt_to_string(config_contents)
         else:
-            logger.debug(
-                "Analyzing container with TXT config string '%s'", config_string
-            )
+            logger.debug("Analyzing container with TXT config string %r", config_string)
             config_dir = ""
 
         logger.debug("Creating the Job object")
@@ -130,33 +128,31 @@ class AnalyzeContainer(Configurable):
         tasks_root_directory = gf.norm_join(
             config_dir, parameters[gc.PPN_JOB_IS_HIERARCHY_PREFIX]
         )
-        logger.debug("Path of the tasks root directory: '%s'", tasks_root_directory)
+        logger.debug("Path of the tasks root directory: %r", tasks_root_directory)
 
         logger.debug("Calculating the path of the sync map root directory")
         sync_map_root_directory = gf.norm_join(
             config_dir, parameters[gc.PPN_JOB_OS_HIERARCHY_PREFIX]
         )
         job_os_hierarchy_type = parameters[gc.PPN_JOB_OS_HIERARCHY_TYPE]
-        logger.debug(
-            "Path of the sync map root directory: '%s'", sync_map_root_directory
-        )
+        logger.debug("Path of the sync map root directory: %r", sync_map_root_directory)
 
         text_file_relative_path = parameters[gc.PPN_JOB_IS_TEXT_FILE_RELATIVE_PATH]
-        logger.debug("Relative path for text file: '%s'", text_file_relative_path)
+        logger.debug("Relative path for text file: %r", text_file_relative_path)
         text_file_name_regex = re.compile(
             parameters[gc.PPN_JOB_IS_TEXT_FILE_NAME_REGEX]
         )
         logger.debug(
-            "Regex for text file: '%s'",
+            "Regex for text file: %r",
             parameters[gc.PPN_JOB_IS_TEXT_FILE_NAME_REGEX],
         )
         audio_file_relative_path = parameters[gc.PPN_JOB_IS_AUDIO_FILE_RELATIVE_PATH]
-        logger.debug("Relative path for audio file: '%s'", audio_file_relative_path)
+        logger.debug("Relative path for audio file: %r", audio_file_relative_path)
         audio_file_name_regex = re.compile(
             parameters[gc.PPN_JOB_IS_AUDIO_FILE_NAME_REGEX]
         )
         logger.debug(
-            "Regex for audio file: '%s'",
+            "Regex for audio file: %r",
             parameters[gc.PPN_JOB_IS_AUDIO_FILE_NAME_REGEX],
         )
 
@@ -168,21 +164,21 @@ class AnalyzeContainer(Configurable):
                 text_file_relative_path,
                 text_file_name_regex,
             )
-            logger.debug("Found text files: '%s'", text_files)
+            logger.debug("Found text files: %r", text_files)
             audio_files = self._find_files(
                 entries,
                 tasks_root_directory,
                 audio_file_relative_path,
                 audio_file_name_regex,
             )
-            logger.debug("Found audio files: '%s'", audio_files)
+            logger.debug("Found audio files: %r", audio_files)
 
             logger.debug("Matching files in flat hierarchy...")
             matched_tasks = self._match_files_flat_hierarchy(text_files, audio_files)
             logger.debug("Matching files in flat hierarchy... done")
 
             for task_info in matched_tasks:
-                logger.debug("Creating task: '%s'", task_info)
+                logger.debug("Creating task: %r", task_info)
                 task = self._create_task(
                     task_info,
                     config_string,
@@ -206,7 +202,7 @@ class AnalyzeContainer(Configurable):
                     tasks_root_directory, matched_directory
                 )
                 logger.debug(
-                    "Looking for text/audio pairs in directory '%s'",
+                    "Looking for text/audio pairs in directory %r",
                     matched_directory_full_path,
                 )
 
@@ -217,24 +213,24 @@ class AnalyzeContainer(Configurable):
                     text_file_relative_path,
                     text_file_name_regex,
                 )
-                logger.debug("Found text files: '%s'", text_files)
+                logger.debug("Found text files: %r", text_files)
                 audio_files = self._find_files(
                     entries,
                     matched_directory_full_path,
                     audio_file_relative_path,
                     audio_file_name_regex,
                 )
-                logger.debug("Found audio files: '%s'", audio_files)
+                logger.debug("Found audio files: %r", audio_files)
 
                 # if we have found exactly one text and one audio file,
                 # create a Task
                 if len(text_files) == 1 and len(audio_files) == 1:
                     logger.debug(
-                        "Exactly one text file and one audio file in '%s'",
+                        "Exactly one text file and one audio file in %r",
                         matched_directory,
                     )
                     task_info = [matched_directory, text_files[0], audio_files[0]]
-                    logger.debug("Creating task: '%s'", task_info)
+                    logger.debug("Creating task: %r", task_info)
                     task = self._create_task(
                         task_info,
                         config_string,
@@ -243,11 +239,11 @@ class AnalyzeContainer(Configurable):
                     )
                     job.add_task(task)
                 elif len(text_files) > 1:
-                    logger.debug("More than one text file in '%s'", matched_directory)
+                    logger.debug("More than one text file in %r", matched_directory)
                 elif len(audio_files) > 1:
-                    logger.debug("More than one audio file in '%s'", matched_directory)
+                    logger.debug("More than one audio file in %r", matched_directory)
                 else:
-                    logger.debug("No text nor audio file in '%s'", matched_directory)
+                    logger.debug("No text nor audio file in %r", matched_directory)
 
         return job
 
@@ -340,14 +336,14 @@ class AnalyzeContainer(Configurable):
         parameters = gf.config_string_to_dict(config_string)
         logger.debug("Creating task")
         task = Task(config_string)
-        task.configuration["description"] = "Task %s" % task_info[0]
+        task.configuration["description"] = f"Task {task_info[0]}"
         logger.debug("Task description: %s", task.configuration["description"])
         try:
             task.configuration["language"] = parameters[gc.PPN_TASK_LANGUAGE]
-            logger.debug("Set language from task: '%s'", task.configuration["language"])
+            logger.debug("Set language from task: %r", task.configuration["language"])
         except KeyError:
             task.configuration["language"] = parameters[gc.PPN_JOB_LANGUAGE]
-            logger.debug("Set language from job: '%s'", task.configuration["language"])
+            logger.debug("Set language from job: %r", task.configuration["language"])
         custom_id = task_info[0]
         task.configuration["custom_id"] = custom_id
         logger.debug("Task custom_id: %s", task.configuration["custom_id"])

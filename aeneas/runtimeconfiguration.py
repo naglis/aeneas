@@ -693,14 +693,6 @@ class RuntimeConfiguration(Configuration):
     parameters.
     Please note that you will be billed according to your Nuance Developers account plan.
 
-    Specify the value
-    :data:`~aeneas.synthesizer.Synthesizer.CUSTOM` (``custom``)
-    to use a custom TTS;
-    you will need to provide the path to the Python source file
-    containing your TTS wrapper using the
-    :data:`~aeneas.runtimeconfiguration.RuntimeConfiguration.TTS_PATH`
-    parameter.
-
     .. versionadded:: 1.5.0
     """
 

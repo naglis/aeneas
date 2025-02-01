@@ -65,9 +65,6 @@ class Synthesizer(Configurable):
     AWS = "aws"
     """ Select AWS Polly TTS API wrapper """
 
-    CUSTOM = "custom"
-    """ Select custom TTS engine wrapper """
-
     ESPEAK = "espeak"
     """ Select eSpeak wrapper """
 
@@ -83,7 +80,7 @@ class Synthesizer(Configurable):
     NUANCE = "nuance"
     """ Select Nuance TTS API wrapper """
 
-    ALLOWED_VALUES = [AWS, CUSTOM, ESPEAK, ESPEAKNG, FESTIVAL, MACOS, NUANCE]
+    ALLOWED_VALUES = [AWS, ESPEAK, ESPEAKNG, FESTIVAL, MACOS, NUANCE]
     """ List of all the allowed values """
 
     def __init__(self, rconf=None):
@@ -99,26 +96,6 @@ class Synthesizer(Configurable):
         requested_tts_engine = self.rconf[RuntimeConfiguration.TTS]
         tts_cls = None
         match requested_tts_engine:
-            case self.CUSTOM:
-                logger.debug("TTS engine: custom")
-                tts_path = self.rconf[RuntimeConfiguration.TTS_PATH]
-                if tts_path is None:
-                    raise ValueError("You must specify a value for tts_path")
-                try:
-                    import imp
-
-                    logger.debug("Loading CustomTTSWrapper module from %r...", tts_path)
-                    imp.load_source("CustomTTSWrapperModule", tts_path)
-                    logger.debug(
-                        "Loading CustomTTSWrapper module from %r... done", tts_path
-                    )
-                    logger.debug("Importing CustomTTSWrapper...")
-                    from CustomTTSWrapperModule import CustomTTSWrapper
-
-                    logger.debug("Importing CustomTTSWrapper... done")
-                    tts_cls = CustomTTSWrapper
-                except Exception as exc:
-                    raise OSError("Unable to load custom TTS wrapper") from exc
             case self.AWS:
                 if importlib.util.find_spec("boto3") is None:
                     raise ImportError(

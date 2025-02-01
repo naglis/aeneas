@@ -465,8 +465,10 @@ class AbstractCLIProgram(Configurable):
         :type  path: string (path)
         :rtype: bool
         """
-        if not os.path.isfile(path):
-            self.print_error(f"Path {path!r} does not exist or is not a file")
+        if not (os.path.isfile(path) or os.path.isdir(path)):
+            self.print_error(
+                f"Path {path!r} does not exist or is not a file or directory"
+            )
             return False
         return True
 

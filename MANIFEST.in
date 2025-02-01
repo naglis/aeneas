@@ -5,7 +5,6 @@ recursive-include aeneas/cint *
 recursive-include aeneas/cmfcc *
 recursive-include aeneas/cwave *
 recursive-include aeneas/extra *
-prune aeneas/extra/ctw_speect
 recursive-include aeneas/res *
 recursive-include aeneas/syncmap *
 recursive-include aeneas/tools/res *

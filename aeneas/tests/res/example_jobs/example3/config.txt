@@ -18,5 +18,5 @@ os_task_file_format=smil
 os_task_file_smil_page_ref=page.xhtml
 os_task_file_smil_audio_ref=audio.mp3
 
-job_language=en
+job_language=eng
 job_description=Example 3 (paged hierarchy, unparsed text files)

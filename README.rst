@@ -255,8 +255,6 @@ Supported Features
    (default), eSpeak-ng, Festival, MacOS (via say), Nuance TTS API
 -  Default TTS (eSpeak) called via a Python C extension for fast audio
    synthesis
--  Possibility of running a custom, user-provided TTS engine Python
-   wrapper (e.g., included example for speect)
 -  Batch processing of multiple audio/text pairs
 -  Download audio from a YouTube video
 -  In multilevel mode, recursive alignment from paragraph to sentence to

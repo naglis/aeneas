@@ -41,7 +41,7 @@ You must ``git clone`` the main repository instead.
 Certain tests might fail
 if you do not set your environment up properly,
 for example, if you do not have optional libraries/tools installed
-(e.g., ``festival`` or ``speect``, etc.).
+(e.g., ``festival``, etc.).
 
 In the root directory of the repository
 there is a ``run_all_unit_tests.py`` script

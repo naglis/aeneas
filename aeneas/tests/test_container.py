@@ -53,7 +53,7 @@ class TestContainer(unittest.TestCase):
         "epub": {
             "path": gf.absolute_path("res/container/job.epub", __file__),
             "format": ContainerFormat.EPUB,
-            "config_size": 599,
+            "config_size": 600,
         },
         "tar": {
             "path": gf.absolute_path("res/container/job.tar", __file__),
@@ -73,12 +73,12 @@ class TestContainer(unittest.TestCase):
         "unpacked": {
             "path": gf.absolute_path("res/container/job", __file__),
             "format": ContainerFormat.UNPACKED,
-            "config_size": 599,
+            "config_size": 600,
         },
         "zip": {
             "path": gf.absolute_path("res/container/job.zip", __file__),
             "format": ContainerFormat.ZIP,
-            "config_size": 599,
+            "config_size": 600,
         },
         "zip_utf8": {
             "path": gf.absolute_path("res/container/job_utf8.zip", __file__),

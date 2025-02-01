@@ -39,12 +39,6 @@ class TestExecuteTaskCLI(ExecuteTaskCLICase):
     def test_example_ctw_espeak(self):
         self.execute([("", "--example-ctw-espeak")], 0)
 
-    # NOTE disabling this test since it requires a speect voice
-    def test_example_ctw_speect(self):
-        # unable to run speect with Python 3,
-        # perform the test only on Python 2
-        self.execute([("", "--example-ctw-speect")], 0)
-
     def test_example_eaf(self):
         self.execute([("", "--example-eaf")], 0)
 

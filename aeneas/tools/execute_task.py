@@ -61,7 +61,6 @@ class ExecuteTaskCLI(AbstractCLIProgram):
 
     AUDIO_FILE = gf.relative_path("res/audio.mp3", __file__)
     CTW_ESPEAK = gf.relative_path("../extra/ctw_espeak.py", __file__)
-    CTW_SPEECT = gf.relative_path("../extra/ctw_speect/ctw_speect.py", __file__)
 
     DEMOS = {
         "--example-aftercurrent": {
@@ -98,15 +97,6 @@ class ExecuteTaskCLI(AbstractCLIProgram):
             "config": "task_language=eng|is_text_type=plain|os_task_file_format=tsv",
             "syncmap": "output/sonnet.ctw_espeak.tsv",
             "options": '-r="tts=custom|tts_path=%s"' % CTW_ESPEAK,
-            "show": False,
-        },
-        "--example-ctw-speect": {
-            "description": "input: plain text, output: TSV, tts engine: ctw speect",
-            "audio": AUDIO_FILE,
-            "text": gf.relative_path("res/plain.txt", __file__),
-            "config": "task_language=eng|is_text_type=plain|os_task_file_format=tsv",
-            "syncmap": "output/sonnet.ctw_speect.tsv",
-            "options": '-r="tts=custom|tts_path=%s"' % CTW_SPEECT,
             "show": False,
         },
         "--example-eaf": {
@@ -487,9 +477,6 @@ class ExecuteTaskCLI(AbstractCLIProgram):
                     elif key == "--example-ctw-espeak":
                         self.rconf[RuntimeConfiguration.TTS] = "custom"
                         self.rconf[RuntimeConfiguration.TTS_PATH] = self.CTW_ESPEAK
-                    elif key == "--example-ctw-speect":
-                        self.rconf[RuntimeConfiguration.TTS] = "custom"
-                        self.rconf[RuntimeConfiguration.TTS_PATH] = self.CTW_SPEECT
                     elif key == "--example-festival":
                         self.rconf[RuntimeConfiguration.TTS] = "festival"
                     elif key == "--example-mws":
