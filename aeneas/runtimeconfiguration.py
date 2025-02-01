@@ -84,7 +84,7 @@ class RuntimeConfiguration(Configuration):
     Otherwise, use the pure Python code.
 
     This option is equivalent to
-    setting ``CDTW``, ``CEW``, ``CFW``,
+    setting ``CDTW``, ``CENGW``, ``CEW``, ``CFW``,
     and ``CMFCC`` to ``True`` or ``False`` at once.
 
     Default: ``True``.
@@ -101,6 +101,15 @@ class RuntimeConfiguration(Configuration):
     Default: ``True``.
 
     .. versionadded:: 1.5.1
+    """
+
+    CENGW = "cengw"
+    """
+    If ``True`` and the Python C extension ``cengw``
+    is available, use it.
+    Otherwise, use the pure Python code.
+
+    Default: ``True``.
     """
 
     CEW = "cew"
@@ -637,21 +646,21 @@ class RuntimeConfiguration(Configuration):
     Allowed values are listed in :data:`~aeneas.synthesizer.Synthesizer.ALLOWED_VALUES`.
 
     The default value is
-    :data:`~aeneas.synthesizer.Synthesizer.ESPEAK` (``espeak``)
-    which will use the built-in eSpeak TTS wrapper.
-    You might need to provide a ``/full/path/to/your/espeak`` value
-    to the
-    :data:`~aeneas.runtimeconfiguration.RuntimeConfiguration.TTS_PATH`
-    parameter if the command ``espeak`` is not available in
-    one of the directories listed in your ``PATH`` environment variable.
-
-    Specify the value
     :data:`~aeneas.synthesizer.Synthesizer.ESPEAKNG` (``espeak-ng``)
-    to use the eSpeak-ng TTS wrapper.
+    which will use the built-in eSpeak NG TTS wrapper.
     You might need to provide a ``/full/path/to/your/espeak-ng`` value
     to the
     :data:`~aeneas.runtimeconfiguration.RuntimeConfiguration.TTS_PATH`
     parameter if the command ``espeak-ng`` is not available in
+    one of the directories listed in your ``PATH`` environment variable.
+
+    Specify the value
+    :data:`~aeneas.synthesizer.Synthesizer.ESPEAK` (``espeak``)
+    to use the eSpeak TTS wrapper.
+    You might need to provide a ``/full/path/to/your/espeak`` value
+    to the
+    :data:`~aeneas.runtimeconfiguration.RuntimeConfiguration.TTS_PATH`
+    parameter if the command ``espeak`` is not available in
     one of the directories listed in your ``PATH`` environment variable.
 
     Specify the value
@@ -919,6 +928,7 @@ class RuntimeConfiguration(Configuration):
         ),
         (C_EXTENSIONS, (True, bool, [], "run C/C++ extensions")),
         (CDTW, (True, bool, [], "run C extension cdtw")),
+        (CENGW, (True, bool, [], "run C extension cengw")),
         (CEW, (True, bool, [], "run C extension cew")),
         (CFW, (True, bool, [], "run C++ extension cfw")),
         (CMFCC, (True, bool, [], "run C extension cmfcc")),
@@ -1034,11 +1044,11 @@ class RuntimeConfiguration(Configuration):
             (0, int, [], "max length of single text file, in fragments (0 to disable)"),
         ),
         (TMP_PATH, (None, None, [], "path to the temporary dir")),
-        (TTS, ("espeak", None, [], "TTS wrapper to use")),
+        (TTS, ("espeak-ng", None, [], "TTS wrapper to use")),
         (
             TTS_PATH,
             (None, None, [], "path of the TTS executable/wrapper"),
-        ),  # None (= default) or "espeak" or "/usr/bin/espeak"
+        ),  # None (= default) or "espeak-ng" or "/usr/bin/espeak-ng"
         (
             TTS_VOICE_CODE,
             (

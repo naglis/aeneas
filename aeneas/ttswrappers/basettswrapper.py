@@ -280,12 +280,16 @@ class BaseTTSWrapper(Configurable):
             raise NotImplementedError(
                 "You must implement at least one call method: subprocess, C extension, or Python"
             )
+
         super().__init__(rconf=rconf)
+
         self.subprocess_arguments = []
+
         self.tts_path = self.rconf[RuntimeConfiguration.TTS_PATH]
         if self.tts_path is None:
             logger.debug("No tts_path specified in rconf, setting default TTS path")
             self.tts_path = self.DEFAULT_TTS_PATH
+
         self.use_cache = self.rconf[RuntimeConfiguration.TTS_CACHE]
         self.cache = TTSCache(rconf=rconf) if self.use_cache else None
         logger.debug("TTS path is             %s", self.tts_path)

@@ -24,22 +24,22 @@ import unittest
 
 
 @unittest.skipIf(
-    importlib.util.find_spec("aeneas.cew.cew") is None,
-    "CEW C extension is not available",
+    importlib.util.find_spec("aeneas.cengw.cengw") is None,
+    "CENGW C extension is not available",
 )
-class TestCEW(unittest.TestCase):
-    def test_cew_synthesize_multiple(self):
+class TestCENGW(unittest.TestCase):
+    def test_cengw_synthesize_multiple(self):
         c_quit_after = 0.0
         c_backwards = 0
         c_text = [
-            ("en", "Dummy 1"),  # NOTE cew requires the actual eSpeak voice code
-            ("en", "Dummy 2"),  # NOTE cew requires the actual eSpeak voice code
-            ("en", "Dummy 3"),  # NOTE cew requires the actual eSpeak voice code
+            ("en", "Dummy 1"),  # NOTE cew requires the actual eSpeak NG voice code
+            ("en", "Dummy 2"),  # NOTE cew requires the actual eSpeak NG voice code
+            ("en", "Dummy 3"),  # NOTE cew requires the actual eSpeak NG voice code
         ]
-        import aeneas.cew.cew as cew
+        import aeneas.cengw.cengw as cengw
 
         with tempfile.NamedTemporaryFile(suffix=".wav") as tmp_file:
-            sample_rate, synthesized_fragments, intervals = cew.synthesize_multiple(
+            sample_rate, synthesized_fragments, intervals = cengw.synthesize_multiple(
                 tmp_file.name, c_quit_after, c_backwards, c_text
             )
 
@@ -47,21 +47,21 @@ class TestCEW(unittest.TestCase):
         self.assertEqual(synthesized_fragments, 3)
         self.assertEqual(len(intervals), 3)
 
-    def test_cew_synthesize_multiple_lang(self):
+    def test_cengw_synthesize_multiple_lang(self):
         c_quit_after = 0.0
         c_backwards = 0
         c_text = [
-            ("en", "Dummy 1"),  # NOTE cew requires the actual eSpeak voice code
+            ("en", "Dummy 1"),  # NOTE cew requires the actual eSpeak NG voice code
             (
                 "it",
                 "Segnaposto 2",
-            ),  # NOTE cew requires the actual eSpeak voice code
-            ("en", "Dummy 3"),  # NOTE cew requires the actual eSpeak voice code
+            ),  # NOTE cew requires the actual eSpeak NG voice code
+            ("en", "Dummy 3"),  # NOTE cew requires the actual eSpeak NG voice code
         ]
-        import aeneas.cew.cew as cew
+        import aeneas.cengw.cengw as cengw
 
         with tempfile.NamedTemporaryFile(suffix=".wav") as tmp_file:
-            sample_rate, synthesized_fragments, intervals = cew.synthesize_multiple(
+            sample_rate, synthesized_fragments, intervals = cengw.synthesize_multiple(
                 tmp_file.name, c_quit_after, c_backwards, c_text
             )
 

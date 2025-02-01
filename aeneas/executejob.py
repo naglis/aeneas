@@ -169,7 +169,7 @@ class ExecuteJob(Configurable):
             logger.debug("Setting absolute paths for tasks...")
             for task in self.job.tasks:
                 task.text_file_path_absolute = gf.norm_join(
-                    self.working_directory.path, task.text_file_path
+                    self.working_directory.name, task.text_file_path
                 )
                 task.audio_file_path_absolute = gf.norm_join(
                     self.working_directory.name, task.audio_file_path
@@ -276,7 +276,7 @@ class ExecuteJob(Configurable):
         output_container_format = self.job.configuration["o_container_format"]
         logger.debug("Output container format: %r", output_container_format)
         output_file_name = self.job.configuration["o_name"]
-        if (output_container_format != ContainerFormat.UNPACKED) and (
+        if output_container_format != ContainerFormat.UNPACKED and (
             not output_file_name.endswith(output_container_format)
         ):
             logger.debug("Adding extension to output_file_name")
@@ -300,7 +300,7 @@ class ExecuteJob(Configurable):
 
         return None
 
-    def clean(self, remove_working_directory=True):
+    def clean(self, remove_working_directory: bool = True):
         """
         Remove the temporary directory.
         If ``remove_working_directory`` is ``True``
@@ -310,12 +310,13 @@ class ExecuteJob(Configurable):
         :param bool remove_working_directory: if ``True``, remove
                                               the working directory as well
         """
-        if remove_working_directory is not None:
+        if remove_working_directory and self.working_directory is not None:
             logger.debug("Removing working directory... ")
             self.working_directory.cleanup()
             logger.debug("Removing working directory... done")
 
-        logger.debug("Removing temporary directory... ")
-        self.tmp_directory.cleanup()
-        self.tmp_directory = None
-        logger.debug("Removing temporary directory... done")
+        if self.tmp_directory is not None:
+            logger.debug("Removing temporary directory... ")
+            self.tmp_directory.cleanup()
+            self.tmp_directory = None
+            logger.debug("Removing temporary directory... done")

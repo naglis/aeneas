@@ -776,6 +776,9 @@ def can_run_c_extension(name: str | None = None) -> bool:
 
     # Python C extension for synthesizing with eSpeak.
     can_run_cew = functools.partial(can_import, "aeneas.cew.cew")
+    #
+    # Python C extension for synthesizing with eSpeak NG.
+    can_run_cengw = functools.partial(can_import, "aeneas.cengw.cengw")
 
     # Python C extension for synthesizing with Festival.
     can_run_cfw = functools.partial(can_import, "aeneas.cfw.cfw")
@@ -784,13 +787,15 @@ def can_run_c_extension(name: str | None = None) -> bool:
         return can_run_cdtw()
     elif name == "cmfcc":
         return can_run_cmfcc()
+    elif name == "cengw":
+        return can_run_cengw()
     elif name == "cew":
         return can_run_cew()
     elif name == "cfw":
         return can_run_cfw()
     else:
         # NOTE cfw is still experimental!
-        return can_run_cdtw() and can_run_cmfcc() and can_run_cew()
+        return can_run_cdtw() and can_run_cmfcc() and (can_run_cengw() or can_run_cew())
 
 
 def run_c_extension_with_fallback(
@@ -816,20 +821,18 @@ def run_c_extension_with_fallback(
     if not rconf["c_extensions"]:
         log_function("C extensions disabled")
     elif extension not in rconf:
-        log_function(["C extension '%s' not recognized", extension])
+        log_function("C extension %r not recognized", extension)
     elif not rconf[extension]:
-        log_function(["C extension '%s' disabled", extension])
+        log_function("C extension %r disabled", extension)
     else:
-        log_function(["C extension '%s' enabled", extension])
+        log_function("C extension %r enabled", extension)
         if c_function is None:
             log_function("C function is None")
         elif can_run_c_extension(extension):
-            log_function(["C extension '%s' enabled and it can be loaded", extension])
+            log_function("C extension %r enabled and it can be loaded", extension)
             computed, result = c_function(*args)
         else:
-            log_function(
-                ["C extension '%s' enabled but it cannot be loaded", extension]
-            )
+            log_function("C extension %r enabled but it cannot be loaded", extension)
     if not computed:
         if py_function is None:
             log_function("Python function is None")

@@ -24,8 +24,6 @@
 Metadata for setting the aeneas package up
 """
 
-import io
-
 __author__ = "Alberto Pettarin"
 __email__ = "aeneas@readbeyond.it"
 __copyright__ = """
@@ -87,6 +85,7 @@ PKG_EXTRAS_REQUIRE = {
 PKG_PACKAGES = [
     "aeneas",
     "aeneas.cdtw",
+    "aeneas.cengw",
     "aeneas.cew",
     "aeneas.cfw",
     "aeneas.cmfcc",
@@ -102,8 +101,8 @@ PKG_PACKAGES = [
 PKG_PACKAGE_DATA = {
     "aeneas": ["res/*", "*.md"],
     "aeneas.cdtw": ["*.c", "*.h", "*.md"],
+    "aeneas.cengw": ["*.c", "*.h", "*.md", "*.dll"],
     "aeneas.cew": ["*.c", "*.h", "*.md", "*.dll"],
-    "aeneas.cew": ["*.cc", "*.h", "*.md"],
     "aeneas.cmfcc": ["*.c", "*.h", "*.md"],
     "aeneas.cwave": ["*.c", "*.h", "*.md"],
     "aeneas.extra": ["*.md"],
@@ -149,13 +148,10 @@ PKG_LICENSE = "GNU Affero General Public License v3 (AGPL v3)"
 
 # human-readable descriptions
 PKG_SHORT_DESCRIPTION = "aeneas is a Python/C library and a set of tools to automagically synchronize audio and text (aka forced alignment)"
-try:
-    PKG_LONG_DESCRIPTION = open("README.rst", encoding="utf-8").read()
-except:
-    PKG_LONG_DESCRIPTION = PKG_SHORT_DESCRIPTION
+PKG_LONG_DESCRIPTION = open("README.rst", encoding="utf-8").read()
 
 # PyPI keywords
-PKG_KEYWORDS = [
+PKG_KEYWORDS = (
     "AUD",
     "AWS Polly TTS API",
     "CSV",
@@ -204,7 +200,7 @@ PKG_KEYWORDS = [
     "text to speech",
     "text2wave",
     "tts",
-]
+)
 
 # PyPI classifiers
 PKG_CLASSIFIERS = [
@@ -221,11 +217,11 @@ PKG_CLASSIFIERS = [
     "Operating System :: POSIX :: Linux",
     "Programming Language :: C",
     "Programming Language :: Python",
-    "Programming Language :: Python :: 2",
-    "Programming Language :: Python :: 2.7",
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.4",
-    "Programming Language :: Python :: 3.5",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
     "Topic :: Education",
     "Topic :: Multimedia",
     "Topic :: Multimedia :: Sound/Audio",

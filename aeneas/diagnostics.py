@@ -228,6 +228,23 @@ class Diagnostics:
         return True
 
     @classmethod
+    def check_cengw(cls):
+        """
+        Check whether Python C extension ``cengw`` can be imported.
+
+        Return ``True`` on failure and ``False`` on success.
+
+        :rtype: bool
+        """
+        if gf.can_run_c_extension("cengw"):
+            gf.print_success("aeneas.cengw   AVAILABLE")
+            return False
+        gf.print_warning("aeneas.cengw   NOT AVAILABLE")
+        gf.print_info("  You can still run aeneas but it will be a bit slower")
+        gf.print_info("  Please refer to the installation documentation for details")
+        return True
+
+    @classmethod
     def check_cew(cls):
         """
         Check whether Python C extension ``cew`` can be imported.
@@ -274,6 +291,7 @@ class Diagnostics:
             # we do not want lazy evaluation
             c_ext_warnings = cls.check_cdtw() or c_ext_warnings
             c_ext_warnings = cls.check_cmfcc() or c_ext_warnings
+            c_ext_warnings = cls.check_cengw() or c_ext_warnings
             c_ext_warnings = cls.check_cew() or c_ext_warnings
         # return results
         return (False, warnings, c_ext_warnings)

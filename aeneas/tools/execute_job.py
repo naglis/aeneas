@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 # aeneas is a Python/C library and a set of tools
 # to automagically synchronize audio and text (aka forced alignment)
 #
@@ -26,6 +24,7 @@ as a container and a configuration string
 (i.e., from a wizard).
 """
 
+import logging
 import sys
 
 from aeneas.executejob import ExecuteJob
@@ -34,6 +33,8 @@ from aeneas.runtimeconfiguration import RuntimeConfiguration
 from aeneas.tools.abstract_cli_program import AbstractCLIProgram
 from aeneas.validator import Validator
 import aeneas.globalfunctions as gf
+
+logger = logging.getLogger(__name__)
 
 
 class ExecuteJobCLI(AbstractCLIProgram):
@@ -87,8 +88,8 @@ class ExecuteJobCLI(AbstractCLIProgram):
         container_path = self.actual_arguments[0]
         output_directory_path = self.actual_arguments[1]
         config_string = None
-        if (len(self.actual_arguments)) > 2 and (
-            not self.actual_arguments[2].startswith("-")
+        if len(self.actual_arguments) > 2 and not self.actual_arguments[2].startswith(
+            "-"
         ):
             config_string = self.actual_arguments[2]
         validate = not self.has_option("--skip-validator")
@@ -115,9 +116,9 @@ class ExecuteJobCLI(AbstractCLIProgram):
                         f"The given container is not valid: {result.pretty_print()}"
                     )
                     return self.ERROR_EXIT_CODE
-            except Exception as exc:
-                self.print_error(
-                    f"An unexpected error occurred while validating the container: {exc}"
+            except Exception:
+                logger.exception(
+                    "An unexpected error occurred while validating the container"
                 )
                 return self.ERROR_EXIT_CODE
 
@@ -125,19 +126,15 @@ class ExecuteJobCLI(AbstractCLIProgram):
             self.print_info("Loading job from container...")
             executor = ExecuteJob(rconf=self.rconf)
             executor.load_job_from_container(container_path, config_string)
-        except Exception as exc:
-            self.print_error(
-                f"An unexpected error occurred while loading the job: {exc}"
-            )
+        except Exception:
+            logger.exception("An unexpected error occurred while loading the job")
             return self.ERROR_EXIT_CODE
 
         try:
             self.print_info("Executing...")
             executor.execute()
-        except Exception as exc:
-            self.print_error(
-                f"An unexpected error occurred while executing the job: {exc}"
-            )
+        except Exception:
+            logger.exception("An unexpected error occurred while executing the job")
             return self.ERROR_EXIT_CODE
 
         try:
@@ -146,9 +143,9 @@ class ExecuteJobCLI(AbstractCLIProgram):
             self.print_info(f"Created output file {path!r}")
             executor.clean(True)
             return self.NO_ERROR_EXIT_CODE
-        except Exception as exc:
-            self.print_error(
-                f"An unexpected error occurred while writing the output container: {exc}"
+        except Exception:
+            logger.exception(
+                "An unexpected error occurred while writing the output container"
             )
 
         return self.ERROR_EXIT_CODE

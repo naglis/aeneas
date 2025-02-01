@@ -29,8 +29,14 @@ https://github.com/espeak-ng/espeak-ng/
 for further details.
 """
 
+import logging
+
+from aeneas.exacttiming import TimeValue
 from aeneas.language import Language
 from aeneas.ttswrappers.basettswrapper import BaseTTSWrapper
+import aeneas.globalfunctions as gf
+
+logger = logging.getLogger(__name__)
 
 
 class ESPEAKNGTTSWrapper(BaseTTSWrapper):
@@ -999,6 +1005,10 @@ class ESPEAKNGTTSWrapper(BaseTTSWrapper):
 
     HAS_SUBPROCESS_CALL = True
 
+    HAS_C_EXTENSION_CALL = True
+
+    C_EXTENSION_NAME = "cengw"
+
     def __init__(self, rconf=None):
         super().__init__(rconf=rconf)
         self.set_subprocess_arguments(
@@ -1011,3 +1021,101 @@ class ESPEAKNGTTSWrapper(BaseTTSWrapper):
                 self.CLI_PARAMETER_TEXT_STDIN,
             ]
         )
+
+    def _synthesize_multiple_c_extension(
+        self, text_file, output_file_path, quit_after=None, backwards=False
+    ):
+        """
+        Synthesize multiple text fragments, using the cengw extension.
+
+        Return a tuple (anchors, total_time, num_chars).
+
+        :rtype: (bool, (list, :class:`~aeneas.exacttiming.TimeValue`, int))
+        """
+        logger.debug("Synthesizing using C extension...")
+
+        # convert parameters from Python values to C values
+        try:
+            c_quit_after = float(quit_after)
+        except TypeError:
+            c_quit_after = 0.0
+        c_backwards = int(backwards)
+        logger.debug("output_file_path: %s", output_file_path)
+        logger.debug("c_quit_after:     %.3f", c_quit_after)
+        logger.debug("c_backwards:      %d", c_backwards)
+        logger.debug("Preparing u_text...")
+        u_text = []
+        fragments = text_file.fragments
+        for fragment in fragments:
+            f_lang = fragment.language
+            f_text = fragment.filtered_text
+            if f_lang is None:
+                f_lang = self.DEFAULT_LANGUAGE
+            f_voice_code = self._language_to_voice_code(f_lang)
+            if f_text is None:
+                f_text = ""
+            u_text.append((f_voice_code, f_text))
+        logger.debug("Preparing u_text... done")
+
+        # call C extension
+        sample_rate = None
+        synthesized_fragments = None
+        intervals = None
+
+        if sample_rate is None:
+            logger.debug("Preparing c_text...")
+            c_text = [(gf.safe_unicode(t[0]), gf.safe_unicode(t[1])) for t in u_text]
+            logger.debug("Preparing c_text... done")
+
+            logger.debug("Calling aeneas.cengw directly")
+            try:
+                logger.debug("Importing aeneas.cengw...")
+                import aeneas.cengw.cengw as cengw
+
+                logger.debug("Importing aeneas.cengw... done")
+                logger.debug("Calling aeneas.cengw...")
+                sample_rate, synthesized_fragments, intervals = (
+                    cengw.synthesize_multiple(
+                        output_file_path, c_quit_after, c_backwards, c_text
+                    )
+                )
+                logger.debug("Calling aeneas.cengw... done")
+            except Exception:
+                logger.exception("An unexpected error occurred while running cengw")
+                return (False, None)
+
+        logger.debug(
+            "Sample rate: %s, synthesized fragments: %s",
+            sample_rate,
+            synthesized_fragments,
+        )
+
+        # create output
+        anchors = []
+        current_time = TimeValue("0.000")
+        num_chars = 0
+        if backwards:
+            fragments = fragments[::-1]
+        for i in range(synthesized_fragments):
+            # get the correct fragment
+            fragment = fragments[i]
+            # store for later output
+            anchors.append(
+                [
+                    TimeValue(intervals[i][0]),
+                    fragment.identifier,
+                    fragment.filtered_text,
+                ]
+            )
+            # increase the character counter
+            num_chars += fragment.characters
+            # update current_time
+            current_time = TimeValue(intervals[i][1])
+
+        # return output
+        # NOTE anchors do not make sense if backwards == True
+        logger.debug("Returning %d time anchors", len(anchors))
+        logger.debug("Current time %.3f", current_time)
+        logger.debug("Synthesized %d characters", num_chars)
+        logger.debug("Synthesizing using C extension... done")
+        return (True, (anchors, current_time, num_chars))

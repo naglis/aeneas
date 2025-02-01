@@ -72,9 +72,14 @@ class TestExecuteJobCLI(ExecuteJobCLICase):
             [("in", "../tools/res/job.zip"), ("out", ""), ("", '-r="cdtw=False"')], 0
         )
 
+    def test_exec_cengw(self):
+        self.execute(
+            [("in", "../tools/res/job.zip"), ("out", ""), ("", '-r="cengw=False"')], 0
+        )
+
     def test_exec_cew(self):
         self.execute(
-            [("in", "../tools/res/job.zip"), ("out", ""), ("", '-r="cdtw=False"')], 0
+            [("in", "../tools/res/job.zip"), ("out", ""), ("", '-r="cew=False"')], 0
         )
 
     def test_exec_cew_subprocess_enabled(self):

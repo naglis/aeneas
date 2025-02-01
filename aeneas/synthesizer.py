@@ -54,8 +54,6 @@ class Synthesizer(Configurable):
 
     :param rconf: a runtime configuration
     :type  rconf: :class:`~aeneas.runtimeconfiguration.RuntimeConfiguration`
-    :param logger: the logger object
-    :type  logger: :class:`~aeneas.logger.Logger`
     :raises: OSError: if a custom TTS engine is requested
                       but it cannot be loaded
     :raises: ImportError: if the AWS Polly TTS API wrapper is requested
@@ -74,7 +72,7 @@ class Synthesizer(Configurable):
     """ Select eSpeak wrapper """
 
     ESPEAKNG = "espeak-ng"
-    """ Select eSpeak-ng wrapper """
+    """ Select eSpeak NG wrapper """
 
     FESTIVAL = "festival"
     """ Select Festival wrapper """
@@ -109,12 +107,10 @@ class Synthesizer(Configurable):
                 try:
                     import imp
 
-                    logger.debug(
-                        "Loading CustomTTSWrapper module from '%s'...", tts_path
-                    )
+                    logger.debug("Loading CustomTTSWrapper module from %r...", tts_path)
                     imp.load_source("CustomTTSWrapperModule", tts_path)
                     logger.debug(
-                        "Loading CustomTTSWrapper module from '%s'... done", tts_path
+                        "Loading CustomTTSWrapper module from %r... done", tts_path
                     )
                     logger.debug("Importing CustomTTSWrapper...")
                     from CustomTTSWrapperModule import CustomTTSWrapper
@@ -146,9 +142,9 @@ class Synthesizer(Configurable):
             case _ as other:
                 raise ValueError(f"Invalid TTS engine type {other!r}")
 
-        logger.debug("Creating %r instance...", type(tts_cls))
+        logger.debug("Creating %r instance...", tts_cls.__name__)
         self.tts_engine = tts_cls(rconf=self.rconf)
-        logger.debug("Creating %r instance... done", type(tts_cls))
+        logger.debug("Creating %r instance... done", tts_cls.__name__)
         logger.debug("Selecting TTS engine... done")
 
     @property

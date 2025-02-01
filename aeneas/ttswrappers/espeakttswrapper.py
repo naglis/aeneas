@@ -834,8 +834,8 @@ class ESPEAKTTSWrapper(BaseTTSWrapper):
         logger.debug("Preparing u_text... done")
 
         # call C extension
-        sr = None
-        sf = None
+        sample_rate = None
+        synthesized_fragments = None
         intervals = None
         if self.rconf[RuntimeConfiguration.CEW_SUBPROCESS_ENABLED]:
             logger.debug("Using cewsubprocess to call aeneas.cew")
@@ -846,8 +846,10 @@ class ESPEAKTTSWrapper(BaseTTSWrapper):
                 logger.debug("Importing aeneas.cewsubprocess... done")
                 logger.debug("Calling aeneas.cewsubprocess...")
                 cewsub = CEWSubprocess(rconf=self.rconf)
-                sr, sf, intervals = cewsub.synthesize_multiple(
-                    output_file_path, c_quit_after, c_backwards, u_text
+                sample_rate, synthesized_fragments, intervals = (
+                    cewsub.synthesize_multiple(
+                        output_file_path, c_quit_after, c_backwards, u_text
+                    )
                 )
                 logger.debug("Calling aeneas.cewsubprocess... done")
             except Exception:
@@ -857,7 +859,7 @@ class ESPEAKTTSWrapper(BaseTTSWrapper):
                 # NOTE not critical, try calling aeneas.cew directly
                 # COMMENTED return (False, None)
 
-        if sr is None:
+        if sample_rate is None:
             logger.debug("Preparing c_text...")
             c_text = [(gf.safe_unicode(t[0]), gf.safe_unicode(t[1])) for t in u_text]
             logger.debug("Preparing c_text... done")
@@ -865,11 +867,11 @@ class ESPEAKTTSWrapper(BaseTTSWrapper):
             logger.debug("Calling aeneas.cew directly")
             try:
                 logger.debug("Importing aeneas.cew...")
-                import aeneas.cew.cew
+                import aeneas.cew.cew as cew
 
                 logger.debug("Importing aeneas.cew... done")
                 logger.debug("Calling aeneas.cew...")
-                sr, sf, intervals = aeneas.cew.cew.synthesize_multiple(
+                sample_rate, synthesized_fragments, intervals = cew.synthesize_multiple(
                     output_file_path, c_quit_after, c_backwards, c_text
                 )
                 logger.debug("Calling aeneas.cew... done")
@@ -877,8 +879,7 @@ class ESPEAKTTSWrapper(BaseTTSWrapper):
                 logger.exception("An unexpected error occurred while running cew")
                 return (False, None)
 
-        logger.debug("sr: %d", sr)
-        logger.debug("sf: %d", sf)
+        logger.debug("sr: %d, sf: %d", sample_rate, synthesized_fragments)
 
         # create output
         anchors = []
@@ -886,7 +887,7 @@ class ESPEAKTTSWrapper(BaseTTSWrapper):
         num_chars = 0
         if backwards:
             fragments = fragments[::-1]
-        for i in range(sf):
+        for i in range(synthesized_fragments):
             # get the correct fragment
             fragment = fragments[i]
             # store for later output

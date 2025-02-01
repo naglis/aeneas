@@ -90,15 +90,18 @@ class Container(Configurable):
     def __init__(
         self,
         file_path: str,
-        container_format: ContainerFormat | None = None,
+        container_format: ContainerFormat | str | None = None,
         rconf=None,
     ):
         if file_path is None:
             raise TypeError("File path is None")
-        if container_format is not None and not isinstance(
+
+        if isinstance(container_format, str):
+            container_format = ContainerFormat(container_format)
+        elif container_format is not None and not isinstance(
             container_format, ContainerFormat
         ):
-            raise ValueError("Container format not allowed")
+            raise ValueError(f"Container format {container_format!r} not allowed")
         super().__init__(rconf=rconf)
         self.file_path = file_path
         self.container_format = container_format

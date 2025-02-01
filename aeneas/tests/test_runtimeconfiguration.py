@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 # aeneas is a Python/C library and a set of tools
 # to automagically synchronize audio and text (aka forced alignment)
 #
@@ -55,9 +53,9 @@ class TestRuntimeConfiguration(unittest.TestCase):
         rconf = RuntimeConfiguration()
         self.assertEqual(rconf.mwl, TimeValue("0.100"))
 
-    def test_tts(self):
+    def test_default_tts(self):
         rconf = RuntimeConfiguration()
-        self.assertEqual(rconf.tts, "espeak")
+        self.assertEqual(rconf.tts, "espeak-ng")
 
     def test_tts_path(self):
         rconf = RuntimeConfiguration()
@@ -97,7 +95,7 @@ class TestRuntimeConfiguration(unittest.TestCase):
         self.assertEqual(rconf.config_string, rconf2.config_string)
 
     def test_set_rconf_string(self):
-        params = [
+        params = (
             (
                 "aba_nonspeech_tolerance=0.040",
                 "aba_nonspeech_tolerance",
@@ -108,6 +106,7 @@ class TestRuntimeConfiguration(unittest.TestCase):
             ("c_extensions=False", "c_extensions", False),
             ("cdtw=False", "cdtw", False),
             ("cew=False", "cew", False),
+            ("cengw=False", "cengw", False),
             ("cmfcc=False", "cmfcc", False),
             ("cew_subprocess_enabled=True", "cew_subprocess_enabled", True),
             (
@@ -198,7 +197,8 @@ class TestRuntimeConfiguration(unittest.TestCase):
                 "vad_min_nonspeech_length",
                 TimeValue("0.500"),
             ),
-        ]
+        )
         for string, key, value in params:
-            rconf = RuntimeConfiguration(string)
-            self.assertEqual(rconf[key], value)
+            with self.subTest(string=string, key=key, value=value):
+                rconf = RuntimeConfiguration(string)
+                self.assertEqual(rconf[key], value)
