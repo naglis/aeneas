@@ -115,7 +115,9 @@ class DownloadCLI(AbstractCLIProgram):
                             r["format"], r["ext"], r["abr"], filesize
                         )
                     )
-                self.print_generic(f"Available audio streams:\n{'\n'.join(msg)}")
+                self.print_generic(
+                    "Available audio streams:\n{streams}".format(streams="\n".join(msg))
+                )
             return self.NO_ERROR_EXIT_CODE
         except ImportError:
             self.print_no_dependency_error()
