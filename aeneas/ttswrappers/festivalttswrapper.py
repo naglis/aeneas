@@ -128,7 +128,7 @@ class FESTIVALTTSWrapper(BaseTTSWrapper):
         ENG_USA: "English (USA)",
     }
 
-    CODE_TO_HUMAN_LIST = sorted([f"{k}\t{v}" for k, v in CODE_TO_HUMAN.items()])
+    CODE_TO_HUMAN_LIST = sorted(f"{k}\t{v}" for k, v in CODE_TO_HUMAN.items())
 
     VOICE_CODE_TO_SUBPROCESS = {
         CES: "(language_czech)",
