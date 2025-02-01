@@ -86,10 +86,10 @@ class AbstractCLIProgram(Configurable):
 
     RCONF_PARAMETERS = RuntimeConfiguration.parameters(sort=True, as_strings=True)
 
-    def __init__(self, use_sys=True, invoke=None, rconf=None):
+    def __init__(self, use_sys: bool = True, invoke: str | None = None, rconf=None):
         super().__init__(rconf=rconf)
         self.invoke = (
-            "python -m aeneas.tools.%s" % (self.NAME) if (invoke is None) else invoke
+            f"python -m aeneas.tools.{self.NAME}" if invoke is None else invoke
         )
         self.use_sys = use_sys
         self.formal_arguments_raw = []
@@ -104,7 +104,7 @@ class AbstractCLIProgram(Configurable):
         logging.WARNING: gf.print_warning,
     }
 
-    def print_generic(self, msg, prefix=None):
+    def print_generic(self, msg, prefix: int | None = None):
         """
         Print a message and log it.
 
@@ -116,14 +116,14 @@ class AbstractCLIProgram(Configurable):
         if prefix is None:
             logger.info(msg)
         else:
-            logger.debug(f"{prefix}{msg}")
+            logger.log(prefix, msg)
         if self.use_sys:
-            if (prefix is not None) and (prefix in self.PREFIX_TO_PRINT_FUNCTION):
+            if prefix is not None and prefix in self.PREFIX_TO_PRINT_FUNCTION:
                 self.PREFIX_TO_PRINT_FUNCTION[prefix](msg)
             else:
                 gf.safe_print(msg)
 
-    def print_error(self, msg):
+    def print_error(self, msg: str):
         """
         Print an error message and log it.
 
@@ -131,7 +131,7 @@ class AbstractCLIProgram(Configurable):
         """
         self.print_generic(msg, logging.ERROR)
 
-    def print_info(self, msg):
+    def print_info(self, msg: str):
         """
         Print an info message and log it.
 
@@ -139,7 +139,7 @@ class AbstractCLIProgram(Configurable):
         """
         self.print_generic(msg, logging.INFO)
 
-    def print_warning(self, msg):
+    def print_warning(self, msg: str):
         """
         Print a warning message and log it.
 
@@ -147,7 +147,7 @@ class AbstractCLIProgram(Configurable):
         """
         self.print_generic(msg, logging.WARNING)
 
-    def exit(self, code):
+    def exit(self, code: int):
         """
         Exit with the given exit code,
         possibly with ``sys.exit()``.
@@ -160,7 +160,7 @@ class AbstractCLIProgram(Configurable):
             sys.exit(code)
         return code
 
-    def print_help(self, short=False):
+    def print_help(self, short: bool = False):
         """
         Print help message and exit.
 
@@ -204,14 +204,14 @@ class AbstractCLIProgram(Configurable):
         options = ["OPTIONS"] + sorted(options) + [""]
 
         parameters = []
-        if ("parameters" in self.HELP) and (len(self.HELP["parameters"]) > 0):
+        if "parameters" in self.HELP and self.HELP["parameters"]:
             parameters.append("PARAMETERS")
             for par in self.HELP["parameters"]:
                 parameters.append(f"  {par}")
             parameters.append("")
 
         examples = []
-        if ("examples" in self.HELP) and (len(self.HELP["examples"]) > 0):
+        if "examples" in self.HELP and self.HELP["examples"]:
             examples.append("EXAMPLES")
             for exa in self.HELP["examples"]:
                 examples.append(f"  {self.invoke} {exa}")
@@ -333,7 +333,7 @@ class AbstractCLIProgram(Configurable):
             args.remove(flag)
 
         # set RuntimeConfiguration string, if specified
-        for flag in ["-r", "--runtime-configuration"]:
+        for flag in ("-r", "--runtime-configuration"):
             rconf_string = self.has_option_with_value(flag, actual_arguments=False)
             if rconf_string is not None:
                 self.rconf = RuntimeConfiguration(rconf_string)
@@ -341,7 +341,7 @@ class AbstractCLIProgram(Configurable):
 
         # set log file path, if requested
         log_path = None
-        for flag in ["-l", "--log"]:
+        for flag in ("-l", "--log"):
             log_path = self.has_option_with_value(flag, actual_arguments=False)
             if log_path is not None:
                 args.remove(f"{flag}={log_path}")
@@ -361,7 +361,7 @@ class AbstractCLIProgram(Configurable):
             logging.basicConfig(level=loglevel)
 
         # if no actual arguments left, print help
-        if len(args) < 1 and show_help:
+        if not args and show_help:
             return self.print_help(short=True)
 
         # store actual arguments
@@ -466,7 +466,7 @@ class AbstractCLIProgram(Configurable):
         :rtype: bool
         """
         if not os.path.isfile(path):
-            self.print_error(f"Path '{path}' does not exist or is not a file")
+            self.print_error(f"Path {path!r} does not exist or is not a file")
             return False
         return True
 
@@ -480,7 +480,7 @@ class AbstractCLIProgram(Configurable):
         :rtype: bool
         """
         if not os.path.isfile(path):
-            self.print_error(f"Path '{path}' does not exist or is not a file")
+            self.print_error(f"Path {path!r} does not exist or is not a file")
             return False
         return True
 
@@ -494,9 +494,9 @@ class AbstractCLIProgram(Configurable):
         :rtype: bool
         """
         if not gf.file_can_be_written(path):
-            self.print_error("Unable to create file '%s'" % (path))
             self.print_error(
-                "Make sure the file path is written/escaped correctly and that you have write permission on it"
+                f"Unable to create file {path!r}. "
+                "Make sure the file path is written/escaped correctly and that you have write permission on it."
             )
             return False
         return True
@@ -511,13 +511,13 @@ class AbstractCLIProgram(Configurable):
         :rtype: bool
         """
         if not os.path.isdir(path):
-            self.print_error("Directory '%s' does not exist" % (path))
+            self.print_error(f"Directory {path!r} does not exist")
             return False
         test_file = os.path.join(path, "file.test")
         if not gf.file_can_be_written(test_file):
-            self.print_error("Unable to write inside directory '%s'" % (path))
             self.print_error(
-                "Make sure the directory path is written/escaped correctly and that you have write permission on it"
+                f"Unable to write inside directory {path!r}. "
+                "Make sure the directory path is written/escaped correctly and that you have write permission on it."
             )
             return False
         return True
@@ -529,25 +529,27 @@ class AbstractCLIProgram(Configurable):
             return text_file
         else:
             if text_format not in TextFileFormat.ALLOWED_VALUES:
-                self.print_error("File format '%s' is not allowed" % (text_format))
                 self.print_error(
-                    "Allowed text file formats: %s"
-                    % (" ".join(TextFileFormat.ALLOWED_VALUES))
+                    f"File format {text_format!r} is not allowed. "
+                    f"Allowed text file formats: {' '.join(TextFileFormat.ALLOWED_VALUES)}."
                 )
                 return None
             try:
                 return TextFile(text, text_format, parameters)
             except OSError:
-                self.print_error("Cannot read file '%s'" % (text))
+                self.print_error(f"Cannot read file {text!r}")
             return None
 
     def print_no_dependency_error(self):
         self.print_error(
             "You need to install Python module youtube-dl to download audio from YouTube. Run:"
+            "\n"
+            "$ pip install youtube-dl"
+            "\n"
+            "or, to install for all users:"
+            "\n"
+            "$ sudo pip install youtube-dl"
         )
-        self.print_error("$ pip install youtube-dl")
-        self.print_error("or, to install for all users:")
-        self.print_error("$ sudo pip install youtube-dl")
 
 
 def main() -> int:
