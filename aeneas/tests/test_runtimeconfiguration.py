@@ -79,13 +79,13 @@ class TestRuntimeConfiguration(unittest.TestCase):
     def test_set_tts(self):
         rconf = RuntimeConfiguration()
         rconf.set_tts(level=1)
-        self.assertEqual(rconf.tts, "espeak")
+        self.assertEqual(rconf.tts, "espeak-ng")
         self.assertEqual(rconf.tts_path, None)
         rconf.set_tts(level=2)
-        self.assertEqual(rconf.tts, "espeak")
+        self.assertEqual(rconf.tts, "espeak-ng")
         self.assertEqual(rconf.tts_path, None)
         rconf.set_tts(level=3)
-        self.assertEqual(rconf.tts, "espeak")
+        self.assertEqual(rconf.tts, "espeak-ng")
         self.assertEqual(rconf.tts_path, None)
 
     def test_clone(self):
