@@ -70,7 +70,7 @@ class ExecuteTask(Configurable):
     :type  rconf: :class:`~aeneas.runtimeconfiguration.RuntimeConfiguration`
     """
 
-    def __init__(self, task=None, rconf=None):
+    def __init__(self, task: Task | None = None, rconf=None):
         super().__init__(rconf=rconf)
         self.task = task
         self.step_index = 1
@@ -80,7 +80,7 @@ class ExecuteTask(Configurable):
         if task is not None:
             self.load_task(self.task)
 
-    def load_task(self, task):
+    def load_task(self, task: Task):
         """
         Load the task from the given ``Task`` object.
 
@@ -88,8 +88,6 @@ class ExecuteTask(Configurable):
         :type  task: :class:`~aeneas.task.Task`
         :raises: :class:`~aeneas.executetask.ExecuteTaskInputError`: if ``task`` is not an instance of :class:`~aeneas.task.Task`
         """
-        if not isinstance(task, Task):
-            raise ExecuteTaskExecutionError("`task` is not an instance of Task")
         self.task = task
 
     def _step_begin(self, label, log: bool = True):
@@ -110,7 +108,7 @@ class ExecuteTask(Configurable):
         """Log failure of a step"""
         logger.critical("STEP %d (%s) FAILURE", self.step_index, self.step_label)
         self.step_index += 1
-        raise ExecuteTaskExecutionError("Unexpected error while executing task")
+        raise ExecuteTaskExecutionError("Unexpected error while executing task") from exc
 
     def execute(self):
         """
@@ -150,9 +148,7 @@ class ExecuteTask(Configurable):
                 "The task text file seems to have no text fragments"
             )
         task_max_text_length = self.rconf[RuntimeConfiguration.TASK_MAX_TEXT_LENGTH]
-        if task_max_text_length > 0 and (
-            len(self.task.text_file) > task_max_text_length
-        ):
+        if task_max_text_length > 0 and len(self.task.text_file) > task_max_text_length:
             raise ExecuteTaskInputError(
                 f"The text file of the task has {len(self.task.text_file):d} fragments, "
                 f"more than the maximum allowed ({task_max_text_length:d})."
@@ -304,7 +300,12 @@ class ExecuteTask(Configurable):
             self._step_failure(exc)
 
     def _execute_level(
-        self, level, audio_file_mfcc, text_files, sync_roots, force_aba_auto=False
+        self,
+        level: int,
+        audio_file_mfcc: AudioFileMFCC,
+        text_files: list[TextFile],
+        sync_roots: list[Tree],
+        force_aba_auto: bool = False,
     ):
         """
         Compute the alignment for all the nodes in the given level.
@@ -328,15 +329,19 @@ class ExecuteTask(Configurable):
         next_level_text_files = []
         next_level_sync_roots = []
         for text_file_index, text_file in enumerate(text_files):
-            logger.debug("Text level %d, fragment %d", level, text_file_index)
-            logger.debug("  Len:   %d", len(text_file))
+            logger.debug(
+                "Text level: %d, fragment: %d, len: %d",
+                level,
+                text_file_index,
+                len(text_file),
+            )
             sync_root = sync_roots[text_file_index]
-            if (level > 1) and (len(text_file) == 1):
+            if level > 1 and len(text_file) == 1:
                 logger.debug(
                     "Level > 1 and only one text fragment => return trivial tree"
                 )
                 self._append_trivial_tree(text_file, sync_root)
-            elif (level > 1) and (sync_root.value.begin == sync_root.value.end):
+            elif level > 1 and sync_root.value.begin == sync_root.value.end:
                 logger.debug(
                     "Level > 1 and parent has begin == end => return trivial tree"
                 )
@@ -348,13 +353,13 @@ class ExecuteTask(Configurable):
                 if not sync_root.is_empty:
                     begin = sync_root.value.begin
                     end = sync_root.value.end
-                    logger.debug("  Setting begin: %.3f", begin)
-                    logger.debug("  Setting end:   %.3f", end)
+                    logger.debug("Setting begin: %.3f", begin)
+                    logger.debug("Setting end: %.3f", end)
                     audio_file_mfcc.set_head_middle_tail(
                         head_length=begin, middle_length=(end - begin)
                     )
                 else:
-                    logger.debug("  No begin or end to set")
+                    logger.debug("No begin or end to set")
                 self._execute_inner(
                     audio_file_mfcc,
                     text_file,
@@ -372,12 +377,12 @@ class ExecuteTask(Configurable):
 
     def _execute_inner(
         self,
-        audio_file_mfcc,
-        text_file,
-        sync_root=None,
-        force_aba_auto=False,
-        log=True,
-        leaf_level=False,
+        audio_file_mfcc: AudioFileMFCC,
+        text_file: TextFile,
+        sync_root: Tree | None = None,
+        force_aba_auto: bool = False,
+        log: bool = True,
+        leaf_level: bool = False,
     ):
         """
         Align a subinterval of the given AudioFileMFCC
@@ -429,7 +434,7 @@ class ExecuteTask(Configurable):
         )
         self._step_end(log=log)
 
-    def _load_audio_file(self):
+    def _load_audio_file(self) -> AudioFile:
         """
         Load audio in memory.
 
@@ -447,7 +452,7 @@ class ExecuteTask(Configurable):
         self._step_end()
         return audio_file
 
-    def _clear_audio_file(self, audio_file):
+    def _clear_audio_file(self, audio_file: AudioFile):
         """
         Clear audio from memory.
 
@@ -456,10 +461,11 @@ class ExecuteTask(Configurable):
         """
         self._step_begin("clear audio file")
         audio_file.clear_data()
-        audio_file = None
         self._step_end()
 
-    def _extract_mfcc(self, file_path=None, file_format=None, audio_file=None):
+    def _extract_mfcc(
+        self, file_path=None, file_format=None, audio_file=None
+    ) -> AudioFileMFCC:
         """
         Extract the MFCCs from the given audio file.
 
@@ -490,7 +496,7 @@ class ExecuteTask(Configurable):
             logger.debug("Running VAD inside _extract_mfcc... done")
         return audio_file_mfcc
 
-    def _compute_head_process_tail(self, audio_file_mfcc):
+    def _compute_head_process_tail(self, audio_file_mfcc: AudioFileMFCC):
         """
         Set the audio file head or tail,
         by either reading the explicit values
@@ -510,9 +516,9 @@ class ExecuteTask(Configurable):
         tail_max = self.task.configuration["i_a_tail_max"]
         tail_min = self.task.configuration["i_a_tail_min"]
         if (
-            (head_length is not None)
-            or (process_length is not None)
-            or (tail_length is not None)
+            head_length is not None
+            or process_length is not None
+            or tail_length is not None
         ):
             logger.debug("Setting explicit head process tail")
         else:
@@ -525,12 +531,12 @@ class ExecuteTask(Configurable):
             head_length = TimeValue("0.000")
             process_length = None
             tail_length = TimeValue("0.000")
-            if (head_min is not None) or (head_max is not None):
+            if head_min is not None or head_max is not None:
                 logger.debug("Detecting HEAD...")
                 head_length = sd.detect_head(head_min, head_max)
                 logger.debug("Detected HEAD: %.3f", head_length)
                 logger.debug("Detecting HEAD... done")
-            if (tail_min is not None) or (tail_max is not None):
+            if tail_min is not None or tail_max is not None:
                 logger.debug("Detecting TAIL...")
                 tail_length = sd.detect_tail(tail_min, tail_max)
                 logger.debug("Detected TAIL: %.3f", tail_length)
@@ -543,17 +549,13 @@ class ExecuteTask(Configurable):
 
     def _set_synthesizer(self):
         """Create synthesizer"""
-        logger.debug("Setting synthesizer...")
         self.synthesizer = Synthesizer(rconf=self.rconf)
-        logger.debug("Setting synthesizer... done")
 
     def _clear_cache_synthesizer(self):
         """Clear the cache of the synthesizer"""
-        logger.debug("Clearing synthesizer...")
         self.synthesizer.clear_cache()
-        logger.debug("Clearing synthesizer... done")
 
-    def _synthesize(self, text_file: TextFile, output_path: str):
+    def _synthesize(self, text_file: TextFile, output_path: str) -> tuple[str, list]:
         """
         Synthesize text into a WAVE file.
 
@@ -592,11 +594,11 @@ class ExecuteTask(Configurable):
     def _adjust_boundaries(
         self,
         boundary_indices,
-        text_file,
+        text_file: TextFile,
         real_wave_mfcc,
-        sync_root,
-        force_aba_auto=False,
-        leaf_level=False,
+        sync_root: Tree,
+        force_aba_auto: bool = False,
+        leaf_level: bool = False,
     ):
         """
         Adjust boundaries as requested by the user.
@@ -626,7 +628,7 @@ class ExecuteTask(Configurable):
         )
         aba.append_fragment_list_to_sync_root(sync_root=sync_root)
 
-    def _append_trivial_tree(self, text_file, sync_root):
+    def _append_trivial_tree(self, text_file: TextFile, sync_root: Tree):
         """
         Append trivial tree, made by one HEAD,
         one sync map fragment for each element of ``text_file``,
@@ -650,7 +652,7 @@ class ExecuteTask(Configurable):
         aba.intervals_to_fragment_list(text_file=text_file, time_values=time_values)
         aba.append_fragment_list_to_sync_root(sync_root=sync_root)
 
-    def _create_sync_map(self, sync_root):
+    def _create_sync_map(self, sync_root: Tree):
         """
         If requested, check that the computed sync map is consistent.
         Then, add it to the Task.

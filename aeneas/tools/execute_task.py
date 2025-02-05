@@ -191,7 +191,7 @@ class ExecuteTaskCLI(AbstractCLIProgram):
             "text": gf.relative_path("res/mplain.txt", __file__),
             "config": "task_language=eng-USA|is_text_type=mplain|os_task_file_format=json",
             "syncmap": "output/sonnet.mplain.json",
-            "options": '-r="tts_l1=festival|tts_l2=festival|tts_l3=espeak"',
+            "options": '-r="tts_l1=festival|tts_l2=festival|tts_l3=espeak-ng"',
             "show": False,
         },
         "--example-munparsed-json": {
@@ -481,7 +481,7 @@ class ExecuteTaskCLI(AbstractCLIProgram):
                     elif key == "--example-multilevel-tts":
                         self.rconf[RuntimeConfiguration.TTS_L1] = "festival"
                         self.rconf[RuntimeConfiguration.TTS_L2] = "festival"
-                        self.rconf[RuntimeConfiguration.TTS_L3] = "espeak"
+                        self.rconf[RuntimeConfiguration.TTS_L3] = "espeak-ng"
                     elif key == "--example-words-festival-cache":
                         self.rconf[RuntimeConfiguration.TTS] = "festival"
                         self.rconf[RuntimeConfiguration.TTS_CACHE] = True
