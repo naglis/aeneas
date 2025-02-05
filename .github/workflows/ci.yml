@@ -2,6 +2,9 @@ name: Python package
 
 on: [push]
 
+env:
+  UNITTEST_RUN_SLOW_TESTS: "1"
+
 jobs:
   build:
 
