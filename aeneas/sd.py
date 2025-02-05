@@ -275,8 +275,8 @@ class SD(Configurable):
             int(search_window / mws), self.real_wave_mfcc.all_length
         )
         logger.debug("Query MFCC length (frames): %d", query_mfcc.all_length)
-        logger.debug("Real MFCC length (frames):  %d", self.real_wave_mfcc.all_length)
-        logger.debug("Search window end (s):      %.3f", search_window)
+        logger.debug("Real MFCC length (frames): %d", self.real_wave_mfcc.all_length)
+        logger.debug("Search window end (s): %.3f", search_window)
         logger.debug("Search window end (frames): %d", search_window_end)
 
         if tail:
@@ -296,9 +296,7 @@ class SD(Configurable):
         search_end = None
         candidates_begin = []
         for interval in speech_intervals:
-            if (interval[0] >= min_length_frames) and (
-                interval[0] <= max_length_frames
-            ):
+            if interval[0] >= min_length_frames and interval[0] <= max_length_frames:
                 candidates_begin.append(interval[0])
             search_end = interval[1]
             if search_end >= search_window_end:

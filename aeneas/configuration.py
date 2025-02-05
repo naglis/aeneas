@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 # aeneas is a Python/C library and a set of tools
 # to automagically synchronize audio and text (aka forced alignment)
 #
@@ -30,11 +28,11 @@ This module contains the following classes:
 .. versionadded:: 1.4.1
 """
 
-from copy import deepcopy
+import copy
+import decimal
 import enum
 import typing
 
-from aeneas.exacttiming import Decimal
 from aeneas.exacttiming import TimeValue
 import aeneas.globalconstants as gc
 import aeneas.globalfunctions as gf
@@ -169,7 +167,7 @@ class Configuration:
 
         :rtype: :class:`~aeneas.configuration.Configuration`
         """
-        return deepcopy(self)
+        return copy.deepcopy(self)
 
     @property
     def config_string(self):
@@ -208,7 +206,7 @@ class Configuration:
             if ftype is None:
                 return ""
 
-            if ftype in [TimeValue, Decimal, float]:
+            if ftype in [TimeValue, decimal.Decimal, float]:
                 cftype = "float"
                 cfdefault = "%.3f" % ftype(fdefault) if fdefault is not None else "None"
             elif ftype is int:

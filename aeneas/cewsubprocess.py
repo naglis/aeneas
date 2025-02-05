@@ -41,7 +41,6 @@ See the following discussions for details:
 import argparse
 import logging
 import subprocess
-import sys
 import tempfile
 
 from aeneas.exacttiming import TimeValue

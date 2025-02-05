@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 # aeneas is a Python/C library and a set of tools
 # to automagically synchronize audio and text (aka forced alignment)
 #
@@ -32,11 +30,12 @@ This module contains the following classes:
 .. versionadded:: 1.5.0
 """
 
-from decimal import Decimal
+import decimal
 import math
+import typing
 
 
-class TimeValue(Decimal):
+class TimeValue(decimal.Decimal):
     """
     A numeric type to represent time values with arbitrary precision.
     """
@@ -68,49 +67,49 @@ class TimeValue(Decimal):
     #      is still an instance of TimeValue
 
     def __add__(self, other):
-        return TimeValue(Decimal.__add__(self, other))
+        return TimeValue(decimal.Decimal.__add__(self, other))
 
     def __div__(self, other):
-        return TimeValue(Decimal.__div__(self, other))
+        return TimeValue(decimal.Decimal.__div__(self, other))
 
     def __floordiv__(self, other):
-        return TimeValue(Decimal.__floordiv__(self, other))
+        return TimeValue(decimal.Decimal.__floordiv__(self, other))
 
     def __mod__(self, other):
-        return TimeValue(Decimal.__mod__(self, other))
+        return TimeValue(decimal.Decimal.__mod__(self, other))
 
     def __mul__(self, other):
-        return TimeValue(Decimal.__mul__(self, other))
+        return TimeValue(decimal.Decimal.__mul__(self, other))
 
     def __neg__(self):
-        return TimeValue(Decimal.__neg__(self))
+        return TimeValue(decimal.Decimal.__neg__(self))
 
     def __radd__(self, other):
-        return TimeValue(Decimal.__radd__(self, other))
+        return TimeValue(decimal.Decimal.__radd__(self, other))
 
     def __rdiv__(self, other):
-        return TimeValue(Decimal.__rdiv__(self, other))
+        return TimeValue(decimal.Decimal.__rdiv__(self, other))
 
     def __rfloordiv__(self, other):
-        return TimeValue(Decimal.__rfloordiv__(self, other))
+        return TimeValue(decimal.Decimal.__rfloordiv__(self, other))
 
     def __rmod__(self, other):
-        return TimeValue(Decimal.__rmod__(self, other))
+        return TimeValue(decimal.Decimal.__rmod__(self, other))
 
     def __rmul__(self, other):
-        return TimeValue(Decimal.__rmul__(self, other))
+        return TimeValue(decimal.Decimal.__rmul__(self, other))
 
     def __rsub__(self, other):
-        return TimeValue(Decimal.__rsub__(self, other))
+        return TimeValue(decimal.Decimal.__rsub__(self, other))
 
     def __rtruediv__(self, other):
-        return TimeValue(Decimal.__rtruediv__(self, other))
+        return TimeValue(decimal.Decimal.__rtruediv__(self, other))
 
     def __sub__(self, other):
-        return TimeValue(Decimal.__sub__(self, other))
+        return TimeValue(decimal.Decimal.__sub__(self, other))
 
     def __truediv__(self, other):
-        return TimeValue(Decimal.__truediv__(self, other))
+        return TimeValue(decimal.Decimal.__truediv__(self, other))
 
 
 class TimeInterval:
@@ -128,8 +127,6 @@ class TimeInterval:
     :type  begin: :class:`~aeneas.exacttiming.TimeValue`
     :param end: the end time
     :type  end: :class:`~aeneas.exacttiming.TimeValue`
-    :raises TypeError: if ``begin`` or ``end`` are not instances of :class:`~aeneas.exacttiming.TimeValue`
-    :raises ValueError: if ``begin`` is negative or if ``begin`` is bigger than ``end``
     """
 
     # Relative positions of two intervals
@@ -270,11 +267,7 @@ class TimeInterval:
         RELATIVE_POSITION_II_GG: RELATIVE_POSITION_II_LL,
     }
 
-    def __init__(self, begin, end):
-        if not isinstance(begin, TimeValue):
-            raise TypeError("begin is not an instance of TimeValue")
-        if not isinstance(end, TimeValue):
-            raise TypeError("end is not an instance of TimeValue")
+    def __init__(self, begin: TimeValue, end: TimeValue):
         if begin < 0:
             raise ValueError("begin is negative")
         if begin > end:
@@ -310,7 +303,7 @@ class TimeInterval:
         return f"[{self.begin}, {self.end}]"
 
     @property
-    def length(self):
+    def length(self) -> TimeValue:
         """
         Return the length of this interval,
         that is, the difference between its end and begin values.
@@ -320,7 +313,7 @@ class TimeInterval:
         return self.end - self.begin
 
     @property
-    def has_zero_length(self):
+    def has_zero_length(self) -> bool:
         """
         Returns ``True`` if this interval has zero length,
         that is, if its begin and end values coincide.
@@ -329,7 +322,7 @@ class TimeInterval:
         """
         return self.end == self.begin
 
-    def starts_at(self, time_point):
+    def starts_at(self, time_point: TimeValue) -> bool:
         """
         Returns ``True`` if this interval starts at the given time point.
 
@@ -338,11 +331,9 @@ class TimeInterval:
         :raises TypeError: if ``time_point`` is not an instance of ``TimeValue``
         :rtype: bool
         """
-        if not isinstance(time_point, TimeValue):
-            raise TypeError("time_point is not an instance of TimeValue")
         return self.begin == time_point
 
-    def ends_at(self, time_point):
+    def ends_at(self, time_point: TimeValue) -> bool:
         """
         Returns ``True`` if this interval ends at the given time point.
 
@@ -351,11 +342,9 @@ class TimeInterval:
         :raises TypeError: if ``time_point`` is not an instance of ``TimeValue``
         :rtype: bool
         """
-        if not isinstance(time_point, TimeValue):
-            raise TypeError("time_point is not an instance of TimeValue")
         return self.end == time_point
 
-    def percent_value(self, percent):
+    def percent_value(self, percent: decimal.Decimal) -> TimeValue:
         """
         Returns the time value at ``percent`` of this interval.
 
@@ -364,14 +353,16 @@ class TimeInterval:
         :raises TypeError: if ``time_point`` is not an instance of ``TimeValue``
         :rtype: :class:`~aeneas.exacttiming.TimeValue`
         """
-        if not isinstance(percent, Decimal):
-            raise TypeError("percent is not an instance of Decimal")
-        percent = Decimal(max(min(percent, 100), 0) / 100)
+        percent = decimal.Decimal(max(min(percent, 100), 0) / 100)
         return self.begin + self.length * percent
 
     def offset(
-        self, offset, allow_negative=False, min_begin_value=None, max_end_value=None
-    ):
+        self,
+        offset: TimeValue,
+        allow_negative: bool = False,
+        min_begin_value: TimeValue | None = None,
+        max_end_value: TimeValue | None = None,
+    ) -> "TimeInterval":
         """
         Move this interval by the given shift ``offset``.
 
@@ -388,22 +379,19 @@ class TimeInterval:
         :type  min_begin_value: :class:`~aeneas.exacttiming.TimeValue`
         :param max_begin_value: if not ``None``, specify the maximum value for the end of the translated interval
         :type  max_begin_value: :class:`~aeneas.exacttiming.TimeValue`
-        :raises TypeError: if ``offset`` is not an instance of ``TimeValue``
         :rtype: :class:`~aeneas.exacttiming.TimeInterval`
         """
-        if not isinstance(offset, TimeValue):
-            raise TypeError("offset is not an instance of TimeValue")
         self.begin += offset
         self.end += offset
         if not allow_negative:
             self.begin = max(self.begin, TimeValue("0.000"))
             self.end = max(self.end, TimeValue("0.000"))
-        if (min_begin_value is not None) and (max_end_value is not None):
+        if min_begin_value is not None and max_end_value is not None:
             self.begin = min(max(self.begin, min_begin_value), max_end_value)
             self.end = min(self.end, max_end_value)
         return self
 
-    def contains(self, time_point):
+    def contains(self, time_point: TimeValue) -> bool:
         """
         Returns ``True`` if this interval contains the given time point.
 
@@ -411,11 +399,9 @@ class TimeInterval:
         :type  time_point: :class:`~aeneas.exacttiming.TimeValue`
         :rtype: bool
         """
-        if not isinstance(time_point, TimeValue):
-            raise TypeError("time_point is not an instance of TimeValue")
-        return (self.begin <= time_point) and (time_point <= self.end)
+        return self.begin <= time_point and time_point <= self.end
 
-    def inner_contains(self, time_point):
+    def inner_contains(self, time_point: TimeValue) -> bool:
         """
         Returns ``True`` if this interval contains the given time point,
         excluding its extrema (begin and end).
@@ -424,11 +410,9 @@ class TimeInterval:
         :type  time_point: :class:`~aeneas.exacttiming.TimeValue`
         :rtype: bool
         """
-        if not isinstance(time_point, TimeValue):
-            raise TypeError("time_point is not an instance of TimeValue")
-        return (self.begin < time_point) and (time_point < self.end)
+        return self.begin < time_point and time_point < self.end
 
-    def relative_position_of(self, other):
+    def relative_position_of(self, other: "TimeInterval") -> int:
         """
         Return the position of the given other time interval,
         relative to this time interval,
@@ -438,8 +422,6 @@ class TimeInterval:
         :type  other: :class:`~aeneas.exacttiming.TimeInterval`
         :rtype: int
         """
-        if not isinstance(other, TimeInterval):
-            raise TypeError("other is not an instance of TimeInterval")
         if self.has_zero_length:
             if other.has_zero_length:
                 # TABLE 1
@@ -517,7 +499,7 @@ class TimeInterval:
                     # TABLE 8
                     return self.RELATIVE_POSITION_II_GG
 
-    def relative_position_wrt(self, other):
+    def relative_position_wrt(self, other: "TimeInterval") -> int:
         """
         Return the position of this interval,
         relative to the given other time interval,
@@ -529,7 +511,7 @@ class TimeInterval:
         """
         return self.INVERSE_RELATIVE_POSITION[self.relative_position_of(other)]
 
-    def intersection(self, other):
+    def intersection(self, other: "TimeInterval") -> typing.Union["TimeInterval", None]:
         """
         Return the intersection between this time interval
         and the given time interval, or
@@ -538,41 +520,45 @@ class TimeInterval:
         :rtype: :class:`~aeneas.exacttiming.TimeInterval` or ``NoneType``
         """
         relative_position = self.relative_position_of(other)
-        if relative_position in [
+        if relative_position in (
             self.RELATIVE_POSITION_PP_C,
             self.RELATIVE_POSITION_PI_LC,
             self.RELATIVE_POSITION_PI_LG,
             self.RELATIVE_POSITION_PI_CG,
             self.RELATIVE_POSITION_IP_B,
             self.RELATIVE_POSITION_II_LB,
-        ]:
+        ):
             return TimeInterval(begin=self.begin, end=self.begin)
-        if relative_position in [
+
+        if relative_position in (
             self.RELATIVE_POSITION_IP_E,
             self.RELATIVE_POSITION_II_EG,
-        ]:
+        ):
             return TimeInterval(begin=self.end, end=self.end)
-        if relative_position in [
+
+        if relative_position in (
             self.RELATIVE_POSITION_II_BI,
             self.RELATIVE_POSITION_II_BE,
             self.RELATIVE_POSITION_II_II,
             self.RELATIVE_POSITION_II_IE,
-        ]:
+        ):
             return TimeInterval(begin=other.begin, end=other.end)
-        if relative_position in [
+
+        if relative_position in (
             self.RELATIVE_POSITION_IP_I,
             self.RELATIVE_POSITION_II_LI,
             self.RELATIVE_POSITION_II_LE,
             self.RELATIVE_POSITION_II_LG,
             self.RELATIVE_POSITION_II_BG,
             self.RELATIVE_POSITION_II_IG,
-        ]:
+        ):
             begin = max(self.begin, other.begin)
             end = min(self.end, other.end)
             return TimeInterval(begin=begin, end=end)
+
         return None
 
-    def overlaps(self, other):
+    def overlaps(self, other: "TimeInterval") -> bool:
         """
         Return ``True`` if the given time interval
         overlaps this time interval (possibly only at an extremum).
@@ -583,7 +569,7 @@ class TimeInterval:
         """
         return self.intersection(other) is not None
 
-    def is_non_zero_before_non_zero(self, other):
+    def is_non_zero_before_non_zero(self, other: "TimeInterval") -> bool:
         """
         Return ``True`` if this time interval ends
         when the given other time interval begins,
@@ -596,11 +582,11 @@ class TimeInterval:
         """
         return (
             self.is_adjacent_before(other)
-            and (not self.has_zero_length)
-            and (not other.has_zero_length)
+            and not self.has_zero_length
+            and not other.has_zero_length
         )
 
-    def is_non_zero_after_non_zero(self, other):
+    def is_non_zero_after_non_zero(self, other: "TimeInterval") -> bool:
         """
         Return ``True`` if this time interval begins
         when the given other time interval ends,
@@ -613,7 +599,7 @@ class TimeInterval:
         """
         return other.is_non_zero_before_non_zero(self)
 
-    def is_adjacent_before(self, other):
+    def is_adjacent_before(self, other: "TimeInterval") -> bool:
         """
         Return ``True`` if this time interval ends
         when the given other time interval begins.
@@ -623,11 +609,9 @@ class TimeInterval:
         :raises TypeError: if ``other`` is not an instance of ``TimeInterval``
         :rtype: bool
         """
-        if not isinstance(other, TimeInterval):
-            raise TypeError("other is not an instance of TimeInterval")
         return self.end == other.begin
 
-    def is_adjacent_after(self, other):
+    def is_adjacent_after(self, other: "TimeInterval") -> bool:
         """
         Return ``True`` if this time interval begins
         when the given other time interval ends.
@@ -646,7 +630,7 @@ class TimeInterval:
         end = self.end + quantity
         return TimeInterval(begin=begin, end=end)
 
-    def shrink(self, quantity, from_begin=True):
+    def shrink(self, quantity, from_begin: bool = True):
         if quantity <= 0:
             raise ValueError("quantity is not positive")
         if quantity > self.length:
@@ -656,7 +640,7 @@ class TimeInterval:
         else:
             self.end = self.begin + self.length - quantity
 
-    def enlarge(self, quantity, from_begin=True):
+    def enlarge(self, quantity, from_begin: bool = True):
         if quantity <= 0:
             raise ValueError("quantity is not positive")
         if from_begin:

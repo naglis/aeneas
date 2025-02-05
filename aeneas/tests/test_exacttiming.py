@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 # aeneas is a Python/C library and a set of tools
 # to automagically synchronize audio and text (aka forced alignment)
 #
@@ -20,12 +18,12 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+import decimal
 import unittest
+
 import numpy
 
-from aeneas.exacttiming import Decimal
-from aeneas.exacttiming import TimeInterval
-from aeneas.exacttiming import TimeValue
+from aeneas.exacttiming import TimeInterval, TimeValue
 
 
 class TestExactTiming(unittest.TestCase):
@@ -68,7 +66,7 @@ class TestExactTiming(unittest.TestCase):
         tv3 = TimeValue("3.300")
         self.check(tv1 + tv2, tv3)
         self.check(tv2 + tv1, tv3)
-        d = Decimal("2.200")
+        d = decimal.Decimal("2.200")
         self.check(tv1 + d, tv3)
         self.check(d + tv1, tv3)
 
@@ -77,7 +75,7 @@ class TestExactTiming(unittest.TestCase):
         tv2 = TimeValue("2.200")
         tv3 = TimeValue("0.500")
         self.check(tv1 / tv2, tv3)
-        d = Decimal("2.200")
+        d = decimal.Decimal("2.200")
         self.check(tv1 / d, tv3)
 
     def test_floordiv(self):
@@ -85,7 +83,7 @@ class TestExactTiming(unittest.TestCase):
         tv2 = TimeValue("2.200")
         tv3 = TimeValue("0.000")
         self.check(tv1 // tv2, tv3)
-        d = Decimal("2.200")
+        d = decimal.Decimal("2.200")
         self.check(tv1 // d, tv3)
 
     def test_mod(self):
@@ -93,7 +91,7 @@ class TestExactTiming(unittest.TestCase):
         tv2 = TimeValue("2.200")
         tv3 = TimeValue("0.000")
         self.check(tv2 % tv1, tv3)
-        d = Decimal("1.100")
+        d = decimal.Decimal("1.100")
         self.check(tv2 % d, tv3)
 
     def test_mul(self):
@@ -102,7 +100,7 @@ class TestExactTiming(unittest.TestCase):
         tv3 = TimeValue("2.420")
         self.check(tv1 * tv2, tv3)
         self.check(tv2 * tv1, tv3)
-        d = Decimal("2.200")
+        d = decimal.Decimal("2.200")
         self.check(tv1 * d, tv3)
 
     def test_sub(self):
@@ -112,7 +110,7 @@ class TestExactTiming(unittest.TestCase):
         tv4 = TimeValue("1.100")
         self.check(tv1 - tv2, tv3)
         self.check(tv2 - tv1, tv4)
-        d = Decimal("2.200")
+        d = decimal.Decimal("2.200")
         self.check(tv1 - d, tv3)
 
     def test_truediv(self):
@@ -120,7 +118,7 @@ class TestExactTiming(unittest.TestCase):
         tv2 = TimeValue("2")
         tv3 = TimeValue("0.5")
         self.check(tv1 / tv2, tv3)
-        d = Decimal("2")
+        d = decimal.Decimal("2")
         self.check(tv1 / d, tv3)
 
     def test_op_float(self):
@@ -188,7 +186,12 @@ class TestExactTiming(unittest.TestCase):
     def test_numpy_decimal(self):
         tv1 = TimeValue("1.000")
         n1 = numpy.array(
-            [Decimal("0.000"), Decimal("1.000"), Decimal("2.000")], dtype=Decimal
+            [
+                decimal.Decimal("0.000"),
+                decimal.Decimal("1.000"),
+                decimal.Decimal("2.000"),
+            ],
+            dtype=decimal.Decimal,
         )
         n2 = numpy.array(
             [TimeValue("1.000"), TimeValue("2.000"), TimeValue("3.000")],
@@ -264,40 +267,30 @@ class TestExactTiming(unittest.TestCase):
             self.assertEqual(int(prod) == prod, e)
             self.assertEqual(prod.is_integer, e)
 
-    def test_time_interval_bad_type(self):
-        params = [
-            (None, None),
-            (0, 1),
-            (TimeValue("0.000"), 1),
-            (0, TimeValue("1.000")),
-        ]
-        for b, e in params:
-            with self.assertRaises(TypeError):
-                TimeInterval(begin=b, end=e)
-
     def test_time_interval_bad_value(self):
-        params = [
+        params = (
             ("1.000", "0.000"),
             ("-1.000", "0.000"),
             ("0.000", "-1.000"),
             ("-2.000", "-1.000"),
-        ]
-        for b, e in params:
-            with self.assertRaises(ValueError):
-                TimeInterval(begin=TimeValue(b), end=TimeValue(e))
+        )
+        for begin, end in params:
+            with self.subTest(begin=begin, end=end), self.assertRaises(ValueError):
+                TimeInterval(begin=TimeValue(begin), end=TimeValue(end))
 
     def test_time_interval_constructor(self):
-        params = [
+        params = (
             ("0.000", "0.000"),
             ("0.000", "1.000"),
             ("1.000", "1.000"),
             ("1.234", "1.235"),
-        ]
-        for b, e in params:
-            TimeInterval(begin=TimeValue(b), end=TimeValue(e))
+        )
+        for begin, end in params:
+            with self.subTest(begin=begin, end=end):
+                TimeInterval(begin=TimeValue(begin), end=TimeValue(end))
 
     def test_time_interval_percent(self):
-        params = [
+        params = (
             (-100, "0.000"),
             (-50, "0.000"),
             (0, "0.000"),
@@ -309,12 +302,13 @@ class TestExactTiming(unittest.TestCase):
             (100, "1.000"),
             (150, "1.000"),
             (200, "1.000"),
-        ]
+        )
         t = TimeInterval(begin=TimeValue("0.000"), end=TimeValue("1.000"))
         for p, e in params:
-            p = Decimal(p)
-            e = TimeValue(e)
-            self.assertEqual(t.percent_value(p), e)
+            with self.subTest(p=p, e=e):
+                p = decimal.Decimal(p)
+                e = TimeValue(e)
+                self.assertEqual(t.percent_value(p), e)
 
     def test_time_interval_ordering(self):
         t_0_0 = TimeInterval(begin=TimeValue("0.000"), end=TimeValue("0.000"))
@@ -350,29 +344,31 @@ class TestExactTiming(unittest.TestCase):
         self.assertFalse(t_2_2 != q_2_2)
 
     def test_time_interval_length(self):
-        params = [
+        params = (
             ("0.000", "0.000", "0.000"),
             ("0.000", "1.000", "1.000"),
             ("1.000", "1.000", "0.000"),
             ("1.234", "1.235", "0.001"),
-        ]
+        )
         for begin, end, length in params:
-            ti = TimeInterval(begin=TimeValue(begin), end=TimeValue(end))
-            self.assertEqual(ti.length, TimeValue(length))
+            with self.subTest(begin=begin, end=end, length=length):
+                ti = TimeInterval(begin=TimeValue(begin), end=TimeValue(end))
+                self.assertEqual(ti.length, TimeValue(length))
 
     def test_time_interval_has_zero_length(self):
-        params = [
+        params = (
             ("0.000", "0.000", True),
             ("0.000", "1.000", False),
             ("1.000", "1.000", True),
             ("1.234", "1.235", False),
-        ]
-        for b, e, f in params:
-            ti = TimeInterval(begin=TimeValue(b), end=TimeValue(e))
-            self.assertEqual(ti.has_zero_length, f)
+        )
+        for begin, end, f in params:
+            with self.subTest(begin=begin, end=end, f=f):
+                ti = TimeInterval(begin=TimeValue(begin), end=TimeValue(end))
+                self.assertEqual(ti.has_zero_length, f)
 
     def test_time_interval_starts_at(self):
-        params = [
+        params = (
             ("1.234", "1.237", "0.000", False),
             ("1.234", "1.237", "1.233", False),
             ("1.234", "1.237", "1.234", True),
@@ -381,13 +377,13 @@ class TestExactTiming(unittest.TestCase):
             ("1.234", "1.237", "1.237", False),
             ("1.234", "1.237", "1.238", False),
             ("1.234", "1.237", "2.000", False),
-        ]
+        )
         for b, e, p, f in params:
             ti = TimeInterval(begin=TimeValue(b), end=TimeValue(e))
             self.assertEqual(ti.starts_at(TimeValue(p)), f)
 
     def test_time_interval_ends_at(self):
-        params = [
+        params = (
             ("1.234", "1.237", "0.000", False),
             ("1.234", "1.237", "1.233", False),
             ("1.234", "1.237", "1.234", False),
@@ -396,26 +392,14 @@ class TestExactTiming(unittest.TestCase):
             ("1.234", "1.237", "1.237", True),
             ("1.234", "1.237", "1.238", False),
             ("1.234", "1.237", "2.000", False),
-        ]
-        for b, e, p, f in params:
-            ti = TimeInterval(begin=TimeValue(b), end=TimeValue(e))
-            self.assertEqual(ti.ends_at(TimeValue(p)), f)
-
-    def test_time_interval_offset_bad(self):
-        params = [
-            None,
-            1,
-            1.234,
-            "1.234",
-            Decimal("1.234"),
-        ]
-        ti1 = TimeInterval(begin=TimeValue("0.000"), end=TimeValue("1.000"))
-        for p in params:
-            with self.assertRaises(TypeError):
-                ti1.offset(p)
+        )
+        for begin, end, p, f in params:
+            with self.subTest(begin=begin, end=end, p=p, f=f):
+                ti = TimeInterval(begin=TimeValue(begin), end=TimeValue(end))
+                self.assertEqual(ti.ends_at(TimeValue(p)), f)
 
     def test_time_interval_offset(self):
-        params = [
+        params = (
             (("0.000", "0.000"), "-1.000", False, ("0.000", "0.000")),
             (("0.000", "0.000"), "-0.000", False, ("0.000", "0.000")),
             (("0.000", "0.000"), "0.000", False, ("0.000", "0.000")),
@@ -440,16 +424,18 @@ class TestExactTiming(unittest.TestCase):
             (("1.000", "2.000"), "0.000", True, ("1.000", "2.000")),
             (("1.000", "2.000"), "0.500", True, ("1.500", "2.500")),
             (("1.000", "2.000"), "1.000", True, ("2.000", "3.000")),
-        ]
-        for ti1, d, a, exp in params:
-            ti1 = TimeInterval(begin=TimeValue(ti1[0]), end=TimeValue(ti1[1]))
-            d = TimeValue(d)
-            ti1.offset(offset=d, allow_negative=a)
-            self.assertEqual(ti1.begin, TimeValue(exp[0]))
-            self.assertEqual(ti1.end, TimeValue(exp[1]))
+        )
+        for ti1, offset, allow_negative, expected in params:
+            with self.subTest(
+                ti1=ti1, offset=offset, allow_negative=allow_negative, expected=expected
+            ):
+                ti1 = TimeInterval(begin=TimeValue(ti1[0]), end=TimeValue(ti1[1]))
+                ti1.offset(offset=TimeValue(offset), allow_negative=allow_negative)
+                self.assertEqual(ti1.begin, TimeValue(expected[0]))
+                self.assertEqual(ti1.end, TimeValue(expected[1]))
 
     def test_time_interval_contains(self):
-        params = [
+        params = (
             ("1.000", "1.000", "0.000", False),
             ("1.000", "1.000", "0.999", False),
             ("1.000", "1.000", "1.000", True),
@@ -476,13 +462,14 @@ class TestExactTiming(unittest.TestCase):
             ("1.234", "1.237", "1.237", True),
             ("1.234", "1.237", "1.238", False),
             ("1.234", "1.237", "2.000", False),
-        ]
-        for b, e, p, f in params:
-            ti = TimeInterval(begin=TimeValue(b), end=TimeValue(e))
-            self.assertEqual(ti.contains(TimeValue(p)), f)
+        )
+        for begin, end, p, f in params:
+            with self.subTest(begin=begin, end=end, p=p, f=f):
+                ti = TimeInterval(begin=TimeValue(begin), end=TimeValue(end))
+                self.assertEqual(ti.contains(TimeValue(p)), f)
 
     def test_time_interval_inner_contains(self):
-        params = [
+        params = (
             ("1.000", "1.000", "0.000", False),
             ("1.000", "1.000", "0.999", False),
             ("1.000", "1.000", "1.000", False),
@@ -509,13 +496,14 @@ class TestExactTiming(unittest.TestCase):
             ("1.234", "1.237", "1.237", False),
             ("1.234", "1.237", "1.238", False),
             ("1.234", "1.237", "2.000", False),
-        ]
-        for b, e, p, f in params:
-            ti = TimeInterval(begin=TimeValue(b), end=TimeValue(e))
-            self.assertEqual(ti.inner_contains(TimeValue(p)), f)
+        )
+        for begin, end, p, f in params:
+            with self.subTest(beging=begin, end=end, p=p, f=f):
+                ti = TimeInterval(begin=TimeValue(begin), end=TimeValue(end))
+                self.assertEqual(ti.inner_contains(TimeValue(p)), f)
 
     def test_time_interval_relative_position_of(self):
-        params = [
+        params = (
             # TABLE 1
             (
                 ("1.000", "1.000"),
@@ -654,15 +642,16 @@ class TestExactTiming(unittest.TestCase):
                 ("2.500", "3.000"),
                 TimeInterval.RELATIVE_POSITION_II_GG,
             ),
-        ]
-        for ti1, ti2, exp in params:
-            ti1 = TimeInterval(begin=TimeValue(ti1[0]), end=TimeValue(ti1[1]))
-            ti2 = TimeInterval(begin=TimeValue(ti2[0]), end=TimeValue(ti2[1]))
-            self.assertEqual(ti1.relative_position_of(ti2), exp)
-            self.assertEqual(ti2.relative_position_wrt(ti1), exp)
+        )
+        for ti1, ti2, expected in params:
+            with self.subTest(ti1=ti1, ti2=ti2, expected=expected):
+                ti1 = TimeInterval(begin=TimeValue(ti1[0]), end=TimeValue(ti1[1]))
+                ti2 = TimeInterval(begin=TimeValue(ti2[0]), end=TimeValue(ti2[1]))
+                self.assertEqual(ti1.relative_position_of(ti2), expected)
+                self.assertEqual(ti2.relative_position_wrt(ti1), expected)
 
     def test_time_interval_intersection(self):
-        params = [
+        params = (
             # TABLE 1
             (("1.000", "1.000"), ("0.000", "0.000"), None),
             (("1.000", "1.000"), ("1.000", "1.000"), ("1.000", "1.000")),
@@ -697,19 +686,22 @@ class TestExactTiming(unittest.TestCase):
             (("1.000", "2.000"), ("2.000", "2.500"), ("2.000", "2.000")),
             # TABLE 8
             (("1.000", "2.000"), ("2.500", "3.000"), None),
-        ]
-        for ti1, ti2, exp in params:
-            ti1 = TimeInterval(begin=TimeValue(ti1[0]), end=TimeValue(ti1[1]))
-            ti2 = TimeInterval(begin=TimeValue(ti2[0]), end=TimeValue(ti2[1]))
-            if exp is not None:
-                exp = TimeInterval(begin=TimeValue(exp[0]), end=TimeValue(exp[1]))
-            self.assertEqual(ti1.intersection(ti2), exp)
-            self.assertEqual(ti2.intersection(ti1), exp)
-            self.assertEqual(ti1.overlaps(ti2), exp is not None)
-            self.assertEqual(ti2.overlaps(ti1), exp is not None)
+        )
+        for ti1, ti2, expected in params:
+            with self.subTest(ti1=ti1, ti2=ti2, expected=expected):
+                ti1 = TimeInterval(begin=TimeValue(ti1[0]), end=TimeValue(ti1[1]))
+                ti2 = TimeInterval(begin=TimeValue(ti2[0]), end=TimeValue(ti2[1]))
+                if expected is not None:
+                    expected = TimeInterval(
+                        begin=TimeValue(expected[0]), end=TimeValue(expected[1])
+                    )
+                self.assertEqual(ti1.intersection(ti2), expected)
+                self.assertEqual(ti2.intersection(ti1), expected)
+                self.assertEqual(ti1.overlaps(ti2), expected is not None)
+                self.assertEqual(ti2.overlaps(ti1), expected is not None)
 
     def test_time_interval_adjacent(self):
-        params = [
+        params = (
             (("1.000", "1.000"), ("0.000", "2.000"), False),
             (("1.000", "1.000"), ("0.999", "2.000"), False),
             (("1.000", "1.000"), ("1.000", "1.000"), True),
@@ -722,15 +714,16 @@ class TestExactTiming(unittest.TestCase):
             (("0.000", "1.000"), ("1.000", "2.000"), True),
             (("0.000", "1.000"), ("1.001", "2.000"), False),
             (("0.000", "1.000"), ("2.000", "2.000"), False),
-        ]
-        for ti1, ti2, exp in params:
-            ti1 = TimeInterval(begin=TimeValue(ti1[0]), end=TimeValue(ti1[1]))
-            ti2 = TimeInterval(begin=TimeValue(ti2[0]), end=TimeValue(ti2[1]))
-            self.assertEqual(ti1.is_adjacent_before(ti2), exp)
-            self.assertEqual(ti2.is_adjacent_after(ti1), exp)
+        )
+        for ti1, ti2, expected in params:
+            with self.subTest(ti1=ti1, ti2=ti2, expected=expected):
+                ti1 = TimeInterval(begin=TimeValue(ti1[0]), end=TimeValue(ti1[1]))
+                ti2 = TimeInterval(begin=TimeValue(ti2[0]), end=TimeValue(ti2[1]))
+                self.assertEqual(ti1.is_adjacent_before(ti2), expected)
+                self.assertEqual(ti2.is_adjacent_after(ti1), expected)
 
     def test_time_interval_non_zero_before_non_zero(self):
-        params = [
+        params = (
             (("1.000", "1.000"), ("0.000", "2.000"), False),
             (("1.000", "1.000"), ("0.999", "2.000"), False),
             (("1.000", "1.000"), ("1.000", "1.000"), False),
@@ -743,9 +736,10 @@ class TestExactTiming(unittest.TestCase):
             (("0.000", "1.000"), ("1.000", "2.000"), True),
             (("0.000", "1.000"), ("1.001", "2.000"), False),
             (("0.000", "1.000"), ("2.000", "2.000"), False),
-        ]
-        for ti1, ti2, exp in params:
-            ti1 = TimeInterval(begin=TimeValue(ti1[0]), end=TimeValue(ti1[1]))
-            ti2 = TimeInterval(begin=TimeValue(ti2[0]), end=TimeValue(ti2[1]))
-            self.assertEqual(ti1.is_non_zero_before_non_zero(ti2), exp)
-            self.assertEqual(ti2.is_non_zero_after_non_zero(ti1), exp)
+        )
+        for ti1, ti2, expected in params:
+            with self.subTest(ti1=ti1, ti2=ti2, expected=expected):
+                ti1 = TimeInterval(begin=TimeValue(ti1[0]), end=TimeValue(ti1[1]))
+                ti2 = TimeInterval(begin=TimeValue(ti2[0]), end=TimeValue(ti2[1]))
+                self.assertEqual(ti1.is_non_zero_before_non_zero(ti2), expected)
+                self.assertEqual(ti2.is_non_zero_after_non_zero(ti1), expected)

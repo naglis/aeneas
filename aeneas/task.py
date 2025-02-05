@@ -25,13 +25,14 @@ This module contains the following classes:
 * :class:`~aeneas.task.TaskConfiguration`, representing a task configuration.
 """
 
+import decimal
 import logging
 import os
 
 from aeneas.adjustboundaryalgorithm import AdjustBoundaryAlgorithm
 from aeneas.audiofile import AudioFile
 from aeneas.configuration import Configuration
-from aeneas.exacttiming import Decimal, TimeValue
+from aeneas.exacttiming import TimeValue
 from aeneas.logger import Configurable
 from aeneas.language import Language
 from aeneas.textfile import TextFile
@@ -390,7 +391,7 @@ class TaskConfiguration(Configuration):
             gc.PPN_TASK_ADJUST_BOUNDARY_RATE_VALUE,
             (
                 None,
-                Decimal,
+                decimal.Decimal,
                 ["aba_rate_value"],
                 "max rate, in chars/s (rate, rateaggressive)",
             ),

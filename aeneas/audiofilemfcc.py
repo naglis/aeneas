@@ -355,7 +355,7 @@ class AudioFileMFCC(Configurable):
 
     def intervals(
         self, speech: bool = True, time: bool = True
-    ) -> list[int] | list[TimeValue]:
+    ) -> list[tuple[int, int]] | list[TimeInterval]:
         """
         Return a list of intervals::
 

@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 # aeneas is a Python/C library and a set of tools
 # to automagically synchronize audio and text (aka forced alignment)
 #
@@ -25,21 +23,19 @@ Execute a Task, that is, a pair of audio/text files
 and a configuration string.
 """
 
+import decimal
 import sys
 
 from aeneas.adjustboundaryalgorithm import AdjustBoundaryAlgorithm
 from aeneas.audiofile import AudioFile
 from aeneas.downloader import Downloader
-from aeneas.exacttiming import Decimal
 from aeneas.executetask import ExecuteTask
 from aeneas.idsortingalgorithm import IDSortingAlgorithm
 from aeneas.language import Language
 from aeneas.runtimeconfiguration import RuntimeConfiguration
-from aeneas.syncmap import SyncMapFormat
+from aeneas.syncmap import SyncMapFormat, SyncMapHeadTailFormat
 from aeneas.syncmap.fragment import FragmentType
-from aeneas.syncmap import SyncMapHeadTailFormat
-from aeneas.task import Task
-from aeneas.task import TaskConfiguration
+from aeneas.task import Task, TaskConfiguration
 from aeneas.textfile import TextFileFormat
 from aeneas.tools.abstract_cli_program import AbstractCLIProgram
 from aeneas.ttswrappers.awsttswrapper import AWSTTSWrapper
@@ -679,7 +675,7 @@ class ExecuteTaskCLI(AbstractCLIProgram):
                 faster = [
                     leaf
                     for leaf in task.sync_map_leaves(FragmentType.REGULAR)
-                    if leaf.rate >= max_rate + Decimal("0.001")
+                    if leaf.rate >= max_rate + decimal.Decimal("0.001")
                 ]
                 if len(faster) > 0:
                     self.print_warning(
