@@ -561,9 +561,6 @@ class TestTextFile(unittest.TestCase):
     def test_filter_ignore_regex_replace_empty(self):
         self.filter_ignore_regex("word", [""], [""])
 
-    def test_filter_ignore_regex_replace_none(self):
-        self.filter_ignore_regex("word", [None], [None])
-
     def test_filter_ignore_regex_no_match(self):
         self.filter_ignore_regex("word", ["abc"], ["abc"])
 

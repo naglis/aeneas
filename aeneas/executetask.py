@@ -108,7 +108,9 @@ class ExecuteTask(Configurable):
         """Log failure of a step"""
         logger.critical("STEP %d (%s) FAILURE", self.step_index, self.step_label)
         self.step_index += 1
-        raise ExecuteTaskExecutionError("Unexpected error while executing task") from exc
+        raise ExecuteTaskExecutionError(
+            "Unexpected error while executing task"
+        ) from exc
 
     def execute(self):
         """

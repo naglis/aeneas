@@ -1059,7 +1059,7 @@ class TextFile(Configurable):
                 )
             )
 
-    def _build_text_filter(self):
+    def _build_text_filter(self) -> "TextFilter":
         """
         Build a suitable TextFilter object.
         """
@@ -1110,7 +1110,7 @@ class TextFilter(Configurable):
         super().__init__(rconf=rconf)
         self.filters = []
 
-    def add_filter(self, new_filter, as_last=True):
+    def add_filter(self, new_filter: "TextFilter", as_last: bool = True):
         """
         Compose this filter with the given ``new_filter`` filter.
 
@@ -1123,7 +1123,7 @@ class TextFilter(Configurable):
         else:
             self.filters = [new_filter] + self.filters
 
-    def apply_filter(self, strings):
+    def apply_filter(self, strings: list[str]) -> list[str]:
         """
         Apply the text filter filter to the given list of strings.
 
@@ -1151,17 +1151,17 @@ class TextFilterIgnoreRegex(TextFilter):
     def __init__(self, regex: str, rconf=None):
         try:
             self.regex = re.compile(regex)
-        except Exception:
-            raise ValueError(f"String {regex!r} is not a valid regular expression")
+        except Exception as exc:
+            raise ValueError(
+                f"String {regex!r} is not a valid regular expression"
+            ) from exc
         TextFilter.__init__(self, rconf=rconf)
 
-    def apply_filter(self, strings):
+    def apply_filter(self, strings: list[str]) -> list[str]:
         return [self._apply_single(s) for s in strings]
 
-    def _apply_single(self, string):
+    def _apply_single(self, string: str) -> str:
         """Apply filter to single string"""
-        if string is None:
-            return None
         result = self.regex.sub("", string)
         result = self.SPACES_REGEX.sub(" ", result).strip()
         return result

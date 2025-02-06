@@ -382,7 +382,6 @@ class AudioFileMFCC(Configurable):
             intervals = [
                 TimeInterval(begin=(b * mws), end=((e + 1) * mws)) for b, e in intervals
             ]
-        logger.debug("Converting... done")
         return intervals
 
     def inside_nonspeech(self, index: int) -> tuple[int, int] | None:
@@ -393,7 +392,7 @@ class AudioFileMFCC(Configurable):
         i.e., ``interval_end`` is assumed not to be included.
         """
         self._ensure_mfcc_mask()
-        if (index < 0) or (index >= self.all_length) or (self.__mfcc_mask[index]):
+        if index < 0 or index >= self.all_length or self.__mfcc_mask[index]:
             return None
         return self._binary_search_intervals(self.__nonspeech_intervals, index)
 
@@ -409,7 +408,7 @@ class AudioFileMFCC(Configurable):
         while start <= end:
             middle_index = start + ((end - start) // 2)
             middle = intervals[middle_index]
-            if (middle[0] <= index) and (index < middle[1]):
+            if middle[0] <= index and index < middle[1]:
                 return middle
             elif middle[0] > index:
                 end = middle_index - 1
@@ -431,7 +430,7 @@ class AudioFileMFCC(Configurable):
 
         :param int index: the new index for MIDDLE begin
         """
-        if (index < 0) or (index > self.all_length):
+        if index < 0 or index > self.all_length:
             raise ValueError("The given index is not valid")
         self.__middle_begin = index
 
@@ -456,7 +455,7 @@ class AudioFileMFCC(Configurable):
 
         :param int index: the new index for MIDDLE end
         """
-        if (index < 0) or (index > self.all_length):
+        if index < 0 or index > self.all_length:
             raise ValueError("The given index is not valid")
         self.__middle_end = index
 
@@ -643,17 +642,15 @@ class AudioFileMFCC(Configurable):
         :raises: ValueError: if one of the arguments is greater
                              than the length of the audio file
         """
-        for variable, name in [
+        for variable, name in (
             (head_length, "head_length"),
             (middle_length, "middle_length"),
             (tail_length, "tail_length"),
-        ]:
-            if (variable is not None) and (not isinstance(variable, TimeValue)):
-                raise TypeError("%s is not None or TimeValue" % name)
-            if (variable is not None) and (variable > self.audio_length):
-                raise ValueError(
-                    "%s is greater than the length of the audio file" % name
-                )
+        ):
+            if variable is not None and not isinstance(variable, TimeValue):
+                raise TypeError(f"{name} is not None or TimeValue")
+            if variable is not None and variable > self.audio_length:
+                raise ValueError(f"{name} is greater than the length of the audio file")
         logger.debug("Setting head middle tail...")
         mws = self.rconf.mws
         logger.debug(
@@ -666,6 +663,6 @@ class AudioFileMFCC(Configurable):
         elif tail_length is not None:
             self.middle_end = self.all_length - int(tail_length / mws)
         logger.debug(
-            "After:  0 %d %d %d", self.middle_begin, self.middle_end, self.all_length
+            "After: 0 %d %d %d", self.middle_begin, self.middle_end, self.all_length
         )
         logger.debug("Setting head middle tail... done")

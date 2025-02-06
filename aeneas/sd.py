@@ -157,10 +157,10 @@ class SD(Configurable):
         begin = head
         end = self.real_wave_mfcc.audio_length - tail
         logger.debug("Audio length: %.3f", self.real_wave_mfcc.audio_length)
-        logger.debug("Head length:  %.3f", head)
-        logger.debug("Tail length:  %.3f", tail)
-        logger.debug("Begin:        %.3f", begin)
-        logger.debug("End:          %.3f", end)
+        logger.debug("Head length: %.3f", head)
+        logger.debug("Tail length: %.3f", tail)
+        logger.debug("Begin: %.3f", begin)
+        logger.debug("End: %.3f", end)
         if (begin >= TimeValue("0.000")) and (end > begin):
             logger.debug("Returning %.3f %.3f", begin, end)
             return (begin, end)
@@ -244,12 +244,12 @@ class SD(Configurable):
         mws = self.rconf.mws
         min_length_frames = int(min_length / mws)
         max_length_frames = int(max_length / mws)
-        logger.debug("MFCC window shift s:     %.3f", mws)
-        logger.debug("Min start length s:      %.3f", min_length)
+        logger.debug("MFCC window shift s: %.3f", mws)
+        logger.debug("Min start length s: %.3f", min_length)
         logger.debug("Min start length frames: %d", min_length_frames)
-        logger.debug("Max start length s:      %.3f", max_length)
+        logger.debug("Max start length s: %.3f", max_length)
         logger.debug("Max start length frames: %d", max_length_frames)
-        logger.debug("Tail?:                   %s", tail)
+        logger.debug("Tail?: %s", tail)
 
         logger.debug("Synthesizing query...")
         synt_duration = max_length * self.QUERY_FACTOR
@@ -337,8 +337,8 @@ class SD(Configurable):
                     candidate_begin * mws,
                     search_end * mws,
                 )
-                logger.debug("  Min value: %.6f", min_value)
-                logger.debug("  Min index: %d == %.3f", min_index, min_index * mws)
+                logger.debug("Min value: %.6f", min_value)
+                logger.debug("Min index: %d == %.3f", min_index, min_index * mws)
                 candidates.append((min_value, candidate_begin, min_index))
             except Exception:
                 logger.exception(
@@ -357,7 +357,7 @@ class SD(Configurable):
         logger.debug("Candidates:")
         for candidate in candidates:
             logger.debug(
-                "  Value: %.6f Begin Time: %.3f Min Index: %d",
+                "Value: %.6f Begin Time: %.3f Min Index: %d",
                 candidate[0],
                 candidate[1] * mws,
                 candidate[2],
