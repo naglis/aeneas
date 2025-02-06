@@ -82,8 +82,8 @@ class SyncMapFormatGenericTabular(SyncMapFormatBase):
     Otherwise, use the specified character.
     """
 
-    def __init__(self, variant=DEFAULT, parameters=None, rconf=None):
-        super().__init__(variant=variant, parameters=parameters, rconf=rconf)
+    def __init__(self, variant=DEFAULT, parameters=None):
+        super().__init__(variant=variant, parameters=parameters)
         # store parse/format time functions
         if self.variant in self.MACHINE_ALIASES:
             self.parse_time_function = gf.time_from_ssmmm

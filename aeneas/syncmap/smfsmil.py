@@ -48,8 +48,8 @@ class SyncMapFormatSMIL(SyncMapFormatGenericXML):
 
     MACHINE_ALIASES = [MACHINE]
 
-    def __init__(self, variant=DEFAULT, parameters=None, rconf=None):
-        super().__init__(variant=variant, parameters=parameters, rconf=rconf)
+    def __init__(self, variant=DEFAULT, parameters=None):
+        super().__init__(variant=variant, parameters=parameters)
         if self.variant in self.MACHINE_ALIASES:
             self.format_time_function = gf.time_to_ssmmm
         else:

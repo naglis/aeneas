@@ -38,7 +38,6 @@ import json
 import logging
 import os
 
-from aeneas.logger import Configurable
 from aeneas.syncmap.format import SyncMapFormat
 from aeneas.syncmap.fragment import SyncMapFragment, FragmentType
 from aeneas.syncmap.fragmentlist import SyncMapFragmentList
@@ -50,7 +49,7 @@ import aeneas.globalfunctions as gf
 logger = logging.getLogger(__name__)
 
 
-class SyncMap(Configurable):
+class SyncMap:
     """
     A synchronization map, that is, a tree of
     :class:`~aeneas.syncmap.fragment.SyncMapFragment`
@@ -93,10 +92,9 @@ class SyncMap(Configurable):
     ]
     FINETUNEAS_PATH = "../res/finetuneas.html"
 
-    def __init__(self, tree: Tree | None = None, rconf=None):
+    def __init__(self, tree: Tree | None = None):
         if tree is not None and not isinstance(tree, Tree):
             raise TypeError("tree is not an instance of Tree")
-        super().__init__(rconf=rconf)
         if tree is None:
             tree = Tree()
         self.fragments_tree = tree
@@ -215,7 +213,7 @@ class SyncMap(Configurable):
         max_time = max(leaf.interval.end for leaf in leaves)
         logger.debug("  Max time: %.3f", max_time)
         logger.debug("  Creating SyncMapFragmentList...")
-        smf = SyncMapFragmentList(begin=min_time, end=max_time, rconf=self.rconf)
+        smf = SyncMapFragmentList(begin=min_time, end=max_time)
         logger.debug("  Creating SyncMapFragmentList... done")
         logger.debug("  Sorting SyncMapFragmentList...")
         result = True
@@ -406,7 +404,6 @@ class SyncMap(Configurable):
         reader = (SyncMapFormat.CODE_TO_CLASS[sync_map_format])(
             variant=sync_map_format,
             parameters=parameters,
-            rconf=self.rconf,
         )
 
         # open file for reading
@@ -536,7 +533,6 @@ class SyncMap(Configurable):
         writer = (SyncMapFormat.CODE_TO_CLASS[sync_map_format])(
             variant=sync_map_format,
             parameters=parameters,
-            rconf=self.rconf,
         )
 
         # create dir hierarchy, if needed

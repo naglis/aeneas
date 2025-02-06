@@ -39,7 +39,6 @@ import typing
 from bs4 import BeautifulSoup
 
 from aeneas.idsortingalgorithm import IDSortingAlgorithm
-from aeneas.logger import Configurable
 from aeneas.tree import Tree
 from aeneas.language import Language
 import aeneas.globalconstants as gc
@@ -440,7 +439,7 @@ class TextFragment:
         return len(self.filtered_text)
 
 
-class TextFile(Configurable):
+class TextFile:
     """
     A tree of text fragments, representing a text file.
 
@@ -450,8 +449,6 @@ class TextFile(Configurable):
     :param file_format: the format of the text file
     :type  file_format: :class:`~aeneas.textfile.TextFileFormat`
     :param dict parameters: additional parameters used to parse the text file
-    :param rconf: a runtime configuration
-    :type  rconf: :class:`~aeneas.runtimeconfiguration.RuntimeConfiguration`
     :raises: OSError: if ``file_path`` cannot be read
     :raises: TypeError: if ``parameters`` is not an instance of ``dict``
     :raises: ValueError: if ``file_format`` value is not allowed
@@ -464,14 +461,12 @@ class TextFile(Configurable):
         file_path: str | None = None,
         file_format: str | None = None,
         parameters: dict | None = None,
-        rconf=None,
     ):
-        super().__init__(rconf=rconf)
         self.file_path = file_path
         self.file_format = file_format
         self.parameters = {} if parameters is None else parameters
         self.fragments_tree = Tree()
-        if (self.file_path is not None) and (self.file_format is not None):
+        if self.file_path is not None and self.file_format is not None:
             self._read_from_file()
 
     def __len__(self):
@@ -1089,7 +1084,7 @@ class TextFile(Configurable):
         return text_filter
 
 
-class TextFilter(Configurable):
+class TextFilter:
     """
     A text filter is a function acting on a list of strings,
     and returning a new list of strings derived from the former
@@ -1099,15 +1094,11 @@ class TextFilter(Configurable):
     or it might transliterate its characters.
 
     Filters can be chained, to the left or to the right.
-
-    :param rconf: a runtime configuration
-    :type  rconf: :class:`~aeneas.runtimeconfiguration.RuntimeConfiguration`
     """
 
     SPACES_REGEX = re.compile(r" [ ]+")
 
-    def __init__(self, rconf=None):
-        super().__init__(rconf=rconf)
+    def __init__(self):
         self.filters = []
 
     def add_filter(self, new_filter: "TextFilter", as_last: bool = True):
@@ -1143,19 +1134,17 @@ class TextFilterIgnoreRegex(TextFilter):
     Leading/trailing spaces, and repeated spaces are removed.
 
     :param regex regex: the regular expression to be applied
-    :param rconf: a runtime configuration
-    :type  rconf: :class:`~aeneas.runtimeconfiguration.RuntimeConfiguration`
     :raises: ValueError: if ``regex`` is not a valid regex
     """
 
-    def __init__(self, regex: str, rconf=None):
+    def __init__(self, regex: str):
         try:
             self.regex = re.compile(regex)
         except Exception as exc:
             raise ValueError(
                 f"String {regex!r} is not a valid regular expression"
             ) from exc
-        TextFilter.__init__(self, rconf=rconf)
+        super().__init__()
 
     def apply_filter(self, strings: list[str]) -> list[str]:
         return [self._apply_single(s) for s in strings]
@@ -1176,21 +1165,19 @@ class TextFilterTransliterate(TextFilter):
     :param map_object: the map object
     :type  map_object: :class:`~aeneas.textfile.TransliterationMap`
     :param string map_file_path: the path to a map file
-    :param rconf: a runtime configuration
-    :type  rconf: :class:`~aeneas.runtimeconfiguration.RuntimeConfiguration`
     :raises: OSError: if ``map_file_path`` cannot be read
     :raises: TypeError: if ``map_object`` is not an instance
                         of :class:`~aeneas.textfile.TransliterationMap`
     """
 
-    def __init__(self, map_file_path=None, map_object=None, rconf=None):
+    def __init__(self, map_file_path=None, map_object=None):
         if map_object is not None:
             if not isinstance(map_object, TransliterationMap):
                 raise TypeError("map_object is not an instance of TransliterationMap")
             self.trans_map = map_object
         elif map_file_path is not None:
             self.trans_map = TransliterationMap(file_path=map_file_path)
-        TextFilter.__init__(self, rconf=rconf)
+        super().__init__()
 
     def apply_filter(self, strings):
         return [self._apply_single(s) for s in strings]
@@ -1204,7 +1191,7 @@ class TextFilterTransliterate(TextFilter):
         return result
 
 
-class TransliterationMap(Configurable):
+class TransliterationMap:
     """
     A transliteration map is a dictionary that maps Unicode characters
     to their equivalent Unicode characters or strings (character sequences).
@@ -1216,8 +1203,6 @@ class TransliterationMap(Configurable):
     included at the top of the ``transliteration.map`` sample file.
 
     :param string file_path: the path to the map file to be read
-    :param rconf: a runtime configuration
-    :type  rconf: :class:`~aeneas.runtimeconfiguration.RuntimeConfiguration`
     :raises: OSError: if ``file_path`` cannot be read
     """
 
@@ -1225,8 +1210,7 @@ class TransliterationMap(Configurable):
     DELETE_REGEX = re.compile(r"^([^ ]+)$")
     REPLACE_REGEX = re.compile(r"^([^ ]+) ([^ ]+)$")
 
-    def __init__(self, file_path, rconf=None):
-        super().__init__(rconf=rconf)
+    def __init__(self, file_path):
         self.trans_map = {}
         self.file_path = file_path
 

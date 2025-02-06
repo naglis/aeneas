@@ -34,8 +34,8 @@ class SyncMapFormatGenericSubtitles(SyncMapFormatBase):
     associated with this format.
     """
 
-    def __init__(self, variant=DEFAULT, parameters=None, rconf=None):
-        super().__init__(variant=variant, parameters=parameters, rconf=rconf)
+    def __init__(self, variant=DEFAULT, parameters=None):
+        super().__init__(variant=variant, parameters=parameters)
 
         #
         # NOTE since we store functions (parse_..., format_...)

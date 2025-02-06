@@ -21,7 +21,6 @@
 import abc
 import typing
 
-from aeneas.logger import Configurable
 from aeneas.language import Language
 from aeneas.exacttiming import TimeValue
 from aeneas.syncmap.fragment import SyncMapFragment
@@ -33,7 +32,7 @@ if typing.TYPE_CHECKING:
     from aeneas.syncmap import SyncMap
 
 
-class SyncMapFormatBase(Configurable, abc.ABC):
+class SyncMapFormatBase(abc.ABC):
     """
     Base class for I/O handlers.
     """
@@ -42,7 +41,6 @@ class SyncMapFormatBase(Configurable, abc.ABC):
         self,
         variant: str | None = None,
         parameters: dict | None = None,
-        rconf=None,
     ):
         """
         TBW
@@ -52,7 +50,7 @@ class SyncMapFormatBase(Configurable, abc.ABC):
         :param parameters: additional parameters to read or write
         :type parameters: ``None`` or ``dict``
         """
-        super().__init__(rconf=rconf)
+        super().__init__()
         self.variant = variant
         self.parameters = parameters
 

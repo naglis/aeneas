@@ -25,7 +25,6 @@ import logging
 import typing
 
 from aeneas.exacttiming import TimeInterval, TimeValue
-from aeneas.logger import Configurable
 from aeneas.syncmap.fragment import SyncMapFragment, FragmentType
 from aeneas.textfile import TextFragment
 import aeneas.globalconstants as gc
@@ -33,7 +32,7 @@ import aeneas.globalconstants as gc
 logger = logging.getLogger(__name__)
 
 
-class SyncMapFragmentList(Configurable):
+class SyncMapFragmentList:
     """
     A type representing a list of sync map fragments,
     with some constraints:
@@ -76,7 +75,7 @@ class SyncMapFragmentList(Configurable):
     )
     """ Allowed positions for any pair of time intervals in the list """
 
-    def __init__(self, begin: TimeValue, end: TimeValue, rconf=None):
+    def __init__(self, begin: TimeValue, end: TimeValue):
         if not isinstance(begin, TimeValue):
             raise TypeError("begin is not an instance of TimeValue")
         if not isinstance(end, TimeValue):
@@ -85,7 +84,6 @@ class SyncMapFragmentList(Configurable):
             raise ValueError("begin is negative")
         if begin > end:
             raise ValueError("begin is bigger than end")
-        super().__init__(rconf=rconf)
         self.begin = begin
         self.end = end
         self.__sorted = True

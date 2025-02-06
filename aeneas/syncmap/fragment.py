@@ -56,7 +56,7 @@ class SyncMapFragment:
     :param float confidence: the confidence of the audio timing
     """
 
-    NOT_REGULAR_TYPES = [FragmentType.HEAD, FragmentType.TAIL, FragmentType.NONSPEECH]
+    NOT_REGULAR_TYPES = (FragmentType.HEAD, FragmentType.TAIL, FragmentType.NONSPEECH)
     """ Types of fragment different than ``REGULAR`` """
 
     def __init__(
