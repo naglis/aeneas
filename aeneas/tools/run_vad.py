@@ -27,9 +27,11 @@ using the MFCC energy-based VAD algorithm.
 
 import sys
 
-from aeneas.audiofile import AudioFileConverterError
-from aeneas.audiofile import AudioFileNotInitializedError
-from aeneas.audiofile import AudioFileUnsupportedFormatError
+from aeneas.audiofile import (
+    AudioFileConverterError,
+    AudioFileNotInitializedError,
+    AudioFileUnsupportedFormatError,
+)
 from aeneas.audiofilemfcc import AudioFileMFCC
 from aeneas.runtimeconfiguration import RuntimeConfiguration
 from aeneas.tools.abstract_cli_program import AbstractCLIProgram
@@ -74,7 +76,7 @@ class RunVADCLI(AbstractCLIProgram):
             return self.print_help()
         audio_file_path = self.actual_arguments[0]
         mode = self.actual_arguments[1]
-        if mode not in ["speech", "nonspeech", "both"]:
+        if mode not in ("speech", "nonspeech", "both"):
             return self.print_help()
         output_file_path = None
         if len(self.actual_arguments) >= 3:
@@ -84,8 +86,8 @@ class RunVADCLI(AbstractCLIProgram):
         self.check_c_extensions("cmfcc")
         if not self.check_input_file(audio_file_path):
             return self.ERROR_EXIT_CODE
-        if (output_file_path is not None) and (
-            not self.check_output_file(output_file_path)
+        if output_file_path is not None and not self.check_output_file(
+            output_file_path
         ):
             return self.ERROR_EXIT_CODE
 
@@ -94,20 +96,21 @@ class RunVADCLI(AbstractCLIProgram):
             audio_file_mfcc = AudioFileMFCC(audio_file_path, rconf=self.rconf)
         except AudioFileConverterError:
             self.print_error(
-                "Unable to call the ffmpeg executable '%s'"
+                "Unable to call the ffmpeg executable %r"
                 % (self.rconf[RuntimeConfiguration.FFMPEG_PATH])
             )
             self.print_error("Make sure the path to ffmpeg is correct")
             return self.ERROR_EXIT_CODE
         except (AudioFileUnsupportedFormatError, AudioFileNotInitializedError):
-            self.print_error("Cannot read file '%s'" % (audio_file_path))
-            self.print_error("Check that its format is supported by ffmpeg")
+            self.print_error(
+                f"Cannot read file {audio_file_path!r}. "
+                "Check that its format is supported by ffmpeg"
+            )
             return self.ERROR_EXIT_CODE
         except Exception as exc:
             self.print_error(
-                "An unexpected error occurred while reading the audio file:"
+                f"An unexpected error occurred while reading the audio file: {exc}"
             )
-            self.print_error("%s" % exc)
             return self.ERROR_EXIT_CODE
         self.print_info("Reading audio... done")
 
@@ -155,7 +158,7 @@ class RunVADCLI(AbstractCLIProgram):
         :param intervals: a list of tuples, each representing an interval
         :type  intervals: list of tuples
         """
-        msg = [template % (interval) for interval in intervals]
+        msg = [template % interval for interval in intervals]
         if output_file_path is None:
             self.print_info("Intervals detected:")
             for line in msg:

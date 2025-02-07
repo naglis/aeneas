@@ -812,7 +812,7 @@ class BaseTTSWrapper(Configurable):
             logger.debug("Reversing audio samples... done")
 
         # write output file
-        logger.debug("Writing audio file '%s'", output_file_path)
+        logger.debug("Writing audio file %r", output_file_path)
         output_file.write(file_path=output_file_path)
 
         # return output

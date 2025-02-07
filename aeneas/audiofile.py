@@ -414,7 +414,7 @@ class AudioFile(Configurable):
 
                 tmp_file_path = tmp_file.name
 
-                logger.debug("Temporary PCM16 mono WAVE file: '%s'", tmp_file_path)
+                logger.debug("Temporary PCM16 mono WAVE file: %r", tmp_file_path)
                 converter = FFMPEGWrapper(rconf=self.rconf)
                 try:
                     logger.debug("Converting audio file to mono...")
@@ -633,7 +633,7 @@ class AudioFile(Configurable):
                 )
             else:
                 self.read_samples_from_file()
-        logger.debug("Writing audio file '%s'...", file_path)
+        logger.debug("Writing audio file %r...", file_path)
         try:
             # our value is a float64 in [-1, 1]
             # scipy writes the sample as an int16_t, that is, a number in [-32768, 32767]
@@ -641,7 +641,7 @@ class AudioFile(Configurable):
             scipywavwrite(file_path, self.audio_sample_rate, data)
         except Exception as exc:
             raise OSError(f"Error writing audio file to '{file_path}'") from exc
-        logger.debug("Writing audio file '%s'... done", file_path)
+        logger.debug("Writing audio file %r... done", file_path)
 
     def clear_data(self):
         """

@@ -151,7 +151,7 @@ class FFPROBEWrapper(Configurable):
             *self.FFPROBE_PARAMETERS,
             audio_file_path,
         ]
-        logger.debug("Calling with arguments '%s'", arguments)
+        logger.debug("Calling with arguments %r", arguments)
         try:
             output = subprocess.check_output(
                 arguments,
@@ -160,7 +160,7 @@ class FFPROBEWrapper(Configurable):
             )
         except OSError as exc:
             raise FFPROBEPathError(
-                "Unable to call the '%s' ffprobe executable"
+                "Unable to call the %r ffprobe executable"
                 % self.rconf[RuntimeConfiguration.FFPROBE_PATH]
             ) from exc
         except subprocess.CalledProcessError as exc:

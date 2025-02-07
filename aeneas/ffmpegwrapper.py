@@ -200,12 +200,12 @@ class FFMPEGWrapper(Configurable):
 
         arguments.append(output_file_path)
 
-        logger.debug("Calling with arguments '%s'", arguments)
+        logger.debug("Calling with arguments %r", arguments)
         try:
             subprocess.check_output(arguments, stderr=subprocess.PIPE, text=True)
         except OSError as exc:
             raise FFMPEGPathError(
-                "Unable to call the '%s' ffmpeg executable"
+                "Unable to call the %r ffmpeg executable"
                 % self.rconf[RuntimeConfiguration.FFMPEG_PATH]
             ) from exc
         except subprocess.CalledProcessError as exc:

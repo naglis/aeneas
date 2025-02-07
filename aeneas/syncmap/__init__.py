@@ -397,9 +397,9 @@ class SyncMap:
         if sync_map_format not in SyncMapFormat.CODE_TO_CLASS:
             raise ValueError(f"Sync map format {sync_map_format!r} is not allowed")
 
-        logger.debug("Input format:     '%s'", sync_map_format)
-        logger.debug("Input path:       '%s'", input_file_path)
-        logger.debug("Input parameters: '%s'", parameters)
+        logger.debug("Input format:     %r", sync_map_format)
+        logger.debug("Input path:       %r", input_file_path)
+        logger.debug("Input parameters: %r", parameters)
 
         reader = (SyncMapFormat.CODE_TO_CLASS[sync_map_format])(
             variant=sync_map_format,
@@ -416,7 +416,7 @@ class SyncMap:
         # overwrite language if requested
         language = gf.safe_get(parameters, gc.PPN_SYNCMAP_LANGUAGE, None)
         if language is not None:
-            logger.debug("Overwriting language to '%s'", language)
+            logger.debug("Overwriting language to %r", language)
             for fragment in self.fragments:
                 if fragment.text_fragment is not None:
                     fragment.text_fragment.language = language
@@ -447,7 +447,7 @@ class SyncMap:
             Select the given levels of the fragments tree,
             modifying the given syncmap (always pass a copy of it!).
             """
-            logger.debug("Levels: '%s'", levels)
+            logger.debug("Levels: %r", levels)
             if levels is None:
                 return
             try:
@@ -464,7 +464,7 @@ class SyncMap:
             Set the appropriate head/tail nodes of the fragments tree,
             modifying the given syncmap (always pass a copy of it!).
             """
-            logger.debug("Head/tail format: '%s'", head_tail_format)
+            logger.debug("Head/tail format: %r", head_tail_format)
             tree = syncmap.fragments_tree
             head = tree.get_child(0)
             first = tree.get_child(1)
@@ -508,9 +508,9 @@ class SyncMap:
                 f"Cannot write sync map file {output_file_path!r}. Wrong permissions?"
             )
 
-        logger.debug("Output format:     '%s'", sync_map_format)
-        logger.debug("Output path:       '%s'", output_file_path)
-        logger.debug("Output parameters: '%s'", parameters)
+        logger.debug("Output format:     %r", sync_map_format)
+        logger.debug("Output path:       %r", output_file_path)
+        logger.debug("Output parameters: %r", parameters)
 
         # select levels and head/tail format
         pruned_syncmap = self.clone()

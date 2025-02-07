@@ -103,7 +103,7 @@ class CEWSubprocess(Configurable):
                 audio_file_path,
                 data_file_path,
             ]
-            logger.debug("Calling with arguments: '%s'", " ".join(arguments))
+            logger.debug("Calling with arguments: %r", " ".join(arguments))
             subprocess.check_call(
                 arguments,
                 stdout=subprocess.PIPE,

@@ -231,7 +231,7 @@ def write(filename, rate, data):
         if not (
             dkind == "i" or dkind == "f" or (dkind == "u" and data.dtype.itemsize == 1)
         ):
-            raise ValueError("Unsupported data type '%s'" % data.dtype)
+            raise ValueError(f"Unsupported data type {data.dtype!r}")
 
         fid.write(b"RIFF")
         fid.write(b"\x00\x00\x00\x00")
@@ -272,12 +272,6 @@ def write(filename, rate, data):
             fid.seek(0)
 
 
-if sys.version_info[0] >= 3:
-
-    def _array_tofile(fid, data):
-        # ravel gives a c-contiguous buffer
-        fid.write(data.ravel().view("b").data)
-else:
-
-    def _array_tofile(fid, data):
-        fid.write(data.tostring())
+def _array_tofile(fid, data):
+    # ravel gives a c-contiguous buffer
+    fid.write(data.ravel().view("b").data)

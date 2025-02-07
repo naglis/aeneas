@@ -730,13 +730,13 @@ class ExecuteTaskCLI(AbstractCLIProgram):
         :type  parameter: Unicode string
         """
         if parameter in self.VALUES:
-            self.print_info("Available values for parameter '%s':" % parameter)
+            self.print_info(f"Available values for parameter {parameter!r}:")
             self.print_generic("\n".join(self.VALUES[parameter]))
             return self.HELP_EXIT_CODE
-        if parameter not in ["?", ""]:
-            self.print_error("Invalid parameter name '%s'" % parameter)
+        if parameter not in ("?", ""):
+            self.print_error(f"Invalid parameter name {parameter!r}")
         self.print_info("Parameters for which values can be listed:")
-        self.print_generic("\n".join(sorted(self.VALUES.keys())))
+        self.print_generic("\n".join(sorted(self.VALUES)))
         return self.HELP_EXIT_CODE
 
 

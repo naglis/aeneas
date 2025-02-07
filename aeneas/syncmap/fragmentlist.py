@@ -542,7 +542,7 @@ class SyncMapFragmentList:
             logger.debug("  Remove long nonspeech")
             lines = []
         else:
-            logger.debug("  Replace long nonspeech with '%s'", replacement_string)
+            logger.debug("  Replace long nonspeech with %r", replacement_string)
             lines = [replacement_string]
         # first, make room for the nonspeech intervals
         logger.debug("  First pass: making room...")

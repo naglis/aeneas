@@ -86,7 +86,7 @@ class DownloadCLI(AbstractCLIProgram):
 
         try:
             if download:
-                self.print_info("Downloading audio stream from '%s' ..." % source_url)
+                self.print_info(f"Downloading audio stream from {source_url!r} ...")
                 downloader = Downloader()
                 result = downloader.audio_from_youtube(
                     source_url,

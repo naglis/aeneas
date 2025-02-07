@@ -442,10 +442,10 @@ def pairs_to_dict(pairs, result=None):
     for pair in pairs:
         if len(pair) > 0:
             tokens = pair.split(gc.CONFIG_STRING_ASSIGNMENT_SYMBOL)
-            if (len(tokens) == 2) and (len(tokens[0])) > 0 and (len(tokens[1]) > 0):
+            if len(tokens) == 2 and len(tokens[0]) > 0 and len(tokens[1]) > 0:
                 dictionary[tokens[0]] = tokens[1]
             elif result is not None:
-                result.add_warning("Invalid key=value string: '%s'" % pair)
+                result.add_warning(f"Invalid key=value string: {pair!r}")
     return dictionary
 
 
@@ -501,7 +501,7 @@ def ensure_parent_directory(path, ensure_parent=True):
         try:
             os.makedirs(parent_directory)
         except OSError:
-            raise OSError("Directory '%s' cannot be created" % parent_directory)
+            raise OSError(f"Directory {parent_directory!r} cannot be created")
 
 
 def time_from_ttml(string):

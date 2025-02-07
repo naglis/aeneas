@@ -326,9 +326,12 @@ class DTWAligner(Configurable):
             / self.rconf[RuntimeConfiguration.MFCC_WINDOW_SHIFT]
         )
         mfcc2_length = self.synt_wave_mfcc.middle_length
-        logger.debug("Requested algorithm: '%s'", algorithm)
-        logger.debug("delta = %d", delta)
-        logger.debug("m = %d", mfcc2_length)
+        logger.debug(
+            "Requested algorithm: %r, delta = %d, m = %d",
+            algorithm,
+            delta,
+            mfcc2_length,
+        )
         # check if delta is >= length of synt wave
         if mfcc2_length <= delta:
             logger.debug("We have mfcc2_length <= delta")

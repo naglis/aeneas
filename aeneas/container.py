@@ -353,7 +353,7 @@ class Container(Configurable):
         if self.container_format is None:
             logger.debug("Inferring actual container format...")
             path_lowercased = self.file_path.lower()
-            logger.debug("Lowercased file path: '%s'", path_lowercased)
+            logger.debug("Lowercased file path: %r", path_lowercased)
             self.container_format = ContainerFormat.UNPACKED
             for fmt in ContainerFormat:
                 if fmt == ContainerFormat.UNPACKED:
@@ -363,7 +363,7 @@ class Container(Configurable):
                     self.container_format = fmt
                     break
             logger.debug("Inferring actual container format... done")
-            logger.debug("Inferred format: '%s'", self.container_format)
+            logger.debug("Inferred format: %r", self.container_format)
 
         # set the actual container
         logger.debug("Setting actual container...")
@@ -381,7 +381,7 @@ class Container(Configurable):
             variant=variant,
             rconf=self.rconf,
         )
-        logger.debug("Actual container format: '%s'", self.container_format)
+        logger.debug("Actual container format: %r", self.container_format)
         logger.debug("Setting actual container... done")
 
 
