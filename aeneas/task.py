@@ -28,12 +28,12 @@ This module contains the following classes:
 import decimal
 import logging
 import os
+import uuid
 
 from aeneas.adjustboundaryalgorithm import AdjustBoundaryAlgorithm
 from aeneas.audiofile import AudioFile
 from aeneas.configuration import Configuration
 from aeneas.exacttiming import TimeValue
-from aeneas.logger import Configurable
 from aeneas.language import Language
 from aeneas.textfile import TextFile
 import aeneas.globalconstants as gc
@@ -42,60 +42,62 @@ import aeneas.globalfunctions as gf
 logger = logging.getLogger(__name__)
 
 
-class Task(Configurable):
+class Task:
     """
     A structure representing a task, that is,
     an audio file and an ordered set of text fragments
     to be synchronized.
 
     :param string config_string: the task configuration string
-    :param rconf: a runtime configuration
-    :type  rconf: :class:`~aeneas.runtimeconfiguration.RuntimeConfiguration`
     :raises: TypeError: if ``config_string`` is not ``None`` and
                         it is not a Unicode string
     """
 
-    def __init__(self, config_string=None, rconf=None):
-        super().__init__(rconf=rconf)
-        self.identifier = gf.uuid_string()
-        self.configuration = None
-        self.audio_file_path = None  # relative to input container root
-        self.audio_file_path_absolute = (
-            None  # concrete path, file will be read from this!
-        )
+    def __init__(self, config_string=None):
+        self.identifier = str(uuid.uuid4())
+        # relative to input container root
+        self.audio_file_path = None
+        # concrete path, file will be read from this!
+        self.audio_file_path_absolute = None
         self.audio_file = None
-        self.text_file_path = None  # relative to input container root
-        self.text_file_path_absolute = (
-            None  # concrete path, file will be read from this!
-        )
+        # relative to input container root
+        self.text_file_path = None
+        # concrete path, file will be read from this!
+        self.text_file_path_absolute = None
         self.text_file = None
-        self.sync_map_file_path = None  # relative to output container root
-        self.sync_map_file_path_absolute = (
-            None  # concrete path, file will be written to this!
-        )
+        # relative to output container root
+        self.sync_map_file_path = None
+        # concrete path, file will be written to this!
+        self.sync_map_file_path_absolute = None
         self.sync_map = None
+
+        self.configuration = None
         if config_string is not None:
             self.configuration = TaskConfiguration(config_string)
 
     def __str__(self):
-        msg = [
-            f"{gc.RPN_TASK_IDENTIFIER}: '{self.identifier}'",
-            "Configuration:\n%s" % self.configuration,
-            "Audio file path: %s" % self.audio_file_path,
-            "Audio file path (absolute): %s" % self.audio_file_path_absolute,
-            "Text file path: %s" % self.text_file_path,
-            "Text file path (absolute): %s" % self.text_file_path_absolute,
-            "Sync map file path: %s" % self.sync_map_file_path,
-            "Sync map file path (absolute): %s" % self.sync_map_file_path_absolute,
-        ]
-        return "\n".join(msg)
+        return (
+            f"{gc.RPN_TASK_IDENTIFIER}: {self.identifier!r}"
+            "\n"
+            f"Configuration:\n{self.configuration}"
+            "\n"
+            f"Audio file path: {self.audio_file_path}"
+            "\n"
+            f"Audio file path (absolute): {self.audio_file_path_absolute}"
+            "\n"
+            f"Text file path: {self.text_file_path}"
+            "\n"
+            f"Text file path (absolute): {self.text_file_path_absolute}"
+            "\n"
+            f"Sync map file path: {self.sync_map_file_path}"
+            "\n"
+            f"Sync map file path (absolute): {self.sync_map_file_path_absolute}"
+        )
 
     @property
-    def identifier(self):
+    def identifier(self) -> str:
         """
         The identifier of the task.
-
-        :rtype: string
         """
         return self.__identifier
 
@@ -157,7 +159,7 @@ class Task(Configurable):
 
         .. versionadded:: 1.7.0
         """
-        if (self.sync_map is None) or (self.sync_map.fragments_tree is None):
+        if self.sync_map is None or self.sync_map.fragments_tree is None:
             return []
         return [f for f in self.sync_map.leaves(fragment_type)]
 
@@ -193,7 +195,7 @@ class Task(Configurable):
             "self.sync_map_file_path_absolute is %s", self.sync_map_file_path_absolute
         )
 
-        if (container_root_path is not None) and (self.sync_map_file_path is not None):
+        if container_root_path is not None and self.sync_map_file_path is not None:
             path = os.path.join(container_root_path, self.sync_map_file_path)
         elif self.sync_map_file_path_absolute:
             path = self.sync_map_file_path_absolute
@@ -234,7 +236,7 @@ class Task(Configurable):
         logger.debug("Populate audio file...")
         if self.audio_file_path_absolute is not None:
             logger.debug(
-                "audio_file_path_absolute is '%s'", self.audio_file_path_absolute
+                "audio_file_path_absolute is %r", self.audio_file_path_absolute
             )
             self.audio_file = AudioFile(file_path=self.audio_file_path_absolute)
             self.audio_file.read_properties()
@@ -248,8 +250,9 @@ class Task(Configurable):
         the text file at ``self.text_file_path_absolute``.
         """
         logger.debug("Populate text file...")
-        if (self.text_file_path_absolute is not None) and (
-            self.configuration["language"] is not None
+        if (
+            self.text_file_path_absolute is not None
+            and self.configuration["language"] is not None
         ):
             # the following values might be None
             parameters = {
@@ -344,7 +347,7 @@ class TaskConfiguration(Configuration):
     :raises: KeyError: if trying to access a key not listed above
     """
 
-    FIELDS = [
+    FIELDS = (
         (gc.PPN_TASK_CUSTOM_ID, (None, None, ["custom_id"], "custom ID")),
         (gc.PPN_TASK_DESCRIPTION, (None, None, ["description"], "description")),
         (gc.PPN_TASK_LANGUAGE, (None, Language, ["language"], "language (REQ, *)")),
@@ -589,10 +592,7 @@ class TaskConfiguration(Configuration):
             gc.PPN_TASK_OS_FILE_SMIL_PAGE_REF,
             (None, None, ["o_smil_page_ref"], "text ref value (smil, smilh, smilm)"),
         ),
-    ]
-
-    def __init__(self, config_string=None):
-        super().__init__(config_string)
+    )
 
     def aba_parameters(self):
         """

@@ -341,9 +341,9 @@ class AudioFile(Configurable):
         logger.debug("Reading properties...")
 
         # get the file size
-        logger.debug("Getting file size for '%s'", self.file_path)
+        logger.debug("Getting file size for %r", self.file_path)
         self.file_size = gf.file_size(self.file_path)
-        logger.debug("File size for '%s' is '%d'", self.file_path, self.file_size)
+        logger.debug("File size for %r is '%d'", self.file_path, self.file_size)
 
         # get the audio properties using FFPROBEWrapper
         try:

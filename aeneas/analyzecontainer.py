@@ -36,7 +36,6 @@ import typing
 from aeneas.container import Container
 from aeneas.hierarchytype import HierarchyType
 from aeneas.job import Job
-from aeneas.logger import Configurable
 from aeneas.task import Task
 import aeneas.globalconstants as gc
 import aeneas.globalfunctions as gf
@@ -50,18 +49,15 @@ class TaskInfo(typing.NamedTuple):
     audio_path: str
 
 
-class AnalyzeContainer(Configurable):
+class AnalyzeContainer:
     """
     Analyze a given container and build the corresponding job.
 
     :param container: the container to be analyzed
     :type  container: :class:`~aeneas.container.Container`
-    :param rconf: a runtime configuration
-    :type  rconf: :class:`~aeneas.runtimeconfiguration.RuntimeConfiguration`
     """
 
-    def __init__(self, container: Container, rconf=None):
-        super().__init__(rconf=rconf)
+    def __init__(self, container: Container):
         self.container = container
 
     def analyze(self, config_string: str | None = None) -> Job | None:
@@ -370,14 +366,15 @@ class AnalyzeContainer(Configurable):
         )
         return task
 
-    def _replace_placeholder(self, string: str, custom_id: str) -> str:
+    def _replace_placeholder(self, string: str | None, custom_id: str) -> str | None:
         """
         Replace the prefix placeholder
         :class:`~aeneas.globalconstants.PPV_OS_TASK_PREFIX`
         with ``custom_id`` and return the resulting string.
-
-        :rtype: string
         """
+        if string is None:
+            return None
+
         logger.debug(
             "Replacing %r with %r in %r",
             gc.PPV_OS_TASK_PREFIX,

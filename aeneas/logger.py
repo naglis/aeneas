@@ -30,4 +30,4 @@ class Configurable:
     """
 
     def __init__(self, rconf: RuntimeConfiguration | None = None):
-        self.rconf = rconf if rconf is not None else RuntimeConfiguration()
+        self.rconf = RuntimeConfiguration() if rconf is None else rconf

@@ -26,14 +26,14 @@ A generic rooted, ordered, levelled tree.
 
 import copy
 import logging
+import typing
 
-from aeneas.logger import Configurable
 import aeneas.globalfunctions as gf
 
 logger = logging.getLogger(__name__)
 
 
-class Tree(Configurable):
+class Tree:
     """
     A generic rooted, ordered, levelled tree.
 
@@ -54,34 +54,28 @@ class Tree(Configurable):
     not for best performance or minimum memory footprint.
     Using this class should be fine for representing
     any reasonable text tree.
-
-    :param rconf: a runtime configuration
-    :type  rconf: :class:`~aeneas.runtimeconfiguration.RuntimeConfiguration`
     """
 
-    def __init__(self, value=None, rconf=None):
-        super().__init__(rconf=rconf)
+    def __init__(self, value=None):
         self.value = value
         self.__children = []
         self.__parent = None
         self.__level = 0
 
     def __str__(self):
-        return "{} (l: {}, c: {})".format(
-            self.value, gf.safe_int(self.level), gf.safe_int(len(self))
+        return (
+            f"{self.value} (l: {gf.safe_int(self.level)}, c: {gf.safe_int(len(self))})"
         )
 
     def __len__(self):
         return len(self.children)
 
-    def clone(self):
+    def clone(self) -> "Tree":
         """
         Return a deep copy of this node
         and of any children it might have.
 
         .. versionadded:: 1.7.0
-
-        :rtype: :class:`~aeneas.tree.Tree`
         """
         return copy.deepcopy(self)
 
@@ -104,70 +98,56 @@ class Tree(Configurable):
         self.__value = value
 
     @property
-    def children(self):
+    def children(self) -> list["Tree"]:
         """
         Return the list of the direct children of this node.
-
-        :rtype: list of :class:`~aeneas.tree.Tree`
         """
         return self.__children
 
     @property
-    def vchildren(self):
+    def vchildren(self) -> list:
         """
         Return the list of values of the direct children of this node.
-
-        :rtype: list of variant
         """
         return [n.value for n in self.children]
 
     @property
-    def children_not_empty(self):
+    def children_not_empty(self) -> list["Tree"]:
         """
         Return the list of the not empty direct children of this node.
-
-        :rtype: list of :class:`~aeneas.tree.Tree`
         """
         return [n for n in self.children if not n.is_empty]
 
     @property
-    def vchildren_not_empty(self):
+    def vchildren_not_empty(self) -> list["Tree"]:
         """
         Return the list of values of the not empty direct children of this node.
-
-        :rtype: list of :class:`~aeneas.tree.Tree`
         """
         return [n.value for n in self.children_not_empty]
 
     @property
-    def is_leaf(self):
+    def is_leaf(self) -> bool:
         """
         Return ``True`` if this node is a leaf node.
-
-        :rtype: bool
         """
         return len(self.children) == 0
 
     @property
-    def is_empty(self):
+    def is_empty(self) -> bool:
         """
         Return ``True`` if this node is empty, i.e., it has no value.
-
-        :rtype: bool
         """
         return self.value is None
 
     @property
-    def parent(self):
+    def parent(self) -> typing.Union["Tree", None]:
         """
         Return the parent node of this node, or ``None`` if this node is a root.
-
-        :rtype: :class:`~aeneas.tree.Tree`
         """
         return self.__parent
 
     @parent.setter
-    def parent(self, parent):
+    def parent(self, parent: "Tree"):
         """
         Set the parent of this node.
 
@@ -177,39 +157,33 @@ class Tree(Configurable):
         self.__parent = parent
 
     @property
-    def is_root(self):
+    def is_root(self) -> bool:
         """
         Return ``True`` if this node is the root node.
-
-        :rtype: bool
         """
         return self.__parent is None
 
     @property
-    def level(self):
+    def level(self) -> int:
         """
         Return the level of this node,
         starting from ``0`` for the root,
         ``1`` for the direct children of the root,
         and so on.
-
-        :rtype: int
         """
         return self.__level
 
     @property
-    def is_pleasant(self):
+    def is_pleasant(self) -> bool:
         """
         Return ``True`` if all the leaves
         in the subtree rooted at this node
         are at the same level.
-
-        :rtype: bool
         """
-        levels = sorted([n.level for n in self.leaves])
+        levels = sorted(n.level for n in self.leaves)
         return levels[0] == levels[-1]
 
-    def add_child(self, node, as_last=True):
+    def add_child(self, node: "Tree", as_last: bool = True):
         """
         Add the given child to the current list of children.
 
@@ -235,7 +209,7 @@ class Tree(Configurable):
         for n in node.subtree:
             n.__level += new_height
 
-    def remove_child(self, index):
+    def remove_child(self, index: int):
         """
         Remove the child at the given index
         from the current list of children.
@@ -260,7 +234,7 @@ class Tree(Configurable):
                     self.parent = None
                     break
 
-    def remove_children(self, reset_parent=True):
+    def remove_children(self, reset_parent: bool = True):
         """
         Remove all the children of this node.
 
@@ -291,25 +265,21 @@ class Tree(Configurable):
         return self.get_child(index).value
 
     @property
-    def subtree(self):
+    def subtree(self) -> list["Tree"]:
         """
         Return the list of the nodes in the tree rooted at this node, in DFS order.
 
         Note that this node is always the first element of the returned list.
         If you want to exclude it, use ``node.subtree[1:]``.
-
-        :rtype: list of Tree
         """
         return list(self.dfs)
 
     @property
-    def leaves(self):
+    def leaves(self) -> list["Tree"]:
         """
         Return the list of leaves
         in the tree rooted at this node,
         in DFS order.
-
-        :rtype: list of :class:`~aeneas.tree.Tree`
         """
         return [n for n in self.dfs if n.is_leaf]
 
@@ -325,13 +295,11 @@ class Tree(Configurable):
         return [n.value for n in self.leaves]
 
     @property
-    def leaves_not_empty(self):
+    def leaves_not_empty(self) -> list["Tree"]:
         """
         Return the list of leaves not empty
         in the tree rooted at this node,
         in DFS order.
-
-        :rtype: list of :class:`~aeneas.tree.Tree`
         """
         return [n for n in self.dfs if ((n.is_leaf) and (not n.is_empty))]
 
@@ -347,7 +315,7 @@ class Tree(Configurable):
         return [n.value for n in self.leaves_not_empty]
 
     @property
-    def height(self):
+    def height(self) -> int:
         """
         Return the height of the tree
         rooted at this node,
@@ -355,30 +323,24 @@ class Tree(Configurable):
         of a deepest leaf and the level of this node.
         Return ``1`` for a single-node tree,
         ``2`` for a two-levels tree, etc.
-
-        :rtype: int
         """
         return max(n.level for n in self.subtree) - self.level + 1
 
     @property
-    def dfs(self):
+    def dfs(self) -> typing.Iterator["Tree"]:
         """
         Depth-first search of the tree rooted at this node.
         (First visit children, then visit current node.)
-
-        :rtype: generator of :class:`~aeneas.tree.Tree`
         """
         for node in self.children:
             yield from node.dfs
         yield self
 
     @property
-    def pre(self):
+    def pre(self) -> typing.Iterator["Tree"]:
         """
         Pre-order search of the tree rooted at this node.
         (First visit current node, then visit children.)
-
-        :rtype: generator of :class:`~aeneas.tree.Tree`
         """
         yield self
         for node in self.children:

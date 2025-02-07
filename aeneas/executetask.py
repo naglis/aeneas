@@ -659,7 +659,7 @@ class ExecuteTask(Configurable):
         If requested, check that the computed sync map is consistent.
         Then, add it to the Task.
         """
-        sync_map = SyncMap(tree=sync_root, rconf=self.rconf)
+        sync_map = SyncMap(tree=sync_root)
         if self.rconf.safety_checks:
             logger.debug("Running sanity check on computed sync map...")
             if not sync_map.leaves_are_consistent:

@@ -31,20 +31,16 @@ This module contains the following classes:
 import logging
 import re
 
-from aeneas.logger import Configurable
-
 logger = logging.getLogger(__name__)
 
 
-class IDSortingAlgorithm(Configurable):
+class IDSortingAlgorithm:
     """
     Enumeration of the available algorithms to sort
     a list of XML ``id`` attributes.
 
     :param algorithm: the id sorting algorithm to be used
     :type  algorithm: :class:`~aeneas.idsortingalgorithm.IDSortingAlgorithm`
-    :param rconf: a runtime configuration
-    :type  rconf: :class:`~aeneas.runtimeconfiguration.RuntimeConfiguration`
     :raises: ValueError: if the value of ``algorithm`` is not allowed
     """
 
@@ -61,16 +57,15 @@ class IDSortingAlgorithm(Configurable):
     (e.g., ``f2`` before ``f020`` before ``f10``,
     assuming this was their order in the XML DOM) """
 
-    ALLOWED_VALUES = [LEXICOGRAPHIC, NUMERIC, UNSORTED]
+    ALLOWED_VALUES = (LEXICOGRAPHIC, NUMERIC, UNSORTED)
     """ List of all the allowed values """
 
-    def __init__(self, algorithm, rconf=None):
+    def __init__(self, algorithm: str):
         if algorithm not in self.ALLOWED_VALUES:
             raise ValueError("Algorithm value not allowed")
-        super().__init__(rconf=rconf)
         self.algorithm = algorithm
 
-    def sort(self, ids):
+    def sort(self, ids: list[str]) -> list[str]:
         """
         Sort the given list of identifiers,
         returning a new (sorted) list.
@@ -79,7 +74,7 @@ class IDSortingAlgorithm(Configurable):
         :rtype: list
         """
 
-        def extract_int(string):
+        def extract_int(string: str) -> int:
             """
             Extract an integer from the given string.
 

@@ -33,7 +33,6 @@ import sys
 import tempfile
 import importlib.util
 import functools
-import uuid
 
 from aeneas.exacttiming import TimeValue
 import aeneas.globalconstants as gc
@@ -130,15 +129,6 @@ def print_warning(msg, color=True):
         safe_print(f"{ANSI_WARNING}[WARN] {msg}{ANSI_END}")
     else:
         safe_print("[WARN] %s" % (msg))
-
-
-def uuid_string():
-    """
-    Return a uuid4 as a Unicode string.
-
-    :rtype: string
-    """
-    return safe_unicode(str(uuid.uuid4())).lower()
 
 
 def tmp_file(suffix="", root=None):

@@ -25,29 +25,25 @@ This module contains the following classes:
 * :class:`~aeneas.job.JobConfiguration`, representing a job configuration.
 """
 
+import uuid
+
 from aeneas.configuration import Configuration
-from aeneas.logger import Configurable
 from aeneas.language import Language
+from aeneas.task import Task
 import aeneas.globalconstants as gc
-import aeneas.globalfunctions as gf
 
 
-class Job(Configurable):
+class Job:
     """
     A structure representing a job, that is,
     a collection of related Tasks.
 
     :param string config_string: the job configuration string
-    :param rconf: a runtime configuration
-    :type  rconf: :class:`~aeneas.runtimeconfiguration.RuntimeConfiguration`
-    :raises: TypeError: if ``config_string`` is not ``None`` and
-                        not a Unicode string
     """
 
-    def __init__(self, config_string=None, rconf=None):
-        super().__init__(rconf=rconf)
+    def __init__(self, config_string: str | None = None):
         self.tasks = []
-        self.identifier = gf.uuid_string()
+        self.identifier = str(uuid.uuid4())
         self.configuration = (
             None if config_string is None else JobConfiguration(config_string)
         )
@@ -56,17 +52,16 @@ class Job(Configurable):
         return len(self.tasks)
 
     def __str__(self):
-        i = 0
-        msg = []
-        msg.append(f"{gc.RPN_JOB_IDENTIFIER}: '{self.identifier}'")
-        msg.append(f"Configuration:\n{self.configuration}")
-        msg.append("Tasks:")
-        for task in self.tasks:
+        msg = [
+            f"{gc.RPN_JOB_IDENTIFIER}: '{self.identifier}'",
+            f"Configuration:\n{self.configuration}",
+            "Tasks:",
+        ]
+        for i, task in enumerate(self.tasks):
             msg.append(f"Task {i:d} {task.identifier}")
-            i += 1
         return "\n".join(msg)
 
-    def add_task(self, task):
+    def add_task(self, task: Task):
         """
         Add a task to this job.
 
@@ -122,7 +117,7 @@ class JobConfiguration(Configuration):
     :raises: KeyError: if trying to access a key not listed above
     """
 
-    FIELDS = [
+    FIELDS = (
         (gc.PPN_JOB_DESCRIPTION, (None, None, ["description"], "description")),
         (gc.PPN_JOB_LANGUAGE, (None, Language, ["language"], "language")),
         (
@@ -166,7 +161,4 @@ class JobConfiguration(Configuration):
             gc.PPN_JOB_OS_HIERARCHY_TYPE,
             (None, None, ["o_hierarchy_type"], "type of output container hierarchy"),
         ),
-    ]
-
-    def __init__(self, config_string=None):
-        super().__init__(config_string)
+    )

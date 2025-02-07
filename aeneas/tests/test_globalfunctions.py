@@ -30,10 +30,6 @@ import aeneas.globalfunctions as gf
 
 
 class TestGlobalFunctions(unittest.TestCase):
-    def test_uuid_string(self):
-        uuid = gf.uuid_string()
-        self.assertEqual(len(uuid), 36)
-
     def test_tmp_file(self):
         tmp_handler, tmp_file = gf.tmp_file()
         self.assertTrue(os.path.isfile(tmp_file))

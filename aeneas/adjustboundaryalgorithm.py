@@ -208,7 +208,7 @@ class AdjustBoundaryAlgorithm(Configurable):
     .. versionadded:: 1.1.0
     """
 
-    ALLOWED_VALUES = [
+    ALLOWED_VALUES = (
         AFTERCURRENT,
         AUTO,
         BEFORENEXT,
@@ -216,7 +216,7 @@ class AdjustBoundaryAlgorithm(Configurable):
         PERCENT,
         RATE,
         RATEAGGRESSIVE,
-    ]
+    )
     """ List of all the allowed values """
 
     def __init__(self, rconf=None):
@@ -228,10 +228,10 @@ class AdjustBoundaryAlgorithm(Configurable):
         self,
         aba_parameters,
         boundary_indices,
-        real_wave_mfcc,
-        text_file,
-        allow_arbitrary_shift=False,
-    ):
+        real_wave_mfcc: AudioFileMFCC,
+        text_file: TextFile,
+        allow_arbitrary_shift: bool = False,
+    ) -> list[SyncMapFragmentList]:
         """
         Adjust the boundaries of the text map
         using the algorithm and parameters
@@ -251,13 +251,8 @@ class AdjustBoundaryAlgorithm(Configurable):
 
         :rtype: list of :class:`~aeneas.syncmap.SyncMapFragmentList`
         """
-        logger.debug("Called adjust")
         if boundary_indices is None:
             raise TypeError("`boundary_indices` is None")
-        if not isinstance(real_wave_mfcc, AudioFileMFCC):
-            raise TypeError("real_wave_mfcc is not an AudioFileMFCC object")
-        if not isinstance(text_file, TextFile):
-            raise TypeError("text_file is not a TextFile object")
 
         nozero = aba_parameters["nozero"]
         ns_min, ns_string = aba_parameters["nonspeech"]
@@ -297,7 +292,7 @@ class AdjustBoundaryAlgorithm(Configurable):
 
         return self.smflist
 
-    def intervals_to_fragment_list(self, text_file, time_values):
+    def intervals_to_fragment_list(self, text_file: TextFile, time_values: list):
         """
         Transform a list of at least 4 time values
         (corresponding to at least 3 intervals)
@@ -316,8 +311,6 @@ class AdjustBoundaryAlgorithm(Configurable):
                             or ``time_values`` is not a list
         :raises: ValueError: if ``time_values`` has length less than four
         """
-        if not isinstance(text_file, TextFile):
-            raise TypeError("text_file is not an instance of TextFile")
         if not isinstance(time_values, list):
             raise TypeError("time_values is not a list")
         if len(time_values) < 4:
@@ -328,7 +321,7 @@ class AdjustBoundaryAlgorithm(Configurable):
         logger.debug(
             "  Creating SyncMapFragmentList with begin %.3f and end %.3f", begin, end
         )
-        self.smflist = SyncMapFragmentList(begin=begin, end=end, rconf=self.rconf)
+        self.smflist = SyncMapFragmentList(begin=begin, end=end)
         logger.debug("  Creating HEAD fragment")
         self.smflist.add(
             SyncMapFragment.from_begin_end(
@@ -382,7 +375,7 @@ class AdjustBoundaryAlgorithm(Configurable):
         logger.debug("Sorting fragment list... done")
         return self.smflist
 
-    def append_fragment_list_to_sync_root(self, sync_root):
+    def append_fragment_list_to_sync_root(self, sync_root: Tree):
         """
         Append the sync map fragment list
         to the given node from a sync map tree.
@@ -557,7 +550,7 @@ class AdjustBoundaryAlgorithm(Configurable):
     # HELPER FUNCTIONS
     # #####################################################
 
-    def _apply_offset(self, offset):
+    def _apply_offset(self, offset: TimeValue):
         """
         Apply the given offset (negative, zero, or positive)
         to all time intervals.
@@ -601,10 +594,7 @@ class AdjustBoundaryAlgorithm(Configurable):
         logger.debug("  First pass: done")
 
         logger.debug("  Second pass: move end point of good pairs")
-        for (
-            nsi,
-            frag_index,
-        ) in pairs:
+        for nsi, frag_index in pairs:
             new_value = adjust_function(nsi)
             logger.debug("    Current interval: %s", self.smflist[frag_index].interval)
             logger.debug("    New value:        %.3f", new_value)
@@ -612,7 +602,7 @@ class AdjustBoundaryAlgorithm(Configurable):
             logger.debug("    New interval:     %s", self.smflist[frag_index].interval)
         logger.debug("  Second pass: done")
 
-    def _apply_rate(self, max_rate, aggressive=False):
+    def _apply_rate(self, max_rate, aggressive: bool = False):
         """
         Try to adjust the rate (characters/second)
         of the fragments of the list,
@@ -627,25 +617,28 @@ class AdjustBoundaryAlgorithm(Configurable):
         the faster current one,
         if the previous fragment could not contribute enough slack.
         """
-        logger.debug("Called _apply_rate")
-        logger.debug("  Aggressive: %s", aggressive)
-        logger.debug("  Max rate:   %.3f", max_rate)
+        logger.debug(
+            "Called _apply_rate(max_rate=%.3f, agressive=%s)", max_rate, aggressive
+        )
         regular_fragments = list(self.smflist.regular_fragments)
         if len(regular_fragments) <= 1:
             logger.debug("  The list contains at most one regular fragment, returning")
             return
+
         faster_fragments = [
             (i, f)
             for i, f in regular_fragments
-            if (f.rate is not None) and (f.rate >= max_rate + decimal.Decimal("0.001"))
+            if f.rate is not None and f.rate >= max_rate + decimal.Decimal("0.001")
         ]
 
         if not faster_fragments:
             logger.debug("  No regular fragment faster than max rate, returning")
             return
 
-        logger.warning("  Some fragments have rate faster than max rate:")
-        logger.debug("  %s", [i for i, f in faster_fragments])
+        logger.warning(
+            "  Some fragments have rate faster than max rate: %s",
+            [i for i, f in faster_fragments],
+        )
         logger.debug("Fixing rate for faster fragments...")
         for frag_index, fragment in faster_fragments:
             self.smflist.fix_fragment_rate(frag_index, max_rate, aggressive=aggressive)
@@ -656,5 +649,7 @@ class AdjustBoundaryAlgorithm(Configurable):
             if (f.rate is not None) and (f.rate >= max_rate + decimal.Decimal("0.001"))
         ]
         if faster_fragments:
-            logger.warning("  Some fragments still have rate faster than max rate:")
-            logger.debug("  %s", [i for i, f in faster_fragments])
+            logger.warning(
+                "  Some fragments still have rate faster than max rate: %s",
+                [i for i, f in faster_fragments],
+            )
