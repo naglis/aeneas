@@ -31,6 +31,7 @@ This module contains the following classes:
 import logging
 import os
 import re
+import typing
 
 from aeneas.container import Container
 from aeneas.hierarchytype import HierarchyType
@@ -43,6 +44,12 @@ import aeneas.globalfunctions as gf
 logger = logging.getLogger(__name__)
 
 
+class TaskInfo(typing.NamedTuple):
+    custom_id: str
+    text_path: str
+    audio_path: str
+
+
 class AnalyzeContainer(Configurable):
     """
     Analyze a given container and build the corresponding job.
@@ -51,18 +58,13 @@ class AnalyzeContainer(Configurable):
     :type  container: :class:`~aeneas.container.Container`
     :param rconf: a runtime configuration
     :type  rconf: :class:`~aeneas.runtimeconfiguration.RuntimeConfiguration`
-    :raises: TypeError: if ``container`` is ``None`` or not an instance of :class:`~aeneas.container.Container`
     """
 
-    def __init__(self, container, rconf=None):
-        if container is None:
-            raise TypeError("container is None")
-        if not isinstance(container, Container):
-            raise TypeError("container is not an instance of Container")
+    def __init__(self, container: Container, rconf=None):
         super().__init__(rconf=rconf)
         self.container = container
 
-    def analyze(self, config_string=None):
+    def analyze(self, config_string: str | None = None) -> Job | None:
         """
         Analyze the given container and
         return the corresponding job object.
@@ -88,7 +90,7 @@ class AnalyzeContainer(Configurable):
             logger.exception("An unexpected error occurred while analyzing")
         return None
 
-    def _analyze_txt_config(self, config_string=None):
+    def _analyze_txt_config(self, config_string: str | None = None) -> Job:
         """
         Analyze the given container and return the corresponding job.
 
@@ -173,19 +175,16 @@ class AnalyzeContainer(Configurable):
             )
             logger.debug("Found audio files: %r", audio_files)
 
-            logger.debug("Matching files in flat hierarchy...")
-            matched_tasks = self._match_files_flat_hierarchy(text_files, audio_files)
-            logger.debug("Matching files in flat hierarchy... done")
-
-            for task_info in matched_tasks:
+            for task_info in self._match_files_flat_hierarchy(text_files, audio_files):
                 logger.debug("Creating task: %r", task_info)
-                task = self._create_task(
-                    task_info,
-                    config_string,
-                    sync_map_root_directory,
-                    job_os_hierarchy_type,
+                job.add_task(
+                    self._create_task(
+                        task_info,
+                        config_string,
+                        sync_map_root_directory,
+                        job_os_hierarchy_type,
+                    )
                 )
-                job.add_task(task)
 
         if parameters[gc.PPN_JOB_IS_HIERARCHY_TYPE] == HierarchyType.PAGED:
             logger.debug("Looking for text/audio pairs in paged hierarchy")
@@ -229,15 +228,18 @@ class AnalyzeContainer(Configurable):
                         "Exactly one text file and one audio file in %r",
                         matched_directory,
                     )
-                    task_info = [matched_directory, text_files[0], audio_files[0]]
-                    logger.debug("Creating task: %r", task_info)
-                    task = self._create_task(
-                        task_info,
-                        config_string,
-                        sync_map_root_directory,
-                        job_os_hierarchy_type,
+                    task_info = TaskInfo(
+                        matched_directory, text_files[0], audio_files[0]
                     )
-                    job.add_task(task)
+                    logger.debug("Creating task: %r", task_info)
+                    job.add_task(
+                        self._create_task(
+                            task_info,
+                            config_string,
+                            sync_map_root_directory,
+                            job_os_hierarchy_type,
+                        )
+                    )
                 elif len(text_files) > 1:
                     logger.debug("More than one text file in %r", matched_directory)
                 elif len(audio_files) > 1:
@@ -247,7 +249,7 @@ class AnalyzeContainer(Configurable):
 
         return job
 
-    def _analyze_xml_config(self, config_contents=None):
+    def _analyze_xml_config(self, config_contents: str | None = None) -> Job:
         """
         Analyze the given container and return the corresponding job.
 
@@ -262,10 +264,10 @@ class AnalyzeContainer(Configurable):
         if config_contents is None:
             logger.debug("Analyzing container with XML config file")
             config_entry = self.container.entry_config_xml
-            logger.debug("Found XML config entry '%s'", config_entry)
+            logger.debug("Found XML config entry %r", config_entry)
             config_dir = os.path.dirname(config_entry)
-            logger.debug("Directory of XML config entry: '%s'", config_dir)
-            logger.debug("Reading XML config entry: '%s'", config_entry)
+            logger.debug("Directory of XML config entry: %r", config_dir)
+            logger.debug("Reading XML config entry: %r", config_entry)
             config_contents = self.container.read_entry(config_entry)
         else:
             logger.debug("Analyzing container with XML config contents")
@@ -285,40 +287,42 @@ class AnalyzeContainer(Configurable):
             config_dir, job_parameters[gc.PPN_JOB_OS_HIERARCHY_PREFIX]
         )
         job_os_hierarchy_type = job_parameters[gc.PPN_JOB_OS_HIERARCHY_TYPE]
-        logger.debug(
-            "Path of the sync map root directory: '%s'", sync_map_root_directory
-        )
+        logger.debug("Path of the sync map root directory: %r", sync_map_root_directory)
 
         logger.debug("Converting job config dict into job config string")
         config_string = gf.config_dict_to_string(job_parameters)
         job = Job(config_string)
 
         for task_parameters in tasks_parameters:
-            logger.debug("Converting task config dict into task config string")
             config_string = gf.config_dict_to_string(task_parameters)
-            logger.debug("Creating task with config string '%s'", config_string)
-            try:
-                custom_id = task_parameters[gc.PPN_TASK_CUSTOM_ID]
-            except KeyError:
-                custom_id = ""
-            task_info = [
+            logger.debug("Creating task with config string %r", config_string)
+            custom_id = task_parameters.get(gc.PPN_TASK_CUSTOM_ID, "")
+            task_info = TaskInfo(
                 custom_id,
                 gf.norm_join(config_dir, task_parameters[gc.PPN_TASK_IS_TEXT_FILE_XML]),
                 gf.norm_join(
                     config_dir, task_parameters[gc.PPN_TASK_IS_AUDIO_FILE_XML]
                 ),
-            ]
-            logger.debug("Creating task: '%s'", task_info)
-            task = self._create_task(
-                task_info, config_string, sync_map_root_directory, job_os_hierarchy_type
             )
-            job.add_task(task)
+            logger.debug("Creating task: %r", task_info)
+            job.add_task(
+                self._create_task(
+                    task_info,
+                    config_string,
+                    sync_map_root_directory,
+                    job_os_hierarchy_type,
+                )
+            )
 
         return job
 
     def _create_task(
-        self, task_info, config_string, sync_map_root_directory, job_os_hierarchy_type
-    ):
+        self,
+        task_info: TaskInfo,
+        config_string: str,
+        sync_map_root_directory: str,
+        job_os_hierarchy_type,
+    ) -> Task:
         """
         Create a task object from
 
@@ -332,11 +336,9 @@ class AnalyzeContainer(Configurable):
         :type  job_os_hierarchy_type: :class:`~aeneas.hierarchytype.HierarchyType`
         :rtype: :class:`~aeneas.task.Task`
         """
-        logger.debug("Converting config string to config dict")
         parameters = gf.config_string_to_dict(config_string)
-        logger.debug("Creating task")
         task = Task(config_string)
-        task.configuration["description"] = f"Task {task_info[0]}"
+        task.configuration["description"] = f"Task {task_info.custom_id}"
         logger.debug("Task description: %s", task.configuration["description"])
         try:
             task.configuration["language"] = parameters[gc.PPN_TASK_LANGUAGE]
@@ -344,33 +346,31 @@ class AnalyzeContainer(Configurable):
         except KeyError:
             task.configuration["language"] = parameters[gc.PPN_JOB_LANGUAGE]
             logger.debug("Set language from job: %r", task.configuration["language"])
-        custom_id = task_info[0]
-        task.configuration["custom_id"] = custom_id
-        logger.debug("Task custom_id: %s", task.configuration["custom_id"])
-        task.text_file_path = task_info[1]
+        task.configuration["custom_id"] = task_info.custom_id
+        logger.debug("Task custom_id: %s", task_info.custom_id)
+        task.text_file_path = task_info.text_path
         logger.debug("Task text file path: %s", task.text_file_path)
-        task.audio_file_path = task_info[2]
+        task.audio_file_path = task_info.audio_path
         logger.debug("Task audio file path: %s", task.audio_file_path)
         task.sync_map_file_path = self._compute_sync_map_file_path(
             sync_map_root_directory,
             job_os_hierarchy_type,
-            custom_id,
+            task_info.custom_id,
             task.configuration["o_name"],
         )
         logger.debug("Task sync map file path: %s", task.sync_map_file_path)
 
         logger.debug("Replacing placeholder in os_file_smil_audio_ref")
         task.configuration["o_smil_audio_ref"] = self._replace_placeholder(
-            task.configuration["o_smil_audio_ref"], custom_id
+            task.configuration["o_smil_audio_ref"], task_info.custom_id
         )
         logger.debug("Replacing placeholder in os_file_smil_page_ref")
         task.configuration["o_smil_page_ref"] = self._replace_placeholder(
-            task.configuration["o_smil_page_ref"], custom_id
+            task.configuration["o_smil_page_ref"], task_info.custom_id
         )
-        logger.debug("Returning task")
         return task
 
-    def _replace_placeholder(self, string, custom_id):
+    def _replace_placeholder(self, string: str, custom_id: str) -> str:
         """
         Replace the prefix placeholder
         :class:`~aeneas.globalconstants.PPV_OS_TASK_PREFIX`
@@ -378,17 +378,17 @@ class AnalyzeContainer(Configurable):
 
         :rtype: string
         """
-        if string is None:
-            return None
         logger.debug(
-            "Replacing '%s' with '%s' in '%s'",
+            "Replacing %r with %r in %r",
             gc.PPV_OS_TASK_PREFIX,
             custom_id,
             string,
         )
         return string.replace(gc.PPV_OS_TASK_PREFIX, custom_id)
 
-    def _compute_sync_map_file_path(self, root, hierarchy_type, custom_id, file_name):
+    def _compute_sync_map_file_path(
+        self, root: str, hierarchy_type, custom_id: str, file_name: str
+    ) -> str:
         """
         Compute the sync map file path inside the output container.
 
@@ -406,7 +406,13 @@ class AnalyzeContainer(Configurable):
         file_name_joined = gf.norm_join(prefix, file_name)
         return self._replace_placeholder(file_name_joined, custom_id)
 
-    def _find_files(self, entries, root, relative_path, file_name_regex):
+    def _find_files(
+        self,
+        entries: list[str],
+        root: str,
+        relative_path: str | None,
+        file_name_regex: re.Pattern[str],
+    ) -> list[str]:
         """
         Return the elements in entries that
 
@@ -419,27 +425,27 @@ class AnalyzeContainer(Configurable):
         :param regex file_name_regex: the regex matching the desired file names
         :rtype: list of strings (path)
         """
-        logger.debug("Finding files within root: '%s'", root)
+
         target = root
         if relative_path is not None:
-            logger.debug("Joining relative path: '%s'", relative_path)
             target = gf.norm_join(root, relative_path)
-        logger.debug("Finding files within target: '%s'", target)
+
+        logger.debug("Finding files within target: %r", target)
         files = []
         target_len = len(target)
         for entry in entries:
-            if entry.startswith(target):
-                logger.debug("Examining entry: '%s'", entry)
-                entry_suffix = entry[target_len + 1 :]
-                logger.debug("Examining entry suffix: '%s'", entry_suffix)
-                if re.search(file_name_regex, entry_suffix) is not None:
-                    logger.debug("Match: '%s'", entry)
-                    files.append(entry)
-                else:
-                    logger.debug("No match: '%s'", entry)
+            if not entry.startswith(target):
+                continue
+
+            entry_suffix = entry[target_len + 1 :]
+            if file_name_regex.search(entry_suffix):
+                files.append(entry)
+
         return sorted(files)
 
-    def _match_files_flat_hierarchy(self, text_files, audio_files):
+    def _match_files_flat_hierarchy(
+        self, text_files, audio_files
+    ) -> typing.Iterator[TaskInfo]:
         """
         Match audio and text files in flat hierarchies.
 
@@ -456,35 +462,32 @@ class AnalyzeContainer(Configurable):
 
         :param list text_files: the entries corresponding to text files
         :param list audio_files: the entries corresponding to audio files
-        :rtype: list of lists (see above)
+        :rtype: iterator of TaskInfo
         """
-        logger.debug("Matching files in flat hierarchy")
-        logger.debug("Text files: '%s'", text_files)
-        logger.debug("Audio files: '%s'", audio_files)
-        d_text = {}
-        d_audio = {}
-        for text_file in text_files:
-            text_file_no_ext = gf.file_name_without_extension(text_file)
-            d_text[text_file_no_ext] = text_file
-            logger.debug(
-                "Added text file '%s' to key '%s'", text_file, text_file_no_ext
-            )
-        for audio_file in audio_files:
-            audio_file_no_ext = gf.file_name_without_extension(audio_file)
-            d_audio[audio_file_no_ext] = audio_file
-            logger.debug(
-                "Added audio file '%s' to key '%s'", audio_file, audio_file_no_ext
-            )
-        tasks = []
-        for key in d_text:
-            logger.debug("Examining text key '%s'", key)
-            if key in d_audio:
-                logger.debug("Key '%s' is also in audio", key)
-                tasks.append([key, d_text[key], d_audio[key]])
-                logger.debug("Added pair ('%s', '%s')", d_text[key], d_audio[key])
-        return tasks
+        logger.debug(
+            "Matching text files %r and audio files %r in flat hierarchy",
+            text_files,
+            audio_files,
+        )
 
-    def _match_directories(self, entries, root, regex_string):
+        d_text = {
+            gf.file_name_without_extension(text_file): text_file
+            for text_file in text_files
+        }
+        d_audio = {
+            gf.file_name_without_extension(audio_file): audio_file
+            for audio_file in audio_files
+        }
+
+        for key in d_text:
+            if key not in d_audio:
+                continue
+
+            yield TaskInfo(key, d_text[key], d_audio[key])
+
+    def _match_directories(
+        self, entries: list[str], root: str, regex_string: str
+    ) -> list[str]:
         """
         Match directory names in paged hierarchies.
 
@@ -509,26 +512,29 @@ class AnalyzeContainer(Configurable):
         :param string regex_string: regex string to match directory names
         :rtype: list of matched directories
         """
-        logger.debug("Matching directory names in paged hierarchy")
-        logger.debug("Matching within '%s'", root)
-        logger.debug("Matching regex '%s'", regex_string)
+        logger.debug(
+            "Matching directory names based on regex %r in paged hierarchy within %r",
+            regex_string,
+            root,
+        )
         regex = re.compile(regex_string)
         directories = set()
         root_len = len(root)
         for entry in entries:
             # look only inside root dir
-            if entry.startswith(root):
-                logger.debug("Examining '%s'", entry)
-                # remove common prefix root/
-                entry = entry[root_len + 1 :]
-                # split path
-                entry_splitted = entry.split(os.sep)
-                # match regex
-                if len(entry_splitted) >= 2 and (
-                    re.match(regex, entry_splitted[0]) is not None
-                ):
-                    directories.add(entry_splitted[0])
-                    logger.debug("Match: '%s'", entry_splitted[0])
-                else:
-                    logger.debug("No match: '%s'", entry)
+            if not entry.startswith(root):
+                continue
+
+            logger.debug("Examining %r", entry)
+            # remove common prefix root/
+            entry = entry[root_len + len(os.sep) :]
+            # split path
+            entry_splitted = entry.split(os.sep)
+            # match regex
+            if len(entry_splitted) >= 2 and regex.match(entry_splitted[0]):
+                directories.add(entry_splitted[0])
+                logger.debug("Match: %r", entry_splitted[0])
+            else:
+                logger.debug("No match: %r", entry)
+
         return sorted(directories)

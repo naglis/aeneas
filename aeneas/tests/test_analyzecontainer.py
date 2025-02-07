@@ -64,14 +64,6 @@ class TestAnalyzeContainer(unittest.TestCase):
 
     NOT_EXISTING_PATH = gf.absolute_path("res/validator/x/y/z/not_existing", __file__)
 
-    def test_none(self):
-        with self.assertRaises(TypeError):
-            AnalyzeContainer(None)
-
-    def test_not_container(self):
-        with self.assertRaises(TypeError):
-            AnalyzeContainer(self.NOT_EXISTING_PATH)
-
     def test_container_not_existing(self):
         analyzer = AnalyzeContainer(Container(self.NOT_EXISTING_PATH))
         job = analyzer.analyze()
