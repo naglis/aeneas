@@ -38,58 +38,6 @@ class TestValidateCLI(ExecuteCLICase):
     def test_bad_type(self):
         self.execute([("", "foo"), ("in", "../tools/res/config.txt")], 2)
 
-    def test_config_txt(self):
-        self.execute([("", "config"), ("in", "../tools/res/config.txt")], 0)
-
-    def test_config_txt_bad(self):
-        self.execute([("", "config"), ("in", "../tools/res/config.bad.txt")], 1)
-
-    def test_config_xml(self):
-        self.execute([("", "config"), ("in", "../tools/res/config.xml")], 0)
-
-    def test_config_xml_bad(self):
-        self.execute([("", "config"), ("in", "../tools/res/config.bad.xml")], 1)
-
-    def test_container(self):
-        self.execute([("", "container"), ("in", "../tools/res/job.zip")], 0)
-
-    def test_container_bad(self):
-        self.execute([("", "container"), ("in", "../tools/res/job_no_config.zip")], 1)
-
-    def test_container_too_many_tasks(self):
-        self.execute(
-            [
-                ("", "container"),
-                ("in", "../tools/res/job.zip"),
-                ("", '-r="job_max_tasks=1"'),
-            ],
-            1,
-        )
-
-    def test_job(self):
-        self.execute(
-            [
-                ("", "job"),
-                (
-                    "",
-                    "job_language=it|os_job_file_name=output.zip|os_job_file_container=zip|is_hierarchy_type=flat",
-                ),
-            ],
-            0,
-        )
-
-    def test_job_bad(self):
-        self.execute(
-            [
-                ("", "job"),
-                (
-                    "",
-                    "os_job_file_name=output.zip|os_job_file_container=zip|is_hierarchy_type=flat",
-                ),
-            ],
-            1,
-        )
-
     def test_task(self):
         self.execute(
             [
@@ -114,29 +62,6 @@ class TestValidateCLI(ExecuteCLICase):
             1,
         )
 
-    def test_wizard(self):
-        self.execute(
-            [
-                ("", "wizard"),
-                (
-                    "",
-                    r"is_hierarchy_type=flat|is_hierarchy_prefix=assets/|is_text_file_relative_path=.|is_text_file_name_regex=.*\.xhtml|is_text_type=unparsed|is_audio_file_relative_path=.|is_audio_file_name_regex=.*\.mp3|is_text_unparsed_id_regex=f[0-9]+|is_text_unparsed_id_sort=numeric|os_job_file_name=demo_sync_job_output|os_job_file_container=zip|os_job_file_hierarchy_type=flat|os_job_file_hierarchy_prefix=assets/|os_task_file_name=\$PREFIX.xhtml.smil|os_task_file_format=smil|os_task_file_smil_page_ref=\$PREFIX.xhtml|os_task_file_smil_audio_ref=../Audio/\$PREFIX.mp3|job_language=eng|job_description=Demo Sync Job",
-                ),
-                ("in", "../tools/res/job_no_config.zip"),
-            ],
-            0,
-        )
-
-    def test_wizard_bad(self):
-        self.execute(
-            [
-                ("", "wizard"),
-                ("", "job_language=it|invalid=string"),
-                ("in", "../tools/res/job_no_config.zip"),
-            ],
-            1,
-        )
-
     def test_read_missing_1(self):
         self.execute([("", "config")], 2)
 
@@ -151,21 +76,3 @@ class TestValidateCLI(ExecuteCLICase):
             ],
             2,
         )
-
-    def test_read_missing_4(self):
-        self.execute([("", "wizard"), ("in", "../tools/res/job_no_config.zip")], 2)
-
-    def test_read_missing_5(self):
-        self.execute([("", "wizard"), ("", "job_language=it|invalid=string")], 2)
-
-    def test_read_cannot_read_1(self):
-        self.execute([("", "config"), ("", "/foo/bar/baz.txt")], 1)
-
-    def test_read_cannot_read_2(self):
-        self.execute([("", "container"), ("", "/foo/bar/baz.txt")], 1)
-
-    def test_read_cannot_read_3(self):
-        self.execute([("", "config"), ("", "../tools/res/parsed.txt")], 1)
-
-    def test_read_cannot_read_4(self):
-        self.execute([("", "container"), ("", "../tools/res/config.txt")], 1)

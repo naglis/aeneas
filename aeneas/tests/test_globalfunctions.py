@@ -218,24 +218,6 @@ class TestGlobalFunctions(unittest.TestCase):
             with self.subTest(string=string, expected=expected):
                 self.assertEqual(gf.config_string_to_dict(string), expected)
 
-    def test_config_xml_to_dict_job(self):
-        for xml, expected in (
-            (None, {}),
-            ("", {}),
-            ("<job></job>", {}),
-            ("<job><k1>v1</k1></job>", {"k1": "v1"}),
-            ("<job><k1>v1</k1><k2></k2></job>", {"k1": "v1"}),
-            ("<job><k1>v1</k1><k2>  </k2></job>", {"k1": "v1"}),
-            ("<job><k1>v1</k1><k2>v2</k2></job>", {"k1": "v1", "k2": "v2"}),
-            ("<job><k1>v1</k1><k2> v2</k2></job>", {"k1": "v1", "k2": "v2"}),
-            ("<job><k1>v1</k1><k2> v2 </k2></job>", {"k1": "v1", "k2": "v2"}),
-            ("<job><k1>v1</k1><k2>v2 </k2></job>", {"k1": "v1", "k2": "v2"}),
-        ):
-            with self.subTest(xml=xml, expected=expected):
-                self.assertEqual(
-                    gf.config_xml_to_dict(xml, result=None, parse_job=True), expected
-                )
-
     def test_config_xml_to_dict_task(self):
         for xml, expected in (
             (None, []),
@@ -279,9 +261,7 @@ class TestGlobalFunctions(unittest.TestCase):
             ),
         ):
             with self.subTest(xml=xml, expected=expected):
-                self.assertEqual(
-                    gf.config_xml_to_dict(xml, result=None, parse_job=False), expected
-                )
+                self.assertEqual(gf.config_xml_to_dict(xml, result=None), expected)
 
     def test_config_dict_to_string(self):
         self.assertEqual(gf.config_dict_to_string({}), "")

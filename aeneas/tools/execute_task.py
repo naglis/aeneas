@@ -518,7 +518,7 @@ class ExecuteTaskCLI(AbstractCLIProgram):
             )
             validator = Validator()
             result = validator.check_configuration_string(
-                config_string, is_job=False, external_name=True
+                config_string, external_name=True
             )
             if not result.passed:
                 self.print_error(
@@ -639,10 +639,9 @@ class ExecuteTaskCLI(AbstractCLIProgram):
         """
         msg = []
         i = 1
-        for key in sorted(self.DEMOS.keys()):
-            example = self.DEMOS[key]
+        for key, example in sorted(self.DEMOS.items()):
             if full or example["show"]:
-                msg.append("Example %d (%s)" % (i, example["description"]))
+                msg.append(f"Example {i} ({example['description']})")
                 msg.append(f"  $ {self.invoke} {key}")
                 msg.append("")
                 i += 1

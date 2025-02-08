@@ -36,7 +36,7 @@ from aeneas.exacttiming import TimeValue
 class RuntimeConfiguration(Configuration):
     """
     A structure representing a runtime configuration, that is,
-    a set of parameters for the algorithms which process jobs and tasks.
+    a set of parameters for the algorithms which process tasks.
 
     Allowed keys are listed below as class members.
 
@@ -251,18 +251,6 @@ class RuntimeConfiguration(Configuration):
     You might use a full path, like ``/path/to/your/ffprobe``.
 
     Default: ``ffprobe``.
-
-    .. versionadded:: 1.4.1
-    """
-
-    JOB_MAX_TASKS = "job_max_tasks"
-    """
-    Maximum number of Tasks of a Job.
-    If a Job has more Tasks than this value,
-    it will not be executed and an error will be raised.
-    Use ``0`` for disabling this check.
-
-    Default: ``0`` (disabled).
 
     .. versionadded:: 1.4.1
     """
@@ -917,7 +905,6 @@ class RuntimeConfiguration(Configuration):
             FFPROBE_PATH,
             ("ffprobe", None, [], "path to ffprobe executable"),
         ),  # or a full path like "/usr/bin/ffprobe"
-        (JOB_MAX_TASKS, (0, int, [], "max number of tasks per job (0 to disable)")),
         (MFCC_FILTERS, (40, int, [], "number of MFCC filters")),
         (MFCC_SIZE, (13, int, [], "number of MFCC")),
         (MFCC_FFT_ORDER, (512, int, [], "FFT order for computing MFCC")),

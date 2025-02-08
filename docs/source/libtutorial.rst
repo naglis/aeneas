@@ -356,24 +356,19 @@ and the following modules:
     :maxdepth: 3
 
     adjustboundaryalgorithm
-    analyzecontainer
     audiofile
     audiofilemfcc
     cewsubprocess
     configuration
-    container
     diagnostics
     dtw
     exacttiming
-    executejob
     executetask
     ffmpegwrapper
     ffprobewrapper
     globalconstants
     globalfunctions
-    hierarchytype
     idsortingalgorithm
-    job
     language
     mfcc
     runtimeconfiguration
@@ -416,9 +411,8 @@ Package ``aeneas.tools``
 
 The ``aeneas.tools`` package contains the built-in command line tools for ``aeneas``.
 
-The two main tools are:
+The main tools are:
 
-* ``aeneas.tools.execute_job``
 * ``aeneas.tools.execute_task``
 
 which are described in the :ref:`clitutorial`.
@@ -435,7 +429,7 @@ useful for debugging or converting between different file formats:
 * ``aeneas.tools.run_sd``: read an audio file and the corresponding text file and detect the audio head/tail
 * ``aeneas.tools.run_vad``: read an audio file and compute speech/nonspeech time intervals
 * ``aeneas.tools.synthesize_text``: synthesize several text fragments read from file into a single wav file
-* ``aeneas.tools.validate``: validate a job container or configuration strings/files
+* ``aeneas.tools.validate``: validate configuration strings
 
 Run each program without arguments
 to get its help manual and usage examples.

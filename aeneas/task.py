@@ -341,7 +341,7 @@ class TaskConfiguration(Configuration):
     * :data:`~aeneas.globalconstants.PPN_TASK_OS_FILE_SMIL_AUDIO_REF`             or ``o_smil_audio_ref``
     * :data:`~aeneas.globalconstants.PPN_TASK_OS_FILE_SMIL_PAGE_REF`              or ``o_smil_page_ref``
 
-    :param string config_string: the job configuration string
+    :param string config_string: the configuration string
     :raises: TypeError: if ``config_string`` is not ``None`` and
                         it is not a Unicode string
     :raises: KeyError: if trying to access a key not listed above

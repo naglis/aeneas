@@ -107,7 +107,6 @@ PKG_SCRIPTS = [
     "bin/aeneas_check_setup",
     "bin/aeneas_convert_syncmap",
     "bin/aeneas_download",
-    "bin/aeneas_execute_job",
     "bin/aeneas_execute_task",
     "bin/aeneas_synthesize_text",
     "bin/aeneas_validate",

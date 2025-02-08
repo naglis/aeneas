@@ -4,7 +4,6 @@ import os
 import tempfile
 
 from aeneas.tools.execute_task import ExecuteTaskCLI
-from aeneas.tools.execute_job import ExecuteJobCLI
 
 import aeneas.globalfunctions as gf
 
@@ -46,10 +45,6 @@ class ExecuteCLICase(unittest.TestCase):
             exit_code = self.CLI_CLS(use_sys=False).run(arguments=params)
 
         self.assertEqual(exit_code, expected_exit_code)
-
-
-class ExecuteJobCLICase(ExecuteCLICase):
-    CLI_CLS = ExecuteJobCLI
 
 
 class ExecuteTaskCLICase(ExecuteCLICase):

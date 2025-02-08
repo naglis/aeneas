@@ -119,7 +119,6 @@ class TestRuntimeConfiguration(unittest.TestCase):
             ("ffmpeg_path=/foo/bar/ffmpeg", "ffmpeg_path", "/foo/bar/ffmpeg"),
             ("ffmpeg_sample_rate=8000", "ffmpeg_sample_rate", 8000),
             ("ffprobe_path=/foo/bar/ffprobe", "ffprobe_path", "/foo/bar/ffprobe"),
-            ("job_max_tasks=10", "job_max_tasks", 10),
             ("mfcc_filters=100", "mfcc_filters", 100),
             ("mfcc_size=20", "mfcc_size", 20),
             ("mfcc_fft_order=256", "mfcc_fft_order", 256),

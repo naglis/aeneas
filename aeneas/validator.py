@@ -28,13 +28,9 @@ This module contains the following classes:
 import logging
 import os.path
 
-from aeneas.analyzecontainer import AnalyzeContainer
-from aeneas.container import Container, ContainerFormat
 from aeneas.executetask import AdjustBoundaryAlgorithm
-from aeneas.hierarchytype import HierarchyType
 from aeneas.idsortingalgorithm import IDSortingAlgorithm
 from aeneas.logger import Configurable
-from aeneas.runtimeconfiguration import RuntimeConfiguration
 from aeneas.syncmap import SyncMapFormat, SyncMapHeadTailFormat
 from aeneas.textfile import TextFileFormat
 import aeneas.globalconstants as gc
@@ -55,17 +51,10 @@ class Validator(Configurable):
         #
         # NOTE disabling the check on language since now we support multiple TTS
         # COMMENTED (
-        # COMMENTED    gc.PPN_JOB_LANGUAGE,
-        # COMMENTED    Language.ALLOWED_VALUES
-        # COMMENTED ),
-        # COMMENTED (
         # COMMENTED     gc.PPN_TASK_LANGUAGE,
         # COMMENTED     Language.ALLOWED_VALUES
         # COMMENTED ),
         #
-        (gc.PPN_JOB_IS_HIERARCHY_TYPE, HierarchyType.ALLOWED_VALUES),
-        (gc.PPN_JOB_OS_CONTAINER_FORMAT, [v.value for v in ContainerFormat]),
-        (gc.PPN_JOB_OS_HIERARCHY_TYPE, HierarchyType.ALLOWED_VALUES),
         (gc.PPN_TASK_IS_TEXT_FILE_FORMAT, TextFileFormat.ALLOWED_VALUES),
         (gc.PPN_TASK_OS_FILE_FORMAT, SyncMapFormat.ALLOWED_VALUES),
         (gc.PPN_TASK_IS_TEXT_UNPARSED_ID_SORT, IDSortingAlgorithm.ALLOWED_VALUES),
@@ -74,12 +63,6 @@ class Validator(Configurable):
     ]
 
     IMPLIED_PARAMETERS = (
-        (
-            # is_hierarchy_type=paged => is_task_dir_name_regex
-            gc.PPN_JOB_IS_HIERARCHY_TYPE,
-            [HierarchyType.PAGED],
-            [gc.PPN_JOB_IS_TASK_DIRECTORY_NAME_REGEX],
-        ),
         (
             # is_text_type=unparsed => is_text_unparsed_id_sort
             gc.PPN_TASK_IS_TEXT_FILE_FORMAT,
@@ -168,12 +151,6 @@ class Validator(Configurable):
         ),
     )
 
-    JOB_REQUIRED_PARAMETERS = (
-        gc.PPN_JOB_LANGUAGE,
-        gc.PPN_JOB_OS_CONTAINER_FORMAT,
-        gc.PPN_JOB_OS_FILE_NAME,
-    )
-
     TASK_REQUIRED_PARAMETERS = (
         gc.PPN_TASK_IS_TEXT_FILE_FORMAT,
         gc.PPN_TASK_LANGUAGE,
@@ -188,27 +165,9 @@ class Validator(Configurable):
     )
 
     TXT_REQUIRED_PARAMETERS = (
-        gc.PPN_JOB_IS_AUDIO_FILE_NAME_REGEX,
-        gc.PPN_JOB_IS_AUDIO_FILE_RELATIVE_PATH,
-        gc.PPN_JOB_IS_HIERARCHY_PREFIX,
-        gc.PPN_JOB_IS_HIERARCHY_TYPE,
-        gc.PPN_JOB_IS_TEXT_FILE_NAME_REGEX,
-        gc.PPN_JOB_IS_TEXT_FILE_RELATIVE_PATH,
-        gc.PPN_JOB_LANGUAGE,
-        gc.PPN_JOB_OS_CONTAINER_FORMAT,
-        gc.PPN_JOB_OS_FILE_NAME,
-        gc.PPN_JOB_OS_HIERARCHY_PREFIX,
-        gc.PPN_JOB_OS_HIERARCHY_TYPE,
         gc.PPN_TASK_IS_TEXT_FILE_FORMAT,
         gc.PPN_TASK_OS_FILE_FORMAT,
         gc.PPN_TASK_OS_FILE_NAME,
-    )
-
-    XML_JOB_REQUIRED_PARAMETERS = (
-        gc.PPN_JOB_OS_CONTAINER_FORMAT,
-        gc.PPN_JOB_OS_FILE_NAME,
-        gc.PPN_JOB_OS_HIERARCHY_PREFIX,
-        gc.PPN_JOB_OS_HIERARCHY_TYPE,
     )
 
     XML_TASK_REQUIRED_PARAMETERS = (
@@ -281,34 +240,26 @@ class Validator(Configurable):
 
         return self.result
 
-    def check_configuration_string(
-        self, config_string, is_job: bool = True, external_name: bool = False
-    ):
+    def check_configuration_string(self, config_string, external_name: bool = False):
         """
-        Check whether the given job or task configuration string
+        Check whether the given task configuration string
         is well-formed (if ``is_bstring`` is ``True``)
         and it has all the required parameters.
 
         :param string config_string: the byte string or Unicode string to be checked
-        :param bool is_job: if ``True``, ``config_string`` is a job config string
         :param bool external_name: if ``True``, the task name is provided externally,
                                    and it is not required to appear
                                    in the config string
         :rtype: :class:`~aeneas.validator.ValidatorResult`
         """
-        if is_job:
-            logger.debug("Checking job configuration string")
-        else:
-            logger.debug("Checking task configuration string")
+        logger.debug("Checking task configuration string")
 
         self.result = ValidatorResult()
 
         if self._are_safety_checks_disabled("check_configuration_string"):
             return self.result
 
-        if is_job:
-            required_parameters = self.JOB_REQUIRED_PARAMETERS
-        elif external_name:
+        if external_name:
             required_parameters = self.TASK_REQUIRED_PARAMETERS_EXTERNAL_NAME
         else:
             required_parameters = self.TASK_REQUIRED_PARAMETERS
@@ -325,140 +276,6 @@ class Validator(Configurable):
         parameters = gf.config_string_to_dict(config_string, self.result)
         self._check_required_parameters(required_parameters, parameters)
         logger.debug("Checking config_string: returning %s", self.result.passed)
-        return self.result
-
-    def check_config_txt(self, contents, is_config_string: bool = False):
-        """
-        Check whether the given TXT config file contents
-        (if ``is_config_string`` is ``False``) or
-        TXT config string (if ``is_config_string`` is ``True``)
-        is well-formed and it has all the required parameters.
-
-        :param string contents: the TXT config file contents or TXT config string
-        :param bool is_config_string: if ``True``, contents is a config string
-        :rtype: :class:`~aeneas.validator.ValidatorResult`
-        """
-        logger.debug("Checking contents TXT config file")
-
-        self.result = ValidatorResult()
-
-        if self._are_safety_checks_disabled("check_config_txt"):
-            return self.result
-
-        is_bstring = isinstance(contents, bytes)
-        if is_bstring:
-            logger.debug("Checking that contents is well formed")
-            self.check_raw_string(contents, is_bstring=True)
-            if not self.result.passed:
-                return self.result
-            contents = gf.safe_unicode(contents)
-        if not is_config_string:
-            logger.debug("Converting file contents to config string")
-            contents = gf.config_txt_to_string(contents)
-        logger.debug("Checking required parameters")
-        required_parameters = self.TXT_REQUIRED_PARAMETERS
-        parameters = gf.config_string_to_dict(contents, self.result)
-        self._check_required_parameters(required_parameters, parameters)
-        logger.debug("Checking contents: returning %s", self.result.passed)
-        return self.result
-
-    def check_config_xml(self, contents):
-        """
-        Check whether the given XML config file contents
-        is well-formed and it has all the required parameters.
-
-        :param string contents: the XML config file contents or XML config string
-        :param bool is_config_string: if ``True``, contents is a config string
-        :rtype: :class:`~aeneas.validator.ValidatorResult`
-        """
-        logger.debug("Checking contents XML config file")
-        self.result = ValidatorResult()
-        if self._are_safety_checks_disabled("check_config_xml"):
-            return self.result
-        contents = gf.safe_bytes(contents)
-        logger.debug("Checking that contents is well formed")
-        self.check_raw_string(contents, is_bstring=True)
-        if not self.result.passed:
-            return self.result
-        logger.debug("Checking required parameters for job")
-        job_parameters = gf.config_xml_to_dict(contents, self.result, parse_job=True)
-        self._check_required_parameters(
-            self.XML_JOB_REQUIRED_PARAMETERS, job_parameters
-        )
-        if not self.result.passed:
-            return self.result
-        logger.debug("Checking required parameters for task")
-        tasks_parameters = gf.config_xml_to_dict(contents, self.result, parse_job=False)
-        for parameters in tasks_parameters:
-            logger.debug("Checking required parameters for task: %r", parameters)
-            self._check_required_parameters(
-                self.XML_TASK_REQUIRED_PARAMETERS, parameters
-            )
-            if not self.result.passed:
-                return self.result
-        return self.result
-
-    def check_container(
-        self,
-        container_path: str,
-        container_format=None,
-        config_string: str | None = None,
-    ):
-        """
-        Check whether the given container is well-formed.
-
-        :param string container_path: the path of the container to be checked
-        :param container_format: the format of the container
-        :type  container_format: :class:`~aeneas.container.ContainerFormat`
-        :param string config_string: the configuration string generated by the wizard
-        :rtype: :class:`~aeneas.validator.ValidatorResult`
-        """
-        logger.debug("Checking container %r", container_path)
-        self.result = ValidatorResult()
-
-        if self._are_safety_checks_disabled("check_container"):
-            return self.result
-
-        if not (os.path.isfile(container_path) or os.path.isdir(container_path)):
-            self._failed(f"Container {container_path!r} not found.")
-            return self.result
-
-        container = Container(container_path, container_format)
-        try:
-            logger.debug("Checking container has config file")
-            if config_string is not None:
-                logger.debug("Container with config string from wizard")
-                self.check_config_txt(config_string, is_config_string=True)
-            elif container.has_config_xml:
-                logger.debug("Container has XML config file")
-                contents = container.read_entry(container.entry_config_xml)
-                if contents is None:
-                    self._failed("Unable to read the contents of XML config file.")
-                    return self.result
-                self.check_config_xml(contents)
-            elif container.has_config_txt:
-                logger.debug("Container has TXT config file")
-                contents = container.read_entry(container.entry_config_txt)
-                if contents is None:
-                    self._failed("Unable to read the contents of TXT config file.")
-                    return self.result
-                self.check_config_txt(contents, is_config_string=False)
-            else:
-                self._failed("Container does not have a TXT or XML configuration file.")
-
-            logger.debug("Checking we have a valid job in the container")
-            if not self.result.passed:
-                return self.result
-            logger.debug("Analyze the contents of the container")
-            analyzer = AnalyzeContainer(container)
-            if config_string is not None:
-                job = analyzer.analyze(config_string=config_string)
-            else:
-                job = analyzer.analyze()
-            self._check_analyzed_job(job, container)
-
-        except OSError:
-            self._failed("Unable to read the contents of the container.")
         return self.result
 
     def _are_safety_checks_disabled(self, caller="unknown_function"):
@@ -592,59 +409,6 @@ class Validator(Configurable):
         logger.debug("Checking all implied parameters are present")
         self._check_implied_parameters(parameters)
         return self.result
-
-    def _check_analyzed_job(self, job, container):
-        """
-        Check that the job object generated from the given container
-        is well formed, that it has at least one task,
-        and that the text file of each task has the correct encoding.
-        Log messages into ``self.result``.
-
-        :param job: the Job object generated from container
-        :type  job: :class:`~aeneas.job.Job`
-        :param container: the Container object
-        :type  container: :class:`~aeneas.container.Container`
-        """
-        logger.debug("Checking the Job object generated from container")
-
-        logger.debug("Checking that the Job is not None")
-        if job is None:
-            self._failed("Unable to create a Job from the container.")
-            return
-
-        logger.debug("Checking that the Job has at least one Task")
-        if len(job) == 0:
-            self._failed("Unable to create at least one Task from the container.")
-            return
-
-        if self.rconf[RuntimeConfiguration.JOB_MAX_TASKS] > 0:
-            logger.debug("Checking that the Job does not have too many Tasks")
-            if len(job) > self.rconf[RuntimeConfiguration.JOB_MAX_TASKS]:
-                self._failed(
-                    "The Job has %d Tasks, more than the maximum allowed (%d)."
-                    % (len(job), self.rconf[RuntimeConfiguration.JOB_MAX_TASKS])
-                )
-                return
-
-        logger.debug("Checking that each Task text file is well formed")
-        for task in job.tasks:
-            logger.debug("Checking Task text file %r", task.text_file_path)
-            text_file_bstring = container.read_entry(task.text_file_path)
-            if text_file_bstring is None or len(text_file_bstring) == 0:
-                self._failed(f"Text file {task.text_file_path!r} is empty")
-                return
-            self._check_utf8_encoding(text_file_bstring)
-            if not self.result.passed:
-                self._failed(
-                    f"Text file {task.text_file_path!r} is not encoded in UTF-8"
-                )
-                return
-            self._check_not_empty(text_file_bstring)
-            if not self.result.passed:
-                self._failed(f"Text file {task.text_file_path!r} is empty")
-                return
-            logger.debug("Checking Task text file %r: passed", task.text_file_path)
-        logger.debug("Checking each Task text file is well formed: passed")
 
 
 class ValidatorResult:

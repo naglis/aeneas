@@ -873,8 +873,8 @@ class TextFile:
                     logger.debug("Found L1 node with text: %r", paragraph_text)
                 else:
                     logger.debug("Found L1 node but it has no words, skipping")
-            except KeyError:
-                logger.warning("KeyError while parsing a L1 node")
+            except KeyError as exc:
+                logger.warning("KeyError (%s) while parsing a L1 node", exc)
 
         # append to fragments
         self.fragments_tree = tree
@@ -998,8 +998,8 @@ class TextFile:
 
                 text_from_id[f_id] = f_text
                 ids.append(f_id)
-            except KeyError:
-                logger.warning("KeyError while parsing a node")
+            except KeyError as exc:
+                logger.warning("KeyError (%s) while parsing a node", exc)
 
         # sort by ID as requested
         id_sort = gf.safe_get(

@@ -62,10 +62,9 @@ the built-in command line tools.)
 Using aeneas Built-in Command Line Tools
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-**aeneas** provides the following two main command line programs:
+**aeneas** provides the following command line programs:
 
 * ``aeneas.tools.execute_task``
-* ``aeneas.tools.execute_job``
 
 .. note::
 
@@ -91,33 +90,6 @@ for which you want to compute a **single sync map file**.
     and parameters like "output in SMIL format, language is Italian,
     extract text from the elements in the XHTML file with
     attribute ``id`` matching the regular expression ``f[0-9]+``".
-
-A **Job** is a container (ZIP or TAR file, or an uncompressed directory)
-including one or more Tasks;
-normally a Job is handy to **batch processing multiple Tasks**
-sharing the same execution parameters.
-
-.. topic:: Example
-
-    A Job might consists of fifteen Tasks,
-    each corresponding to an XHTML page inside a
-    Fixed-Layout EPUB 3 file.
-    Fifteen SMIL files,
-    one for each Task (i.e., XHTML page)
-    will be produced.
-
-Run the above commands without arguments to get an **help message**.
-**aeneas** includes some example input files which cover common use cases,
-enabling the user to run **live examples**.
-
-The help message for ``aeneas.tools.execute_job`` reads:
-
-.. literalinclude:: _static/execute_job_help.txt
-    :language: text
-
-The paths in the example might differ, depending on the installation location of **aeneas**.
-Usually, each command line in the ``EXAMPLES`` section
-can be copied-and-pasted to see the corresponding example running live.
 
 The help message for ``aeneas.tools.execute_task`` reads:
 

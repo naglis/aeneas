@@ -144,7 +144,6 @@ Usage
    .. code:: bash
 
        python -m aeneas.tools.execute_task
-       python -m aeneas.tools.execute_job
 
    You can also get a list of **live examples** that you can immediately
    run on your machine thanks to the included files:
@@ -191,19 +190,6 @@ As you can see, the third argument (the *configuration string*)
 specifies the parameters controlling the I/O formats and the processing
 options for the task. Consult the
 `documentation <http://www.readbeyond.it/aeneas/docs/>`__ for details.
-
-3. If you have several tasks to process, you can create a **job
-   container** to batch process them:
-
-   .. code:: bash
-
-       python -m aeneas.tools.execute_job job.zip output_directory
-
-File ``job.zip`` should contain a ``config.txt`` or ``config.xml``
-configuration file, providing **aeneas** with all the information needed
-to parse the input assets and format the output sync map files. Consult
-the `documentation <http://www.readbeyond.it/aeneas/docs/>`__ for
-details.
 
 The `documentation <http://www.readbeyond.it/aeneas/docs/>`__ contains a
 highly suggested

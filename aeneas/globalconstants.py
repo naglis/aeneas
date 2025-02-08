@@ -42,12 +42,6 @@ CONFIG_STRING_SEPARATOR_SYMBOL = "|"
 PARSED_TEXT_SEPARATOR = "|"
 """ Separator for input text files in parsed format """
 
-CONFIG_TXT_FILE_NAME = "config.txt"
-""" File name for the TXT configuration file in containers """
-
-CONFIG_XML_FILE_NAME = "config.xml"
-""" File name for the XML configuration file in containers """
-
 CONFIG_XML_TASK_TAG = "task"
 """ ``<task>`` tag in the XML configuration file """
 
@@ -71,13 +65,6 @@ MIMETYPE_MAP = {
 # PARAMETER NAMES
 
 # reserved parameter names (RPN)
-RPN_JOB_IDENTIFIER = "job_identifier"
-"""
-The identifier of a job. Reserved.
-
-Usage: reserved
-"""
-
 RPN_TASK_IDENTIFIER = "task_identifier"
 """
 The identifier of a task. Reserved.
@@ -86,207 +73,6 @@ Usage: reserved
 """
 
 # public parameter names (PPN)
-PPN_JOB_DESCRIPTION = "job_description"
-"""
-A human-readable description of the job.
-
-Usage: config string, TXT config file, XML config file
-
-Values: string
-
-Example::
-
-    job_description=This is a sample description
-
-"""
-
-PPN_JOB_LANGUAGE = "job_language"
-"""
-The language of the job.
-
-Usage: config string, TXT config file, XML config file
-
-Values: listed in :class:`~aeneas.language.Language`
-
-Example::
-
-    job_language=eng-GBR
-    job_language=eng-USA
-    job_language=ita-ITA
-
-"""
-
-PPN_JOB_IS_AUDIO_FILE_NAME_REGEX = "is_audio_file_name_regex"
-r"""
-The regex to match audio files in this job.
-
-Usage: config string, TXT config file
-
-Values: regex
-
-Example::
-
-    is_audio_file_name_regex=.*\.mp3
-    is_audio_file_name_regex=audio.ogg
-
-"""
-
-PPN_JOB_IS_AUDIO_FILE_RELATIVE_PATH = "is_audio_file_relative_path"
-"""
-The path, relative to the task root directory,
-where the audio files should be searched in input containers.
-
-Usage: config string, TXT config file
-
-Values: string
-
-Example::
-
-    is_audio_file_relative_path=../audio
-    is_audio_file_relative_path=mp3
-    is_audio_file_relative_path=.
-
-"""
-
-PPN_JOB_IS_HIERARCHY_PREFIX = "is_hierarchy_prefix"
-"""
-The path, relative to the position of the TXT/XML config file,
-to be considered the task root directory, in input containers.
-
-Usage: config string, TXT config file
-
-Values: string
-
-Example::
-
-    is_hierarchy_prefix=OEBPS/Resources
-    is_hierarchy_prefix=.
-
-"""
-
-PPN_JOB_IS_HIERARCHY_TYPE = "is_hierarchy_type"
-"""
-The type of hierarchy of the input job container.
-
-Usage: config string, TXT config file
-
-Values: listed in :class:`~aeneas.hierarchytype.HierarchyType`
-
-Example::
-
-    is_hierarchy_type=flat
-    is_hierarchy_type=paged
-
-"""
-
-PPN_JOB_IS_TASK_DIRECTORY_NAME_REGEX = "is_task_dir_name_regex"
-"""
-The regex to match task directory names
-within the base task directory in input containers.
-Applies to paged hierarchies only.
-
-Usage: config string, TXT config file
-
-Values: regex
-
-Example::
-
-    is_task_dir_name_regex=[0-9]+
-    is_text_dir_name_regex=page[0-9]+
-
-"""
-
-PPN_JOB_IS_TEXT_FILE_NAME_REGEX = "is_text_file_name_regex"
-r"""
-The regex for matching the text file name
-of tasks in input containers.
-
-Usage: config string, TXT config file
-
-Values: regex
-
-Example::
-
-    is_text_file_name_regex=.*\.xhtml
-    is_text_file_name_regex=page.xhtml
-
-"""
-
-PPN_JOB_IS_TEXT_FILE_RELATIVE_PATH = "is_text_file_relative_path"
-"""
-The path, relative to the task root directory,
-where the text files should be searched in input containers.
-
-Usage: config string, TXT config file
-
-Values: string
-
-Example::
-
-    is_audio_file_relative_path=../pages
-    is_audio_file_relative_path=xhtml
-    is_audio_file_relative_path=.
-
-"""
-
-PPN_JOB_OS_CONTAINER_FORMAT = "os_job_file_container"
-"""
-The format of the output container.
-
-Usage: config string, TXT config file, XML config file
-
-Values: listed in :class:`~aeneas.container.ContainerFormat`
-
-Example::
-
-    os_job_file_container=zip
-
-"""
-
-PPN_JOB_OS_FILE_NAME = "os_job_file_name"
-"""
-The file name of the output container.
-
-Usage: config string, TXT config file, XML config file
-
-Values: string
-
-Example::
-
-    os_job_file_name=output_sync_maps.zip
-
-"""
-
-PPN_JOB_OS_HIERARCHY_PREFIX = "os_job_file_hierarchy_prefix"
-"""
-The path of the root directory of the output container,
-under which the task directories will be created.
-
-Usage: config string, TXT config file, XML config file
-
-Values: string
-
-Example::
-
-    os_job_file_hierarchy_prefix=OEBPS/Resources
-
-"""
-
-PPN_JOB_OS_HIERARCHY_TYPE = "os_job_file_hierarchy_type"
-"""
-The type of output container structure.
-
-Usage: config string, TXT config file, XML config file
-
-Values: listed in :class:`~aeneas.hierarchytype.HierarchyType`
-
-Example::
-
-    os_job_file_hierarchy_type=flat
-    os_job_file_hierarchy_type=paged
-
-"""
-
 PPN_SYNCMAP_LANGUAGE = "language"
 """
 Key for specifying the syncmap language
@@ -915,11 +701,7 @@ PPN_TASK_OS_FILE_NAME = "os_task_file_name"
 """
 The name of the sync map file output for the task.
 
-If processing a Job,
-the value might contain the ``PPV_OS_TASK_PREFIX`` placeholder,
-that will be replaced by a suitable path string.
-
-Usage: config string, TXT config file, XML config file
+Usage: config string
 
 Values: string
 

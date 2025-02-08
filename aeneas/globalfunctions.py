@@ -342,7 +342,7 @@ def config_string_to_dict(string: str, result=None) -> dict[str, str]:
     return pairs_to_dict(pairs, result)
 
 
-def config_xml_to_dict(contents, result, parse_job: bool = True):
+def config_xml_to_dict(contents, result):
     """
     Convert the contents of a XML config file
     into the corresponding dictionary ::
@@ -353,52 +353,34 @@ def config_xml_to_dict(contents, result, parse_job: bool = True):
         dictionary[key_n] = value_n
 
     :param bytes contents: the XML configuration contents
-    :param bool parse_job: if ``True``, parse the job properties;
-                           if ``False``, parse the tasks properties
-    :rtype: dict (``parse_job=True``) or list of dict (``parse_job=False``)
+    :rtype: list of dict
     """
     from lxml import etree
 
     try:
         root = etree.fromstring(contents)
         pairs = []
-        if parse_job:
-            # parse job
-            for elem in root:
-                if (elem.tag != gc.CONFIG_XML_TASKS_TAG) and (elem.text is not None):
-                    pairs.append(
-                        "{}{}{}".format(
-                            safe_unicode(elem.tag),
-                            gc.CONFIG_STRING_ASSIGNMENT_SYMBOL,
-                            safe_unicode(elem.text.strip()),
-                        )
-                    )
-            return pairs_to_dict(pairs)
-        else:
-            # parse tasks
-            output_list = []
-            for task in root.find(gc.CONFIG_XML_TASKS_TAG):
-                if task.tag == gc.CONFIG_XML_TASK_TAG:
-                    pairs = []
-                    for elem in task:
-                        if elem.text is not None:
-                            pairs.append(
-                                "{}{}{}".format(
-                                    safe_unicode(elem.tag),
-                                    gc.CONFIG_STRING_ASSIGNMENT_SYMBOL,
-                                    safe_unicode(elem.text.strip()),
-                                )
+        # parse tasks
+        output_list = []
+        for task in root.find(gc.CONFIG_XML_TASKS_TAG):
+            if task.tag == gc.CONFIG_XML_TASK_TAG:
+                pairs = []
+                for elem in task:
+                    if elem.text is not None:
+                        pairs.append(
+                            "{}{}{}".format(
+                                safe_unicode(elem.tag),
+                                gc.CONFIG_STRING_ASSIGNMENT_SYMBOL,
+                                safe_unicode(elem.text.strip()),
                             )
-                    output_list.append(pairs_to_dict(pairs))
-            return output_list
+                        )
+                output_list.append(pairs_to_dict(pairs))
+        return output_list
     except Exception:
         if result is not None:
             result.passed = False
             result.add_error("An error occurred while parsing XML file")
-        if parse_job:
-            return {}
-        else:
-            return []
+        return []
 
 
 def config_dict_to_string(dictionary: typing.Mapping[str, typing.Any]) -> str:

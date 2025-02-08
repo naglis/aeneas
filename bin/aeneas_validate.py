@@ -21,14 +21,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 """
-Perform validation in one of the following modes:
-
-1. a container
-2. a job configuration string
-3. a task configuration string
-4. a container + configuration string from wizard
-5. a job TXT configuration file
-6. a job XML configuration file
+Perform validation on a task configuration string
 """
 
 import sys
@@ -49,14 +42,7 @@ __version__ = "1.7.3"
 
 def main():
     """
-    Perform validation in one of the following modes:
-
-    1. a container
-    2. a job configuration string
-    3. a task configuration string
-    4. a container + configuration string from wizard
-    5. a job TXT configuration file
-    6. a job XML configuration file
+    Perform validation on a task configuration string
     """
     ValidateCLI(invoke="aeneas_validate").run(arguments=sys.argv)
 
