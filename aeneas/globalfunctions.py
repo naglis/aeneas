@@ -34,6 +34,7 @@ import re
 import shutil
 import sys
 import tempfile
+import typing
 
 from aeneas.exacttiming import TimeValue
 import aeneas.globalconstants as gc
@@ -57,7 +58,7 @@ FROZEN = getattr(sys, "frozen", False)
 # COMMON FUNCTIONS
 
 
-def safe_print(msg):
+def safe_print(msg: str):
     """
     Safely print a given Unicode string to stdout,
     possibly replacing characters non-printable
@@ -83,7 +84,7 @@ def safe_print(msg):
             )
 
 
-def print_error(msg, color=True):
+def print_error(msg: str, color: bool = True):
     """
     Print an error message.
 
@@ -93,20 +94,20 @@ def print_error(msg, color=True):
     if color and is_posix():
         safe_print(f"{ANSI_ERROR}[ERRO] {msg}{ANSI_END}")
     else:
-        safe_print("[ERRO] %s" % (msg))
+        safe_print(f"[ERRO] {msg}")
 
 
-def print_info(msg, color=True):
+def print_info(msg: str, color: bool = True):
     """
     Print an info message.
 
     :param string msg: the message
     :param bool color: if ``True``, print with POSIX color
     """
-    safe_print("[INFO] %s" % (msg))
+    safe_print(f"[INFO] {msg}")
 
 
-def print_success(msg, color=True):
+def print_success(msg: str, color: bool = True):
     """
     Print a success message.
 
@@ -116,10 +117,10 @@ def print_success(msg, color=True):
     if color and is_posix():
         safe_print(f"{ANSI_OK}[INFO] {msg}{ANSI_END}")
     else:
-        safe_print("[INFO] %s" % (msg))
+        safe_print(f"[INFO] {msg}")
 
 
-def print_warning(msg, color=True):
+def print_warning(msg: str, color: bool = True):
     """
     Print a warning message.
 
@@ -129,10 +130,10 @@ def print_warning(msg, color=True):
     if color and is_posix():
         safe_print(f"{ANSI_WARNING}[WARN] {msg}{ANSI_END}")
     else:
-        safe_print("[WARN] %s" % (msg))
+        safe_print(f"[WARN] {msg}")
 
 
-def tmp_file(suffix="", root=None):
+def tmp_file(suffix: str = "", root=None):
     """
     Return a (handler, path) tuple
     for a temporary file with given suffix created by ``tempfile``.
@@ -146,7 +147,7 @@ def tmp_file(suffix="", root=None):
     return tempfile.mkstemp(suffix=suffix, dir=root)
 
 
-def file_extension(path):
+def file_extension(path: str | None) -> str | None:
     """
     Return the file extension.
 
@@ -166,7 +167,7 @@ def file_extension(path):
     return ext
 
 
-def mimetype_from_path(path):
+def mimetype_from_path(path: str) -> str | None:
     """
     Return a mimetype from the file extension.
 
@@ -181,7 +182,7 @@ def mimetype_from_path(path):
     return None
 
 
-def file_name_without_extension(path):
+def file_name_without_extension(path: str | None) -> str | None:
     """
     Return the file name without extension.
 
@@ -199,7 +200,7 @@ def file_name_without_extension(path):
     return os.path.splitext(os.path.basename(path))[0]
 
 
-def datetime_string(time_zone=False):
+def datetime_string(time_zone: bool = False) -> str:
     """
     Return a string representing the current date and time,
     in ``YYYY-MM-DDThh:mm:ss`` or ``YYYY-MM-DDThh:mm:ss+hh:mm`` format
@@ -222,7 +223,7 @@ def datetime_string(time_zone=False):
     )
 
 
-def safe_float(string, default=None):
+def safe_float(string: str, default: float | None = None) -> float | None:
     """
     Safely parse a string into a float.
 
@@ -238,7 +239,7 @@ def safe_float(string, default=None):
     return value
 
 
-def safe_int(string, default=None):
+def safe_int(string: str, default: int | None = None) -> int | None:
     """
     Safely parse a string into an int.
 
@@ -254,7 +255,12 @@ def safe_int(string, default=None):
     return value
 
 
-def safe_get(dictionary, key, default_value, can_return_none: bool = True):
+def safe_get(
+    dictionary: typing.Mapping[str, typing.Any],
+    key: str,
+    default_value: typing.Any,
+    can_return_none: bool = True,
+) -> typing.Any:
     """
     Safely perform a dictionary get,
     returning the default value if the key is not found.
@@ -277,7 +283,7 @@ def safe_get(dictionary, key, default_value, can_return_none: bool = True):
     return return_value
 
 
-def norm_join(prefix, suffix):
+def norm_join(prefix: str, suffix: str) -> str:
     """
     Join ``prefix`` and ``suffix`` paths
     and return the resulting path, normalized.
@@ -295,7 +301,7 @@ def norm_join(prefix, suffix):
     return os.path.normpath(os.path.join(prefix, suffix))
 
 
-def config_txt_to_string(string):
+def config_txt_to_string(string: str) -> str | None:
     """
     Convert the contents of a TXT config file
     into the corresponding configuration string ::
@@ -314,7 +320,7 @@ def config_txt_to_string(string):
     return gc.CONFIG_STRING_SEPARATOR_SYMBOL.join(pairs)
 
 
-def config_string_to_dict(string, result=None):
+def config_string_to_dict(string: str, result=None) -> dict[str, str]:
     """
     Convert a given configuration string ::
 
@@ -395,7 +401,7 @@ def config_xml_to_dict(contents, result, parse_job: bool = True):
             return []
 
 
-def config_dict_to_string(dictionary):
+def config_dict_to_string(dictionary: typing.Mapping[str, typing.Any]) -> str:
     """
     Convert a given config dictionary ::
 
@@ -417,7 +423,7 @@ def config_dict_to_string(dictionary):
     return gc.CONFIG_STRING_SEPARATOR_SYMBOL.join(parameters)
 
 
-def pairs_to_dict(pairs, result=None):
+def pairs_to_dict(pairs: list[str], result=None) -> dict[str, str]:
     """
     Convert a given list of ``key=value`` strings ::
 
@@ -444,7 +450,7 @@ def pairs_to_dict(pairs, result=None):
     return dictionary
 
 
-def copytree(source_directory, destination_directory, ignore=None):
+def copytree(source_directory: str, destination_directory: str, ignore=None):
     """
     Recursively copy the contents of a source directory
     into a destination directory.
@@ -480,7 +486,7 @@ def copytree(source_directory, destination_directory, ignore=None):
         shutil.copyfile(source_directory, destination_directory)
 
 
-def ensure_parent_directory(path, ensure_parent=True):
+def ensure_parent_directory(path: str, ensure_parent: bool = True):
     """
     Ensures the parent directory exists.
 
@@ -499,7 +505,7 @@ def ensure_parent_directory(path, ensure_parent=True):
             raise OSError(f"Directory {parent_directory!r} cannot be created")
 
 
-def time_from_ttml(string):
+def time_from_ttml(string: str | None) -> TimeValue:
     """
     Parse the given ``SS.mmms`` string
     (TTML values have an "s" suffix, e.g. ``1.234s``)
@@ -509,13 +515,13 @@ def time_from_ttml(string):
     :rtype: :class:`~aeneas.exacttiming.TimeValue`
     """
     if string is None or len(string) < 2:
-        return 0
+        return TimeValue("0.000")
     # strips "s" at the end
     string = string[:-1]
     return time_from_ssmmm(string)
 
 
-def time_to_ttml(time_value):
+def time_to_ttml(time_value: float | None) -> str:
     """
     Format the given time value into a ``SS.mmms`` string
     (TTML values have an "s" suffix, e.g. ``1.234s``).
@@ -531,11 +537,11 @@ def time_to_ttml(time_value):
     :rtype: string
     """
     if time_value is None:
-        time_value = 0
-    return "%ss" % time_to_ssmmm(time_value)
+        time_value = 0.0
+    return f"{time_to_ssmmm(time_value)}s"
 
 
-def time_from_ssmmm(string):
+def time_from_ssmmm(string: str | None) -> TimeValue:
     """
     Parse the given ``SS.mmm`` string and return a time value.
 
@@ -547,7 +553,7 @@ def time_from_ssmmm(string):
     return TimeValue(string)
 
 
-def time_to_ssmmm(time_value):
+def time_to_ssmmm(time_value: float | None) -> str:
     """
     Format the given time value into a ``SS.mmm`` string.
 
@@ -562,11 +568,11 @@ def time_to_ssmmm(time_value):
     :rtype: string
     """
     if time_value is None:
-        time_value = 0
+        time_value = 0.0
     return f"{time_value:.3f}"
 
 
-def time_from_hhmmssmmm(string, decimal_separator="."):
+def time_from_hhmmssmmm(string: str, decimal_separator: str = ".") -> TimeValue:
     """
     Parse the given ``HH:MM:SS.mmm`` string and return a time value.
 
@@ -589,7 +595,7 @@ def time_from_hhmmssmmm(string, decimal_separator="."):
     return v_length
 
 
-def time_to_hhmmssmmm(time_value, decimal_separator="."):
+def time_to_hhmmssmmm(time_value: float | None, decimal_separator: str = ".") -> str:
     """
     Format the given time value into a ``HH:MM:SS.mmm`` string.
 
@@ -610,7 +616,7 @@ def time_to_hhmmssmmm(time_value, decimal_separator="."):
     :rtype: string
     """
     if time_value is None:
-        time_value = 0
+        time_value = 0.0
     tmp = time_value
     hours = int(math.floor(tmp / 3600))
     tmp -= hours * 3600
@@ -657,7 +663,7 @@ def time_to_srt(time_value: TimeValue) -> str:
     return time_to_hhmmssmmm(time_value, decimal_separator=",")
 
 
-def split_url(url):
+def split_url(url: str | None) -> tuple[str | None, str | None]:
     """
     Split the given URL ``base#anchor`` into ``(base, anchor)``,
     or ``(base, None)`` if no anchor is present.
@@ -769,7 +775,7 @@ def can_run_c_extension(name: str | None = None) -> bool:
 
 
 def run_c_extension_with_fallback(
-    log_function, extension, c_function, py_function, args, rconf
+    log_function, extension: str, c_function, py_function, args, rconf
 ):
     """
     Run a function calling a C extension, falling back
@@ -849,7 +855,6 @@ def file_size(path: str) -> int:
     Return ``-1`` if the file does not exist or cannot be read.
 
     :param string path: the file path
-    :rtype: int
     """
     try:
         return os.path.getsize(path)
@@ -857,15 +862,17 @@ def file_size(path: str) -> int:
         return -1
 
 
-def delete_directory(path):
+def delete_directory(path: str | None):
     """
     Safely delete a directory.
 
     :param string path: the file path
     """
-    if path is not None:
-        with contextlib.suppress(Exception):
-            shutil.rmtree(path)
+    if path is None:
+        return
+
+    with contextlib.suppress(Exception):
+        shutil.rmtree(path)
 
 
 def close_file_handler(handler):
@@ -874,12 +881,14 @@ def close_file_handler(handler):
 
     :param object handler: the file handler (as returned by tempfile)
     """
-    if handler is not None:
-        with contextlib.suppress(Exception):
-            os.close(handler)
+    if handler is None:
+        return
+
+    with contextlib.suppress(Exception):
+        os.close(handler)
 
 
-def delete_file(handler, path):
+def delete_file(handler, path: str | None):
     """
     Safely delete file.
 
@@ -887,12 +896,14 @@ def delete_file(handler, path):
     :param string path: the file path
     """
     close_file_handler(handler)
-    if path is not None:
-        with contextlib.suppress(Exception):
-            os.remove(path)
+    if path is None:
+        return
+
+    with contextlib.suppress(Exception):
+        os.remove(path)
 
 
-def relative_path(path, from_file):
+def relative_path(path: str | None, from_file: str) -> str | None:
     """
     Return the relative path of a file or directory, specified
     as ``path`` relative to (the parent directory of) ``from_file``.
@@ -930,7 +941,7 @@ def relative_path(path, from_file):
     return os.path.relpath(abs_path_target, start=abs_path_cwd)
 
 
-def absolute_path(path, from_file):
+def absolute_path(path: str | None, from_file: str) -> str | None:
     """
     Return the absolute path of a file or directory, specified
     as ``path`` relative to (the parent directory of) ``from_file``.
@@ -957,7 +968,7 @@ def absolute_path(path, from_file):
     return os.path.abspath(target)
 
 
-def read_file_bytes(input_file_path):
+def read_file_bytes(input_file_path: str) -> bytes | None:
     """
     Read the file at the given file path
     and return its contents as a byte string,
@@ -989,7 +1000,7 @@ def human_readable_number(number: int | float, suffix: str = "") -> str:
     return f"{number:.1f}Y{suffix}"
 
 
-def is_utf8_encoded(bstring):
+def is_utf8_encoded(bstring: bytes) -> bool:
     """
     Return ``True`` if the given byte string can be decoded
     into a Unicode string using the UTF-8 decoder.
@@ -1003,7 +1014,7 @@ def is_utf8_encoded(bstring):
     return False
 
 
-def safe_unicode(string):
+def safe_unicode(string: typing.AnyStr | None) -> str | None:
     """
     Safely convert the given string to a Unicode string.
 
@@ -1017,7 +1028,7 @@ def safe_unicode(string):
     return string
 
 
-def safe_bytes(string):
+def safe_bytes(string: typing.AnyStr | None) -> bytes | None:
     """
     Safely convert the given string to a bytes string.
 
@@ -1031,7 +1042,7 @@ def safe_bytes(string):
     return string
 
 
-def safe_unicode_stdin(string):
+def safe_unicode_stdin(string: typing.AnyStr | None) -> str | None:
     """
     Safely convert the given string to a Unicode string,
     decoding using ``sys.stdin.encoding`` if needed.
@@ -1055,7 +1066,7 @@ def safe_unicode_stdin(string):
     return string
 
 
-def bundle_directory():
+def bundle_directory() -> str | None:
     """
     Return the absolute path of the bundle directory
     if running from a frozen binary; otherwise return ``None``.
