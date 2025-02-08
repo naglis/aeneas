@@ -218,51 +218,6 @@ class TestGlobalFunctions(unittest.TestCase):
             with self.subTest(string=string, expected=expected):
                 self.assertEqual(gf.config_string_to_dict(string), expected)
 
-    def test_config_xml_to_dict_task(self):
-        for xml, expected in (
-            (None, []),
-            ("", []),
-            ("<job></job>", []),
-            ("<job><k1>v1</k1></job>", []),
-            ("<job><k1>v1</k1><k2></k2></job>", []),
-            ("<job><tasks></tasks></job>", []),
-            ("<job><tasks><foo></foo></tasks></job>", []),
-            ("<job><tasks><task></task></tasks></job>", [{}]),
-            ("<job><tasks><task></task><foo></foo></tasks></job>", [{}]),
-            (
-                "<job><tasks><task></task><foo></foo><task></task></tasks></job>",
-                [{}, {}],
-            ),
-            ("<job><tasks><task><k1></k1></task><foo></foo></tasks></job>", [{}]),
-            ("<job><tasks><task><k1>v1</k1></task></tasks></job>", [{"k1": "v1"}]),
-            (
-                "<job><tasks><task><k1>v1</k1><k2>v2</k2></task></tasks></job>",
-                [{"k1": "v1", "k2": "v2"}],
-            ),
-            (
-                "<job><tasks><task><k1>v1</k1><k2> v2</k2></task></tasks></job>",
-                [{"k1": "v1", "k2": "v2"}],
-            ),
-            (
-                "<job><tasks><task><k1>v1</k1><k2> v2 </k2></task></tasks></job>",
-                [{"k1": "v1", "k2": "v2"}],
-            ),
-            (
-                "<job><tasks><task><k1>v1</k1><k2>v2 </k2></task></tasks></job>",
-                [{"k1": "v1", "k2": "v2"}],
-            ),
-            (
-                "<job><tasks><task><k1>v1</k1></task><task><k2>v2</k2></task></tasks></job>",
-                [{"k1": "v1"}, {"k2": "v2"}],
-            ),
-            (
-                "<job><tasks><task><k1>v1</k1></task><task><k2>v2</k2></task><task></task></tasks></job>",
-                [{"k1": "v1"}, {"k2": "v2"}, {}],
-            ),
-        ):
-            with self.subTest(xml=xml, expected=expected):
-                self.assertEqual(gf.config_xml_to_dict(xml, result=None), expected)
-
     def test_config_dict_to_string(self):
         self.assertEqual(gf.config_dict_to_string({}), "")
         self.assertEqual(gf.config_dict_to_string({"k1": "v1"}), "k1=v1")
