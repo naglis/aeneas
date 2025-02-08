@@ -71,10 +71,6 @@ deps() {
         fi
         pip install -U lxml BeautifulSoup4
         pip install -U boto3 requests tgt
-        # NOTE Pillow might raise errors due to missing libraries
-        #      (e.g., libjpeg, libpng, zlib)
-        #      so install it as the last one
-        pip install -U Pillow
         deactivate
         cd ..
         echo "[INFO] Installing Python dependencies in $1 ... done"

@@ -142,7 +142,6 @@ you might need to install the following optional dependencies:
 
 * ``boto3`` (for using the AWS Polly TTS API wrapper)
 * ``requests`` (for using the Nuance TTS API wrapper)
-* ``Pillow`` (for plotting waveforms with :mod:`~aeneas.plotter`)
 * ``tgt`` (for outputting sync maps to TextGrid format)
 
 
@@ -377,7 +376,6 @@ and the following modules:
     job
     language
     mfcc
-    plotter
     runtimeconfiguration
     sd
     syncmap
@@ -432,7 +430,6 @@ useful for debugging or converting between different file formats:
 * ``aeneas.tools.extract_mfcc``: extract MFCCs from a monoaural WAVE file
 * ``aeneas.tools.ffmpeg_wrapper``: a wrapper around ``ffmpeg``
 * ``aeneas.tools.ffprobe_wrapper``: a wrapper around ``ffprobe``
-* ``aeneas.tools.plot_waveform``: plot a waveform and sets of labels to file
 * ``aeneas.tools.read_audio``: read the properties of an audio file
 * ``aeneas.tools.read_text``: read a text file and show the extracted text fragments
 * ``aeneas.tools.run_sd``: read an audio file and the corresponding text file and detect the audio head/tail

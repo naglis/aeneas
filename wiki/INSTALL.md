@@ -18,7 +18,6 @@ You can also install **aeneas** from source, just keep in mind:
 * you can install **aeneas** in a virtual environment
   created by `virtualenv` or similar;
 * **aeneas** provides a few extra tools
-  (e.g., `download` and `plot_waveform`)
   which require extra dependencies.
   These extra tools are not installed by default:
   if you want to install them,

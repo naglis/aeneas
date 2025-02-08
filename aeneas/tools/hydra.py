@@ -35,7 +35,6 @@ from aeneas.tools.execute_task import ExecuteTaskCLI
 from aeneas.tools.extract_mfcc import ExtractMFCCCLI
 from aeneas.tools.ffmpeg_wrapper import FFMPEGWrapperCLI
 from aeneas.tools.ffprobe_wrapper import FFPROBEWrapperCLI
-from aeneas.tools.plot_waveform import PlotWaveformCLI
 from aeneas.tools.read_audio import ReadAudioCLI
 from aeneas.tools.read_text import ReadTextCLI
 from aeneas.tools.run_sd import RunSDCLI
@@ -65,7 +64,6 @@ class HydraCLI(AbstractCLIProgram):
             "--extract-mfcc: call aeneas.tools.extract_mfcc",
             "--ffmpeg-wrapper: call aeneas.tools.ffmpeg_wrapper",
             "--ffprobe-wrapper: call aeneas.tools.ffprobe_wrapper",
-            "--plot-waveform: call aeneas.tools.plot_waveform",
             "--read-audio: call aeneas.tools.read_audio",
             "--read-text: call aeneas.tools.read_text",
             "--run-sd: call aeneas.tools.run_sd",
@@ -89,7 +87,6 @@ class HydraCLI(AbstractCLIProgram):
         (ExtractMFCCCLI, ["--extract-mfcc"]),
         (FFMPEGWrapperCLI, ["--ffmpeg-wrapper"]),
         (FFPROBEWrapperCLI, ["--ffprobe-wrapper"]),
-        (PlotWaveformCLI, ["--plot-waveform"]),
         (ReadAudioCLI, ["--read-audio"]),
         (ReadTextCLI, ["--read-text"]),
         (RunSDCLI, ["--run-sd"]),

@@ -55,20 +55,11 @@ PKG_INSTALL_REQUIRES = ["BeautifulSoup4>=4.5.1", "lxml>=3.6.0", "numpy>=1.9"]
 PKG_EXTRAS_REQUIRE = {
     "full": [
         "boto3>=1.4.2",
-        "Pillow>=3.1.1",
-        "requests>=2.9.1",
-        "tgt>=1.4.2",
-    ],
-    "nopillow": [
-        "boto3>=1.4.2",
         "requests>=2.9.1",
         "tgt>=1.4.2",
     ],
     "boto3": [
         "boto3>=1.4.2",
-    ],
-    "pillow": [
-        "Pillow>=3.1.1",
     ],
     "requests": [
         "requests>=2.9.1",
@@ -118,7 +109,6 @@ PKG_SCRIPTS = [
     "bin/aeneas_download",
     "bin/aeneas_execute_job",
     "bin/aeneas_execute_task",
-    "bin/aeneas_plot_waveform",
     "bin/aeneas_synthesize_text",
     "bin/aeneas_validate",
 ]
