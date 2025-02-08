@@ -145,59 +145,6 @@ def tmp_file(suffix: str = "", root=None):
     return tempfile.mkstemp(suffix=suffix, dir=root)
 
 
-def file_extension(path: str | None) -> str | None:
-    """
-    Return the file extension.
-
-    Examples: ::
-
-        /foo/bar.baz => baz
-        None         => None
-
-    :param string path: the file path
-    :rtype: string
-    """
-    if path is None:
-        return None
-    ext = os.path.splitext(os.path.basename(path))[1]
-    if ext.startswith("."):
-        ext = ext[1:]
-    return ext
-
-
-def mimetype_from_path(path: str) -> str | None:
-    """
-    Return a mimetype from the file extension.
-
-    :param string path: the file path
-    :rtype: string
-    """
-    extension = file_extension(path)
-    if extension is not None:
-        extension = extension.lower()
-        if extension in gc.MIMETYPE_MAP:
-            return gc.MIMETYPE_MAP[extension]
-    return None
-
-
-def file_name_without_extension(path: str | None) -> str | None:
-    """
-    Return the file name without extension.
-
-    Examples: ::
-
-        /foo/bar.baz => bar
-        /foo/bar     => bar
-        None         => None
-
-    :param string path: the file path
-    :rtype: string
-    """
-    if path is None:
-        return None
-    return os.path.splitext(os.path.basename(path))[0]
-
-
 def datetime_string(time_zone: bool = False) -> str:
     """
     Return a string representing the current date and time,
@@ -281,43 +228,6 @@ def safe_get(
     return return_value
 
 
-def norm_join(prefix: str, suffix: str) -> str:
-    """
-    Join ``prefix`` and ``suffix`` paths
-    and return the resulting path, normalized.
-
-    :param string prefix: the prefix path
-    :param string suffix: the suffix path
-    :rtype: string
-    """
-    if prefix is None and suffix is None:
-        return "."
-    if prefix is None:
-        return os.path.normpath(suffix)
-    if suffix is None:
-        return os.path.normpath(prefix)
-    return os.path.normpath(os.path.join(prefix, suffix))
-
-
-def config_txt_to_string(string: str) -> str | None:
-    """
-    Convert the contents of a TXT config file
-    into the corresponding configuration string ::
-
-        key_1=value_1|key_2=value_2|...|key_n=value_n
-
-    Leading and trailing blank characters will be stripped
-    and empty lines (after stripping) will be ignored.
-
-    :param string string: the contents of a TXT config file
-    :rtype: string
-    """
-    if string is None:
-        return None
-    pairs = [line.strip() for line in string.splitlines() if line.strip()]
-    return gc.CONFIG_STRING_SEPARATOR_SYMBOL.join(pairs)
-
-
 def config_string_to_dict(string: str, result=None) -> dict[str, str]:
     """
     Convert a given configuration string ::
@@ -340,28 +250,6 @@ def config_string_to_dict(string: str, result=None) -> dict[str, str]:
     return pairs_to_dict(pairs, result)
 
 
-def config_dict_to_string(dictionary: typing.Mapping[str, typing.Any]) -> str:
-    """
-    Convert a given config dictionary ::
-
-        dictionary[key_1] = value_1
-        dictionary[key_2] = value_2
-        ...
-        dictionary[key_n] = value_n
-
-    into the corresponding string ::
-
-        key_1=value_1|key_2=value_2|...|key_n=value_n
-
-    :param dict dictionary: the config dictionary
-    :rtype: string
-    """
-    parameters = []
-    for key in dictionary:
-        parameters.append(f"{key}{gc.CONFIG_STRING_ASSIGNMENT_SYMBOL}{dictionary[key]}")
-    return gc.CONFIG_STRING_SEPARATOR_SYMBOL.join(parameters)
-
-
 def pairs_to_dict(pairs: list[str], result=None) -> dict[str, str]:
     """
     Convert a given list of ``key=value`` strings ::
@@ -380,12 +268,14 @@ def pairs_to_dict(pairs: list[str], result=None) -> dict[str, str]:
     """
     dictionary = {}
     for pair in pairs:
-        if len(pair) > 0:
-            tokens = pair.split(gc.CONFIG_STRING_ASSIGNMENT_SYMBOL)
-            if len(tokens) == 2 and len(tokens[0]) > 0 and len(tokens[1]) > 0:
-                dictionary[tokens[0]] = tokens[1]
-            elif result is not None:
-                result.add_warning(f"Invalid key=value string: {pair!r}")
+        if len(pair) == 0:
+            continue
+
+        tokens = pair.split(gc.CONFIG_STRING_ASSIGNMENT_SYMBOL)
+        if len(tokens) == 2 and len(tokens[0]) > 0 and len(tokens[1]) > 0:
+            dictionary[tokens[0]] = tokens[1]
+        elif result is not None:
+            result.add_warning(f"Invalid key=value string: {pair!r}")
     return dictionary
 
 
@@ -602,25 +492,6 @@ def time_to_srt(time_value: TimeValue) -> str:
     return time_to_hhmmssmmm(time_value, decimal_separator=",")
 
 
-def split_url(url: str | None) -> tuple[str | None, str | None]:
-    """
-    Split the given URL ``base#anchor`` into ``(base, anchor)``,
-    or ``(base, None)`` if no anchor is present.
-
-    In case there are two or more ``#`` characters,
-    return only the first two tokens: ``a#b#c => (a, b)``.
-
-    :param string url: the url
-    :rtype: list of str
-    """
-    if url is None:
-        return (None, None)
-    array = url.split("#")
-    if len(array) == 1:
-        array.append(None)
-    return tuple(array[0:2])
-
-
 def is_posix() -> bool:
     """
     Return ``True`` if running on a POSIX OS.
@@ -629,20 +500,6 @@ def is_posix() -> bool:
     # the registered values of os.name are:
     # "posix", "nt", "os2", "ce", "java", "riscos"
     return os.name == "posix"
-
-
-def is_linux() -> bool:
-    """
-    Return ``True`` if running on Linux.
-    """
-    return is_posix() and os.uname()[0] == "Linux"
-
-
-def is_osx() -> bool:
-    """
-    Return ``True`` if running on Mac OS X (Darwin).
-    """
-    return is_posix() and os.uname()[0] == "Darwin"
 
 
 def is_windows() -> bool:
@@ -764,32 +621,6 @@ def run_c_extension_with_fallback(
     return result
 
 
-def file_size(path: str) -> int:
-    """
-    Return the size, in bytes, of the file at the given ``path``.
-    Return ``-1`` if the file does not exist or cannot be read.
-
-    :param string path: the file path
-    """
-    try:
-        return os.path.getsize(path)
-    except OSError:
-        return -1
-
-
-def delete_directory(path: str | None):
-    """
-    Safely delete a directory.
-
-    :param string path: the file path
-    """
-    if path is None:
-        return
-
-    with contextlib.suppress(Exception):
-        shutil.rmtree(path)
-
-
 def close_file_handler(handler):
     """
     Safely close the given file handler.
@@ -883,38 +714,6 @@ def absolute_path(path: str | None, from_file: str) -> str | None:
     return os.path.abspath(target)
 
 
-def read_file_bytes(input_file_path: str) -> bytes | None:
-    """
-    Read the file at the given file path
-    and return its contents as a byte string,
-    or ``None`` if an error occurred.
-
-    :param string input_file_path: the file path
-    :rtype: bytes
-    """
-    contents = None
-    with contextlib.suppress(Exception), open(input_file_path, "rb") as input_file:
-        contents = input_file.read()
-    return contents
-
-
-def human_readable_number(number: int | float, suffix: str = "") -> str:
-    """
-    Format the given number into a human-readable string.
-
-    Code adapted from http://stackoverflow.com/a/1094933
-
-    :param variant number: the number (int or float)
-    :param string suffix: the unit of the number
-    :rtype: string
-    """
-    for unit in ("", "K", "M", "G", "T", "P", "E", "Z"):
-        if abs(number) < 1024.0:
-            return f"{number:3.1f}{unit}{suffix}"
-        number /= 1024.0
-    return f"{number:.1f}Y{suffix}"
-
-
 def is_utf8_encoded(bstring: bytes) -> bool:
     """
     Return ``True`` if the given byte string can be decoded
@@ -979,18 +778,6 @@ def safe_unicode_stdin(string: typing.AnyStr | None) -> str | None:
         except Exception:
             return string.decode("utf-8")
     return string
-
-
-def bundle_directory() -> str | None:
-    """
-    Return the absolute path of the bundle directory
-    if running from a frozen binary; otherwise return ``None``.
-
-    :rtype: string
-    """
-    if FROZEN:
-        return sys._MEIPASS
-    return None
 
 
 def with_ns(tag: str, ns: str) -> str:

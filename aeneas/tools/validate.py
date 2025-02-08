@@ -22,11 +22,11 @@
 Perform validation on a task configuration string
 """
 
+import os.path
 import sys
 
 from aeneas.tools.abstract_cli_program import AbstractCLIProgram
 from aeneas.validator import Validator
-import aeneas.globalfunctions as gf
 
 
 class ValidateCLI(AbstractCLIProgram):
@@ -36,7 +36,7 @@ class ValidateCLI(AbstractCLIProgram):
 
     TASK_CONFIG_STRING = "task_language=ita|is_text_type=plain|os_task_file_name=output.txt|os_task_file_format=txt"
 
-    NAME = gf.file_name_without_extension(__file__)
+    NAME = os.path.splitext(__file__)[0]
 
     HELP = {
         "description": "Perform validation of a config string",

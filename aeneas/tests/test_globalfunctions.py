@@ -38,56 +38,6 @@ class TestGlobalFunctions(unittest.TestCase):
         self.assertTrue(os.path.isfile(tmp_file))
         gf.delete_file(tmp_handler, tmp_file)
 
-    def test_file_extension_None(self):
-        self.assertIsNone(gf.file_extension(None))
-
-    def test_file_extension(self):
-        for path, expected in (
-            ("", ""),
-            ("/", ""),
-            ("/foo", ""),
-            ("/foo.", ""),
-            ("/.foo", ""),
-            ("/foo.bar", "bar"),
-            ("/foo/bar/foo.baz", "baz"),
-            ("/foo/bar/baz", ""),
-            ("/foo/bar/.baz", ""),
-            ("foo", ""),
-            ("foo.", ""),
-            (".foo", ""),
-            ("foo.bar", "bar"),
-            ("foo/bar/foo.baz", "baz"),
-            ("foo/bar/baz", ""),
-            ("foo/bar/.baz", ""),
-        ):
-            with self.subTest(path=path, expected=expected):
-                self.assertEqual(gf.file_extension(path), expected)
-
-    def test_file_name_without_extension_None(self):
-        self.assertIsNone(gf.file_name_without_extension(None))
-
-    def test_file_name_without_extension(self):
-        for path, expected in (
-            ("", ""),
-            ("/", ""),
-            ("/foo", "foo"),
-            ("/foo.", "foo"),
-            ("/.foo", ".foo"),
-            ("/foo.bar", "foo"),
-            ("/foo/bar/foo.baz", "foo"),
-            ("/foo/bar/baz", "baz"),
-            ("/foo/bar/.baz", ".baz"),
-            ("foo", "foo"),
-            ("foo.", "foo"),
-            (".foo", ".foo"),
-            ("foo.bar", "foo"),
-            ("foo/bar/foo.baz", "foo"),
-            ("foo/bar/baz", "baz"),
-            ("foo/bar/.baz", ".baz"),
-        ):
-            with self.subTest(path=path, expected=expected):
-                self.assertEqual(gf.file_name_without_extension(path), expected)
-
     def test_safe_float(self):
         for value, default, expected in (
             ("3.14", 1.23, 3.14),
@@ -138,67 +88,6 @@ class TestGlobalFunctions(unittest.TestCase):
             ):
                 self.assertEqual(gf.safe_get(dictionary, key, default), expected)
 
-    def test_norm_join(self):
-        for prefix, suffix, expected in (
-            (None, None, "."),
-            (None, "", "."),
-            (None, "/foo", "/foo"),
-            (None, "/foo.bar", "/foo.bar"),
-            (None, "/foo/../bar", "/bar"),
-            (None, "/foo/./bar", "/foo/bar"),
-            (None, "/foo/bar/baz", "/foo/bar/baz"),
-            (None, "/foo/bar/../../baz", "/baz"),
-            (None, "/foo/bar/./baz", "/foo/bar/baz"),
-            ("", None, "."),
-            ("/foo", None, "/foo"),
-            ("/foo.bar", None, "/foo.bar"),
-            ("/foo/../bar", None, "/bar"),
-            ("/foo/./bar", None, "/foo/bar"),
-            ("/foo/bar/baz", None, "/foo/bar/baz"),
-            ("/foo/bar/../../baz", None, "/baz"),
-            ("/foo/bar/./baz", None, "/foo/bar/baz"),
-            ("", "", "."),
-            ("/", "", "/"),
-            ("", "/", "/"),
-            ("/", "/", "/"),
-            ("/foo", "bar", "/foo/bar"),
-            ("/foo", "bar/foo.baz", "/foo/bar/foo.baz"),
-            ("/foo", "bar/../foo.baz", "/foo/foo.baz"),
-            ("/foo", "bar/../../foo.baz", "/foo.baz"),
-            ("/foo", "bar.baz", "/foo/bar.baz"),
-            ("/foo/../", "bar.baz", "/bar.baz"),
-            ("/foo/", "../bar.baz", "/bar.baz"),
-            ("/foo/./", "bar.baz", "/foo/bar.baz"),
-            ("/foo/", "./bar.baz", "/foo/bar.baz"),
-            ("foo", "bar", "foo/bar"),
-            ("foo", "bar/foo.baz", "foo/bar/foo.baz"),
-            ("foo", "bar/../foo.baz", "foo/foo.baz"),
-            ("foo", "bar/../../foo.baz", "foo.baz"),
-            ("foo", "bar.baz", "foo/bar.baz"),
-            ("foo/../", "bar.baz", "bar.baz"),
-            ("foo/", "../bar.baz", "bar.baz"),
-            ("foo/./", "bar.baz", "foo/bar.baz"),
-            ("foo/", "./bar.baz", "foo/bar.baz"),
-        ):
-            with self.subTest(prefix=prefix, suffix=suffix, expected=expected):
-                self.assertEqual(gf.norm_join(prefix, suffix), expected)
-
-    def test_config_txt_None_to_string(self):
-        self.assertIsNone(gf.config_txt_to_string(None))
-
-    def test_config_txt_to_string(self):
-        for txt, expected in (
-            ("", ""),
-            ("k1=v1", "k1=v1"),
-            ("k1=v1\n\n", "k1=v1"),
-            ("k1=v1\nk2=v2", "k1=v1|k2=v2"),
-            ("k1=v1\nk2=v2\n\n\nk3=v3\n", "k1=v1|k2=v2|k3=v3"),
-            (" k1=v1\n k2=v2 \n\n\nk3=v3 \n", "k1=v1|k2=v2|k3=v3"),
-            ("k1=v1\nk2\nk3=v3", "k1=v1|k2|k3=v3"),
-        ):
-            with self.subTest(txt=txt, expected=expected):
-                self.assertEqual(gf.config_txt_to_string(txt), expected)
-
     def test_config_string_to_dict(self):
         for string, expected in (
             (None, {}),
@@ -217,13 +106,6 @@ class TestGlobalFunctions(unittest.TestCase):
         ):
             with self.subTest(string=string, expected=expected):
                 self.assertEqual(gf.config_string_to_dict(string), expected)
-
-    def test_config_dict_to_string(self):
-        self.assertEqual(gf.config_dict_to_string({}), "")
-        self.assertEqual(gf.config_dict_to_string({"k1": "v1"}), "k1=v1")
-        self.assertEqual(
-            gf.config_dict_to_string({"k1": "v1", "k2": "v2"}), "k1=v1|k2=v2"
-        )
 
     def test_pairs_to_dict(self):
         for pairs, expected in (
@@ -402,26 +284,7 @@ class TestGlobalFunctions(unittest.TestCase):
             with self.subTest(value=value, expected=expected):
                 self.assertEqual(gf.time_to_srt(value), expected)
 
-    def test_split_url(self):
-        for url, expected in (
-            (None, (None, None)),
-            ("", ("", None)),
-            ("foo", ("foo", None)),
-            ("foo.html", ("foo.html", None)),
-            ("foo.html#", ("foo.html", "")),
-            ("foo.html#id", ("foo.html", "id")),
-            ("foo.html#id#bad", ("foo.html", "id")),
-        ):
-            with self.subTest(url=url, expected=expected):
-                self.assertEqual(gf.split_url(url), expected)
-
     def test_is_posix(self):
-        self.skipTest("TODO")
-
-    def test_is_linux(self):
-        self.skipTest("TODO")
-
-    def test_is_osx(self):
         self.skipTest("TODO")
 
     def test_is_windows(self):
@@ -440,34 +303,6 @@ class TestGlobalFunctions(unittest.TestCase):
 
     def test_run_c_extension_with_fallback(self):
         self.skipTest("TODO")
-
-    def test_file_size_nonzero(self):
-        handler, path = gf.tmp_file()
-        with open(path, "w", encoding="utf-8") as tmp_file:
-            tmp_file.write("Foo bar")
-        self.assertEqual(gf.file_size(path), 7)
-        gf.delete_file(handler, path)
-
-    def test_file_size_zero(self):
-        handler, path = gf.tmp_file()
-        self.assertEqual(gf.file_size(path), 0)
-        gf.delete_file(handler, path)
-
-    def test_file_size_not_existing(self):
-        path = "/foo/bar/baz"
-        self.assertEqual(gf.file_size(path), -1)
-
-    def test_delete_directory_existing(self):
-        tmp_dir = tempfile.mkdtemp()
-        self.assertTrue(os.path.isdir(tmp_dir))
-        gf.delete_directory(tmp_dir)
-        self.assertFalse(os.path.isdir(tmp_dir))
-
-    def test_delete_directory_not_existing(self):
-        orig = "/foo/bar/baz"
-        self.assertFalse(os.path.isdir(orig))
-        gf.delete_directory(orig)
-        self.assertFalse(os.path.isdir(orig))
 
     def test_close_file_handler(self):
         handler, path = gf.tmp_file()
@@ -529,33 +364,6 @@ class TestGlobalFunctions(unittest.TestCase):
         ]
         for test in tests:
             self.assertEqual(gf.absolute_path(test[0], test[1]), test[2])
-
-    def test_read_file_bytes(self):
-        handler, path = gf.tmp_file()
-        with open(path, "w", encoding="utf-8") as tmp_file:
-            tmp_file.write("Foo bar")
-        contents = gf.read_file_bytes(path)
-        self.assertIsInstance(contents, bytes)
-        self.assertEqual(len(contents), 7)
-        gf.delete_file(handler, path)
-
-    def test_human_readable_number(self):
-        tests = [
-            (0, "0.0"),
-            (0.0, "0.0"),
-            (1, "1.0"),
-            (1.0, "1.0"),
-            (10, "10.0"),
-            (100, "100.0"),
-            (1000, "1000.0"),
-            (2000, "2.0K"),
-            (3000, "2.9K"),
-            (1000000, "976.6K"),
-            (2000000, "1.9M"),
-            (3000000, "2.9M"),
-        ]
-        for test in tests:
-            self.assertEqual(gf.human_readable_number(test[0]), test[1])
 
     def test_is_utf8_encoded(self):
         tests = [

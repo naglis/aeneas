@@ -24,7 +24,9 @@
 Extract MFCCs from a given audio file.
 """
 
+import os.path
 import sys
+
 import numpy
 
 from aeneas.audiofile import (
@@ -46,7 +48,7 @@ class ExtractMFCCCLI(AbstractCLIProgram):
     INPUT_FILE = gf.relative_path("res/audio.wav", __file__)
     OUTPUT_FILE = "output/audio.wav.mfcc.txt"
 
-    NAME = gf.file_name_without_extension(__file__)
+    NAME = os.path.splitext(__file__)[0]
 
     HELP = {
         "description": "Extract MFCCs from a given audio file as a fat matrix.",

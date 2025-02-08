@@ -25,6 +25,7 @@ to the CLI programs in aeneas.tools.
 
 import logging
 import os
+import os.path
 import sys
 import tempfile
 import typing
@@ -65,7 +66,7 @@ class AbstractCLIProgram(Configurable):
     :type  rconf: :class:`aeneas.runtimeconfiguration.RuntimeConfiguration`
     """
 
-    NAME: typing.ClassVar[str] = gf.file_name_without_extension(__file__)
+    NAME: typing.ClassVar[str] = os.path.splitext(__file__)[0]
 
     AENEAS_URL = "https://www.readbeyond.it/aeneas/"
     DOCS_URL = "https://www.readbeyond.it/aeneas/docs/"

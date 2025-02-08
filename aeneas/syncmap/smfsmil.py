@@ -76,7 +76,7 @@ class SyncMapFormatSMIL(SyncMapFormatGenericXML):
         for par in root.iter(with_smil_ns("par")):
             for child in par:
                 if child.tag == with_smil_ns("text"):
-                    identifier = gf.safe_unicode(gf.split_url(child.get("src"))[1])
+                    identifier = urllib.parse.urlparse(child.get("src")).fragment
                 elif child.tag == with_smil_ns("audio"):
                     begin = self._autodetect_parse_duration(child.get("clipBegin"))
                     end = self._autodetect_parse_duration(child.get("clipEnd"))

@@ -24,6 +24,7 @@
 Read audio file properties using the ``ffprobe`` wrapper.
 """
 
+import os.path
 import sys
 
 from aeneas.ffprobewrapper import (
@@ -44,7 +45,7 @@ class FFPROBEWrapperCLI(AbstractCLIProgram):
 
     AUDIO_FILE = gf.relative_path("res/audio.mp3", __file__)
 
-    NAME = gf.file_name_without_extension(__file__)
+    NAME = os.path.splitext(__file__)[0]
 
     HELP = {
         "description": "Read audio file properties using the ffprobe wrapper.",

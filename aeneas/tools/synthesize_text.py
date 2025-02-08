@@ -25,6 +25,7 @@ Synthesize several text fragments,
 producing a WAV audio file.
 """
 
+import os.path
 import sys
 
 from aeneas.synthesizer import Synthesizer
@@ -48,7 +49,7 @@ class SynthesizeTextCLI(AbstractCLIProgram):
     TEXT_FILE_SUBTITLES = gf.relative_path("res/subtitles.txt", __file__)
     TEXT_FILE_UNPARSED = gf.relative_path("res/unparsed.xhtml", __file__)
 
-    NAME = gf.file_name_without_extension(__file__)
+    NAME = os.path.splitext(__file__)[0]
 
     HELP = {
         "description": "Synthesize several text fragments.",

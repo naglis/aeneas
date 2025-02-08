@@ -31,6 +31,7 @@ This module contains the following classes:
 
 import contextlib
 import logging
+import os.path
 import tempfile
 import typing
 
@@ -333,8 +334,8 @@ class AudioFile(Configurable):
 
         # get the file size
         logger.debug("Getting file size for %r", self.file_path)
-        self.file_size = gf.file_size(self.file_path)
-        logger.debug("File size for %r is '%d'", self.file_path, self.file_size)
+        self.file_size = os.path.getsize(self.file_path)
+        logger.debug("File size for %r: %d bytes", self.file_path, self.file_size)
 
         # get the audio properties using FFPROBEWrapper
         try:

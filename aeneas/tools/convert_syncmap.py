@@ -25,6 +25,7 @@ Convert a sync map from a format to another.
 """
 
 import sys
+import os.path
 
 from aeneas.syncmap import SyncMap
 from aeneas.syncmap import SyncMapFormat
@@ -50,7 +51,7 @@ class ConvertSyncMapCLI(AbstractCLIProgram):
     OUTPUT_MAP_SRT = "output/syncmap.srt"
     OUTPUT_MAP_TXT = "output/syncmap.txt"
 
-    NAME = gf.file_name_without_extension(__file__)
+    NAME = os.path.splitext(__file__)[0]
 
     HELP = {
         "description": "Convert a sync map from a format to another.",
@@ -93,7 +94,7 @@ class ConvertSyncMapCLI(AbstractCLIProgram):
             return self.ERROR_EXIT_CODE
         input_sm_format = self.has_option_with_value("--input-format")
         if input_sm_format is None:
-            input_sm_format = gf.file_extension(input_file_path)
+            input_sm_format = os.path.splitext(input_file_path)[1].removeprefix(".")
         if not self.check_format(input_sm_format):
             return self.ERROR_EXIT_CODE
 
@@ -106,7 +107,9 @@ class ConvertSyncMapCLI(AbstractCLIProgram):
         else:
             output_sm_format = self.has_option_with_value("--output-format")
             if output_sm_format is None:
-                output_sm_format = gf.file_extension(output_file_path)
+                output_sm_format = os.path.splitext(output_file_path)[1].removeprefix(
+                    "."
+                )
             if not self.check_format(output_sm_format):
                 return self.ERROR_EXIT_CODE
 

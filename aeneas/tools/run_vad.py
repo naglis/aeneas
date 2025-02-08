@@ -25,6 +25,7 @@ Extract a list of speech intervals from the given audio file,
 using the MFCC energy-based VAD algorithm.
 """
 
+import os.path
 import sys
 
 from aeneas.audiofile import (
@@ -50,7 +51,7 @@ class RunVADCLI(AbstractCLIProgram):
     OUTPUT_SPEECH = "output/speech.txt"
     MODES = ["both", "nonspeech", "speech"]
 
-    NAME = gf.file_name_without_extension(__file__)
+    NAME = os.path.splitext(__file__)[0]
 
     HELP = {
         "description": "Extract a list of speech intervals using the MFCC energy-based VAD.",

@@ -19,6 +19,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import functools
+import os.path
 
 from aeneas.syncmap.smfgxml import SyncMapFormatGenericXML
 import aeneas.globalconstants as gc
@@ -87,9 +88,12 @@ class SyncMapFormatEAF(SyncMapFormatGenericXML):
             media.attrib["MEDIA_URL"] = self.parameters[
                 gc.PPN_TASK_OS_FILE_EAF_AUDIO_REF
             ]
-            media.attrib["MIME_TYPE"] = gf.mimetype_from_path(
-                self.parameters[gc.PPN_TASK_OS_FILE_EAF_AUDIO_REF]
+            extension = (
+                os.path.splitext(self.parameters[gc.PPN_TASK_OS_FILE_EAF_AUDIO_REF])[1]
+                .lower()
+                .removeprefix(".")
             )
+            media.attrib["MIME_TYPE"] = gc.MIMETYPE_MAP.get(extension)
         # time order
         time_order = ET.SubElement(doc, "TIME_ORDER")
         # tier

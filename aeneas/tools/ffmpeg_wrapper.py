@@ -24,10 +24,10 @@
 Convert audio files to mono WAV using the ``ffmpeg`` wrapper.
 """
 
+import os.path
 import sys
 
-from aeneas.ffmpegwrapper import FFMPEGPathError
-from aeneas.ffmpegwrapper import FFMPEGWrapper
+from aeneas.ffmpegwrapper import FFMPEGPathError, FFMPEGWrapper
 from aeneas.runtimeconfiguration import RuntimeConfiguration
 from aeneas.tools.abstract_cli_program import AbstractCLIProgram
 import aeneas.globalfunctions as gf
@@ -41,7 +41,7 @@ class FFMPEGWrapperCLI(AbstractCLIProgram):
     INPUT_FILE = gf.relative_path("res/audio.mp3", __file__)
     OUTPUT_FILE = "output/audio.wav"
 
-    NAME = gf.file_name_without_extension(__file__)
+    NAME = os.path.splitext(__file__)[0]
 
     HELP = {
         "description": "Convert audio files to mono WAV using the ffmpeg wrapper.",

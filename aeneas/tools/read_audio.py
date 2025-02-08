@@ -22,11 +22,14 @@
 Read audio file properties.
 """
 
+import os.path
 import sys
 
-from aeneas.audiofile import AudioFile
-from aeneas.audiofile import AudioFileProbeError
-from aeneas.audiofile import AudioFileUnsupportedFormatError
+from aeneas.audiofile import (
+    AudioFile,
+    AudioFileProbeError,
+    AudioFileUnsupportedFormatError,
+)
 from aeneas.runtimeconfiguration import RuntimeConfiguration
 from aeneas.tools.abstract_cli_program import AbstractCLIProgram
 import aeneas.globalfunctions as gf
@@ -39,7 +42,7 @@ class ReadAudioCLI(AbstractCLIProgram):
 
     AUDIO_FILE = gf.relative_path("res/audio.mp3", __file__)
 
-    NAME = gf.file_name_without_extension(__file__)
+    NAME = os.path.splitext(__file__)[0]
 
     HELP = {
         "description": "Read audio file properties.",

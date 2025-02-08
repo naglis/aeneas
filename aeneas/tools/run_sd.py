@@ -24,11 +24,14 @@
 Detect the audio head and/or tail of the given audio file.
 """
 
+import os.path
 import sys
 
-from aeneas.audiofile import AudioFileConverterError
-from aeneas.audiofile import AudioFileNotInitializedError
-from aeneas.audiofile import AudioFileUnsupportedFormatError
+from aeneas.audiofile import (
+    AudioFileConverterError,
+    AudioFileNotInitializedError,
+    AudioFileUnsupportedFormatError,
+)
 from aeneas.audiofilemfcc import AudioFileMFCC
 from aeneas.runtimeconfiguration import RuntimeConfiguration
 from aeneas.sd import SD
@@ -48,7 +51,7 @@ class RunSDCLI(AbstractCLIProgram):
     PARAMETERS_TAIL = "--min-tail=1.0 --max-tail=5.0"
     TEXT_FILE = gf.relative_path("res/parsed.txt", __file__)
 
-    NAME = gf.file_name_without_extension(__file__)
+    NAME = os.path.splitext(__file__)[0]
 
     HELP = {
         "description": "Detect the audio head and/or tail of the given audio file.",

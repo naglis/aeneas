@@ -24,6 +24,7 @@
 Read text fragments from file.
 """
 
+import os.path
 import sys
 
 from aeneas.textfile import TextFileFormat
@@ -44,7 +45,7 @@ class ReadTextCLI(AbstractCLIProgram):
     TEXT_FILE_SUBTITLES = gf.relative_path("res/subtitles.txt", __file__)
     TEXT_FILE_UNPARSED = gf.relative_path("res/unparsed.xhtml", __file__)
 
-    NAME = gf.file_name_without_extension(__file__)
+    NAME = os.path.splitext(__file__)[0]
 
     HELP = {
         "description": "Read text fragments from file.",

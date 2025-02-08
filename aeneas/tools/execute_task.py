@@ -24,6 +24,7 @@ and a configuration string.
 """
 
 import decimal
+import os.path
 import sys
 
 from aeneas.adjustboundaryalgorithm import AdjustBoundaryAlgorithm
@@ -358,7 +359,7 @@ class ExecuteTaskCLI(AbstractCLIProgram):
         "task_adjust_boundary_algorithm": AdjustBoundaryAlgorithm.ALLOWED_VALUES,
     }
 
-    NAME = gf.file_name_without_extension(__file__)
+    NAME = os.path.splitext(__file__)[0]
 
     HELP = {
         "description": "Execute a Task.",
@@ -498,7 +499,7 @@ class ExecuteTaskCLI(AbstractCLIProgram):
                 )
                 return self.ERROR_EXIT_CODE
 
-        audio_extension = gf.file_extension(audio_file_path)
+        audio_extension = os.path.splitext(audio_file_path)[1].removeprefix(".")
         if audio_extension.lower() not in AudioFile.FILE_EXTENSIONS:
             self.print_warning(
                 f"Your audio file path has extension {audio_extension}, which is uncommon for an audio file. "
