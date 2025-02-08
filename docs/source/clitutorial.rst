@@ -507,12 +507,6 @@ Examples:
 
         python -m aeneas.tools.execute_task --example-json -r="tts=nuance|nuance_tts_api_id=YOUR_NUANCE_API_ID|nuance_tts_api_key=YOUR_NUANCE_API_KEY|tts_cache=True"
 
-#. use a custom TTS wrapper located at ``/path/to/your/wrapper.py`` (see the ``aeneas/extra/`` directory for examples):
-
-    .. code-block:: text
-
-        python -m aeneas.tools.execute_task --example-json -r="tts=custom|tts_path=/path/to/your/wrapper.py"
-
 #. set the temporary directory:
 
     .. code-block:: text

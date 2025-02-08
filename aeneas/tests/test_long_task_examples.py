@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 # aeneas is a Python/C library and a set of tools
 # to automagically synchronize audio and text (aka forced alignment)
 #
@@ -34,10 +32,6 @@ class TestExecuteTaskCLI(ExecuteTaskCLICase):
 
     def test_example_cewsubprocess(self):
         self.execute([("", "--example-cewsubprocess")], 0)
-
-    @extra_test
-    def test_example_ctw_espeak(self):
-        self.execute([("", "--example-ctw-espeak")], 0)
 
     def test_example_eaf(self):
         self.execute([("", "--example-eaf")], 0)

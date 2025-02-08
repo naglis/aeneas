@@ -16,9 +16,6 @@ datas = [
     ("aeneas/res/*",            "aeneas/res"),
     ("aeneas/tools/res/*",      "aeneas/tools/res"),
     # optional, copy files
-    ("aeneas/extra/*.py",       "aeneas/extra"),
-    # optional, create output directory
-    ("aeneas/extra/.gitignore", "output"),
 ]
 
 block_cipher = None

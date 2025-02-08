@@ -1,10 +1,10 @@
 recursive-include aeneas/cdtw *
 recursive-include aeneas/cew *
+recursive-include aeneas/cengw *
 recursive-include aeneas/cfw *
 recursive-include aeneas/cint *
 recursive-include aeneas/cmfcc *
 recursive-include aeneas/cwave *
-recursive-include aeneas/extra *
 recursive-include aeneas/res *
 recursive-include aeneas/syncmap *
 recursive-include aeneas/tools/res *

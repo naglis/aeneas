@@ -344,7 +344,6 @@ The main ``aeneas`` package contains several subpackages:
 * :mod:`aeneas.cfw` (Python C++ extension)
 * :mod:`aeneas.cmfcc` (Python C extension)
 * :mod:`aeneas.cwave` (Python C extension)
-* :mod:`aeneas.extra`
 * :mod:`aeneas.syncmap`
 * :mod:`aeneas.tests`
 * :mod:`aeneas.tools`
@@ -379,19 +378,6 @@ and the following modules:
     textfile
     vad
     validator
-
-
-
-Package ``aeneas.extra``
-~~~~~~~~~~~~~~~~~~~~~~~~
-
-The ``aeneas.extra`` package contains some extra Python source files
-which provide **experimental** and **not officially supported** functions,
-mainly custom, not built-in TTS engine wrappers.
-
-For example, if you want to write your own custom TTS engine wrapper,
-have a look at the ``aeneas/extra/ctw_espeak.py`` source file,
-which is heavily commented and should be easy to modify for your own TTS engine.
 
 
 Package ``aeneas.tests``

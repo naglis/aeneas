@@ -23,5 +23,4 @@ Currently, the available TTS engines are:
 Moreover, custom TTS wrappers can be specified at runtime.
 The wrapper must be implemented in a `CustomTTSWrapper` class,
 subclass of `BaseTTSWrapper`.
-See the `aeneas/extra/` directory for examples.
 
