@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 # aeneas is a Python/C library and a set of tools
 # to automagically synchronize audio and text (aka forced alignment)
 #
@@ -20,8 +18,8 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import unittest
 import importlib.util
+import unittest
 
 import numpy
 
@@ -37,7 +35,7 @@ class TestCDTW(unittest.TestCase):
     MFCC2 = gf.absolute_path("res/cdtw/mfcc2_12_868", __file__)
 
     def test_compute_path(self):
-        import aeneas.cdtw.cdtw
+        import aeneas.cdtw.cdtw as cdtw
 
         mfcc1 = numpy.loadtxt(self.MFCC1)
         mfcc2 = numpy.loadtxt(self.MFCC2)
@@ -46,7 +44,9 @@ class TestCDTW(unittest.TestCase):
         delta = 3000
         if delta > m:
             delta = m
-        best_path = aeneas.cdtw.cdtw.compute_best_path(mfcc1, mfcc2, delta)
+
+        best_path = cdtw.compute_best_path(mfcc1, mfcc2, delta)
+
         self.assertEqual(len(best_path), 1418)
         self.assertEqual(best_path[0], (0, 0))
         self.assertEqual(best_path[-1], (n - 1, m - 1))
