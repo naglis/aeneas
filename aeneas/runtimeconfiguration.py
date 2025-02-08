@@ -520,40 +520,6 @@ class RuntimeConfiguration(Configuration):
     .. versionadded:: 1.7.0
     """
 
-    NUANCE_TTS_API_ID = "nuance_tts_api_id"
-    """
-    Your ID value to use the Nuance TTS API.
-
-    You will be billed according to your Nuance Developers account plan.
-
-    Important: this feature is experimental, use at your own risk.
-    It is recommended not to use this TTS at word-level granularity,
-    as it will create many requests, hence it will be expensive.
-    If you still want to use it, you can enable
-    the TTS caching mechanism by setting
-    :data:`~aeneas.runtimeconfiguration.RuntimeConfiguration.TTS_CACHE`
-    to ``True``.
-
-    .. versionadded:: 1.5.0
-    """
-
-    NUANCE_TTS_API_KEY = "nuance_tts_api_key"
-    """
-    Your KEY value to use the Nuance TTS API.
-
-    You will be billed according to your Nuance Developers account plan.
-
-    Important: this feature is experimental, use at your own risk.
-    It is recommended not to use this TTS at word-level granularity,
-    as it will create many requests, hence it will be expensive.
-    If you still want to use it, you can enable
-    the TTS caching mechanism by setting
-    :data:`~aeneas.runtimeconfiguration.RuntimeConfiguration.TTS_CACHE`
-    to ``True``.
-
-    .. versionadded:: 1.5.0
-    """
-
     SAFETY_CHECKS = "safety_checks"
     """
     If ``True``, perform safety checks on input files and parameters.
@@ -637,16 +603,6 @@ class RuntimeConfiguration(Configuration):
     parameter if the command ``text2wave`` is not available in
     one of the directories listed in your ``PATH`` environment variable.
 
-    Specify the value
-    :data:`~aeneas.synthesizer.Synthesizer.NUANCE` (``nuance``)
-    to use the built-in Nuance TTS API wrapper;
-    you will need to provide your Nuance Developer API ID and API Key using the
-    :data:`~aeneas.runtimeconfiguration.RuntimeConfiguration.NUANCE_TTS_API_ID`
-    and
-    :data:`~aeneas.runtimeconfiguration.RuntimeConfiguration.NUANCE_TTS_API_KEY`
-    parameters.
-    Please note that you will be billed according to your Nuance Developers account plan.
-
     .. versionadded:: 1.5.0
     """
 
@@ -697,35 +653,6 @@ class RuntimeConfiguration(Configuration):
     Default: ``False``.
 
     .. versionadded:: 1.6.0
-    """
-
-    TTS_API_SLEEP = "tts_api_sleep"
-    """
-    Wait this number of seconds before the next HTTP POST request
-    to the Nuance TTS API.
-    This parameter can be used to throttle the HTTP usage.
-    It cannot be a negative value.
-
-    Note that this parameter was called ``nuance_tts_api_sleep``
-    before v1.7.0.
-
-    Default: ``1.000``.
-
-    .. versionadded:: 1.5.0
-    """
-
-    TTS_API_RETRY_ATTEMPTS = "tts_api_retry_attempts"
-    """
-    Retry an HTTP POST request to the Nuance TTS API
-    for this number of times before giving up.
-    It must be an integer greater than zero.
-
-    Note that this parameter was called ``nuance_tts_api_retry_attempts``
-    before v1.7.0.
-
-    Default: ``5``.
-
-    .. versionadded:: 1.5.0
     """
 
     TTS_L1 = "tts_l1"
@@ -964,8 +891,6 @@ class RuntimeConfiguration(Configuration):
             MFCC_WINDOW_SHIFT_L3,
             ("0.005", TimeValue, [], "level 3 (word) MFCC window shift, in s"),
         ),
-        (NUANCE_TTS_API_ID, (None, None, [], "Nuance Developer API ID")),
-        (NUANCE_TTS_API_KEY, (None, None, [], "Nuance Developer API Key")),
         (SAFETY_CHECKS, (True, bool, [], "if True, always perform safety checks")),
         (
             TASK_MAX_AUDIO_LENGTH,
@@ -996,11 +921,6 @@ class RuntimeConfiguration(Configuration):
             ),
         ),
         (TTS_CACHE, (False, bool, [], "if True, cache synthesized audio files")),
-        (TTS_API_SLEEP, ("1.000", TimeValue, [], "sleep between TTS API calls, in s")),
-        (
-            TTS_API_RETRY_ATTEMPTS,
-            (5, int, [], "number of retries for a failed TTS API call"),
-        ),
         (TTS_L1, ("espeak-ng", None, [], "TTS wrapper to use at level 1 (para)")),
         (
             TTS_PATH_L1,

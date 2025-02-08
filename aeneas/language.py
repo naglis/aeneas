@@ -46,7 +46,6 @@ class Language(str, enum.Enum):
     * :class:`~aeneas.ttswrappers.espeakngttswrapper.ESPEAKNGTTSWrapper` (default TTS)
     * :class:`~aeneas.ttswrappers.espeakttswrapper.ESPEAKTTSWrapper`
     * :class:`~aeneas.ttswrappers.festivalttswrapper.FESTIVALTTSWrapper`
-    * :class:`~aeneas.ttswrappers.nuancettswrapper.NuanceTTSWrapper`
 
     Each language is indicated by its ISO 639-3 language code.
     """

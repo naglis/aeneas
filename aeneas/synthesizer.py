@@ -28,7 +28,6 @@ This module contains the following classes:
 .. warning:: This module might be refactored in a future version
 """
 
-import importlib.util
 import logging
 import os.path
 
@@ -38,7 +37,6 @@ from aeneas.textfile import TextFile
 from aeneas.ttswrappers.espeakngttswrapper import ESPEAKNGTTSWrapper
 from aeneas.ttswrappers.espeakttswrapper import ESPEAKTTSWrapper
 from aeneas.ttswrappers.festivalttswrapper import FESTIVALTTSWrapper
-from aeneas.ttswrappers.nuancettswrapper import NuanceTTSWrapper
 
 logger = logging.getLogger(__name__)
 
@@ -53,8 +51,6 @@ class Synthesizer(Configurable):
     :type  rconf: :class:`~aeneas.runtimeconfiguration.RuntimeConfiguration`
     :raises: OSError: if a custom TTS engine is requested
                       but it cannot be loaded
-    :raises: ImportError: if the Nuance TTS API wrapper is requested
-                          but the``requests`` module is not installed
     """
 
     ESPEAK = "espeak"
@@ -66,10 +62,7 @@ class Synthesizer(Configurable):
     FESTIVAL = "festival"
     """ Select Festival wrapper """
 
-    NUANCE = "nuance"
-    """ Select Nuance TTS API wrapper """
-
-    ALLOWED_VALUES = [ESPEAK, ESPEAKNG, FESTIVAL, NUANCE]
+    ALLOWED_VALUES = [ESPEAK, ESPEAKNG, FESTIVAL]
     """ List of all the allowed values """
 
     def __init__(self, rconf=None):
@@ -85,12 +78,6 @@ class Synthesizer(Configurable):
         requested_tts_engine = self.rconf[RuntimeConfiguration.TTS]
         tts_cls = None
         match requested_tts_engine:
-            case self.NUANCE:
-                if importlib.util.find_spec("requests") is None:
-                    raise ImportError(
-                        "Unable to import requests for Nuance TTS API wrapper"
-                    )
-                tts_cls = NuanceTTSWrapper
             case self.ESPEAK:
                 tts_cls = ESPEAKTTSWrapper
             case self.ESPEAKNG:

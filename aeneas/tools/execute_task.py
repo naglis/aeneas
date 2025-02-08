@@ -40,7 +40,6 @@ from aeneas.tools.abstract_cli_program import AbstractCLIProgram
 from aeneas.ttswrappers.espeakngttswrapper import ESPEAKNGTTSWrapper
 from aeneas.ttswrappers.espeakttswrapper import ESPEAKTTSWrapper
 from aeneas.ttswrappers.festivalttswrapper import FESTIVALTTSWrapper
-from aeneas.ttswrappers.nuancettswrapper import NuanceTTSWrapper
 from aeneas.validator import Validator
 import aeneas.globalconstants as gc
 import aeneas.globalfunctions as gf
@@ -360,7 +359,6 @@ class ExecuteTaskCLI(AbstractCLIProgram):
         "espeak": ESPEAKTTSWrapper.CODE_TO_HUMAN_LIST,
         "espeak-ng": ESPEAKNGTTSWrapper.CODE_TO_HUMAN_LIST,
         "festival": FESTIVALTTSWrapper.CODE_TO_HUMAN_LIST,
-        "nuance": NuanceTTSWrapper.CODE_TO_HUMAN_LIST,
         "task_language": Language.CODE_TO_HUMAN_LIST,
         "is_text_type": TextFileFormat.ALLOWED_VALUES,
         "is_text_unparsed_id_sort": IDSortingAlgorithm.ALLOWED_VALUES,

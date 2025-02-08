@@ -218,8 +218,8 @@ which explains how to use the built-in command line tools.
 * Output sync map formats: AUD, CSV, EAF, JSON, SMIL, SRT, SSV, SUB, TEXTGRID, TSV, TTML, TXT, VTT, XML
 * Confirmed working on 38 languages: AFR, ARA, BUL, CAT, CYM, CES, DAN, DEU, ELL, ENG, EPO, EST, FAS, FIN, FRA, GLE, GRC, HRV, HUN, ISL, ITA, JPN, LAT, LAV, LIT, NLD, NOR, RON, RUS, POL, POR, SLK, SPA, SRP, SWA, SWE, TUR, UKR
 * MFCC and DTW computed via Python C extensions to reduce the processing time
-* Several built-in TTS engine wrappers: eSpeak NG (default), eSpeak, Festival, MacOS (via say), Nuance TTS API
-* Default TTS (eSpeak) called via a Python C extension for fast audio synthesis
+* Several built-in TTS engine wrappers: eSpeak NG (default), eSpeak, Festival
+* Default TTS (eSpeak NG) called via a Python C extension for fast audio synthesis
 * Batch processing of multiple audio/text pairs
 * In multilevel mode, recursive alignment from paragraph to sentence to word level
 * In multilevel mode, MFCC resolution, MFCC masking, DTW margin, and TTS engine can be specified for each level independently
@@ -252,7 +252,7 @@ the quality of the alignment at word-level:
 
 * multilevel text (since v1.5.1),
 * MFCC nonspeech masking (since v1.7.0, disabled by default),
-* use better TTS engines, like Festival or Nuance TTS API (since v1.5.0).
+* use better TTS engines, like Festival.
 
 If you use the ``aeneas.tools.execute_task`` command line tool,
 you can add ``--presets-word`` switch to enable MFCC nonspeech masking, for example:

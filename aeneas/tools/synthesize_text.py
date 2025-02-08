@@ -27,7 +27,6 @@ producing a WAV audio file.
 
 import sys
 
-from aeneas.runtimeconfiguration import RuntimeConfiguration
 from aeneas.synthesizer import Synthesizer
 from aeneas.textfile import TextFileFormat
 from aeneas.tools.abstract_cli_program import AbstractCLIProgram
@@ -184,22 +183,6 @@ class SynthesizeTextCLI(AbstractCLIProgram):
             self.print_info(f"Created file {output_file_path!r}")
             synt.clear_cache()
             return self.NO_ERROR_EXIT_CODE
-        except ImportError as exc:
-            tts = self.rconf[RuntimeConfiguration.TTS]
-            if tts == Synthesizer.NUANCE:
-                self.print_error(
-                    "You need to install Python module requests to use the Nuance TTS API wrapper. Run:"
-                    "\n"
-                    "$ pip install requests"
-                    "\n"
-                    "or, to install for all users:"
-                    "\n"
-                    "$ sudo pip install requests"
-                )
-            else:
-                self.print_error(
-                    f"An unexpected error occurred while synthesizing text: {exc}"
-                )
         except Exception as exc:
             self.print_error(
                 f"An unexpected error occurred while synthesizing text: {exc}"

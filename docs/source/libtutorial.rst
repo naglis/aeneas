@@ -140,7 +140,6 @@ This choice might change in the future.
 Depending on what ``aeneas`` classes you want to use,
 you might need to install the following optional dependencies:
 
-* ``requests`` (for using the Nuance TTS API wrapper)
 * ``tgt`` (for outputting sync maps to TextGrid format)
 
 
@@ -442,7 +441,6 @@ in the synthesis step of the alignment procedure.
     espeakttswrapper
     espeakngttswrapper
     festivalttswrapper
-    nuancettswrapper
 
 
 

@@ -61,9 +61,6 @@ class TestExecuteTaskCLI(ExecuteTaskCLICase):
     def test_list_values_festival(self):
         self.execute([("", "--list-values=festival")], 2)
 
-    def test_list_values_nuance(self):
-        self.execute([("", "--list-values=nuance")], 2)
-
     def test_list_values_task_language(self):
         self.execute([("", "--list-values=task_language")], 2)
 

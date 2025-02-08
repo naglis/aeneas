@@ -16,7 +16,6 @@ Currently, the available TTS engines are:
 * `ESPEAKTTSWrapper` for `eSpeak` (C extension, subprocess; default TTS Wrapper)
 * `ESPEAKNGTTSWrapper` for `eSpeak-ng` (subprocess)
 * `FESTIVALTTSWrapper` for `Festival` (subprocess)
-* `NuanceTTSWrapper` for `Nuance TTS API` (Python calling remote Nuance API)
 
 Moreover, custom TTS wrappers can be specified at runtime.
 The wrapper must be implemented in a `CustomTTSWrapper` class,

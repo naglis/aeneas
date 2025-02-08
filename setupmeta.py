@@ -54,11 +54,7 @@ PKG_INSTALL_REQUIRES = ["BeautifulSoup4>=4.5.1", "lxml>=3.6.0", "numpy>=1.9"]
 # required packages to install extra tools
 PKG_EXTRAS_REQUIRE = {
     "full": [
-        "requests>=2.9.1",
         "tgt>=1.4.2",
-    ],
-    "requests": [
-        "requests>=2.9.1",
     ],
     "tgt": [
         "tgt>=1.4.2",
@@ -145,7 +141,6 @@ PKG_KEYWORDS = (
     "JSON",
     "MFCC",
     "Mel-frequency cepstral coefficients",
-    "Nuance TTS API",
     "ReadBeyond Sync",
     "ReadBeyond",
     "SBV",

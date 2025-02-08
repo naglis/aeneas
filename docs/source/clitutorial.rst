@@ -309,7 +309,7 @@ you need to provide the following additional parameters:
     1. MFCC nonspeech masking;
     2. a **multilevel text format**,
        even if you are going to use only the timings for the finer granularity;
-    3. better TTS engines, like Festival or Nuance TTS API;
+    3. better TTS engines, like Festival;
 
     as they generally yield more accurate timings.
 
@@ -494,12 +494,6 @@ Examples:
     .. code-block:: text
 
         python -m aeneas.tools.execute_task --example-json -r="tts=festival|tts_path=/path/to/text2wave"
-
-#. use the Nuance TTS API instead of eSpeak (with TTS caching enabled):
-
-    .. code-block:: text
-
-        python -m aeneas.tools.execute_task --example-json -r="tts=nuance|nuance_tts_api_id=YOUR_NUANCE_API_ID|nuance_tts_api_key=YOUR_NUANCE_API_KEY|tts_cache=True"
 
 #. set the temporary directory:
 

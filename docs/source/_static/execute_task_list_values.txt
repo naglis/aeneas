@@ -1,13 +1,11 @@
 $ python -m aeneas.tools.execute_task --list-values
 
 [INFO] Parameters for which values can be listed:
-aws
 espeak
 espeak-ng
 festival
 is_text_type
 is_text_unparsed_id_sort
-nuance
 os_task_file_format
 os_task_file_head_tail_format
 task_adjust_boundary_algorithm
