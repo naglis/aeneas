@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 # aeneas is a Python/C library and a set of tools
 # to automagically synchronize audio and text (aka forced alignment)
 #
@@ -24,6 +22,8 @@
 from aeneas.syncmap.smfgxml import SyncMapFormatGenericXML
 import aeneas.globalfunctions as gf
 
+import lxml.etree as ET
+
 
 class SyncMapFormatXML(SyncMapFormatGenericXML):
     """
@@ -33,9 +33,7 @@ class SyncMapFormatXML(SyncMapFormatGenericXML):
     DEFAULT = "xml"
 
     def parse(self, input_text, syncmap):
-        from lxml import etree
-
-        root = etree.fromstring(gf.safe_bytes(input_text))
+        root = ET.fromstring(gf.safe_bytes(input_text))
         for frag in root:
             identifier = gf.safe_unicode(frag.get("id"))
             begin = gf.time_from_ssmmm(frag.get("begin"))
@@ -53,22 +51,20 @@ class SyncMapFormatXML(SyncMapFormatGenericXML):
             )
 
     def format(self, syncmap):
-        from lxml import etree
-
         def visit_children(node, parent_elem):
             """Recursively visit the fragments_tree"""
             for child in node.children_not_empty:
                 fragment = child.value
-                fragment_elem = etree.SubElement(parent_elem, "fragment")
+                fragment_elem = ET.SubElement(parent_elem, "fragment")
                 fragment_elem.attrib["id"] = fragment.text_fragment.identifier
                 fragment_elem.attrib["begin"] = gf.time_to_ssmmm(fragment.begin)
                 fragment_elem.attrib["end"] = gf.time_to_ssmmm(fragment.end)
                 for line in fragment.text_fragment.lines:
-                    line_elem = etree.SubElement(fragment_elem, "line")
+                    line_elem = ET.SubElement(fragment_elem, "line")
                     line_elem.text = line
-                children_elem = etree.SubElement(fragment_elem, "children")
+                children_elem = ET.SubElement(fragment_elem, "children")
                 visit_children(child, children_elem)
 
-        map_elem = etree.Element("map")
+        map_elem = ET.Element("map")
         visit_children(syncmap.fragments_tree, map_elem)
         return self._tree_to_string(map_elem)

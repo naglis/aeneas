@@ -30,7 +30,7 @@ class SyncMapFormatVTT(SyncMapFormatGenericSubtitles):
 
     DEFAULT = "vtt"
 
-    def __init__(self, variant=DEFAULT, parameters=None):
+    def __init__(self, variant: str = DEFAULT, parameters=None):
         super().__init__(variant=variant, parameters=parameters)
         self.header_string = "WEBVTT"
         self.header_might_not_have_trailing_blank_line = False

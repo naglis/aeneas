@@ -167,7 +167,7 @@ class SyncMapFormatGenericSubtitles(SyncMapFormatBase):
             if not self.ignore_block(acc):
                 # get identifier, if any
                 j = 0
-                identifier = "f%06d" % cue_index
+                identifier = f"f{cue_index:06}d"
                 if self.cue_has_identifier:
                     identifier = acc[j]
                     j += 1
@@ -204,7 +204,7 @@ class SyncMapFormatGenericSubtitles(SyncMapFormatBase):
         for i, fragment in enumerate(syncmap.fragments, 1):
             text = fragment.text_fragment
             if self.cue_has_identifier or self.cue_has_optional_identifier:
-                msg.append("%d" % i)
+                msg.append(f"{i:d}")
             msg.append(
                 "{}{}{}".format(
                     self.format_time_function(fragment.begin),

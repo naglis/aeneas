@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 # aeneas is a Python/C library and a set of tools
 # to automagically synchronize audio and text (aka forced alignment)
 #
@@ -35,10 +33,14 @@ class SyncMapFormatAudacity(SyncMapFormatGenericTabular):
 
     MACHINE = "audm"
 
-    MACHINE_ALIASES = [DEFAULT, MACHINE]
+    MACHINE_ALIASES = (DEFAULT, MACHINE)
 
     FIELD_DELIMITER = "\t"
 
-    FIELDS = {"begin": 0, "end": 1, "text": 2}
+    FIELDS = {
+        "begin": 0,
+        "end": 1,
+        "text": 2,
+    }
 
     TEXT_DELIMITER = None

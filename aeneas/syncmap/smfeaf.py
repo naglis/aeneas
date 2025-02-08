@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 # aeneas is a Python/C library and a set of tools
 # to automagically synchronize audio and text (aka forced alignment)
 #
@@ -20,10 +18,18 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+import functools
 
 from aeneas.syncmap.smfgxml import SyncMapFormatGenericXML
 import aeneas.globalconstants as gc
 import aeneas.globalfunctions as gf
+
+import lxml.etree as ET
+
+XSI_NS = "http://www.w3.org/2001/XMLSchema-instance"
+
+
+with_xsi_ns = functools.partial(gf.with_ns, ns=XSI_NS)
 
 
 class SyncMapFormatEAF(SyncMapFormatGenericXML):
@@ -34,10 +40,8 @@ class SyncMapFormatEAF(SyncMapFormatGenericXML):
     DEFAULT = "eaf"
 
     def parse(self, input_text, syncmap):
-        from lxml import etree
-
         # get root
-        root = etree.fromstring(gf.safe_bytes(input_text))
+        root = ET.fromstring(gf.safe_bytes(input_text))
         # get time slots
         time_slots = dict()
         for ts in root.iter("TIME_SLOT"):
@@ -61,14 +65,9 @@ class SyncMapFormatEAF(SyncMapFormatGenericXML):
             )
 
     def format(self, syncmap):
-        from lxml import etree
-
-        # namespaces
-        xsi = "http://www.w3.org/2001/XMLSchema-instance"
-        ns_map = {"xsi": xsi}
         # build doc
-        doc = etree.Element("ANNOTATION_DOCUMENT", nsmap=ns_map)
-        doc.attrib["{%s}noNamespaceSchemaLocation" % xsi] = (
+        doc = ET.Element("ANNOTATION_DOCUMENT", nsmap={"xsi": XSI_NS})
+        doc.attrib[with_xsi_ns("noNamespaceSchemaLocation")] = (
             "http://www.mpi.nl/tools/elan/EAFv2.8.xsd"
         )
         doc.attrib["AUTHOR"] = "aeneas"
@@ -76,15 +75,15 @@ class SyncMapFormatEAF(SyncMapFormatGenericXML):
         doc.attrib["FORMAT"] = "2.8"
         doc.attrib["VERSION"] = "2.8"
         # header
-        header = etree.SubElement(doc, "HEADER")
+        header = ET.SubElement(doc, "HEADER")
         header.attrib["MEDIA_FILE"] = ""
         header.attrib["TIME_UNITS"] = "milliseconds"
         if (
-            (self.parameters is not None)
-            and (gc.PPN_TASK_OS_FILE_EAF_AUDIO_REF in self.parameters)
-            and (self.parameters[gc.PPN_TASK_OS_FILE_EAF_AUDIO_REF] is not None)
+            self.parameters is not None
+            and gc.PPN_TASK_OS_FILE_EAF_AUDIO_REF in self.parameters
+            and self.parameters[gc.PPN_TASK_OS_FILE_EAF_AUDIO_REF] is not None
         ):
-            media = etree.SubElement(header, "MEDIA_DESCRIPTOR")
+            media = ET.SubElement(header, "MEDIA_DESCRIPTOR")
             media.attrib["MEDIA_URL"] = self.parameters[
                 gc.PPN_TASK_OS_FILE_EAF_AUDIO_REF
             ]
@@ -92,31 +91,31 @@ class SyncMapFormatEAF(SyncMapFormatGenericXML):
                 self.parameters[gc.PPN_TASK_OS_FILE_EAF_AUDIO_REF]
             )
         # time order
-        time_order = etree.SubElement(doc, "TIME_ORDER")
+        time_order = ET.SubElement(doc, "TIME_ORDER")
         # tier
-        tier = etree.SubElement(doc, "TIER")
+        tier = ET.SubElement(doc, "TIER")
         tier.attrib["LINGUISTIC_TYPE_REF"] = "utterance"
         tier.attrib["TIER_ID"] = "tier1"
         for i, fragment in enumerate(syncmap.fragments, 1):
             # time slots
-            begin_id = "ts%06db" % i
-            end_id = "ts%06de" % i
-            slot = etree.SubElement(time_order, "TIME_SLOT")
+            begin_id = f"ts{i:06d}b"
+            end_id = f"ts{i:06d}e"
+            slot = ET.SubElement(time_order, "TIME_SLOT")
             slot.attrib["TIME_SLOT_ID"] = begin_id
-            slot.attrib["TIME_VALUE"] = "%d" % (fragment.begin * 1000)
-            slot = etree.SubElement(time_order, "TIME_SLOT")
+            slot.attrib["TIME_VALUE"] = str(fragment.begin * 1000)
+            slot = ET.SubElement(time_order, "TIME_SLOT")
             slot.attrib["TIME_SLOT_ID"] = end_id
-            slot.attrib["TIME_VALUE"] = "%d" % (fragment.end * 1000)
+            slot.attrib["TIME_VALUE"] = str(fragment.end * 1000)
             # annotation
-            annotation = etree.SubElement(tier, "ANNOTATION")
-            alignable = etree.SubElement(annotation, "ALIGNABLE_ANNOTATION")
+            annotation = ET.SubElement(tier, "ANNOTATION")
+            alignable = ET.SubElement(annotation, "ALIGNABLE_ANNOTATION")
             alignable.attrib["ANNOTATION_ID"] = fragment.text_fragment.identifier
             alignable.attrib["TIME_SLOT_REF1"] = begin_id
             alignable.attrib["TIME_SLOT_REF2"] = end_id
-            value = etree.SubElement(alignable, "ANNOTATION_VALUE")
+            value = ET.SubElement(alignable, "ANNOTATION_VALUE")
             value.text = " ".join(fragment.text_fragment.lines)
         # linguistic type
-        ling = etree.SubElement(doc, "LINGUISTIC_TYPE")
+        ling = ET.SubElement(doc, "LINGUISTIC_TYPE")
         ling.attrib["LINGUISTIC_TYPE_ID"] = "utterance"
         ling.attrib["TIME_ALIGNABLE"] = "true"
         # write tree

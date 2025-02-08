@@ -95,9 +95,7 @@ class SyncMapFormatGenericTabular(SyncMapFormatBase):
         placeholders = [None for i in range(len(self.FIELDS))]
         for k in self.FIELDS:
             placeholders[self.FIELDS[k]] = k
-        self.write_template = self.FIELD_DELIMITER.join(
-            ["{%s}" % p for p in placeholders]
-        )
+        self.write_template = self.FIELD_DELIMITER.join([f"{p}" for p in placeholders])
 
     def parse(self, input_text, syncmap):
         lines = []
@@ -114,7 +112,7 @@ class SyncMapFormatGenericTabular(SyncMapFormatBase):
             if "identifier" in self.FIELDS:
                 identifier = split[self.FIELDS["identifier"]]
             else:
-                identifier = "f%06d" % index
+                identifier = f"f{index:06}d"
 
             # set begin and end
             begin = self.parse_time_function(split[self.FIELDS["begin"]])
@@ -124,10 +122,10 @@ class SyncMapFormatGenericTabular(SyncMapFormatBase):
             if "text" in self.FIELDS:
                 text = self.FIELD_DELIMITER.join(split[self.FIELDS["text"] :])
                 if (
-                    (self.TEXT_DELIMITER is not None)
-                    and (len(text) > 1)
-                    and (text[0] == self.TEXT_DELIMITER)
-                    and (text[-1] == self.TEXT_DELIMITER)
+                    self.TEXT_DELIMITER is not None
+                    and len(text) > 1
+                    and text[0] == self.TEXT_DELIMITER
+                    and text[-1] == self.TEXT_DELIMITER
                 ):
                     text = text[1:-1]
             else:
