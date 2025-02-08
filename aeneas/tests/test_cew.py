@@ -29,42 +29,48 @@ import unittest
 )
 class TestCEW(unittest.TestCase):
     def test_cew_synthesize_multiple(self):
-        c_quit_after = 0.0
-        c_backwards = 0
-        c_text = [
-            ("en", "Dummy 1"),  # NOTE cew requires the actual eSpeak voice code
-            ("en", "Dummy 2"),  # NOTE cew requires the actual eSpeak voice code
-            ("en", "Dummy 3"),  # NOTE cew requires the actual eSpeak voice code
-        ]
-        import aeneas.cew.cew as cew
+        for name, (
+            c_text,
+            expected_sample_rate,
+            expected_fragments,
+            expected_intervals,
+        ) in {
+            "multiple": (
+                [
+                    # NOTE cew requires the actual eSpeak voice code
+                    ("en", "Dummy 1"),
+                    ("en", "Dummy 2"),
+                    ("en", "Dummy 3"),
+                ],
+                22050,
+                3,
+                3,
+            ),
+            "multiple_lang": (
+                [
+                    # NOTE cew requires the actual eSpeak voice code
+                    ("en", "Dummy 1"),
+                    ("it", "Segnaposto 2"),
+                    ("en", "Dummy 3"),
+                ],
+                22050,
+                3,
+                3,
+            ),
+        }.items():
+            import aeneas.cew.cew as cew
 
-        with tempfile.NamedTemporaryFile(suffix=".wav") as tmp_file:
-            sample_rate, synthesized_fragments, intervals = cew.synthesize_multiple(
-                tmp_file.name, c_quit_after, c_backwards, c_text
-            )
+            c_quit_after, c_backwards = 0.0, 0
+            with (
+                self.subTest(name=name),
+                tempfile.NamedTemporaryFile(suffix=".wav") as tmp_file,
+            ):
+                actual_sample_rate, actual_fragments, actual_intervals = (
+                    cew.synthesize_multiple(
+                        tmp_file.name, c_quit_after, c_backwards, c_text
+                    )
+                )
 
-        self.assertEqual(sample_rate, 22050)
-        self.assertEqual(synthesized_fragments, 3)
-        self.assertEqual(len(intervals), 3)
-
-    def test_cew_synthesize_multiple_lang(self):
-        c_quit_after = 0.0
-        c_backwards = 0
-        c_text = [
-            ("en", "Dummy 1"),  # NOTE cew requires the actual eSpeak voice code
-            (
-                "it",
-                "Segnaposto 2",
-            ),  # NOTE cew requires the actual eSpeak voice code
-            ("en", "Dummy 3"),  # NOTE cew requires the actual eSpeak voice code
-        ]
-        import aeneas.cew.cew as cew
-
-        with tempfile.NamedTemporaryFile(suffix=".wav") as tmp_file:
-            sample_rate, synthesized_fragments, intervals = cew.synthesize_multiple(
-                tmp_file.name, c_quit_after, c_backwards, c_text
-            )
-
-        self.assertEqual(sample_rate, 22050)
-        self.assertEqual(synthesized_fragments, 3)
-        self.assertEqual(len(intervals), 3)
+                self.assertEqual(expected_sample_rate, actual_sample_rate)
+                self.assertEqual(expected_fragments, actual_fragments)
+                self.assertEqual(expected_intervals, len(actual_intervals))
