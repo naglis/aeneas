@@ -31,6 +31,7 @@ This module contains the following classes:
 """
 
 import contextlib
+import io
 import logging
 import os.path
 import re
@@ -665,7 +666,8 @@ class TextFile:
         :param list lines: the text fragments
         """
         logger.debug("Reading text fragments from list")
-        self._read_plain(lines)
+        # TODO: Consider either improving this or removing `read_from_list()`.
+        self._read_plain(io.BytesIO(b"\n".join([line.encode() for line in lines])))
 
     def read_from_list_with_ids(self, lines: typing.Sequence[tuple[str, str]]):
         """
@@ -687,11 +689,6 @@ class TextFile:
         if self.file_format not in TextFileFormat.ALLOWED_VALUES:
             raise ValueError(f"Text file format {self.file_format!r} is not supported.")
 
-        # read the contents of the file
-        logger.debug("Reading contents of file %r", self.file_path)
-        with open(self.file_path, encoding="utf-8") as text_file:
-            lines = text_file.readlines()
-
         # clear text fragments
         self.clear()
 
@@ -705,7 +702,12 @@ class TextFile:
             TextFileFormat.UNPARSED: self._read_unparsed,
             TextFileFormat.UNPARSED_IMG: self._read_unparsed_img,
         }
-        map_read_function[self.file_format](lines)
+
+        # read the contents of the file
+        logger.debug("Reading contents of file %r", self.file_path)
+
+        with open(self.file_path, mode="rb") as f:
+            map_read_function[self.file_format](f)
 
         # log the number of fragments
         logger.debug("Parsed %d fragments", len(self.fragments))
@@ -729,16 +731,16 @@ class TextFile:
             return "\u0009"
         return word_separator
 
-    def _read_mplain(self, lines: typing.Sequence[str]):
+    def _read_mplain(self, buf: typing.IO[bytes]):
         """
         Read text fragments from a multilevel format text file.
 
-        :param list lines: the lines of the subtitles text file
+        :param buf: the bytes file object
         """
         logger.debug("Parsing fragments from subtitles text format")
         word_separator = self._mplain_word_separator()
         logger.debug("Word separator is: %r", word_separator)
-        lines = [line.strip() for line in lines]
+        lines = [line.decode().strip() for line in buf.readlines()]
         i = 1
         current = 0
         tree = Tree()
@@ -800,11 +802,11 @@ class TextFile:
 
         self.fragments_tree = tree
 
-    def _read_munparsed(self, lines: typing.Sequence[str]):
+    def _read_munparsed(self, buf: typing.IO[bytes]):
         """
         Read text fragments from an munparsed format text file.
 
-        :param list lines: the lines of the unparsed text file
+        :param buf: the bytes file object
         """
 
         def nodes_at_level(root, level: int):
@@ -825,7 +827,7 @@ class TextFile:
         #      for example, removing tags but keeping text, etc.
         logger.debug("Parsing fragments from munparsed text format")
         # transform text in a soup object
-        soup = BeautifulSoup("\n".join(lines), "lxml")
+        soup = BeautifulSoup(buf, "lxml")
         # extract according to class_regex and id_regex
         logger.debug("Finding L1 elements")
         tree = Tree()
@@ -879,16 +881,16 @@ class TextFile:
         # append to fragments
         self.fragments_tree = tree
 
-    def _read_subtitles(self, lines: typing.Sequence[str]):
+    def _read_subtitles(self, buf: typing.IO[bytes]):
         """
         Read text fragments from a subtitles format text file.
 
-        :param list lines: the lines of the subtitles text file
+        :param buf: the bytes file object
         :raises: ValueError: if the id regex is not valid
         """
         logger.debug("Parsing fragments from subtitles text format")
         id_format = self._get_id_format()
-        lines = [line.strip() for line in lines]
+        lines = [line.decode().strip() for line in buf.readlines()]
         pairs = []
         i = 1
         current = 0
@@ -907,18 +909,16 @@ class TextFile:
             current += 1
         self._create_text_fragments(pairs)
 
-    def _read_parsed(self, lines: typing.Sequence[str]):
+    def _read_parsed(self, buf: typing.IO[bytes]):
         """
         Read text fragments from a parsed format text file.
 
-        :param list lines: the lines of the parsed text file
-        :param dict parameters: additional parameters for parsing
-                                (e.g., class/id regex strings)
+        :param buf: the bytes file object
         """
         logger.debug("Parsing fragments from parsed text format")
         pairs = []
-        for line in lines:
-            pieces = line.split(gc.PARSED_TEXT_SEPARATOR)
+        for line in buf.readlines():
+            pieces = line.decode().split(gc.PARSED_TEXT_SEPARATOR)
             if len(pieces) != 2:
                 continue
 
@@ -927,19 +927,18 @@ class TextFile:
                 pairs.append((identifier, [text]))
         self._create_text_fragments(pairs)
 
-    def _read_plain(self, lines: typing.Sequence[str]):
+    def _read_plain(self, buf: typing.IO[bytes]):
         """
         Read text fragments from a plain format text file.
 
-        :param list lines: the lines of the plain text file
-        :param dict parameters: additional parameters for parsing
-                                (e.g., class/id regex strings)
+        :param buf: the bytes file object
         :raises: ValueError: if the id regex is not valid
         """
         logger.debug("Parsing fragments from plain text format")
         id_format = self._get_id_format()
         self._create_text_fragments(
-            (id_format % idx, [line.strip()]) for idx, line in enumerate(lines, start=1)
+            (id_format % idx, [line.decode().strip()])
+            for idx, line in enumerate(buf.readlines(), start=1)
         )
 
     @staticmethod
@@ -953,13 +952,11 @@ class TextFile:
 
         return ""
 
-    def _read_unparsed(
-        self, lines: typing.Sequence[str], *, read_img_alt: bool = False
-    ):
+    def _read_unparsed(self, buf: typing.IO[bytes], *, read_img_alt: bool = False):
         """
         Read text fragments from an unparsed format text file.
 
-        :param list lines: the lines of the unparsed text file
+        :param buf: the bytes file object
         :param bool read_img_alt: if True, read text from `<img/>` tag `alt` attribute
         """
 
@@ -983,7 +980,7 @@ class TextFile:
         logger.debug("Parsing fragments from unparsed text format")
 
         # transform text in a soup object
-        soup = BeautifulSoup("\n".join(lines), "lxml")
+        soup = BeautifulSoup(buf, "lxml")
 
         # extract according to class_regex and id_regex
         text_from_id = {}
@@ -1014,14 +1011,14 @@ class TextFile:
         # append to fragments
         self._create_text_fragments((key, [text_from_id[key]]) for key in sorted_ids)
 
-    def _read_unparsed_img(self, lines: typing.Sequence[str]):
+    def _read_unparsed_img(self, buf: typing.IO[bytes]):
         """
         Read text fragments from an unparsed format text file, additionally
         extracting image descriptions.
 
-        :param list lines: the lines of the unparsed text file
+        :param buf: the bytes file object
         """
-        return self._read_unparsed(lines, read_img_alt=True)
+        return self._read_unparsed(buf, read_img_alt=True)
 
     def _get_id_format(self):
         """Return the id regex from the parameters"""
