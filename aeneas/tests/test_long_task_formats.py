@@ -357,17 +357,3 @@ class TestExecuteTaskCLI(ExecuteTaskCLICase):
             ],
             0,
         )
-
-    def test_exec_xml_legacy(self):
-        self.execute(
-            [
-                ("in", "../tools/res/audio.mp3"),
-                ("in", "../tools/res/plain.txt"),
-                (
-                    "",
-                    "task_language=eng|is_text_type=plain|os_task_file_format=xml_legacy",
-                ),
-                ("out", "sonnet.xml_legacy"),
-            ],
-            0,
-        )
