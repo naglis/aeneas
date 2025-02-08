@@ -29,6 +29,9 @@ jobs:
           # Consider adding it as a hard dependency or ignore(skip) in tests if it is not installed intead of failing.
           pip install -r requirements.txt tgt setuptools
       - name: Build C/C++ extensions
+        # Disabled for the time being.
+        # FIXME: Calling C extensions inside GitHub action currently hangs.
+        if: ${{ false }}
         run: |
           cd aeneas/cdtw
           make py
