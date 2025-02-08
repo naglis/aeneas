@@ -23,11 +23,21 @@ jobs:
       - name: Install dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y ffmpeg espeak-ng
+          sudo apt-get install -y ffmpeg espeak-ng libespeak-ng-dev
           python -m pip install --upgrade pip
           # FIXME: `tgt` is temporarily installed since tests break without it.
           # Consider adding it as a hard dependency or ignore(skip) in tests if it is not installed intead of failing.
-          pip install -r requirements.txt tgt
-      - name: Tests
+          pip install -r requirements.txt tgt setuptools
+      - name: Build C/C++ extensions
+        run: |
+          cd aeneas/cdtw
+          make py
+          cd ../cengw
+          make py
+          cd ../cmfcc
+          make py
+          cd ../cwave
+          make py
+      - name: Run tests
         run: |
           python -m unittest discover -v
