@@ -38,7 +38,6 @@ from aeneas.textfile import TextFile
 from aeneas.ttswrappers.espeakngttswrapper import ESPEAKNGTTSWrapper
 from aeneas.ttswrappers.espeakttswrapper import ESPEAKTTSWrapper
 from aeneas.ttswrappers.festivalttswrapper import FESTIVALTTSWrapper
-from aeneas.ttswrappers.macosttswrapper import MacOSTTSWrapper
 from aeneas.ttswrappers.nuancettswrapper import NuanceTTSWrapper
 
 logger = logging.getLogger(__name__)
@@ -67,13 +66,10 @@ class Synthesizer(Configurable):
     FESTIVAL = "festival"
     """ Select Festival wrapper """
 
-    MACOS = "macos"
-    """ Select macOS "say" wrapper """
-
     NUANCE = "nuance"
     """ Select Nuance TTS API wrapper """
 
-    ALLOWED_VALUES = [ESPEAK, ESPEAKNG, FESTIVAL, MACOS, NUANCE]
+    ALLOWED_VALUES = [ESPEAK, ESPEAKNG, FESTIVAL, NUANCE]
     """ List of all the allowed values """
 
     def __init__(self, rconf=None):
@@ -101,8 +97,6 @@ class Synthesizer(Configurable):
                 tts_cls = ESPEAKNGTTSWrapper
             case self.FESTIVAL:
                 tts_cls = FESTIVALTTSWrapper
-            case self.MACOS:
-                tts_cls = MacOSTTSWrapper
             case _ as other:
                 raise ValueError(f"Invalid TTS engine type {other!r}")
 
