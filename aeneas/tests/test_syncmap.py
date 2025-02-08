@@ -74,6 +74,8 @@ class BaseSyncMapCase(unittest.TestCase):
 
 
 class TestSyncMap(BaseSyncMapCase):
+    maxDiff = None
+
     NOT_EXISTING_SRT = gf.absolute_path("not_existing.srt", __file__)
     EXISTING_SRT = gf.absolute_path("res/syncmaps/sonnet001.srt", __file__)
     EMPTY_INTERVAL = TimeInterval(begin=TimeValue("0.000"), end=TimeValue("0.000"))
@@ -320,8 +322,9 @@ class TestSyncMap(BaseSyncMapCase):
         with self.assertRaises(SyncMapMissingParameterError):
             self.write(fmt, parameters=parameters)
 
-    def test_write_valid_smil(self):
-        intervals = [("0.000", "1.000", "foo"), ("1.000", "2.000", "bar")]
+    def _write_smil(
+        self, intervals: list[tuple[str, str, str]], *, parameters: dict | None = None
+    ) -> str:
         tree = Tree()
         for begin, end, text_fragment in intervals:
             smf = SyncMapFragment.from_begin_end(
@@ -335,10 +338,15 @@ class TestSyncMap(BaseSyncMapCase):
 
         with tempfile.TemporaryDirectory() as tmp_dir:
             smil_path = os.path.join(tmp_dir, "test.smil")
-            syn.write(SyncMapFormat.SMIL, smil_path, parameters=self.PARAMETERS)
+            syn.write(SyncMapFormat.SMIL, smil_path, parameters=parameters)
 
             with open(smil_path, mode="rb") as f:
-                data = f.read().decode("utf-8").strip()
+                return f.read().decode("utf-8").strip()
+
+    def test_write_valid_smil(self):
+        intervals = [("0.000", "1.000", "foo"), ("1.000", "2.000", "bar")]
+
+        data = self._write_smil(intervals, parameters=self.PARAMETERS)
 
         self.assertEqual(
             data,
@@ -353,6 +361,37 @@ class TestSyncMap(BaseSyncMapCase):
       <par id="par000002">
         <text src="sonnet001.xhtml#bar"/>
         <audio src="sonnet001.mp3" clipBegin="00:00:01.000" clipEnd="00:00:02.000"/>
+      </par>
+    </seq>
+  </body>
+</smil>""".strip(),
+        )
+
+    def test_write_smil_spaces_in_refs_are_quoted(self):
+        intervals = [("0.000", "1.000", "foo"), ("1.000", "2.000", "bar")]
+
+        data = self._write_smil(
+            intervals,
+            parameters={
+                gc.PPN_TASK_OS_FILE_SMIL_PAGE_REF: "sonnet 001.xhtml",
+                gc.PPN_TASK_OS_FILE_SMIL_AUDIO_REF: "sonnet 001.mp3",
+                gc.PPN_SYNCMAP_LANGUAGE: Language.ENG,
+            },
+        )
+
+        self.assertEqual(
+            data,
+            """
+<smil xmlns="http://www.w3.org/ns/SMIL" xmlns:epub="http://www.idpf.org/2007/ops" version="3.0">
+  <body>
+    <seq id="seq000001" epub:textref="sonnet%20001.xhtml">
+      <par id="par000001">
+        <text src="sonnet%20001.xhtml#foo"/>
+        <audio src="sonnet%20001.mp3" clipBegin="00:00:00.000" clipEnd="00:00:01.000"/>
+      </par>
+      <par id="par000002">
+        <text src="sonnet%20001.xhtml#bar"/>
+        <audio src="sonnet%20001.mp3" clipBegin="00:00:01.000" clipEnd="00:00:02.000"/>
       </par>
     </seq>
   </body>

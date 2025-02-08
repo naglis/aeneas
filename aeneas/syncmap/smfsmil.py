@@ -19,6 +19,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import functools
+import urllib.parse
 
 import lxml.etree as ET
 
@@ -86,18 +87,22 @@ class SyncMapFormatSMIL(SyncMapFormatGenericXML):
 
     def format(self, syncmap) -> str:
         # check for required parameters
-        for key in [
+        for key in (
             gc.PPN_TASK_OS_FILE_SMIL_PAGE_REF,
             gc.PPN_TASK_OS_FILE_SMIL_AUDIO_REF,
-        ]:
+        ):
             if gf.safe_get(self.parameters, key, None) is None:
                 raise SyncMapMissingParameterError(
                     f"Parameter {key!r} must be specified for format {self.variant!r}"
                 )
 
         # we are sure we have them
-        text_ref = self.parameters[gc.PPN_TASK_OS_FILE_SMIL_PAGE_REF]
-        audio_ref = self.parameters[gc.PPN_TASK_OS_FILE_SMIL_AUDIO_REF]
+        text_ref = urllib.parse.quote(
+            self.parameters[gc.PPN_TASK_OS_FILE_SMIL_PAGE_REF]
+        )
+        audio_ref = urllib.parse.quote(
+            self.parameters[gc.PPN_TASK_OS_FILE_SMIL_AUDIO_REF]
+        )
 
         # namespaces
         ns_map = {None: SMIL_NS, "epub": EPUB_NS}
@@ -122,7 +127,7 @@ class SyncMapFormatSMIL(SyncMapFormatGenericXML):
 
         if syncmap.is_single_level:
             # single level
-            for i, fragment in enumerate(syncmap.fragments, 1):
+            for i, fragment in enumerate(syncmap.fragments, start=1):
                 text = fragment.text_fragment
                 par_elem = ET.SubElement(
                     seq_elem,
