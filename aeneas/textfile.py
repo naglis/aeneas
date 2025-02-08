@@ -37,7 +37,7 @@ import os.path
 import re
 import typing
 
-from bs4 import BeautifulSoup
+import bs4
 
 from aeneas.idsortingalgorithm import IDSortingAlgorithm
 from aeneas.tree import Tree
@@ -46,6 +46,10 @@ import aeneas.globalconstants as gc
 import aeneas.globalfunctions as gf
 
 logger = logging.getLogger(__name__)
+
+
+def get_soup(buf: typing.IO[bytes], *, parse_only=None) -> bs4.BeautifulSoup:
+    return bs4.BeautifulSoup(buf, "lxml", parse_only=parse_only)
 
 
 class TextFileFormat:
@@ -827,7 +831,7 @@ class TextFile:
         #      for example, removing tags but keeping text, etc.
         logger.debug("Parsing fragments from munparsed text format")
         # transform text in a soup object
-        soup = BeautifulSoup(buf, "lxml")
+        soup = get_soup(buf)
         # extract according to class_regex and id_regex
         logger.debug("Finding L1 elements")
         tree = Tree()
@@ -960,8 +964,7 @@ class TextFile:
         :param bool read_img_alt: if True, read text from `<img/>` tag `alt` attribute
         """
 
-        def filter_attributes():
-            """Return a dict with the bs4 filter parameters"""
+        def make_soup_strainer() -> bs4.SoupStrainer:
             attributes = {}
             for attribute_name, filter_name in {
                 "class": gc.PPN_TASK_IS_TEXT_UNPARSED_CLASS_REGEX,
@@ -973,22 +976,19 @@ class TextFile:
                     logger.debug("Regex for %s: %r", attribute_name, regex_string)
                     attributes[attribute_name] = re.compile(rf".*\b{regex_string}\b.*")
 
-            return attributes
+            return bs4.SoupStrainer(**attributes)
 
         # TODO better and/or parametric parsing,
         #      for example, removing tags but keeping text, etc.
         logger.debug("Parsing fragments from unparsed text format")
 
         # transform text in a soup object
-        soup = BeautifulSoup(buf, "lxml")
+        soup = get_soup(buf, parse_only=make_soup_strainer())
 
         # extract according to class_regex and id_regex
         text_from_id = {}
         ids = []
-        filter_attributes = filter_attributes()
-        logger.debug("Finding elements matching attributes %r", filter_attributes)
-        nodes = soup.findAll(attrs=filter_attributes)
-        for node in nodes:
+        for node in soup.find_all():
             try:
                 f_id = node["id"]
                 f_text = self._get_node_text(node, read_img_alt=read_img_alt)
