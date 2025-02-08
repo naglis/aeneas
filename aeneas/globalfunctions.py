@@ -24,15 +24,16 @@
 Global common functions.
 """
 
+import contextlib
 import datetime
+import functools
+import importlib.util
 import math
 import os
 import re
 import shutil
 import sys
 import tempfile
-import importlib.util
-import functools
 
 from aeneas.exacttiming import TimeValue
 import aeneas.globalconstants as gc
@@ -232,12 +233,8 @@ def safe_float(string, default=None):
     :rtype: float
     """
     value = default
-    try:
+    with contextlib.suppress(TypeError, ValueError):
         value = float(string)
-    except TypeError:
-        pass
-    except ValueError:
-        pass
     return value
 
 
@@ -257,7 +254,7 @@ def safe_int(string, default=None):
     return value
 
 
-def safe_get(dictionary, key, default_value, can_return_none=True):
+def safe_get(dictionary, key, default_value, can_return_none: bool = True):
     """
     Safely perform a dictionary get,
     returning the default value if the key is not found.
@@ -271,14 +268,12 @@ def safe_get(dictionary, key, default_value, can_return_none=True):
     :rtype: variant
     """
     return_value = default_value
-    try:
+    with contextlib.suppress(KeyError, TypeError):
         return_value = dictionary[key]
-        if (return_value is None) and (not can_return_none):
-            return_value = default_value
-    except (KeyError, TypeError):
-        # KeyError if key is not present in dictionary
-        # TypeError if dictionary is None
-        pass
+
+    if return_value is None and not can_return_none:
+        return_value = default_value
+
     return return_value
 
 
@@ -291,7 +286,7 @@ def norm_join(prefix, suffix):
     :param string suffix: the suffix path
     :rtype: string
     """
-    if (prefix is None) and (suffix is None):
+    if prefix is None and suffix is None:
         return "."
     if prefix is None:
         return os.path.normpath(suffix)
@@ -341,7 +336,7 @@ def config_string_to_dict(string, result=None):
     return pairs_to_dict(pairs, result)
 
 
-def config_xml_to_dict(contents, result, parse_job=True):
+def config_xml_to_dict(contents, result, parse_job: bool = True):
     """
     Convert the contents of a XML config file
     into the corresponding dictionary ::
@@ -513,7 +508,7 @@ def time_from_ttml(string):
     :param string string: the string to be parsed
     :rtype: :class:`~aeneas.exacttiming.TimeValue`
     """
-    if (string is None) or (len(string) < 2):
+    if string is None or len(string) < 2:
         return 0
     # strips "s" at the end
     string = string[:-1]
@@ -547,7 +542,7 @@ def time_from_ssmmm(string):
     :param string string: the string to be parsed
     :rtype: :class:`~aeneas.exacttiming.TimeValue`
     """
-    if (string is None) or (len(string) < 1):
+    if string is None or len(string) < 1:
         return TimeValue("0.000")
     return TimeValue(string)
 
@@ -568,7 +563,7 @@ def time_to_ssmmm(time_value):
     """
     if time_value is None:
         time_value = 0
-    return "%.3f" % (time_value)
+    return f"{time_value:.3f}"
 
 
 def time_from_hhmmssmmm(string, decimal_separator="."):
@@ -584,16 +579,13 @@ def time_from_hhmmssmmm(string, decimal_separator="."):
     else:
         pattern = HHMMSS_MMM_PATTERN
     v_length = TimeValue("0.000")
-    try:
-        match = pattern.search(string)
-        if match is not None:
+    with contextlib.suppress(TypeError):
+        if match := pattern.search(string):
             v_h = int(match.group(1))
             v_m = int(match.group(2))
             v_s = int(match.group(3))
             v_f = TimeValue("0." + match.group(4))
             v_length = v_h * 3600 + v_m * 60 + v_s + v_f
-    except Exception:
-        pass
     return v_length
 
 
@@ -627,16 +619,12 @@ def time_to_hhmmssmmm(time_value, decimal_separator="."):
     seconds = int(math.floor(tmp))
     tmp -= seconds
     milliseconds = int(math.floor(tmp * 1000))
-    return "%02d:%02d:%02d%s%03d" % (
-        hours,
-        minutes,
-        seconds,
-        decimal_separator,
-        milliseconds,
+    return (
+        f"{hours:02d}:{minutes:02d}:{seconds:02d}{decimal_separator}{milliseconds:03d}"
     )
 
 
-def time_from_srt(string):
+def time_from_srt(string: str) -> TimeValue:
     """
     Parse the given ``HH:MM:SS,mmm`` string and return a time value.
 
@@ -646,7 +634,7 @@ def time_from_srt(string):
     return time_from_hhmmssmmm(string, decimal_separator=",")
 
 
-def time_to_srt(time_value):
+def time_to_srt(time_value: TimeValue) -> str:
     """
     Format the given time value into a ``HH:MM:SS,mmm`` string,
     as used in the SRT format.
@@ -688,11 +676,9 @@ def split_url(url):
     return tuple(array[0:2])
 
 
-def is_posix():
+def is_posix() -> bool:
     """
     Return ``True`` if running on a POSIX OS.
-
-    :rtype: bool
     """
     # from https://docs.python.org/2/library/os.html#os.name
     # the registered values of os.name are:
@@ -700,29 +686,23 @@ def is_posix():
     return os.name == "posix"
 
 
-def is_linux():
+def is_linux() -> bool:
     """
     Return ``True`` if running on Linux.
-
-    :rtype: bool
     """
-    return (is_posix()) and (os.uname()[0] == "Linux")
+    return is_posix() and os.uname()[0] == "Linux"
 
 
-def is_osx():
+def is_osx() -> bool:
     """
     Return ``True`` if running on Mac OS X (Darwin).
-
-    :rtype: bool
     """
-    return (is_posix()) and (os.uname()[0] == "Darwin")
+    return is_posix() and os.uname()[0] == "Darwin"
 
 
-def is_windows():
+def is_windows() -> bool:
     """
     Return ``True`` if running on Windows.
-
-    :rtype: bool
     """
     return os.name == "nt"
 
@@ -823,20 +803,23 @@ def run_c_extension_with_fallback(
             computed, result = c_function(*args)
         else:
             log_function("C extension %r enabled but it cannot be loaded", extension)
+
     if not computed:
         if py_function is None:
             log_function("Python function is None")
         else:
             log_function("Running the pure Python code")
             computed, result = py_function(*args)
+
     if not computed:
         raise RuntimeError(
             "Both the C extension and the pure Python code failed. (Wrong arguments? Input too big?)"
         )
+
     return result
 
 
-def file_can_be_written(path):
+def file_can_be_written(path: str) -> bool:
     """
     Return ``True`` if a file can be written at the given ``path``.
 
@@ -860,7 +843,7 @@ def file_can_be_written(path):
     return False
 
 
-def file_size(path):
+def file_size(path: str) -> int:
     """
     Return the size, in bytes, of the file at the given ``path``.
     Return ``-1`` if the file does not exist or cannot be read.
@@ -881,10 +864,8 @@ def delete_directory(path):
     :param string path: the file path
     """
     if path is not None:
-        try:
+        with contextlib.suppress(Exception):
             shutil.rmtree(path)
-        except Exception:
-            pass
 
 
 def close_file_handler(handler):
@@ -894,10 +875,8 @@ def close_file_handler(handler):
     :param object handler: the file handler (as returned by tempfile)
     """
     if handler is not None:
-        try:
+        with contextlib.suppress(Exception):
             os.close(handler)
-        except Exception:
-            pass
 
 
 def delete_file(handler, path):
@@ -909,10 +888,8 @@ def delete_file(handler, path):
     """
     close_file_handler(handler)
     if path is not None:
-        try:
+        with contextlib.suppress(Exception):
             os.remove(path)
-        except Exception:
-            pass
 
 
 def relative_path(path, from_file):
@@ -990,15 +967,12 @@ def read_file_bytes(input_file_path):
     :rtype: bytes
     """
     contents = None
-    try:
-        with open(input_file_path, "rb") as input_file:
-            contents = input_file.read()
-    except Exception:
-        pass
+    with contextlib.suppress(Exception), open(input_file_path, "rb") as input_file:
+        contents = input_file.read()
     return contents
 
 
-def human_readable_number(number, suffix=""):
+def human_readable_number(number: int | float, suffix: str = "") -> str:
     """
     Format the given number into a human-readable string.
 
@@ -1008,11 +982,11 @@ def human_readable_number(number, suffix=""):
     :param string suffix: the unit of the number
     :rtype: string
     """
-    for unit in ["", "K", "M", "G", "T", "P", "E", "Z"]:
+    for unit in ("", "K", "M", "G", "T", "P", "E", "Z"):
         if abs(number) < 1024.0:
             return f"{number:3.1f}{unit}{suffix}"
         number /= 1024.0
-    return "{:.1f}{}{}".format(number, "Y", suffix)
+    return f"{number:.1f}Y{suffix}"
 
 
 def is_utf8_encoded(bstring):
@@ -1023,11 +997,9 @@ def is_utf8_encoded(bstring):
     :param bytes bstring: the string to test
     :rtype: bool
     """
-    try:
+    with contextlib.suppress(UnicodeDecodeError):
         bstring.decode("utf-8")
         return True
-    except UnicodeDecodeError:
-        pass
     return False
 
 

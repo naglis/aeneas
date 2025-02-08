@@ -109,6 +109,7 @@ class AudioFileMFCC(Configurable):
             raise ValueError(
                 "You must initialize with at least one of: file_path, audio_file, or mfcc_matrix"
             )
+
         super().__init__(rconf=rconf)
         self.file_path = file_path
         self.audio_file = audio_file
@@ -122,7 +123,7 @@ class AudioFileMFCC(Configurable):
         if mfcc_matrix is not None:
             self.__mfcc = mfcc_matrix
             self.audio_length = self.all_length * self.rconf.mws
-        elif (self.file_path is not None) or (self.audio_file is not None):
+        elif self.file_path is not None or self.audio_file is not None:
             audio_file_was_none = False
             if self.audio_file is None:
                 audio_file_was_none = True
@@ -152,11 +153,11 @@ class AudioFileMFCC(Configurable):
         logger.debug("Initializing MFCCs... done")
 
     def __str__(self):
-        msg = [
-            "File path:        %s" % self.file_path,
-            "Audio length (s): %s" % gf.safe_float(self.audio_length),
-        ]
-        return "\n".join(msg)
+        return (
+            f"File path:        {self.file_path}"
+            "\n"
+            f"Audio length (s): {gf.safe_float(self.audio_length)}"
+        )
 
     @property
     def all_mfcc(self) -> npt.NDArray:
@@ -482,12 +483,12 @@ class AudioFileMFCC(Configurable):
         logger.debug("Computing MFCCs using C extension...")
         try:
             logger.debug("Importing cmfcc...")
-            import aeneas.cmfcc.cmfcc
+            import aeneas.cmfcc.cmfcc as cmfcc
 
             logger.debug("Importing cmfcc... done")
 
             self.__mfcc = (
-                aeneas.cmfcc.cmfcc.compute_from_data(
+                cmfcc.compute_from_data(
                     self.audio_file.audio_samples,
                     self.audio_file.audio_sample_rate,
                     self.rconf[RuntimeConfiguration.MFCC_FILTERS],

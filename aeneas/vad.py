@@ -78,19 +78,19 @@ class VAD(Configurable):
         """
         logger.debug("Computing VAD for wave")
         mfcc_window_shift = self.rconf.mws
-        logger.debug("MFCC window shift (s):         %.3f", mfcc_window_shift)
+        logger.debug("MFCC window shift (s): %.3f", mfcc_window_shift)
         if log_energy_threshold is None:
             log_energy_threshold = self.rconf[
                 RuntimeConfiguration.VAD_LOG_ENERGY_THRESHOLD
             ]
-            logger.debug("Log energy threshold:          %.3f", log_energy_threshold)
+            logger.debug("Log energy threshold: %.3f", log_energy_threshold)
         if min_nonspeech_length is None:
             min_nonspeech_length = int(
                 self.rconf[RuntimeConfiguration.VAD_MIN_NONSPEECH_LENGTH]
                 / mfcc_window_shift
             )
             logger.debug(
-                "Min nonspeech length (s):      %.3f",
+                "Min nonspeech length (s): %.3f",
                 self.rconf[RuntimeConfiguration.VAD_MIN_NONSPEECH_LENGTH],
             )
         if extend_before is None:
@@ -99,7 +99,7 @@ class VAD(Configurable):
                 / mfcc_window_shift
             )
             logger.debug(
-                "Extend speech before (s):      %.3f",
+                "Extend speech before (s): %.3f",
                 self.rconf[RuntimeConfiguration.VAD_EXTEND_SPEECH_INTERVAL_BEFORE],
             )
         if extend_after is None:
@@ -108,16 +108,17 @@ class VAD(Configurable):
                 / mfcc_window_shift
             )
             logger.debug(
-                "Extend speech after (s):       %.3f",
+                "Extend speech after (s): %.3f",
                 self.rconf[RuntimeConfiguration.VAD_EXTEND_SPEECH_INTERVAL_AFTER],
             )
         energy_length = len(wave_energy)
         energy_threshold = numpy.min(wave_energy) + log_energy_threshold
         logger.debug("Min nonspeech length (frames): %d", min_nonspeech_length)
-        logger.debug("Extend speech before (frames): %d", extend_before)
-        logger.debug("Extend speech after (frames):  %d", extend_after)
+        logger.debug(
+            "Extend speech before/after (frames): %d/%d", extend_before, extend_after
+        )
         logger.debug("Energy vector length (frames): %d", energy_length)
-        logger.debug("Energy threshold (log):        %.3f", energy_threshold)
+        logger.debug("Energy threshold (log): %.3f", energy_threshold)
 
         # using windows to be sure we have at least
         # min_nonspeech_length consecutive frames with nonspeech
@@ -137,10 +138,10 @@ class VAD(Configurable):
         mask = numpy.ones(energy_length, dtype="bool")
         for ns in nonspeech_runs:
             start = ns[0]
-            if (extend_after > 0) and (start > 0):
+            if extend_after > 0 and start > 0:
                 start += extend_after
             stop = ns[-1] + min_nonspeech_length
-            if (extend_before > 0) and (stop < energy_length - 1):
+            if extend_before > 0 and stop < energy_length - 1:
                 stop -= extend_before
             mask[start:stop] = 0
         logger.debug("Determining final labels... done")

@@ -124,11 +124,3 @@ class TestDTWAligner(unittest.TestCase):
         aligner = DTWAligner(synt_wave_mfcc=af)
         with self.assertRaises(DTWAlignerNotInitialized):
             aligner.compute_path()
-
-    def test_compute_acm(self):
-        # NOTE this takes too long, run as part of the long_ tests
-        pass
-
-    def test_compute_path(self):
-        # NOTE this takes too long, run as part of the long_ tests
-        pass

@@ -57,8 +57,6 @@ class AudioFileConverterError(Exception):
     Error raised when the audio converter executable cannot be executed.
     """
 
-    pass
-
 
 class AudioFileNotInitializedError(Exception):
     """
@@ -67,23 +65,17 @@ class AudioFileNotInitializedError(Exception):
     has not been initialized yet.
     """
 
-    pass
-
 
 class AudioFileProbeError(Exception):
     """
     Error raised when the audio probe executable cannot be executed.
     """
 
-    pass
-
 
 class AudioFileUnsupportedFormatError(Exception):
     """
     Error raised when the format of the given file cannot be decoded.
     """
-
-    pass
 
 
 class AudioFile(Configurable):
@@ -213,18 +205,25 @@ class AudioFile(Configurable):
         fmt = self.file_format
         if isinstance(fmt, tuple):
             fmt = "%s %d %d" % fmt
-        msg = [
-            f"File path:         {self.file_path}",
-            f"File format:       {fmt}",
-            f"File size (bytes): {gf.safe_int(self.file_size)}",
-            f"Audio length (s):  {gf.safe_float(self.audio_length)}",
-            f"Audio format:      {self.audio_format}",
-            f"Audio sample rate: {gf.safe_int(self.audio_sample_rate)}",
-            f"Audio channels:    {gf.safe_int(self.audio_channels)}",
-            f"Samples capacity:  {gf.safe_int(self.__samples_capacity)}",
-            f"Samples length:    {gf.safe_int(self.__samples_length)}",
-        ]
-        return "\n".join(msg)
+        return (
+            f"File path:         {self.file_path}"
+            "\n"
+            f"File format:       {fmt}"
+            "\n"
+            f"File size (bytes): {gf.safe_int(self.file_size)}"
+            "\n"
+            f"Audio length (s):  {gf.safe_float(self.audio_length)}"
+            "\n"
+            f"Audio format:      {self.audio_format}"
+            "\n"
+            f"Audio sample rate: {gf.safe_int(self.audio_sample_rate)}"
+            "\n"
+            f"Audio channels:    {gf.safe_int(self.audio_channels)}"
+            "\n"
+            f"Samples capacity:  {gf.safe_int(self.__samples_capacity)}"
+            "\n"
+            f"Samples length:    {gf.safe_int(self.__samples_length)}"
+        )
 
     @property
     def file_path(self) -> str | None:
@@ -253,11 +252,9 @@ class AudioFile(Configurable):
         self.__file_size = file_size
 
     @property
-    def audio_length(self):
+    def audio_length(self) -> TimeValue:
         """
         The length of the audio file, in seconds.
-
-        :rtype: :class:`~aeneas.exacttiming.TimeValue`
         """
         return self.__audio_length
 
@@ -266,11 +263,9 @@ class AudioFile(Configurable):
         self.__audio_length = audio_length
 
     @property
-    def audio_format(self):
+    def audio_format(self) -> str:
         """
         The format of the audio file.
-
-        :rtype: string
         """
         return self.__audio_format
 
@@ -279,11 +274,9 @@ class AudioFile(Configurable):
         self.__audio_format = audio_format
 
     @property
-    def audio_sample_rate(self):
+    def audio_sample_rate(self) -> int:
         """
         The sample rate of the audio file, in samples per second.
-
-        :rtype: int
         """
         return self.__audio_sample_rate
 
@@ -292,11 +285,9 @@ class AudioFile(Configurable):
         self.__audio_sample_rate = audio_sample_rate
 
     @property
-    def audio_channels(self):
+    def audio_channels(self) -> int:
         """
         The number of channels of the audio file.
-
-        :rtype: int
         """
         return self.__audio_channels
 
@@ -395,9 +386,9 @@ class AudioFile(Configurable):
         logger.debug("Loading audio data...")
 
         # determine if we need to convert the audio file
-        convert_audio_file = (self.file_format is None) or (
-            (self.rconf.safety_checks)
-            and (self.file_format != ("pcm_s16le", 1, self.rconf.sample_rate))
+        convert_audio_file = self.file_format is None or (
+            self.rconf.safety_checks
+            and self.file_format != ("pcm_s16le", 1, self.rconf.sample_rate)
         )
 
         with contextlib.ExitStack() as exit_stack:
@@ -467,7 +458,7 @@ class AudioFile(Configurable):
             logger.debug("Audio channels: %d", self.audio_channels)
             logger.debug("Loading audio data... done")
 
-    def preallocate_memory(self, capacity):
+    def preallocate_memory(self, capacity: int):
         """
         Preallocate memory to store audio samples,
         to avoid repeated new allocations and copies
@@ -490,6 +481,7 @@ class AudioFile(Configurable):
         """
         if capacity < 0:
             raise ValueError("The capacity value cannot be negative")
+
         if self.__samples is None:
             logger.debug("Not initialized")
             self.__samples = numpy.zeros(capacity)
@@ -503,6 +495,7 @@ class AudioFile(Configurable):
             )
             self.__samples = numpy.resize(self.__samples, capacity)
             self.__samples_length = min(self.__samples_length, capacity)
+
         self.__samples_capacity = capacity
         logger.debug(
             "Current sample capacity is   (samples): %d", self.__samples_capacity
@@ -546,12 +539,15 @@ class AudioFile(Configurable):
         samples_length = len(samples)
         current_length = self.__samples_length
         future_length = current_length + samples_length
-        if (self.__samples is None) or (self.__samples_capacity < future_length):
+
+        if self.__samples is None or self.__samples_capacity < future_length:
             self.preallocate_memory(2 * future_length)
+
         if reverse:
             self.__samples[current_length:future_length] = samples[::-1]
         else:
             self.__samples[current_length:future_length] = samples[:]
+
         self.__samples_length = future_length
         self._update_length()
         logger.debug("Adding samples... done")
@@ -586,14 +582,9 @@ class AudioFile(Configurable):
         :type  begin: :class:`~aeneas.exacttiming.TimeValue`
         :param length: the position, in seconds
         :type  length: :class:`~aeneas.exacttiming.TimeValue`
-        :raises: TypeError: if one of the arguments is not ``None``
-                            or :class:`~aeneas.exacttiming.TimeValue`
 
         .. versionadded:: 1.2.0
         """
-        for variable, name in [(begin, "begin"), (length, "length")]:
-            if (variable is not None) and (not isinstance(variable, TimeValue)):
-                raise TypeError("%s is not None or TimeValue" % name)
         logger.debug("Trimming...")
         if begin is None and length is None:
             logger.debug("begin and length are both None: nothing to do")
@@ -603,17 +594,21 @@ class AudioFile(Configurable):
                 logger.debug("begin was None, now set to %.3f", begin)
             begin = min(max(TimeValue("0.000"), begin), self.audio_length)
             logger.debug("begin is %.3f", begin)
+
             if length is None:
                 length = self.audio_length - begin
                 logger.debug("length was None, now set to %.3f", length)
             length = min(max(TimeValue("0.000"), length), self.audio_length - begin)
             logger.debug("length is %.3f", length)
+
             begin_index = int(begin * self.audio_sample_rate)
             end_index = int((begin + length) * self.audio_sample_rate)
             new_idx = end_index - begin_index
-            self.__samples[0:new_idx] = self.__samples[begin_index:end_index]
+
+            self.__samples[:new_idx] = self.__samples[begin_index:end_index]
             self.__samples_length = new_idx
             self._update_length()
+
         logger.debug("Trimming... done")
 
     def write(self, file_path: str):
@@ -660,7 +655,7 @@ class AudioFile(Configurable):
 
         This function fails silently if one of the two is ``None``.
         """
-        if (self.audio_sample_rate is not None) and (self.__samples is not None):
+        if self.audio_sample_rate is not None and self.__samples is not None:
             # NOTE computing TimeValue (... / ...) yields wrong results,
             #      see issue #168
             #      self.audio_length = TimeValue(self.__samples_length / self.audio_sample_rate)

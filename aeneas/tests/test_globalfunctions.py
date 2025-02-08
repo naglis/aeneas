@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 # aeneas is a Python/C library and a set of tools
 # to automagically synchronize audio and text (aka forced alignment)
 #
@@ -22,8 +20,8 @@
 
 import os
 import sys
-import unittest
 import tempfile
+import unittest
 
 from aeneas.exacttiming import TimeValue
 import aeneas.globalfunctions as gf
@@ -40,8 +38,11 @@ class TestGlobalFunctions(unittest.TestCase):
         self.assertTrue(os.path.isfile(tmp_file))
         gf.delete_file(tmp_handler, tmp_file)
 
+    def test_file_extension_None(self):
+        self.assertIsNone(gf.file_extension(None))
+
     def test_file_extension(self):
-        tests = [
+        for path, expected in (
             ("", ""),
             ("/", ""),
             ("/foo", ""),
@@ -58,13 +59,15 @@ class TestGlobalFunctions(unittest.TestCase):
             ("foo/bar/foo.baz", "baz"),
             ("foo/bar/baz", ""),
             ("foo/bar/.baz", ""),
-        ]
-        self.assertIsNone(gf.file_extension(None))
-        for test in tests:
-            self.assertEqual(gf.file_extension(test[0]), test[1])
+        ):
+            with self.subTest(path=path, expected=expected):
+                self.assertEqual(gf.file_extension(path), expected)
+
+    def test_file_name_without_extension_None(self):
+        self.assertIsNone(gf.file_name_without_extension(None))
 
     def test_file_name_without_extension(self):
-        tests = [
+        for path, expected in (
             ("", ""),
             ("/", ""),
             ("/foo", "foo"),
@@ -81,13 +84,12 @@ class TestGlobalFunctions(unittest.TestCase):
             ("foo/bar/foo.baz", "foo"),
             ("foo/bar/baz", "baz"),
             ("foo/bar/.baz", ".baz"),
-        ]
-        self.assertIsNone(gf.file_name_without_extension(None))
-        for test in tests:
-            self.assertEqual(gf.file_name_without_extension(test[0]), test[1])
+        ):
+            with self.subTest(path=path, expected=expected):
+                self.assertEqual(gf.file_name_without_extension(path), expected)
 
     def test_safe_float(self):
-        tests = [
+        for value, default, expected in (
             ("3.14", 1.23, 3.14),
             (" 3.14", 1.23, 3.14),
             (" 3.14 ", 1.23, 3.14),
@@ -96,12 +98,12 @@ class TestGlobalFunctions(unittest.TestCase):
             ("", 1.23, 1.23),
             ("foo", 1.23, 1.23),
             (None, 1.23, 1.23),
-        ]
-        for test in tests:
-            self.assertEqual(gf.safe_float(test[0], test[1]), test[2])
+        ):
+            with self.subTest(value=value, default=default, expected=expected):
+                self.assertEqual(gf.safe_float(value, default), expected)
 
     def test_safe_int(self):
-        tests = [
+        for value, default, expected in (
             ("3.14", 1, 3),
             ("3.14 ", 1, 3),
             (" 3.14", 1, 3),
@@ -117,12 +119,12 @@ class TestGlobalFunctions(unittest.TestCase):
             ("", 1, 1),
             ("foo", 1, 1),
             (None, 1, 1),
-        ]
-        for test in tests:
-            self.assertEqual(gf.safe_int(test[0], test[1]), test[2])
+        ):
+            with self.subTest(value=value, default=default, expected=expected):
+                self.assertEqual(gf.safe_int(value, default), expected)
 
     def test_safe_get(self):
-        tests = [
+        for dictionary, key, default, expected in (
             (None, None, "default", "default"),
             (None, "key", "default", "default"),
             ({}, None, "default", "default"),
@@ -130,12 +132,14 @@ class TestGlobalFunctions(unittest.TestCase):
             ([], "key", "default", "default"),
             ({"key": "value"}, None, "default", "default"),
             ({"key": "value"}, "key", "default", "value"),
-        ]
-        for test in tests:
-            self.assertEqual(gf.safe_get(test[0], test[1], test[2]), test[3])
+        ):
+            with self.subTest(
+                dictionary=dictionary, key=key, default=default, expected=expected
+            ):
+                self.assertEqual(gf.safe_get(dictionary, key, default), expected)
 
     def test_norm_join(self):
-        tests = [
+        for prefix, suffix, expected in (
             (None, None, "."),
             (None, "", "."),
             (None, "/foo", "/foo"),
@@ -175,12 +179,15 @@ class TestGlobalFunctions(unittest.TestCase):
             ("foo/", "../bar.baz", "bar.baz"),
             ("foo/./", "bar.baz", "foo/bar.baz"),
             ("foo/", "./bar.baz", "foo/bar.baz"),
-        ]
-        for test in tests:
-            self.assertEqual(gf.norm_join(test[0], test[1]), test[2])
+        ):
+            with self.subTest(prefix=prefix, suffix=suffix, expected=expected):
+                self.assertEqual(gf.norm_join(prefix, suffix), expected)
+
+    def test_config_txt_None_to_string(self):
+        self.assertIsNone(gf.config_txt_to_string(None))
 
     def test_config_txt_to_string(self):
-        tests = [
+        for txt, expected in (
             ("", ""),
             ("k1=v1", "k1=v1"),
             ("k1=v1\n\n", "k1=v1"),
@@ -188,13 +195,12 @@ class TestGlobalFunctions(unittest.TestCase):
             ("k1=v1\nk2=v2\n\n\nk3=v3\n", "k1=v1|k2=v2|k3=v3"),
             (" k1=v1\n k2=v2 \n\n\nk3=v3 \n", "k1=v1|k2=v2|k3=v3"),
             ("k1=v1\nk2\nk3=v3", "k1=v1|k2|k3=v3"),
-        ]
-        self.assertIsNone(gf.config_txt_to_string(None))
-        for test in tests:
-            self.assertEqual(gf.config_txt_to_string(test[0]), test[1])
+        ):
+            with self.subTest(txt=txt, expected=expected):
+                self.assertEqual(gf.config_txt_to_string(txt), expected)
 
     def test_config_string_to_dict(self):
-        tests = [
+        for string, expected in (
             (None, {}),
             ("", {}),
             ("k1=v1", {"k1": "v1"}),
@@ -208,12 +214,12 @@ class TestGlobalFunctions(unittest.TestCase):
             ("k1=v1|k2=v2|k3=v3", {"k1": "v1", "k2": "v2", "k3": "v3"}),
             ("k1=v1|k2=|k3=v3", {"k1": "v1", "k3": "v3"}),
             ("k1=v1|=v2|k3=v3", {"k1": "v1", "k3": "v3"}),
-        ]
-        for test in tests:
-            self.assertEqual(gf.config_string_to_dict(test[0]), test[1])
+        ):
+            with self.subTest(string=string, expected=expected):
+                self.assertEqual(gf.config_string_to_dict(string), expected)
 
     def test_config_xml_to_dict_job(self):
-        tests = [
+        for xml, expected in (
             (None, {}),
             ("", {}),
             ("<job></job>", {}),
@@ -224,14 +230,14 @@ class TestGlobalFunctions(unittest.TestCase):
             ("<job><k1>v1</k1><k2> v2</k2></job>", {"k1": "v1", "k2": "v2"}),
             ("<job><k1>v1</k1><k2> v2 </k2></job>", {"k1": "v1", "k2": "v2"}),
             ("<job><k1>v1</k1><k2>v2 </k2></job>", {"k1": "v1", "k2": "v2"}),
-        ]
-        for test in tests:
-            self.assertEqual(
-                gf.config_xml_to_dict(test[0], result=None, parse_job=True), test[1]
-            )
+        ):
+            with self.subTest(xml=xml, expected=expected):
+                self.assertEqual(
+                    gf.config_xml_to_dict(xml, result=None, parse_job=True), expected
+                )
 
     def test_config_xml_to_dict_task(self):
-        tests = [
+        for xml, expected in (
             (None, []),
             ("", []),
             ("<job></job>", []),
@@ -271,22 +277,21 @@ class TestGlobalFunctions(unittest.TestCase):
                 "<job><tasks><task><k1>v1</k1></task><task><k2>v2</k2></task><task></task></tasks></job>",
                 [{"k1": "v1"}, {"k2": "v2"}, {}],
             ),
-        ]
-        for test in tests:
-            self.assertEqual(
-                gf.config_xml_to_dict(test[0], result=None, parse_job=False), test[1]
-            )
+        ):
+            with self.subTest(xml=xml, expected=expected):
+                self.assertEqual(
+                    gf.config_xml_to_dict(xml, result=None, parse_job=False), expected
+                )
 
     def test_config_dict_to_string(self):
-        self.assertTrue(gf.config_dict_to_string({}) == "")
-        self.assertTrue(gf.config_dict_to_string({"k1": "v1"}) == "k1=v1")
-        self.assertTrue(
-            (gf.config_dict_to_string({"k1": "v1", "k2": "v2"}) == "k1=v1|k2=v2")
-            or (gf.config_dict_to_string({"k1": "v1", "k2": "v2"}) == "k2=v2|k1=v1")
+        self.assertEqual(gf.config_dict_to_string({}), "")
+        self.assertEqual(gf.config_dict_to_string({"k1": "v1"}), "k1=v1")
+        self.assertEqual(
+            gf.config_dict_to_string({"k1": "v1", "k2": "v2"}), "k1=v1|k2=v2"
         )
 
     def test_pairs_to_dict(self):
-        tests = [
+        for pairs, expected in (
             ([], {}),
             ([""], {}),
             (["k1"], {}),
@@ -298,9 +303,9 @@ class TestGlobalFunctions(unittest.TestCase):
             (["k1=v1", "k2="], {"k1": "v1"}),
             (["k1=v1", "=v2"], {"k1": "v1"}),
             (["k1=v1", "k2=v2"], {"k1": "v1", "k2": "v2"}),
-        ]
-        for test in tests:
-            self.assertEqual(gf.pairs_to_dict(test[0]), test[1])
+        ):
+            with self.subTest(pairs=pairs, expected=expected):
+                self.assertEqual(gf.pairs_to_dict(pairs), expected)
 
     def test_copytree(self):
         with (
@@ -346,7 +351,7 @@ class TestGlobalFunctions(unittest.TestCase):
         )
 
     def test_time_from_ttml(self):
-        tests = [
+        for value, expected in (
             (None, TimeValue("0")),
             ("", TimeValue("0")),
             ("s", TimeValue("0")),
@@ -356,22 +361,22 @@ class TestGlobalFunctions(unittest.TestCase):
             ("001s", TimeValue("1")),
             ("1s", TimeValue("1")),
             ("001.234s", TimeValue("1.234")),
-        ]
-        for test in tests:
-            self.assertEqual(gf.time_from_ttml(test[0]), test[1])
+        ):
+            with self.subTest(value=value, expected=expected):
+                self.assertEqual(gf.time_from_ttml(value), expected)
 
     def test_time_to_ttml(self):
-        tests = [
+        for value, expected in (
             (None, "0.000s"),
             (0, "0.000s"),
             (1, "1.000s"),
             (1.234, "1.234s"),
-        ]
-        for test in tests:
-            self.assertEqual(gf.time_to_ttml(test[0]), test[1])
+        ):
+            with self.subTest(value=value, expected=expected):
+                self.assertEqual(gf.time_to_ttml(value), expected)
 
     def test_time_from_ssmmm(self):
-        tests = [
+        for value, expected in (
             (None, TimeValue("0")),
             ("", TimeValue("0")),
             ("0", TimeValue("0")),
@@ -380,22 +385,22 @@ class TestGlobalFunctions(unittest.TestCase):
             ("001", TimeValue("1")),
             ("1.234", TimeValue("1.234")),
             ("001.234", TimeValue("1.234")),
-        ]
-        for test in tests:
-            self.assertEqual(gf.time_from_ssmmm(test[0]), test[1])
+        ):
+            with self.subTest(value=value, expected=expected):
+                self.assertEqual(gf.time_from_ssmmm(value), expected)
 
     def test_time_to_ssmm(self):
-        tests = [
+        for value, expected in (
             (None, "0.000"),
             (0, "0.000"),
             (1, "1.000"),
             (1.234, "1.234"),
-        ]
-        for test in tests:
-            self.assertEqual(gf.time_to_ssmmm(test[0]), test[1])
+        ):
+            with self.subTest(value=value, expected=expected):
+                self.assertEqual(gf.time_to_ssmmm(value), expected)
 
     def test_time_from_hhmmssmmm(self):
-        tests = [
+        for value, expected in (
             (None, TimeValue("0.000")),
             ("", TimeValue("0.000")),
             ("23:45.678", TimeValue("0.000")),  # no 2 ":"
@@ -420,12 +425,12 @@ class TestGlobalFunctions(unittest.TestCase):
             ("01:23:00.000", TimeValue("4980.000")),
             ("01:23:45.000", TimeValue("5025.000")),
             ("01:23:45.678", TimeValue("5025.678")),
-        ]
-        for test in tests:
-            self.assertEqual(gf.time_from_hhmmssmmm(test[0]), test[1])
+        ):
+            with self.subTest(value=value, expected=expected):
+                self.assertEqual(gf.time_from_hhmmssmmm(value), expected)
 
     def test_time_to_hhmmssmmm(self):
-        tests = [
+        for value, expected in (
             (None, "00:00:00.000"),
             (0.000, "00:00:00.000"),
             (12.000, "00:00:12.000"),
@@ -439,12 +444,12 @@ class TestGlobalFunctions(unittest.TestCase):
             (4980.000, "01:23:00.000"),
             (5025.000, "01:23:45.000"),
             (5025.670, "01:23:45.670"),  # numerical issues
-        ]
-        for test in tests:
-            self.assertEqual(gf.time_to_hhmmssmmm(test[0]), test[1])
+        ):
+            with self.subTest(value=value, expected=expected):
+                self.assertEqual(gf.time_to_hhmmssmmm(value), expected)
 
     def test_time_to_srt(self):
-        tests = [
+        for value, expected in (
             (None, "00:00:00,000"),
             (0.000, "00:00:00,000"),
             (12.000, "00:00:12,000"),
@@ -458,12 +463,12 @@ class TestGlobalFunctions(unittest.TestCase):
             (4980.000, "01:23:00,000"),
             (5025.000, "01:23:45,000"),
             (5025.670, "01:23:45,670"),  # numerical issues
-        ]
-        for test in tests:
-            self.assertEqual(gf.time_to_srt(test[0]), test[1])
+        ):
+            with self.subTest(value=value, expected=expected):
+                self.assertEqual(gf.time_to_srt(value), expected)
 
     def test_split_url(self):
-        tests = [
+        for url, expected in (
             (None, (None, None)),
             ("", ("", None)),
             ("foo", ("foo", None)),
@@ -471,29 +476,24 @@ class TestGlobalFunctions(unittest.TestCase):
             ("foo.html#", ("foo.html", "")),
             ("foo.html#id", ("foo.html", "id")),
             ("foo.html#id#bad", ("foo.html", "id")),
-        ]
-        for test in tests:
-            self.assertEqual(gf.split_url(test[0]), test[1])
+        ):
+            with self.subTest(url=url, expected=expected):
+                self.assertEqual(gf.split_url(url), expected)
 
     def test_is_posix(self):
-        # TODO
-        pass
+        self.skipTest("TODO")
 
     def test_is_linux(self):
-        # TODO
-        pass
+        self.skipTest("TODO")
 
     def test_is_osx(self):
-        # TODO
-        pass
+        self.skipTest("TODO")
 
     def test_is_windows(self):
-        # TODO
-        pass
+        self.skipTest("TODO")
 
     def test_fix_slash(self):
-        # TODO
-        pass
+        self.skipTest("TODO")
 
     def test_can_run_c_extension(self):
         gf.can_run_c_extension()
@@ -504,8 +504,7 @@ class TestGlobalFunctions(unittest.TestCase):
         gf.can_run_c_extension("bar")
 
     def test_run_c_extension_with_fallback(self):
-        # TODO
-        pass
+        self.skipTest("TODO")
 
     def test_file_can_be_written_true(self):
         handler, path = gf.tmp_file()
