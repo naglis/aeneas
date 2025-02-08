@@ -41,21 +41,6 @@ class TestExecuteTaskCLI(ExecuteTaskCLICase):
             0,
         )
 
-    def test_exec_keep_audio(self):
-        self.execute(
-            [
-                ("in", "../tools/res/audio.mp3"),
-                ("in", "../tools/res/subtitles.txt"),
-                (
-                    "",
-                    "task_language=eng|is_text_type=subtitles|os_task_file_format=srt",
-                ),
-                ("out", "sonnet.srt"),
-                ("", "--keep-audio"),
-            ],
-            0,
-        )
-
     def test_exec_output_html(self):
         self.execute(
             [
@@ -124,32 +109,6 @@ class TestExecuteTaskCLI(ExecuteTaskCLICase):
                 ),
                 ("out", "sonnet.srt"),
                 ("", "--zero"),
-            ],
-            0,
-        )
-
-    # NOTE disabling these ones as they require a network connection
-    def zzz_test_exec_youtube(self):
-        self.execute(
-            [
-                ("", "https://www.youtube.com/watch?v=rU4a7AA8wM0"),
-                ("in", "../tools/res/plain.txt"),
-                ("", "task_language=eng|is_text_type=plain|os_task_file_format=txt"),
-                ("out", "sonnet.txt"),
-                ("", "-y"),
-            ],
-            0,
-        )
-
-    def zzz_test_exec_youtube_largest_audio(self):
-        self.execute(
-            [
-                ("", "https://www.youtube.com/watch?v=rU4a7AA8wM0"),
-                ("in", "../tools/res/plain.txt"),
-                ("", "task_language=eng|is_text_type=plain|os_task_file_format=txt"),
-                ("out", "sonnet.txt"),
-                ("", "-y"),
-                ("", "--largest-audio"),
             ],
             0,
         )

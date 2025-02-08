@@ -518,17 +518,6 @@ class AbstractCLIProgram(Configurable):
                 self.print_error(f"Cannot read file {text!r}")
             return None
 
-    def print_no_dependency_error(self):
-        self.print_error(
-            "You need to install Python module youtube-dl to download audio from YouTube. Run:"
-            "\n"
-            "$ pip install youtube-dl"
-            "\n"
-            "or, to install for all users:"
-            "\n"
-            "$ sudo pip install youtube-dl"
-        )
-
 
 def main() -> int:
     """

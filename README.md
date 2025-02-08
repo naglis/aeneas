@@ -238,7 +238,6 @@ which explains how to use the built-in command line tools.
 * Several built-in TTS engine wrappers: AWS Polly TTS API, eSpeak (default), eSpeak-ng, Festival, MacOS (via say), Nuance TTS API
 * Default TTS (eSpeak) called via a Python C extension for fast audio synthesis
 * Batch processing of multiple audio/text pairs
-* Download audio from a YouTube video
 * In multilevel mode, recursive alignment from paragraph to sentence to word level
 * In multilevel mode, MFCC resolution, MFCC masking, DTW margin, and TTS engine can be specified for each level independently
 * Robust against misspelled/mispronounced words, local rearrangements of words, background noise/sporadic spikes

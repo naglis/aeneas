@@ -131,7 +131,3 @@ class TestExecuteTaskCLI(ExecuteTaskCLICase):
 
     def test_example_words_multilevel(self):
         self.execute([("", "--example-words-multilevel")], 0)
-
-    # NOTE disabling this test since it requires a network connection
-    def zzz_test_example_youtube(self):
-        self.execute([("", "--example-youtube")], 0)

@@ -410,26 +410,6 @@ For example:
 .. literalinclude:: _static/execute_task_list_values.txt
     :language: text
 
-Downloading Audio From YouTube
-------------------------------
-
-``aeneas`` can download the audio stream from a YouTube video.
-Instead of the audio file path, you provide the YouTube URL,
-and add the ``-y`` switch at the end:
-
-.. literalinclude:: _static/execute_task_youtube.txt
-    :language: text
-
-.. warning::
-
-    The download feature is experimental,
-    and it might be unavailable in the future,
-    for example if YouTube disables API access
-    to audio/video contents.
-    Also note that sometimes the download fails
-    for network/backend reasons: just wait a few seconds
-    and try executing again.
-
 The Runtime Configuration
 -------------------------
 

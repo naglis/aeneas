@@ -114,8 +114,6 @@ class TestRuntimeConfiguration(unittest.TestCase):
                 "cew_subprocess_path",
                 "/foo/bar/python",
             ),
-            ("downloader_sleep=5.000", "downloader_sleep", TimeValue("5.000")),
-            ("downloader_retry_attempts=5", "downloader_retry_attempts", 5),
             ("dtw_algorithm=exact", "dtw_algorithm", "exact"),
             ("dtw_margin=100", "dtw_margin", TimeValue("100")),
             ("ffmpeg_path=/foo/bar/ffmpeg", "ffmpeg_path", "/foo/bar/ffmpeg"),

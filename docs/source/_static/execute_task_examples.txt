@@ -26,7 +26,3 @@ Example 8 (input: parsed text, output: TSV)
 
 Example 9 (input: single word granularity plain text, output: AUD)
   $ python -m aeneas.tools.execute_task --example-words
-
-Example 10 (input: audio from YouTube, output: TXT)
-  $ python -m aeneas.tools.execute_task --example-youtube
-

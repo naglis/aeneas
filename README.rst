@@ -256,7 +256,6 @@ Supported Features
 -  Default TTS (eSpeak) called via a Python C extension for fast audio
    synthesis
 -  Batch processing of multiple audio/text pairs
--  Download audio from a YouTube video
 -  In multilevel mode, recursive alignment from paragraph to sentence to
    word level
 -  In multilevel mode, MFCC resolution, MFCC masking, DTW margin, and

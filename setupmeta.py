@@ -58,13 +58,11 @@ PKG_EXTRAS_REQUIRE = {
         "Pillow>=3.1.1",
         "requests>=2.9.1",
         "tgt>=1.4.2",
-        "youtube-dl>=2016.9.27",
     ],
     "nopillow": [
         "boto3>=1.4.2",
         "requests>=2.9.1",
         "tgt>=1.4.2",
-        "youtube-dl>=2016.9.27",
     ],
     "boto3": [
         "boto3>=1.4.2",

@@ -101,7 +101,3 @@ Example 33 (input: single word granularity plain text, output: AUD, tts engine: 
 
 Example 34 (input: mplain text (multilevel), output: AUD, levels to output: 3)
   $ python -m aeneas.tools.execute_task --example-words-multilevel
-
-Example 35 (input: audio from YouTube, output: TXT)
-  $ python -m aeneas.tools.execute_task --example-youtube
-

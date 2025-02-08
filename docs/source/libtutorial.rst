@@ -144,7 +144,6 @@ you might need to install the following optional dependencies:
 * ``requests`` (for using the Nuance TTS API wrapper)
 * ``Pillow`` (for plotting waveforms with :mod:`~aeneas.plotter`)
 * ``tgt`` (for outputting sync maps to TextGrid format)
-* ``youtube-dl`` (for downloading audio from Internet with :class:`~aeneas.downloader.Downloader`)
 
 
 
@@ -365,7 +364,6 @@ and the following modules:
     configuration
     container
     diagnostics
-    downloader
     dtw
     exacttiming
     executejob
@@ -431,7 +429,6 @@ Moreover, the ``aeneas.tools`` package also contains the following programs,
 useful for debugging or converting between different file formats:
 
 * ``aeneas.tools.convert_syncmap``: convert a sync map from a format to another
-* ``aeneas.tools.download``: download a file from a Web resource (currently, audio from a YouTube video)
 * ``aeneas.tools.extract_mfcc``: extract MFCCs from a monoaural WAVE file
 * ``aeneas.tools.ffmpeg_wrapper``: a wrapper around ``ffmpeg``
 * ``aeneas.tools.ffprobe_wrapper``: a wrapper around ``ffprobe``

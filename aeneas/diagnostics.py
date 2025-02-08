@@ -180,8 +180,6 @@ class Diagnostics:
         :rtype: bool
         """
         try:
-            # disabling this check, as it requires the optional dependency youtube-dl
-            # COMMENTED from aeneas.tools.download import DownloadCLI
             # disabling this check, as it requires the optional dependency Pillow
             # COMMENTED from aeneas.tools.plot_waveform import PlotWaveformCLI
             gf.print_success("aeneas.tools   OK")

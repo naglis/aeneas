@@ -28,7 +28,6 @@ import sys
 
 from aeneas.adjustboundaryalgorithm import AdjustBoundaryAlgorithm
 from aeneas.audiofile import AudioFile
-from aeneas.downloader import Downloader
 from aeneas.executetask import ExecuteTask
 from aeneas.idsortingalgorithm import IDSortingAlgorithm
 from aeneas.language import Language
@@ -365,15 +364,6 @@ class ExecuteTaskCLI(AbstractCLIProgram):
             "options": '-r="tts=festival|tts_cache=True"',
             "show": False,
         },
-        "--example-youtube": {
-            "description": "input: audio from YouTube, output: TXT",
-            "audio": "https://www.youtube.com/watch?v=rU4a7AA8wM0",
-            "text": gf.relative_path("res/plain.txt", __file__),
-            "config": "task_language=eng|is_text_type=plain|os_task_file_format=txt",
-            "syncmap": "output/sonnet.txt",
-            "options": "-y",
-            "show": True,
-        },
     }
 
     PARAMETERS = TaskConfiguration.parameters(sort=True, as_strings=True)
@@ -401,13 +391,10 @@ class ExecuteTaskCLI(AbstractCLIProgram):
             ("--list-parameters", False),
             ("--list-values[=PARAM]", False),
             ("AUDIO_FILE  TEXT_FILE CONFIG_STRING OUTPUT_FILE", True),
-            ("YOUTUBE_URL TEXT_FILE CONFIG_STRING OUTPUT_FILE -y", True),
         ],
         "examples": ["--examples", "--examples-all"],
         "options": [
             "--faster-rate : print fragments with rate > task_adjust_boundary_rate_value",
-            "--keep-audio : do not delete the audio file downloaded from YouTube (-y only)",
-            "--largest-audio : download largest audio stream (-y only)",
             "--list-parameters : list all parameters",
             "--list-values : list all parameters for which values can be listed",
             "--list-values=PARAM : list all allowed values for parameter PARAM",
@@ -416,7 +403,6 @@ class ExecuteTaskCLI(AbstractCLIProgram):
             "--rate : print rate of each fragment",
             "--skip-validator : do not validate the given config string",
             "--zero : print fragments with zero duration",
-            "-y, --youtube : download audio from YouTube video",
         ],
         "parameters": [],
     }
@@ -448,9 +434,6 @@ class ExecuteTaskCLI(AbstractCLIProgram):
         # NOTE list() is needed for Python3, where keys() is not a list!
         demo = self.has_option(list(self.DEMOS.keys()))
         demo_parameters = ""
-        download_from_youtube = self.has_option(["-y", "--youtube"])
-        largest_audio = self.has_option("--largest-audio")
-        keep_audio = self.has_option("--keep-audio")
         output_html = self.has_option("--output-html")
         validate = not self.has_option("--skip-validator")
         print_faster_rate = self.has_option("--faster-rate")
@@ -495,8 +478,6 @@ class ExecuteTaskCLI(AbstractCLIProgram):
                         print_rates = True
                     elif key == "--example-remove-nonspeech-rateaggressive":
                         print_rates = True
-                    elif key == "--example-youtube":
-                        download_from_youtube = True
                     break
         else:
             if len(self.actual_arguments) < 4:
@@ -513,14 +494,8 @@ class ExecuteTaskCLI(AbstractCLIProgram):
 
         html_file_path = None
         if output_html:
-            keep_audio = True
             html_file_path = sync_map_file_path + ".html"
 
-        if download_from_youtube:
-            youtube_url = gf.safe_unicode(audio_file_path)
-
-        if not download_from_youtube and not self.check_input_file(audio_file_path):
-            return self.ERROR_EXIT_CODE
         if not self.check_input_file(text_file_path):
             return self.ERROR_EXIT_CODE
 
@@ -529,10 +504,7 @@ class ExecuteTaskCLI(AbstractCLIProgram):
         if demo:
             msg = []
             msg.append("Running example task with arguments:")
-            if download_from_youtube:
-                msg.append("  YouTube URL:   %s" % youtube_url)
-            else:
-                msg.append("  Audio file:    %s" % audio_file_path)
+            msg.append("  Audio file:    %s" % audio_file_path)
             msg.append("  Text file:     %s" % text_file_path)
             msg.append("  Config string: %s" % config_string)
             msg.append("  Sync map file: %s" % sync_map_file_path)
@@ -554,34 +526,14 @@ class ExecuteTaskCLI(AbstractCLIProgram):
                 )
                 return self.ERROR_EXIT_CODE
 
-        if download_from_youtube:
-            try:
-                self.print_info(f"Downloading audio from {youtube_url!r} ...")
-                downloader = Downloader()
-                audio_file_path = downloader.audio_from_youtube(
-                    youtube_url,
-                    download=True,
-                    output_file_path=None,
-                    largest_audio=largest_audio,
-                )
-                self.print_info(f"Downloading audio from {youtube_url!r} ... done")
-            except ImportError:
-                self.print_no_dependency_error()
-                return self.ERROR_EXIT_CODE
-            except Exception as exc:
-                self.print_error(
-                    f"An unexpected error occurred while downloading audio from YouTube: {exc}"
-                )
-                return self.ERROR_EXIT_CODE
-        else:
-            audio_extension = gf.file_extension(audio_file_path)
-            if audio_extension.lower() not in AudioFile.FILE_EXTENSIONS:
-                self.print_warning(
-                    f"Your audio file path has extension {audio_extension}, which is uncommon for an audio file. "
-                    "Attempting at executing your Task anyway. "
-                    "If it fails, you might have swapped the first two arguments. "
-                    "The audio file path should be the first argument, the text file path the second."
-                )
+        audio_extension = gf.file_extension(audio_file_path)
+        if audio_extension.lower() not in AudioFile.FILE_EXTENSIONS:
+            self.print_warning(
+                f"Your audio file path has extension {audio_extension}, which is uncommon for an audio file. "
+                "Attempting at executing your Task anyway. "
+                "If it fails, you might have swapped the first two arguments. "
+                "The audio file path should be the first argument, the text file path the second."
+            )
 
         try:
             self.print_info("Creating task...")
@@ -638,14 +590,6 @@ class ExecuteTaskCLI(AbstractCLIProgram):
                     f"An unexpected error occurred while writing the HTML file: {exc}"
                 )
                 return self.ERROR_EXIT_CODE
-
-        if download_from_youtube:
-            if keep_audio:
-                self.print_info(
-                    f"Option --keep-audio set: keeping downloaded file {audio_file_path!r}"
-                )
-            else:
-                gf.delete_file(None, audio_file_path)
 
         if print_zero:
             zero_duration = [
