@@ -97,10 +97,10 @@ class SyncMapFormatGenericTabular(SyncMapFormatBase):
             placeholders[self.FIELDS[k]] = k
         self.write_template = self.FIELD_DELIMITER.join([f"{p}" for p in placeholders])
 
-    def parse(self, input_text, syncmap):
+    def parse(self, buf, syncmap):
         lines = []
-        for line in input_text.splitlines():
-            line = line.strip()
+        for line in buf.readlines():
+            line = line.decode().strip()
             if not line:
                 continue
             lines.append(line)

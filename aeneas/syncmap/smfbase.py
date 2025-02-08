@@ -91,10 +91,9 @@ class SyncMapFormatBase(abc.ABC):
         )
 
     @abc.abstractmethod
-    def parse(self, input_text: str, syncmap: "SyncMap") -> str:
+    def parse(self, buf: typing.IO[bytes], syncmap: "SyncMap") -> str:
         """
-        Parse the given ``input_text`` and
-        append the extracted fragments to ``syncmap``.
+        Parse fragments from ``buf`` and append them fragments to ``syncmap``.
         """
 
     @abc.abstractmethod

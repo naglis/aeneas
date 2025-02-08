@@ -63,7 +63,7 @@ class SyncMapFormatSMIL(SyncMapFormatGenericXML):
         else:
             return gf.time_from_ssmmm(value)
 
-    def parse(self, input_text: str, syncmap):
+    def parse(self, buf, syncmap):
         """
         Read from SMIL file.
 
@@ -72,7 +72,7 @@ class SyncMapFormatSMIL(SyncMapFormatGenericXML):
         2. timings must have ``hh:mm:ss.mmm`` or ``ss.mmm`` format (autodetected)
         3. both ``clipBegin`` and ``clipEnd`` attributes of ``<audio>`` must be populated
         """
-        root = ET.fromstring(input_text)
+        root = ET.parse(buf)
         for par in root.iter(with_smil_ns("par")):
             for child in par:
                 if child.tag == with_smil_ns("text"):

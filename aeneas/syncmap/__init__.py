@@ -403,9 +403,8 @@ class SyncMap:
 
         # open file for reading
         logger.debug("Reading input file...")
-        with open(input_file_path, encoding="utf-8") as input_file:
-            input_text = input_file.read()
-        reader.parse(input_text=input_text, syncmap=self)
+        with open(input_file_path, mode="rb") as input_file:
+            reader.parse(input_file, syncmap=self)
         logger.debug("Reading input file... done")
 
         # overwrite language if requested

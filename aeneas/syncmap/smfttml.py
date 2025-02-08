@@ -44,21 +44,17 @@ class SyncMapFormatTTML(SyncMapFormatGenericXML):
 
     DEFAULT = TTML
 
-    def parse(self, input_text, syncmap):
-        root = ET.fromstring(gf.safe_bytes(input_text))
+    def parse(self, buf, syncmap):
+        root = ET.parse(buf).getroot()
         language = root.get(with_xml_ns("lang"))
         for elem in root.iter(with_ttml_ns("p")):
-            identifier = gf.safe_unicode(elem.get(with_xml_ns("id")))
-            begin = gf.time_from_ttml(elem.get("begin"))
-            end = gf.time_from_ttml(elem.get("end"))
-            fragment_lines = self._get_lines_from_node_text(elem)
             self._add_fragment(
                 syncmap=syncmap,
-                identifier=identifier,
+                identifier=elem.get(with_xml_ns("id")),
                 language=language,
-                lines=fragment_lines,
-                begin=begin,
-                end=end,
+                lines=self._get_lines_from_node_text(elem),
+                begin=gf.time_from_ttml(elem.get("begin")),
+                end=gf.time_from_ttml(elem.get("end")),
             )
 
     def format(self, syncmap):

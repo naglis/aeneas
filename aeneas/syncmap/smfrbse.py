@@ -33,9 +33,8 @@ class SyncMapFormatRBSE(SyncMapFormatBase):
 
     DEFAULT = "rbse"
 
-    def parse(self, input_text, syncmap):
-        contents_dict = json.loads(input_text)
-        for fragment in contents_dict["smil_data"]:
+    def parse(self, buf, syncmap):
+        for fragment in json.load(buf)["smil_data"]:
             # TODO read text from additional text_file?
             self._add_fragment(
                 syncmap=syncmap,

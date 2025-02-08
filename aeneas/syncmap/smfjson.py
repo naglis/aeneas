@@ -31,9 +31,8 @@ class SyncMapFormatJSON(SyncMapFormatBase):
 
     DEFAULT = "json"
 
-    def parse(self, input_text, syncmap):
-        contents_dict = json.loads(input_text)
-        for fragment in contents_dict["fragments"]:
+    def parse(self, buf, syncmap):
+        for fragment in json.load(buf)["fragments"]:
             self._add_fragment(
                 syncmap=syncmap,
                 identifier=fragment["id"],

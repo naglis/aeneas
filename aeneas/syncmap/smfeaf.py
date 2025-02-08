@@ -40,29 +40,21 @@ class SyncMapFormatEAF(SyncMapFormatGenericXML):
 
     DEFAULT = "eaf"
 
-    def parse(self, input_text, syncmap):
-        # get root
-        root = ET.fromstring(gf.safe_bytes(input_text))
+    def parse(self, buf, syncmap):
+        root = ET.parse(buf).getroot()
         # get time slots
-        time_slots = dict()
-        for ts in root.iter("TIME_SLOT"):
-            time_slots[ts.get("TIME_SLOT_ID")] = (
-                gf.time_from_ssmmm(ts.get("TIME_VALUE")) / 1000
-            )
+        time_slots = {
+            ts.get("TIME_SLOT_ID"): gf.time_from_ssmmm(ts.get("TIME_VALUE")) / 1000
+            for ts in root.iter("TIME_SLOT")
+        }
         # parse annotations
         for alignable in root.iter("ALIGNABLE_ANNOTATION"):
-            identifier = gf.safe_unicode(alignable.get("ANNOTATION_ID"))
-            begin = time_slots[alignable.get("TIME_SLOT_REF1")]
-            end = time_slots[alignable.get("TIME_SLOT_REF2")]
-            lines = []
-            for value in alignable.iter("ANNOTATION_VALUE"):
-                lines.append(gf.safe_unicode(value.text))
             self._add_fragment(
                 syncmap=syncmap,
-                identifier=identifier,
-                lines=lines,
-                begin=begin,
-                end=end,
+                identifier=alignable.get("ANNOTATION_ID"),
+                lines=[v.text for v in alignable.iter("ANNOTATION_VALUE")],
+                begin=time_slots[alignable.get("TIME_SLOT_REF1")],
+                end=time_slots[alignable.get("TIME_SLOT_REF2")],
             )
 
     def format(self, syncmap):

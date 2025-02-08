@@ -92,7 +92,7 @@ class SyncMapFormatGenericSubtitles(SyncMapFormatBase):
         """
         return False
 
-    def parse(self, input_text, syncmap):
+    def parse(self, buf, syncmap):
         def get_block(input_lines, i):
             """
             Get all the non-empty, consecutive lines, starting from index i,
@@ -133,7 +133,7 @@ class SyncMapFormatGenericSubtitles(SyncMapFormatBase):
             end = self.parse_time_function(end)
             return (begin, end)
 
-        input_lines = [line.strip() for line in input_text.splitlines()]
+        input_lines = [line.decode().strip() for line in buf.readlines()]
         i = 0
         cue_index = 1
 

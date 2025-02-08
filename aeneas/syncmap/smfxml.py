@@ -32,22 +32,14 @@ class SyncMapFormatXML(SyncMapFormatGenericXML):
 
     DEFAULT = "xml"
 
-    def parse(self, input_text, syncmap):
-        root = ET.fromstring(gf.safe_bytes(input_text))
-        for frag in root:
-            identifier = gf.safe_unicode(frag.get("id"))
-            begin = gf.time_from_ssmmm(frag.get("begin"))
-            end = gf.time_from_ssmmm(frag.get("end"))
-            lines = []
-            for child in frag:
-                if child.tag == "line":
-                    lines.append(gf.safe_unicode(child.text))
+    def parse(self, buf, syncmap):
+        for frag in ET.parse(buf).getroot():
             self._add_fragment(
                 syncmap=syncmap,
-                identifier=identifier,
-                lines=lines,
-                begin=begin,
-                end=end,
+                identifier=frag.get("id"),
+                lines=[c.text for c in frag if c.tag == "line"],
+                begin=gf.time_from_ssmmm(frag.get("begin")),
+                end=gf.time_from_ssmmm(frag.get("end")),
             )
 
     def format(self, syncmap):
