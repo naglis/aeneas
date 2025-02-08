@@ -306,15 +306,6 @@ class ExecuteTaskCLI(AbstractCLIProgram):
             "options": "",
             "show": True,
         },
-        "--example-textgrid": {
-            "description": "input: parsed text, output: TextGrid",
-            "audio": AUDIO_FILE,
-            "text": gf.relative_path("res/parsed.txt", __file__),
-            "config": "task_language=eng|is_text_type=parsed|os_task_file_format=textgrid",
-            "syncmap": "output/sonnet.textgrid",
-            "options": "",
-            "show": True,
-        },
         "--example-tsv": {
             "description": "input: parsed text, output: TSV",
             "audio": AUDIO_FILE,

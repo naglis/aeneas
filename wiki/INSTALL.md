@@ -17,11 +17,6 @@ You can also install **aeneas** from source, just keep in mind:
   On Windows, you might need to open a console as Administrator;
 * you can install **aeneas** in a virtual environment
   created by `virtualenv` or similar;
-* **aeneas** provides a few extra tools
-  which require extra dependencies.
-  These extra tools are not installed by default:
-  if you want to install them,
-  use `pip install aeneas[full]` instead of `pip install aeneas`;
 * you can disable compiling Python C/C++ extensions by setting one or more
   of the following environment variables:
   ``AENEAS_WITH_CDTW=False``,

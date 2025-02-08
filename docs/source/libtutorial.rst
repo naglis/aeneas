@@ -137,12 +137,6 @@ However, since they are popular Python packages, to avoid complex import testing
 they are listed as requirements.
 This choice might change in the future.
 
-Depending on what ``aeneas`` classes you want to use,
-you might need to install the following optional dependencies:
-
-* ``tgt`` (for outputting sync maps to TextGrid format)
-
-
 
 Speeding Critical Sections Up: Python C/C++ Extensions
 ------------------------------------------------------

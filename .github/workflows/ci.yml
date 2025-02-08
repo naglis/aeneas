@@ -25,9 +25,7 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y ffmpeg espeak-ng libespeak-ng-dev
           python -m pip install --upgrade pip
-          # FIXME: `tgt` is temporarily installed since tests break without it.
-          # Consider adding it as a hard dependency or ignore(skip) in tests if it is not installed intead of failing.
-          pip install -r requirements.txt tgt setuptools
+          pip install -r requirements.txt setuptools
       - name: Build C/C++ extensions
         # Disabled for the time being.
         # FIXME: Calling C extensions inside GitHub action currently hangs.

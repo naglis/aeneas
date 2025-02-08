@@ -51,16 +51,6 @@ PKG_VERSION = "1.7.3.0"
 # NOTE: this list should be the same as requirements.txt
 PKG_INSTALL_REQUIRES = ["BeautifulSoup4>=4.5.1", "lxml>=3.6.0", "numpy>=1.9"]
 
-# required packages to install extra tools
-PKG_EXTRAS_REQUIRE = {
-    "full": [
-        "tgt>=1.4.2",
-    ],
-    "tgt": [
-        "tgt>=1.4.2",
-    ],
-}
-
 # packages to be distributed
 # NOTE: not including the aeneas.test package to keep the size small
 PKG_PACKAGES = [
@@ -148,11 +138,9 @@ PKG_KEYWORDS = (
     "SRT",
     "SSV",
     "SUB",
-    "TGT",
     "TSV",
     "TTML",
     "TTS",
-    "TextGrid",
     "VTT",
     "XML",
     "aeneas",

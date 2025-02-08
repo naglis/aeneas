@@ -110,9 +110,6 @@ class TestExecuteTaskCLI(ExecuteTaskCLICase):
     def test_example_srt(self):
         self.execute([("", "--example-srt")], 0)
 
-    def test_example_textgrid(self):
-        self.execute([("", "--example-textgrid")], 0)
-
     def test_example_tsv(self):
         self.execute([("", "--example-tsv")], 0)
 

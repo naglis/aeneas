@@ -61,7 +61,7 @@ interval in the audio file:
 This synchronization map can be output to file in several formats,
 depending on its application:
 
--  research: Audacity (AUD), ELAN (EAF), TextGrid;
+-  research: Audacity (AUD), ELAN (EAF);
 -  digital publishing: SMIL for EPUB 3;
 -  closed captioning: SubRip (SRT), SubViewer (SBV/SUB), TTML, WebVTT
    (VTT);
@@ -230,7 +230,7 @@ Supported Features
    paragraph, etc.)
 -  Input audio file formats: all those readable by ``ffmpeg``
 -  Output sync map formats: AUD, CSV, EAF, JSON, SMIL, SRT, SSV, SUB,
-   TEXTGRID, TSV, TTML, TXT, VTT, XML
+   TSV, TTML, TXT, VTT, XML
 -  Confirmed working on 38 languages: AFR, ARA, BUL, CAT, CYM, CES, DAN,
    DEU, ELL, ENG, EPO, EST, FAS, FIN, FRA, GLE, GRC, HRV, HUN, ISL, ITA,
    JPN, LAT, LAV, LIT, NLD, NOR, RON, RUS, POL, POR, SLK, SPA, SRP, SWA,

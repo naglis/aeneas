@@ -84,17 +84,14 @@ Example 27 (input: unparsed text, output: SMIL)
 Example 28 (input: subtitles text, output: SRT)
   $ python -m aeneas.tools.execute_task --example-srt
 
-Example 29 (input: parsed text, output: TextGrid)
-  $ python -m aeneas.tools.execute_task --example-textgrid
-
-Example 30 (input: parsed text, output: TSV)
+Example 29 (input: parsed text, output: TSV)
   $ python -m aeneas.tools.execute_task --example-tsv
 
-Example 31 (input: single word granularity plain text, output: AUD)
+Example 30 (input: single word granularity plain text, output: AUD)
   $ python -m aeneas.tools.execute_task --example-words
 
-Example 32 (input: single word granularity plain text, output: AUD, tts engine: Festival, TTS cache on)
+Example 31 (input: single word granularity plain text, output: AUD, tts engine: Festival, TTS cache on)
   $ python -m aeneas.tools.execute_task --example-words-festival-cache
 
-Example 33 (input: mplain text (multilevel), output: AUD, levels to output: 3)
+Example 32 (input: mplain text (multilevel), output: AUD, levels to output: 3)
   $ python -m aeneas.tools.execute_task --example-words-multilevel

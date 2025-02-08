@@ -48,7 +48,7 @@ To eat the world's due, by the grave and thee.        => [00:00:48.080, 00:00:53
 This synchronization map can be output to file
 in several formats, depending on its application:
 
-* research: Audacity (AUD), ELAN (EAF), TextGrid;
+* research: Audacity (AUD), ELAN (EAF);
 * digital publishing: SMIL for EPUB 3;
 * closed captioning: SubRip (SRT), SubViewer (SBV/SUB), TTML, WebVTT (VTT);
 * Web: JSON;
@@ -215,7 +215,7 @@ which explains how to use the built-in command line tools.
 * Text extraction from XML (e.g., XHTML) files using `id` and `class` attributes
 * Arbitrary text fragment granularity (single word, subphrase, phrase, paragraph, etc.)
 * Input audio file formats: all those readable by `ffmpeg`
-* Output sync map formats: AUD, CSV, EAF, JSON, SMIL, SRT, SSV, SUB, TEXTGRID, TSV, TTML, TXT, VTT, XML
+* Output sync map formats: AUD, CSV, EAF, JSON, SMIL, SRT, SSV, SUB, TSV, TTML, TXT, VTT, XML
 * Confirmed working on 38 languages: AFR, ARA, BUL, CAT, CYM, CES, DAN, DEU, ELL, ENG, EPO, EST, FAS, FIN, FRA, GLE, GRC, HRV, HUN, ISL, ITA, JPN, LAT, LAV, LIT, NLD, NOR, RON, RUS, POL, POR, SLK, SPA, SRP, SWA, SWE, TUR, UKR
 * MFCC and DTW computed via Python C extensions to reduce the processing time
 * Several built-in TTS engine wrappers: eSpeak NG (default), eSpeak, Festival

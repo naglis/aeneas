@@ -30,7 +30,6 @@ from aeneas.syncmap.smfsmil import SyncMapFormatSMIL
 from aeneas.syncmap.smfsrt import SyncMapFormatSRT
 from aeneas.syncmap.smfssv import SyncMapFormatSSV
 from aeneas.syncmap.smfsub import SyncMapFormatSUB
-from aeneas.syncmap.smftextgrid import SyncMapFormatTextGrid
 from aeneas.syncmap.smftsv import SyncMapFormatTSV
 from aeneas.syncmap.smfttml import SyncMapFormatTTML
 from aeneas.syncmap.smftxt import SyncMapFormatTXT
@@ -469,90 +468,6 @@ class SyncMapFormat:
     .. deprecated:: 1.0.3
     """
 
-    TEXTGRID = SyncMapFormatTextGrid.DEFAULT
-    """
-    Alias for ``TEXTGRID_LONG``.
-    """
-
-    TEXTGRID_LONG = SyncMapFormatTextGrid.LONG
-    """
-    Praat full TextGrid format::
-
-        File type = "ooTextFile"
-        Object class = "TextGrid"
-
-        xmin = 0.0
-        xmax = 7.89
-        tiers? <exists>
-        size = 1
-        item []:
-            item [1]:
-                class = "IntervalTier"
-                name = "Token"
-                xmin = 0.0
-                xmax = 7.89
-                intervals: size = 3
-                intervals [1]:
-                    xmin = 0.0
-                    xmax = 1.234
-                    text = "First fragment text"
-                intervals [2]:
-                    xmin = 1.234
-                    xmax = 5.678
-                    text = "Second fragment text"
-                intervals [3]:
-                    xmin = 5.678
-                    xmax = 7.89
-                    text = "Third fragment text"
-
-    * Multiple levels: no (not yet)
-    * Multiple lines: no
-
-    See also http://www.fon.hum.uva.nl/praat/manual/TextGrid_file_formats.html
-
-    Note that at the moment reading support is limited
-    to the first tier in the TextGrid file.
-
-    .. versionadded:: 1.7.0
-    """
-
-    TEXTGRID_SHORT = SyncMapFormatTextGrid.SHORT
-    """
-    Praat short TextGrid format::
-
-        File type = "ooTextFile"
-        Object class = "TextGrid"
-
-        0.0
-        7.89
-        <exists>
-        1
-        "IntervalTier"
-        "Token"
-        0.0
-        7.89
-        3
-        0.0
-        1.234
-        "First fragment text"
-        1.234
-        5.678
-        "Second fragment text"
-        5.678
-        7.89
-        "Third fragment text"
-
-    * Multiple levels: no (not yet)
-    * Multiple lines: no
-
-    See also http://www.fon.hum.uva.nl/praat/manual/TextGrid_file_formats.html
-
-    Note that at the moment reading support is limited
-    to the first tier in the TextGrid file.
-
-    .. versionadded:: 1.7.0
-    """
-
     TSV = SyncMapFormatTSV.DEFAULT
     """
     Alias for ``TSVM``.
@@ -773,9 +688,6 @@ class SyncMapFormat:
         SSVM: SyncMapFormatSSV,
         SUB: SyncMapFormatSUB,
         TAB: SyncMapFormatTSV,
-        TEXTGRID: SyncMapFormatTextGrid,
-        TEXTGRID_LONG: SyncMapFormatTextGrid,
-        TEXTGRID_SHORT: SyncMapFormatTextGrid,
         TSV: SyncMapFormatTSV,
         TSVH: SyncMapFormatTSV,
         TSVM: SyncMapFormatTSV,
