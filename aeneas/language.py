@@ -43,9 +43,8 @@ class Language(str, enum.Enum):
     Consult the documentation of your TTS engine wrapper to
     see the list of languages supported by it:
 
-    * :class:`~aeneas.ttswrappers.awsttswrapper.AWSTTSWrapper`
-    * :class:`~aeneas.ttswrappers.espeakttswrapper.ESPEAKTTSWrapper` (default TTS)
-    * :class:`~aeneas.ttswrappers.espeakngttswrapper.ESPEAKNGTTSWrapper`
+    * :class:`~aeneas.ttswrappers.espeakngttswrapper.ESPEAKNGTTSWrapper` (default TTS)
+    * :class:`~aeneas.ttswrappers.espeakttswrapper.ESPEAKTTSWrapper`
     * :class:`~aeneas.ttswrappers.festivalttswrapper.FESTIVALTTSWrapper`
     * :class:`~aeneas.ttswrappers.nuancettswrapper.NuanceTTSWrapper`
 

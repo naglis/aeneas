@@ -35,7 +35,6 @@ import os.path
 from aeneas.logger import Configurable
 from aeneas.runtimeconfiguration import RuntimeConfiguration
 from aeneas.textfile import TextFile
-from aeneas.ttswrappers.awsttswrapper import AWSTTSWrapper
 from aeneas.ttswrappers.espeakngttswrapper import ESPEAKNGTTSWrapper
 from aeneas.ttswrappers.espeakttswrapper import ESPEAKTTSWrapper
 from aeneas.ttswrappers.festivalttswrapper import FESTIVALTTSWrapper
@@ -55,14 +54,9 @@ class Synthesizer(Configurable):
     :type  rconf: :class:`~aeneas.runtimeconfiguration.RuntimeConfiguration`
     :raises: OSError: if a custom TTS engine is requested
                       but it cannot be loaded
-    :raises: ImportError: if the AWS Polly TTS API wrapper is requested
-                          but the ``boto3`` module is not installed, or
-                          if the Nuance TTS API wrapper is requested
+    :raises: ImportError: if the Nuance TTS API wrapper is requested
                           but the``requests`` module is not installed
     """
-
-    AWS = "aws"
-    """ Select AWS Polly TTS API wrapper """
 
     ESPEAK = "espeak"
     """ Select eSpeak wrapper """
@@ -79,7 +73,7 @@ class Synthesizer(Configurable):
     NUANCE = "nuance"
     """ Select Nuance TTS API wrapper """
 
-    ALLOWED_VALUES = [AWS, ESPEAK, ESPEAKNG, FESTIVAL, MACOS, NUANCE]
+    ALLOWED_VALUES = [ESPEAK, ESPEAKNG, FESTIVAL, MACOS, NUANCE]
     """ List of all the allowed values """
 
     def __init__(self, rconf=None):
@@ -95,12 +89,6 @@ class Synthesizer(Configurable):
         requested_tts_engine = self.rconf[RuntimeConfiguration.TTS]
         tts_cls = None
         match requested_tts_engine:
-            case self.AWS:
-                if importlib.util.find_spec("boto3") is None:
-                    raise ImportError(
-                        "Unable to import boto3 for AWS Polly TTS API wrapper"
-                    )
-                tts_cls = AWSTTSWrapper
             case self.NUANCE:
                 if importlib.util.find_spec("requests") is None:
                     raise ImportError(

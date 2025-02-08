@@ -70,7 +70,7 @@ deps() {
             fi
         fi
         pip install -U lxml BeautifulSoup4
-        pip install -U boto3 requests tgt
+        pip install -U requests tgt
         deactivate
         cd ..
         echo "[INFO] Installing Python dependencies in $1 ... done"

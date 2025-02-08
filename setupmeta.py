@@ -54,12 +54,8 @@ PKG_INSTALL_REQUIRES = ["BeautifulSoup4>=4.5.1", "lxml>=3.6.0", "numpy>=1.9"]
 # required packages to install extra tools
 PKG_EXTRAS_REQUIRE = {
     "full": [
-        "boto3>=1.4.2",
         "requests>=2.9.1",
         "tgt>=1.4.2",
-    ],
-    "boto3": [
-        "boto3>=1.4.2",
     ],
     "requests": [
         "requests>=2.9.1",
@@ -138,7 +134,6 @@ PKG_LONG_DESCRIPTION = open("README.rst", encoding="utf-8").read()
 # PyPI keywords
 PKG_KEYWORDS = (
     "AUD",
-    "AWS Polly TTS API",
     "CSV",
     "DTW",
     "EAF",

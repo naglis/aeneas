@@ -186,17 +186,7 @@ class SynthesizeTextCLI(AbstractCLIProgram):
             return self.NO_ERROR_EXIT_CODE
         except ImportError as exc:
             tts = self.rconf[RuntimeConfiguration.TTS]
-            if tts == Synthesizer.AWS:
-                self.print_error(
-                    "You need to install Python module boto3 to use the AWS Polly TTS API wrapper. Run:"
-                    "\n"
-                    "$ pip install boto3"
-                    "\n"
-                    "or, to install for all users:"
-                    "\n"
-                    "$ sudo pip install boto3"
-                )
-            elif tts == Synthesizer.NUANCE:
+            if tts == Synthesizer.NUANCE:
                 self.print_error(
                     "You need to install Python module requests to use the Nuance TTS API wrapper. Run:"
                     "\n"

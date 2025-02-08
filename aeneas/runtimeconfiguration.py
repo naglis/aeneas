@@ -638,17 +638,6 @@ class RuntimeConfiguration(Configuration):
     one of the directories listed in your ``PATH`` environment variable.
 
     Specify the value
-    :data:`~aeneas.synthesizer.Synthesizer.AWS` (``aws``)
-    to use the built-in AWS Polly TTS API wrapper;
-    you will need to provide your AWS API Access Key and Secret Access Key
-    by either storing them on disk
-    (e.g., in ``~/.aws/credentials`` and ``~/.aws/config``)
-    or setting them in environment variables.
-    Please refer to
-    http://boto3.readthedocs.io/en/latest/guide/configuration.html
-    for further details.
-
-    Specify the value
     :data:`~aeneas.synthesizer.Synthesizer.NUANCE` (``nuance``)
     to use the built-in Nuance TTS API wrapper;
     you will need to provide your Nuance Developer API ID and API Key using the

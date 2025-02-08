@@ -37,7 +37,6 @@ from aeneas.syncmap.fragment import FragmentType
 from aeneas.task import Task, TaskConfiguration
 from aeneas.textfile import TextFileFormat
 from aeneas.tools.abstract_cli_program import AbstractCLIProgram
-from aeneas.ttswrappers.awsttswrapper import AWSTTSWrapper
 from aeneas.ttswrappers.espeakngttswrapper import ESPEAKNGTTSWrapper
 from aeneas.ttswrappers.espeakttswrapper import ESPEAKTTSWrapper
 from aeneas.ttswrappers.festivalttswrapper import FESTIVALTTSWrapper
@@ -359,7 +358,6 @@ class ExecuteTaskCLI(AbstractCLIProgram):
     PARAMETERS = TaskConfiguration.parameters(sort=True, as_strings=True)
 
     VALUES = {
-        "aws": AWSTTSWrapper.CODE_TO_HUMAN_LIST,
         "espeak": ESPEAKTTSWrapper.CODE_TO_HUMAN_LIST,
         "espeak-ng": ESPEAKNGTTSWrapper.CODE_TO_HUMAN_LIST,
         "festival": FESTIVALTTSWrapper.CODE_TO_HUMAN_LIST,

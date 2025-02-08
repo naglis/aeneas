@@ -237,8 +237,8 @@ Supported Features
    SWE, TUR, UKR
 -  MFCC and DTW computed via Python C extensions to reduce the
    processing time
--  Several built-in TTS engine wrappers: AWS Polly TTS API, eSpeak
-   (default), eSpeak-ng, Festival, MacOS (via say), Nuance TTS API
+-  Several built-in TTS engine wrappers: eSpeak NG
+   (default), eSpeak, Festival, MacOS (via say), Nuance TTS API
 -  Default TTS (eSpeak) called via a Python C extension for fast audio
    synthesis
 -  Batch processing of multiple audio/text pairs
@@ -284,7 +284,7 @@ improve the quality of the alignment at word-level:
 
 -  multilevel text (since v1.5.1),
 -  MFCC nonspeech masking (since v1.7.0, disabled by default),
--  use better TTS engines, like Festival or AWS/Nuance TTS API (since
+-  use better TTS engines, like Festival or Nuance TTS API (since
    v1.5.0).
 
 If you use the ``aeneas.tools.execute_task`` command line tool, you can
