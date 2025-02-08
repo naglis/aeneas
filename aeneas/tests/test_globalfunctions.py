@@ -506,15 +506,6 @@ class TestGlobalFunctions(unittest.TestCase):
     def test_run_c_extension_with_fallback(self):
         self.skipTest("TODO")
 
-    def test_file_can_be_written_true(self):
-        handler, path = gf.tmp_file()
-        self.assertTrue(gf.file_can_be_written(path))
-        gf.delete_file(handler, path)
-
-    def test_file_can_be_written_false(self):
-        path = "/foo/bar/baz"
-        self.assertFalse(gf.file_can_be_written(path))
-
     def test_file_size_nonzero(self):
         handler, path = gf.tmp_file()
         with open(path, "w", encoding="utf-8") as tmp_file:

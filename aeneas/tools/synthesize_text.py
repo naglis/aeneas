@@ -156,8 +156,6 @@ class SynthesizeTextCLI(AbstractCLIProgram):
         language = gf.safe_unicode(self.actual_arguments[2])
 
         output_file_path = self.actual_arguments[3]
-        if not self.check_output_file(output_file_path):
-            return self.ERROR_EXIT_CODE
 
         text_file = self.get_text_file(text_format, text, parameters)
         if text_file is None:

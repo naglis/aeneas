@@ -168,16 +168,6 @@ class TestRunVADCLI(ExecuteCLICase):
             1,
         )
 
-    def test_run_cannot_write(self):
-        self.execute(
-            [
-                ("in", "../tools/res/audio.mp3"),
-                ("", "both"),
-                ("", "/foo/bar/baz.txt"),
-            ],
-            1,
-        )
-
     def test_run_missing_1(self):
         self.execute(
             [

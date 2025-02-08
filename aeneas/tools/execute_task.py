@@ -523,10 +523,6 @@ class ExecuteTaskCLI(AbstractCLIProgram):
             return self.ERROR_EXIT_CODE
         if not self.check_input_file(text_file_path):
             return self.ERROR_EXIT_CODE
-        if not self.check_output_file(sync_map_file_path):
-            return self.ERROR_EXIT_CODE
-        if html_file_path is not None and not self.check_output_file(html_file_path):
-            return self.ERROR_EXIT_CODE
 
         self.check_c_extensions()
 

@@ -86,10 +86,6 @@ class RunVADCLI(AbstractCLIProgram):
         self.check_c_extensions("cmfcc")
         if not self.check_input_file(audio_file_path):
             return self.ERROR_EXIT_CODE
-        if output_file_path is not None and not self.check_output_file(
-            output_file_path
-        ):
-            return self.ERROR_EXIT_CODE
 
         self.print_info("Reading audio...")
         try:

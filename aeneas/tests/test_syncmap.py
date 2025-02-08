@@ -76,7 +76,6 @@ class BaseSyncMapCase(unittest.TestCase):
 class TestSyncMap(BaseSyncMapCase):
     NOT_EXISTING_SRT = gf.absolute_path("not_existing.srt", __file__)
     EXISTING_SRT = gf.absolute_path("res/syncmaps/sonnet001.srt", __file__)
-    NOT_WRITEABLE_SRT = gf.absolute_path("x/y/z/not_writeable.srt", __file__)
     EMPTY_INTERVAL = TimeInterval(begin=TimeValue("0.000"), end=TimeValue("0.000"))
 
     def build_tree_from_intervals(
@@ -303,11 +302,6 @@ class TestSyncMap(BaseSyncMapCase):
         syn = SyncMap()
         with self.assertRaises(ValueError):
             syn.write("foo", self.NOT_EXISTING_SRT)
-
-    def test_write_not_existing_path(self):
-        syn = SyncMap()
-        with self.assertRaises(OSError):
-            syn.write(SyncMapFormat.SRT, self.NOT_WRITEABLE_SRT)
 
     def test_write_smil_no_both(self):
         fmt = SyncMapFormat.SMIL

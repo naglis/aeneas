@@ -137,12 +137,7 @@ class Plotter(Configurable):
         :param int h_zoom: the horizontal zoom
         :param int v_zoom: the vertical zoom
         :raises: ImportError: if module ``PIL`` cannot be imported
-        :raises: OSError: if ``output_file_path`` cannot be written
         """
-        # check that output_file_path can be written
-        if not gf.file_can_be_written(output_file_path):
-            raise OSError(f"Cannot write to output file {output_file_path!r}")
-
         # get widths and cumulative height, in modules
         widths = [ls.width for ls in self.labelsets]
         sum_height = sum([ls.height for ls in self.labelsets])

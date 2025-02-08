@@ -97,9 +97,6 @@ class ConvertSyncMapCLI(AbstractCLIProgram):
         if not self.check_format(input_sm_format):
             return self.ERROR_EXIT_CODE
 
-        if not self.check_output_file(output_file_path):
-            return self.ERROR_EXIT_CODE
-
         if output_html:
             if len(self.actual_arguments) < 3:
                 return self.print_help()

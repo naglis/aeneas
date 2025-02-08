@@ -74,8 +74,6 @@ class PlotWaveformCLI(AbstractCLIProgram):
 
         if not self.check_input_file(input_file_path):
             return self.ERROR_EXIT_CODE
-        if not self.check_output_file(output_file_path):
-            return self.ERROR_EXIT_CODE
 
         fast = self.has_option("--fast")
         fragment_text = self.has_option("--text")

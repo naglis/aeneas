@@ -308,11 +308,6 @@ class SyncMap:
 
         .. versionadded:: 1.3.1
         """
-        if not gf.file_can_be_written(output_file_path):
-            raise OSError(
-                f"Cannot output HTML file {output_file_path!r}. Wrong permissions?"
-            )
-
         if parameters is None:
             parameters = {}
 
@@ -503,10 +498,6 @@ class SyncMap:
             raise ValueError("Sync map format is None")
         if sync_map_format not in SyncMapFormat.CODE_TO_CLASS:
             raise ValueError(f"Sync map format {sync_map_format!r} is not allowed")
-        if not gf.file_can_be_written(output_file_path):
-            raise OSError(
-                f"Cannot write sync map file {output_file_path!r}. Wrong permissions?"
-            )
 
         logger.debug("Output format:     %r", sync_map_format)
         logger.debug("Output path:       %r", output_file_path)

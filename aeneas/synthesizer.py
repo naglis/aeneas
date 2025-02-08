@@ -41,7 +41,6 @@ from aeneas.ttswrappers.espeakttswrapper import ESPEAKTTSWrapper
 from aeneas.ttswrappers.festivalttswrapper import FESTIVALTTSWrapper
 from aeneas.ttswrappers.macosttswrapper import MacOSTTSWrapper
 from aeneas.ttswrappers.nuancettswrapper import NuanceTTSWrapper
-import aeneas.globalfunctions as gf
 
 logger = logging.getLogger(__name__)
 
@@ -167,7 +166,6 @@ class Synthesizer(Configurable):
         :param bool backwards: if ``True``, synthesizing from the end of the text file
         :rtype: tuple
         :raises: TypeError: if ``text_file`` is ``None`` or not an instance of ``TextFile``
-        :raises: OSError: if ``audio_file_path`` cannot be written
         :raises: OSError: if ``tts=custom`` in the RuntimeConfiguration and ``tts_path`` cannot be read
         :raises: ValueError: if the TTS engine has not been set yet
         """
@@ -175,8 +173,6 @@ class Synthesizer(Configurable):
             raise TypeError("`text_file` is None")
         if not isinstance(text_file, TextFile):
             raise TypeError("`text_file` is not an instance of TextFile")
-        if not gf.file_can_be_written(audio_file_path):
-            raise OSError(f"Audio file path {audio_file_path!r} cannot be written")
         if self.tts_engine is None:
             raise ValueError("Cannot select the TTS engine")
 

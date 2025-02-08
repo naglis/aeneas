@@ -825,30 +825,6 @@ def run_c_extension_with_fallback(
     return result
 
 
-def file_can_be_written(path: str) -> bool:
-    """
-    Return ``True`` if a file can be written at the given ``path``.
-
-    :param string path: the file path
-    :rtype: bool
-
-    .. warning:: This function will attempt to open the given ``path``
-                 in write mode, possibly destroying the file previously existing there.
-
-    .. versionadded:: 1.4.0
-    """
-    if path is None:
-        return False
-    try:
-        with open(path, "wb"):
-            pass
-        delete_file(None, path)
-        return True
-    except OSError:
-        pass
-    return False
-
-
 def file_size(path: str) -> int:
     """
     Return the size, in bytes, of the file at the given ``path``.

@@ -34,7 +34,6 @@ import tempfile
 
 from aeneas.logger import Configurable
 from aeneas.runtimeconfiguration import RuntimeConfiguration
-import aeneas.globalfunctions as gf
 
 logger = logging.getLogger(__name__)
 
@@ -175,10 +174,6 @@ class Downloader(Configurable):
                 logger.debug(
                     "output_file_path is not None: cheking that file can be written"
                 )
-                if not gf.file_can_be_written(output_file_path):
-                    raise OSError(
-                        f"Path {output_file_path!r} cannot be written. Wrong permissions?"
-                    )
             logger.debug("Determining output file path... done")
             logger.debug("Output file path is %r", output_file_path)
             return output_file_path

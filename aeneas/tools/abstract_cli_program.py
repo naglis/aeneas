@@ -486,23 +486,6 @@ class AbstractCLIProgram(Configurable):
             return False
         return True
 
-    def check_output_file(self, path: str) -> bool:
-        """
-        If the given path cannot be written, emit an error
-        and return ``False``. Otherwise return ``True``.
-
-        :param path: the path of the output file
-        :type  path: string (path)
-        :rtype: bool
-        """
-        if not gf.file_can_be_written(path):
-            self.print_error(
-                f"Unable to create file {path!r}. "
-                "Make sure the file path is written/escaped correctly and that you have write permission on it."
-            )
-            return False
-        return True
-
     def check_output_directory(self, path: str) -> bool:
         """
         If the given directory cannot be written, emit an error
@@ -514,13 +497,6 @@ class AbstractCLIProgram(Configurable):
         """
         if not os.path.isdir(path):
             self.print_error(f"Directory {path!r} does not exist")
-            return False
-        test_file = os.path.join(path, "file.test")
-        if not gf.file_can_be_written(test_file):
-            self.print_error(
-                f"Unable to write inside directory {path!r}. "
-                "Make sure the directory path is written/escaped correctly and that you have write permission on it."
-            )
             return False
         return True
 

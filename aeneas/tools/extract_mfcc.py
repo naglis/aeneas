@@ -86,8 +86,6 @@ class ExtractMFCCCLI(AbstractCLIProgram):
         self.check_c_extensions("cmfcc")
         if not self.check_input_file(input_file_path):
             return self.ERROR_EXIT_CODE
-        if not self.check_output_file(output_file_path):
-            return self.ERROR_EXIT_CODE
 
         try:
             mfccs = AudioFileMFCC(input_file_path, rconf=self.rconf).all_mfcc

@@ -64,8 +64,6 @@ class FFMPEGWrapperCLI(AbstractCLIProgram):
 
         if not self.check_input_file(input_file_path):
             return self.ERROR_EXIT_CODE
-        if not self.check_output_file(output_file_path):
-            return self.ERROR_EXIT_CODE
 
         try:
             converter = FFMPEGWrapper(rconf=self.rconf)
