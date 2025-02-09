@@ -1220,7 +1220,7 @@ class TransliterationMap:
                 if line.startswith("#"):
                     continue
 
-                if line := line.replace("\t", " ").strip():
+                if line := line.expandtabs(tabsize=1).strip():
                     for char, replacement in cls._process_map_rule(line):
                         trans_map[char] = replacement
 

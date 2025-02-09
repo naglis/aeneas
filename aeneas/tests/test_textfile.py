@@ -615,9 +615,6 @@ class TestTextFile(unittest.TestCase):
         self.filter_transliterate(["TUTTE"], ["wwwwE"])
 
     def test_filter_transliterate_replace_codepoint_length(self):
-        self.filter_transliterate(["x" + chr(0x0008) + "z"], ["xaz"])
-        self.filter_transliterate(["x" + chr(0x0088) + "z"], ["xaz"])
-        self.filter_transliterate(["x" + chr(0x0888) + "z"], ["xaz"])
-        self.filter_transliterate(["x" + chr(0x8888) + "z"], ["xaz"])
-        self.filter_transliterate(["x" + chr(0x88888) + "z"], ["xaz"])
-        self.filter_transliterate(["x" + chr(0x108888) + "z"], ["xaz"])
+        for codepoint in (0x0008, 0x0088, 0x0888, 0x8888, 0x88888, 0x108888):
+            with self.subTest(codepoint=codepoint):
+                self.filter_transliterate(["x" + chr(codepoint) + "z"], ["xaz"])
