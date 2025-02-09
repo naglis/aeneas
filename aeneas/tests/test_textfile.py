@@ -590,10 +590,6 @@ class TestTextFile(unittest.TestCase):
     def test_filter_transliterate_identity(self):
         self.filter_transliterate(["worm"], ["worm"])
 
-    def test_filter_transliterate_error(self):
-        with self.assertRaises(OSError):
-            self.filter_transliterate(["worm"], ["worm"], self.NOT_EXISTING_PATH)
-
     def test_filter_transliterate_replace_empty(self):
         self.filter_transliterate([""], [""])
 

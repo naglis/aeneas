@@ -1159,22 +1159,12 @@ class TextFilterTransliterate(TextFilter):
 
     Leading/trailing spaces, and repeated spaces are removed.
 
-    :param map_object: the map object
-    :type  map_object: :class:`~aeneas.textfile.TransliterationMap`
     :param string map_file_path: the path to a map file
-    :raises: OSError: if ``map_file_path`` cannot be read
-    :raises: TypeError: if ``map_object`` is not an instance
-                        of :class:`~aeneas.textfile.TransliterationMap`
     """
 
-    def __init__(self, map_file_path=None, map_object=None):
-        if map_object is not None:
-            if not isinstance(map_object, TransliterationMap):
-                raise TypeError("map_object is not an instance of TransliterationMap")
-            self.trans_map = map_object
-        elif map_file_path is not None:
-            self.trans_map = TransliterationMap(file_path=map_file_path)
+    def __init__(self, map_file_path: str):
         super().__init__()
+        self.trans_map = TransliterationMap.from_path(map_file_path)
 
     def apply_filter(self, strings):
         return [self._apply_single(s) for s in strings]
@@ -1198,79 +1188,46 @@ class TransliterationMap:
 
     For its format, please read the initial comment
     included at the top of the ``transliteration.map`` sample file.
-
-    :param string file_path: the path to the map file to be read
-    :raises: OSError: if ``file_path`` cannot be read
     """
 
     CODEPOINT_REGEX = re.compile(r"U\+([0-9A-Fa-f]+)")
     DELETE_REGEX = re.compile(r"^([^ ]+)$")
     REPLACE_REGEX = re.compile(r"^([^ ]+) ([^ ]+)$")
 
-    def __init__(self, file_path):
-        self.trans_map = {}
-        self.file_path = file_path
+    def __init__(self, trans_map: dict[str, str]):
+        self.trans_map = trans_map
 
-    @property
-    def file_path(self):
+    @classmethod
+    def _process_map_rule(cls, line: str) -> typing.Iterator[tuple[str, str]]:
         """
-        The path of the map file.
-
-        :rtype: string
+        Process the line string containing a map rule.
         """
-        return self.__file_path
+        if result := cls.REPLACE_REGEX.match(line):
+            what = cls._process_first_group(result.group(1))
+            replacement = cls._process_second_group(result.group(2))
+            for char in what:
+                yield char, replacement
+        elif result := cls.DELETE_REGEX.match(line):
+            for char in cls._process_first_group(result.group(1)):
+                yield char, ""
 
-    @file_path.setter
-    def file_path(self, file_path):
-        if file_path is not None and not os.path.exists(file_path):
-            raise OSError(f"Map file {file_path!r} does not exist or is not a file")
-        self.__file_path = file_path
-        self._build_map()
-
-    def transliterate(self, string: str):
-        result = []
-        for char in string:
-            try:
-                result.append(self.trans_map[char])
-            except Exception:
-                result.append(char)
-        return "".join(result)
-
-    def _build_map(self):
-        """
-        Read the map file at path.
-        """
-        self.trans_map = {}
-        with open(self.file_path, encoding="utf-8") as file_obj:
-            contents = file_obj.read().replace("\t", " ")
-            for line in contents.splitlines():
+    @classmethod
+    def from_path(cls, file_path: str):
+        trans_map = {}
+        with open(file_path, encoding="utf-8") as file_obj:
+            for line in file_obj:
                 # ignore lines starting with "#" or blank (after stripping)
                 if line.startswith("#"):
                     continue
 
-                if line := line.strip():
-                    self._process_map_rule(line)
+                if line := line.replace("\t", " ").strip():
+                    for char, replacement in cls._process_map_rule(line):
+                        trans_map[char] = replacement
 
-    def _process_map_rule(self, line: str):
-        """
-        Process the line string containing a map rule.
-        """
-        result = self.REPLACE_REGEX.match(line)
-        if result is not None:
-            what = self._process_first_group(result.group(1))
-            replacement = self._process_second_group(result.group(2))
-            for char in what:
-                self.trans_map[char] = replacement
-                logger.debug("Adding rule: replace %r with %r", char, replacement)
-        else:
-            result = self.DELETE_REGEX.match(line)
-            if result is not None:
-                what = self._process_first_group(result.group(1))
-                for char in what:
-                    self.trans_map[char] = ""
-                    logger.debug("Adding rule: delete %r", char)
+        return cls(trans_map)
 
-    def _process_first_group(self, group):
+    @classmethod
+    def _process_first_group(cls, group: str) -> str:
         """
         Process the first group of a rule.
         """
@@ -1278,11 +1235,11 @@ class TransliterationMap:
             # range
             if len(group.split("-")) == 2:
                 arr = group.split("-")
-                start = self._parse_codepoint(arr[0])
-                end = self._parse_codepoint(arr[1])
+                start = cls._parse_codepoint(arr[0])
+                end = cls._parse_codepoint(arr[1])
         else:
             # single char/U+xxxx
-            start = self._parse_codepoint(group)
+            start = cls._parse_codepoint(group)
             end = start
         result = []
         if start > -1 and end >= start:
@@ -1290,40 +1247,42 @@ class TransliterationMap:
                 result.append(chr(index))
         return result
 
-    def _process_second_group(self, group):
+    @classmethod
+    def _process_second_group(cls, group: str) -> str:
         """
         Process the second group of a (replace) rule.
         """
 
-        def _replace_codepoint(match):
+        def _replace_codepoint(match: re.Match) -> str:
             """
             Replace the matched Unicode hex code
             with the corresponding unicode character
             """
-            result = self._match_to_int(match)
+            result = cls._match_to_int(match)
             if result == -1:
                 return ""
             return chr(result)
 
         result = group
         with contextlib.suppress(Exception):
-            result = re.sub(self.CODEPOINT_REGEX, _replace_codepoint, result)
+            result = re.sub(cls.CODEPOINT_REGEX, _replace_codepoint, result)
         return result
 
-    def _parse_codepoint(self, string):
+    @classmethod
+    def _parse_codepoint(cls, string: str) -> int:
         """
         Parse the given string, either a Unicode character or ``U+....``,
         and return the corresponding Unicode code point as int.
         """
         if len(string) > 1:
-            match = self.CODEPOINT_REGEX.match(string)
-            return self._match_to_int(match)
+            match = cls.CODEPOINT_REGEX.match(string)
+            return cls._match_to_int(match)
         elif len(string) == 1:
-            return self._chr_to_int(string)
+            return cls._chr_to_int(string)
         return -1
 
     @classmethod
-    def _match_to_int(cls, match):
+    def _match_to_int(cls, match: re.Match) -> int:
         """
         Convert to int the first group of the match,
         representing the hex number in :data:`aeneas.textfile.TransliterationMap.CODEPOINT_REGEX`
@@ -1335,7 +1294,7 @@ class TransliterationMap:
         return -1
 
     @classmethod
-    def _chr_to_int(cls, char):
+    def _chr_to_int(cls, char: str) -> int:
         """
         Convert to int the given character.
         """
@@ -1343,3 +1302,6 @@ class TransliterationMap:
             return ord(char)
 
         return -1
+
+    def transliterate(self, string: str) -> str:
+        return "".join([self.trans_map.get(char, char) for char in string])
