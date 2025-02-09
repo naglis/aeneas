@@ -24,8 +24,10 @@ import urllib.parse
 import lxml.etree as ET
 
 from aeneas.exacttiming import TimeValue
+from aeneas.syncmap.fragment import SyncMapFragment
 from aeneas.syncmap.missingparametererror import SyncMapMissingParameterError
 from aeneas.syncmap.smfgxml import SyncMapFormatGenericXML
+from aeneas.textfile import TextFragment
 import aeneas.globalconstants as gc
 import aeneas.globalfunctions as gf
 
@@ -63,7 +65,7 @@ class SyncMapFormatSMIL(SyncMapFormatGenericXML):
         else:
             return gf.time_from_ssmmm(value)
 
-    def parse(self, buf, syncmap):
+    def parse(self, buf):
         """
         Read from SMIL file.
 
@@ -72,17 +74,18 @@ class SyncMapFormatSMIL(SyncMapFormatGenericXML):
         2. timings must have ``hh:mm:ss.mmm`` or ``ss.mmm`` format (autodetected)
         3. both ``clipBegin`` and ``clipEnd`` attributes of ``<audio>`` must be populated
         """
-        root = ET.parse(buf)
-        for par in root.iter(with_smil_ns("par")):
+        for par in ET.parse(buf).iter(with_smil_ns("par")):
             for child in par:
                 if child.tag == with_smil_ns("text"):
                     identifier = urllib.parse.urlparse(child.get("src")).fragment
                 elif child.tag == with_smil_ns("audio"):
                     begin = self._autodetect_parse_duration(child.get("clipBegin"))
                     end = self._autodetect_parse_duration(child.get("clipEnd"))
-            # TODO read text from additional text_file?
-            self._add_fragment(
-                syncmap=syncmap, identifier=identifier, lines=[""], begin=begin, end=end
+
+            yield SyncMapFragment.from_begin_end(
+                begin=begin,
+                end=end,
+                text_fragment=TextFragment(identifier=identifier, lines=[""]),
             )
 
     def format(self, syncmap) -> str:

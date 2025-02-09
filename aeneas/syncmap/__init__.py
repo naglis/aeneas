@@ -396,7 +396,7 @@ class SyncMap:
         logger.debug("Input path:       %r", input_file_path)
         logger.debug("Input parameters: %r", parameters)
 
-        reader = (SyncMapFormat.CODE_TO_CLASS[sync_map_format])(
+        reader = SyncMapFormat.CODE_TO_CLASS[sync_map_format](
             variant=sync_map_format,
             parameters=parameters,
         )
@@ -404,7 +404,9 @@ class SyncMap:
         # open file for reading
         logger.debug("Reading input file...")
         with open(input_file_path, mode="rb") as input_file:
-            reader.parse(input_file, syncmap=self)
+            for fragment in reader.parse(input_file):
+                self.add_fragment(fragment)
+
         logger.debug("Reading input file... done")
 
         # overwrite language if requested

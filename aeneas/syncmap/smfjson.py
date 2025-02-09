@@ -20,7 +20,9 @@
 
 import json
 
+from aeneas.syncmap.fragment import SyncMapFragment
 from aeneas.syncmap.smfbase import SyncMapFormatBase
+from aeneas.textfile import TextFragment
 import aeneas.globalfunctions as gf
 
 
@@ -31,15 +33,16 @@ class SyncMapFormatJSON(SyncMapFormatBase):
 
     DEFAULT = "json"
 
-    def parse(self, buf, syncmap):
+    def parse(self, buf):
         for fragment in json.load(buf)["fragments"]:
-            self._add_fragment(
-                syncmap=syncmap,
-                identifier=fragment["id"],
-                language=fragment["language"],
-                lines=fragment["lines"],
+            yield SyncMapFragment.from_begin_end(
                 begin=gf.time_from_ssmmm(fragment["begin"]),
                 end=gf.time_from_ssmmm(fragment["end"]),
+                text_fragment=TextFragment(
+                    identifier=fragment["id"],
+                    language=fragment["language"],
+                    lines=fragment["lines"],
+                ),
             )
 
     def format(self, syncmap):

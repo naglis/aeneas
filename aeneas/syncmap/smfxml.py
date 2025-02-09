@@ -19,7 +19,9 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
+from aeneas.syncmap.fragment import SyncMapFragment
 from aeneas.syncmap.smfgxml import SyncMapFormatGenericXML
+from aeneas.textfile import TextFragment
 import aeneas.globalfunctions as gf
 
 import lxml.etree as ET
@@ -32,14 +34,15 @@ class SyncMapFormatXML(SyncMapFormatGenericXML):
 
     DEFAULT = "xml"
 
-    def parse(self, buf, syncmap):
+    def parse(self, buf):
         for frag in ET.parse(buf).getroot():
-            self._add_fragment(
-                syncmap=syncmap,
-                identifier=frag.get("id"),
-                lines=[c.text for c in frag if c.tag == "line"],
+            yield SyncMapFragment.from_begin_end(
                 begin=gf.time_from_ssmmm(frag.get("begin")),
                 end=gf.time_from_ssmmm(frag.get("end")),
+                text_fragment=TextFragment(
+                    identifier=frag.get("id"),
+                    lines=[c.text for c in frag if c.tag == "line"],
+                ),
             )
 
     def format(self, syncmap):

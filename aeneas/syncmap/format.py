@@ -25,7 +25,6 @@ from aeneas.syncmap.smfaudacity import SyncMapFormatAudacity
 from aeneas.syncmap.smfcsv import SyncMapFormatCSV
 from aeneas.syncmap.smfeaf import SyncMapFormatEAF
 from aeneas.syncmap.smfjson import SyncMapFormatJSON
-from aeneas.syncmap.smfrbse import SyncMapFormatRBSE
 from aeneas.syncmap.smfsmil import SyncMapFormatSMIL
 from aeneas.syncmap.smfsrt import SyncMapFormatSRT
 from aeneas.syncmap.smfssv import SyncMapFormatSSV
@@ -223,35 +222,6 @@ class SyncMapFormat:
 
     * Multiple levels: yes (output only)
     * Multiple lines: yes
-
-    .. versionadded:: 1.2.0
-    """
-
-    RBSE = SyncMapFormatRBSE.DEFAULT
-    """
-    JSON compatible with ``rb_smil_emulator.js``::
-
-        {
-         "smil_ids": [
-          "f001",
-          "f002",
-          "f003",
-         ],
-         "smil_data": [
-          { "id": "f001", "begin": 0.000, "end": 1.234 },
-          { "id": "f002", "begin": 1.234, "end": 5.678 },
-          { "id": "f003", "begin": 5.678, "end": 7.890 }
-         ]
-        }
-
-    * Multiple levels: no
-    * Multiple lines: no
-
-    See also https://github.com/pettarin/rb_smil_emulator
-
-    Deprecated, it will be removed in v2.0.0.
-
-    .. deprecated:: 1.5.0
 
     .. versionadded:: 1.2.0
     """
@@ -644,7 +614,6 @@ class SyncMapFormat:
         DFXP: SyncMapFormatTTML,
         EAF: SyncMapFormatEAF,
         JSON: SyncMapFormatJSON,
-        RBSE: SyncMapFormatRBSE,
         SBV: SyncMapFormatSUB,
         SMIL: SyncMapFormatSMIL,
         SMILH: SyncMapFormatSMIL,

@@ -20,7 +20,9 @@
 
 import typing
 
+from aeneas.syncmap.fragment import SyncMapFragment
 from aeneas.syncmap.smfbase import SyncMapFormatBase
+from aeneas.textfile import TextFragment
 import aeneas.globalfunctions as gf
 
 
@@ -97,7 +99,7 @@ class SyncMapFormatGenericTabular(SyncMapFormatBase):
             placeholders[self.FIELDS[k]] = k
         self.write_template = self.FIELD_DELIMITER.join([f"{p}" for p in placeholders])
 
-    def parse(self, buf, syncmap):
+    def parse(self, buf):
         lines = []
         for line in buf.readlines():
             line = line.decode().strip()
@@ -131,12 +133,13 @@ class SyncMapFormatGenericTabular(SyncMapFormatBase):
             else:
                 text = ""
 
-            self._add_fragment(
-                syncmap=syncmap,
-                identifier=identifier,
-                lines=[text],
+            yield SyncMapFragment.from_begin_end(
                 begin=begin,
                 end=end,
+                text_fragment=TextFragment(
+                    identifier=identifier,
+                    lines=[text],
+                ),
             )
 
     def format(self, syncmap):

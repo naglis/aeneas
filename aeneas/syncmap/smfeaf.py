@@ -21,7 +21,9 @@
 import functools
 import os.path
 
+from aeneas.syncmap.fragment import SyncMapFragment
 from aeneas.syncmap.smfgxml import SyncMapFormatGenericXML
+from aeneas.textfile import TextFragment
 import aeneas.globalconstants as gc
 import aeneas.globalfunctions as gf
 
@@ -40,7 +42,7 @@ class SyncMapFormatEAF(SyncMapFormatGenericXML):
 
     DEFAULT = "eaf"
 
-    def parse(self, buf, syncmap):
+    def parse(self, buf):
         root = ET.parse(buf).getroot()
         # get time slots
         time_slots = {
@@ -49,12 +51,13 @@ class SyncMapFormatEAF(SyncMapFormatGenericXML):
         }
         # parse annotations
         for alignable in root.iter("ALIGNABLE_ANNOTATION"):
-            self._add_fragment(
-                syncmap=syncmap,
-                identifier=alignable.get("ANNOTATION_ID"),
-                lines=[v.text for v in alignable.iter("ANNOTATION_VALUE")],
+            yield SyncMapFragment.from_begin_end(
                 begin=time_slots[alignable.get("TIME_SLOT_REF1")],
                 end=time_slots[alignable.get("TIME_SLOT_REF2")],
+                text_fragment=TextFragment(
+                    identifier=alignable.get("ANNOTATION_ID"),
+                    lines=[v.text for v in alignable.iter("ANNOTATION_VALUE")],
+                ),
             )
 
     def format(self, syncmap):

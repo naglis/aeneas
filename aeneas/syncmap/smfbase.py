@@ -21,10 +21,7 @@
 import abc
 import typing
 
-from aeneas.language import Language
-from aeneas.exacttiming import TimeValue
 from aeneas.syncmap.fragment import SyncMapFragment
-from aeneas.textfile import TextFragment
 
 
 # FIXME: Remove this hack.
@@ -54,46 +51,10 @@ class SyncMapFormatBase(abc.ABC):
         self.variant = variant
         self.parameters = parameters
 
-    @classmethod
-    def _add_fragment(
-        cls,
-        syncmap: "SyncMap",
-        identifier: str,
-        lines: list[str],
-        begin: TimeValue,
-        end: TimeValue,
-        language: Language | None = None,
-    ):
-        """
-        Add a new fragment to ``syncmap``.
-
-        :param syncmap: the syncmap to append to
-        :type syncmap: :class:`~aeneas.syncmap.SyncMap`
-        :param identifier: the identifier
-        :type identifier: string
-        :param lines: the lines of the text
-        :type lines: list of string
-        :param begin: the begin time
-        :type begin: :class:`~aeneas.exacttiming.TimeValue`
-        :param end: the end time
-        :type end: :class:`~aeneas.exacttiming.TimeValue`
-        :param language: the language
-        :type language: string
-        """
-        syncmap.add_fragment(
-            SyncMapFragment.from_begin_end(
-                text_fragment=TextFragment(
-                    identifier=identifier, lines=lines, language=language
-                ),
-                begin=begin,
-                end=end,
-            )
-        )
-
     @abc.abstractmethod
-    def parse(self, buf: typing.IO[bytes], syncmap: "SyncMap") -> str:
+    def parse(self, buf: typing.IO[bytes]) -> typing.Iterator[SyncMapFragment]:
         """
-        Parse fragments from ``buf`` and append them fragments to ``syncmap``.
+        Yield fragments parsed from ``buf``.
         """
 
     @abc.abstractmethod

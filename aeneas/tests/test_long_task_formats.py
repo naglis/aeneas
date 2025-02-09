@@ -114,17 +114,6 @@ class TestExecuteTaskCLI(ExecuteTaskCLICase):
             0,
         )
 
-    def test_exec_rbse(self):
-        self.execute(
-            [
-                ("in", "../tools/res/audio.mp3"),
-                ("in", "../tools/res/plain.txt"),
-                ("", "task_language=eng|is_text_type=plain|os_task_file_format=rbse"),
-                ("out", "sonnet.rbse"),
-            ],
-            0,
-        )
-
     def test_exec_sbv(self):
         self.execute(
             [

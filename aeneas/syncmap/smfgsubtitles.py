@@ -19,7 +19,9 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
+from aeneas.syncmap.fragment import SyncMapFragment
 from aeneas.syncmap.smfbase import SyncMapFormatBase
+from aeneas.textfile import TextFragment
 import aeneas.globalfunctions as gf
 
 
@@ -37,10 +39,8 @@ class SyncMapFormatGenericSubtitles(SyncMapFormatBase):
     def __init__(self, variant=DEFAULT, parameters=None):
         super().__init__(variant=variant, parameters=parameters)
 
-        #
         # NOTE since we store functions (parse_..., format_...)
         #      we prefer making these instance members rather than class members
-        #
         self.header_string = None
         """
         If not ``None``, the file has the given header.
@@ -92,7 +92,7 @@ class SyncMapFormatGenericSubtitles(SyncMapFormatBase):
         """
         return False
 
-    def parse(self, buf, syncmap):
+    def parse(self, buf):
         def get_block(input_lines, i):
             """
             Get all the non-empty, consecutive lines, starting from index i,
@@ -185,12 +185,13 @@ class SyncMapFormatGenericSubtitles(SyncMapFormatBase):
                 lines = ("\n".join(acc[j:])).split(self.line_break_symbol)
 
                 # append fragment
-                self._add_fragment(
-                    syncmap=syncmap,
-                    identifier=identifier,
-                    lines=lines,
+                yield SyncMapFragment.from_begin_end(
                     begin=begin,
                     end=end,
+                    text_fragment=TextFragment(
+                        identifier=identifier,
+                        lines=lines,
+                    ),
                 )
 
                 # increase cue index
