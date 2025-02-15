@@ -33,6 +33,7 @@ from aeneas.syncmap import (
 )
 from aeneas.task import Task, TaskConfiguration
 from aeneas.textfile import TextFileFormat, TextFragment
+from aeneas.tree import Tree
 import aeneas.globalfunctions as gf
 
 
@@ -45,30 +46,27 @@ class TestTask(unittest.TestCase):
         )
 
     def dummy_sync_map(self):
-        sync_map = SyncMap()
-        frag = TextFragment("f001", Language.ENG, ["Fragment 1"])
-        sync_map.add_fragment(
+        tree = Tree()
+        for frag in (
             SyncMapFragment.from_begin_end(
                 begin=TimeValue("0.000"),
                 end=TimeValue("12.345"),
-                text_fragment=frag,
-            )
-        )
-        frag = TextFragment("f002", Language.ENG, ["Fragment 2"])
-        sync_map.add_fragment(
+                text_fragment=TextFragment("f001", Language.ENG, ["Fragment 1"]),
+            ),
             SyncMapFragment.from_begin_end(
                 begin=TimeValue("12.345"),
                 end=TimeValue("23.456"),
-                text_fragment=frag,
-            )
-        )
-        frag = TextFragment("f003", Language.ENG, ["Fragment 3"])
-        sync_map.add_fragment(
+                text_fragment=TextFragment("f002", Language.ENG, ["Fragment 2"]),
+            ),
             SyncMapFragment.from_begin_end(
-                begin=TimeValue("23.456"), end=TimeValue("34.567"), text_fragment=frag
-            )
-        )
-        return sync_map
+                begin=TimeValue("23.456"),
+                end=TimeValue("34.567"),
+                text_fragment=TextFragment("f003", Language.ENG, ["Fragment 3"]),
+            ),
+        ):
+            tree.add_child(Tree(value=frag))
+
+        return SyncMap(tree=tree)
 
     def setter(self, attribute, value, expected):
         taskconf = TaskConfiguration()

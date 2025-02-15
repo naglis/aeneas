@@ -216,16 +216,18 @@ class Task:
         logger.debug("smil_page_ref is %s", smil_page_ref)
         logger.debug("sync_map_format is %s", sync_map_format)
 
-        logger.debug("Calling sync_map.write...")
-        parameters = {
-            gc.PPN_TASK_OS_FILE_EAF_AUDIO_REF: eaf_audio_ref,
-            gc.PPN_TASK_OS_FILE_HEAD_TAIL_FORMAT: head_tail_format,
-            gc.PPN_TASK_OS_FILE_LEVELS: levels,
-            gc.PPN_TASK_OS_FILE_SMIL_AUDIO_REF: smil_audio_ref,
-            gc.PPN_TASK_OS_FILE_SMIL_PAGE_REF: smil_page_ref,
-        }
-        self.sync_map.write(sync_map_format, path, parameters)
-        logger.debug("Calling sync_map.write... done")
+        with open(path, mode="w", encoding="utf-8") as f:
+            self.sync_map.dump(
+                f,
+                sync_map_format,
+                parameters={
+                    gc.PPN_TASK_OS_FILE_EAF_AUDIO_REF: eaf_audio_ref,
+                    gc.PPN_TASK_OS_FILE_HEAD_TAIL_FORMAT: head_tail_format,
+                    gc.PPN_TASK_OS_FILE_LEVELS: levels,
+                    gc.PPN_TASK_OS_FILE_SMIL_AUDIO_REF: smil_audio_ref,
+                    gc.PPN_TASK_OS_FILE_SMIL_PAGE_REF: smil_page_ref,
+                },
+            )
         return path
 
     def _populate_audio_file(self):

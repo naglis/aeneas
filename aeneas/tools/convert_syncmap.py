@@ -128,8 +128,9 @@ class ConvertSyncMapCLI(AbstractCLIProgram):
             self.print_info(
                 f"Reading sync map in {input_sm_format!r} format from file {input_file_path!r}"
             )
-            syncmap = SyncMap()
-            syncmap.read(input_sm_format, input_file_path, parameters)
+            with open(input_file_path, mode="rb") as f:
+                syncmap = SyncMap.load(f, input_sm_format, parameters=parameters)
+
             self.print_info(f"Read {len(syncmap)} sync map fragments")
         except Exception as exc:
             self.print_error(
@@ -151,15 +152,12 @@ class ConvertSyncMapCLI(AbstractCLIProgram):
                 )
         else:
             try:
-                self.print_info("Writing sync map...")
-                syncmap.write(output_sm_format, output_file_path, parameters)
-                self.print_info(
-                    f"Created {output_sm_format!r} sync map file {output_file_path!r}"
-                )
+                with open(output_file_path, mode="w", encoding="utf-8") as f:
+                    syncmap.dump(f, output_sm_format, parameters=parameters)
                 return self.NO_ERROR_EXIT_CODE
             except Exception as exc:
                 self.print_error(
-                    f"An unexpected error occurred while writing the output sync map: {exc}"
+                    f"An unexpected error occurred while dumping the output sync map: {exc}"
                 )
 
         return self.ERROR_EXIT_CODE

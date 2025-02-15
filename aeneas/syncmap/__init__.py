@@ -37,6 +37,7 @@ import itertools
 import json
 import logging
 import os
+import typing
 
 from aeneas.syncmap.format import SyncMapFormat
 from aeneas.syncmap.fragment import SyncMapFragment, FragmentType
@@ -256,18 +257,6 @@ class SyncMap:
         output_fragments = visit_children(self.fragments_tree)
         return json.dumps({"fragments": output_fragments}, indent=1, sort_keys=True)
 
-    def add_fragment(self, fragment: SyncMapFragment, *, as_last: bool = True):
-        """
-        Add the given sync map fragment,
-        as the first or last child of the root node
-        of the sync map tree.
-
-        :param fragment: the sync map fragment to be added
-        :type  fragment: :class:`~aeneas.syncmap.fragment.SyncMapFragment`
-        :param bool as_last: if ``True``, append fragment; otherwise prepend it
-        """
-        self.fragments_tree.add_child(Tree(value=fragment), as_last=as_last)
-
     def clear(self):
         """
         Clear the sync map, removing all the current fragments.
@@ -348,100 +337,75 @@ class SyncMap:
         with open(output_file_path, "w", encoding="utf-8") as file_obj:
             file_obj.write(template)
 
-    def read(
-        self,
+    @classmethod
+    def load(
+        cls,
+        fobj: typing.IO[bytes],
         sync_map_format: str,
-        input_file_path: str,
+        *,
         parameters: dict | None = None,
     ):
         """
-        Read sync map fragments from the given file in the specified format,
-        and add them the current (this) sync map.
-
-        Return ``True`` if the call succeeded,
-        ``False`` if an error occurred.
+        Read sync map fragments from the given file object in the specified format,
+        and add them the new sync map.
 
         :param sync_map_format: the format of the sync map
         :type  sync_map_format: :class:`~aeneas.syncmap.SyncMapFormat`
-        :param string input_file_path: the path to the input file to read
         :param dict parameters: additional parameters (e.g., for ``SMIL`` input)
-        :raises: ValueError: if ``sync_map_format`` is ``None`` or it is not an allowed value
-        :raises: OSError: if ``input_file_path`` does not exist
         """
-        if sync_map_format is None:
-            raise ValueError("Sync map format is None")
-        if sync_map_format not in SyncMapFormat.CODE_TO_CLASS:
-            raise ValueError(f"Sync map format {sync_map_format!r} is not allowed")
-
-        logger.debug("Input format:     %r", sync_map_format)
-        logger.debug("Input path:       %r", input_file_path)
-        logger.debug("Input parameters: %r", parameters)
 
         reader = SyncMapFormat.CODE_TO_CLASS[sync_map_format](
             variant=sync_map_format,
             parameters=parameters,
         )
 
-        # open file for reading
-        logger.debug("Reading input file...")
-        with open(input_file_path, mode="rb") as input_file:
-            for fragment in reader.parse(input_file):
-                self.add_fragment(fragment)
-
-        logger.debug("Reading input file... done")
-
         # overwrite language if requested
         language = gf.safe_get(parameters, gc.PPN_SYNCMAP_LANGUAGE, None)
-        if language is not None:
-            logger.debug("Overwriting language to %r", language)
-            for fragment in self.fragments:
-                if fragment.text_fragment is not None:
-                    fragment.text_fragment.language = language
 
-    def write(
+        tree = Tree()
+        for fragment in reader.parse(fobj):
+            if language is not None and fragment.text_fragment is not None:
+                fragment.text_fragment.language = language
+
+            tree.add_child(Tree(value=fragment))
+
+        return cls(tree=tree)
+
+    def dump(
         self,
+        fobj: typing.IO[str],
         sync_map_format: str,
-        output_file_path: str,
+        *,
         parameters: dict | None = None,
     ):
         """
-        Write the current sync map to file in the requested format.
-
-        Return ``True`` if the call succeeded,
-        ``False`` if an error occurred.
+        Write the current sync map to file object in the requested format.
 
         :param sync_map_format: the format of the sync map
         :type  sync_map_format: :class:`~aeneas.syncmap.SyncMapFormat`
-        :param string output_file_path: the path to the output file to write
         :param dict parameters: additional parameters (e.g., for ``SMIL`` output)
-        :raises: ValueError: if ``sync_map_format`` is ``None`` or it is not an allowed value
-        :raises: TypeError: if a required parameter is missing
-        :raises: OSError: if ``output_file_path`` cannot be written
         """
 
-        def select_levels(syncmap, levels):
+        parameters = parameters or {}
+
+        def select_levels(syncmap: SyncMap, levels):
             """
             Select the given levels of the fragments tree,
             modifying the given syncmap (always pass a copy of it!).
             """
-            logger.debug("Levels: %r", levels)
-            if levels is None:
-                return
             try:
                 levels = [int(level) for level in levels if int(level) > 0]
                 syncmap.fragments_tree.keep_levels(levels)
-                logger.debug("Selected levels: %s", levels)
             except ValueError:
                 logger.warning(
                     "Cannot convert levels to list of int, returning unchanged"
                 )
 
-        def set_head_tail_format(syncmap, head_tail_format=None):
+        def set_head_tail_format(syncmap: SyncMap, head_tail_format=None):
             """
             Set the appropriate head/tail nodes of the fragments tree,
             modifying the given syncmap (always pass a copy of it!).
             """
-            logger.debug("Head/tail format: %r", head_tail_format)
             tree = syncmap.fragments_tree
             head = tree.get_child(0)
             first = tree.get_child(1)
@@ -469,36 +433,26 @@ class SyncMap:
             if head_tail_format == SyncMapHeadTailFormat.ADD:
                 tail.value.fragment_type = FragmentType.REGULAR
                 logger.debug("Marked TAIL as REGULAR")
+
             # remove all fragments that are not REGULAR
             for node in list(tree.dfs):
-                if (
-                    node.value is not None
-                    and node.value.fragment_type != FragmentType.REGULAR
-                ):
-                    node.remove()
+                if node.value is None:
+                    continue
+                if node.value.fragment_type == FragmentType.REGULAR:
+                    continue
 
-        if sync_map_format is None:
-            raise ValueError("Sync map format is None")
-        if sync_map_format not in SyncMapFormat.CODE_TO_CLASS:
-            raise ValueError(f"Sync map format {sync_map_format!r} is not allowed")
-
-        logger.debug("Output format:     %r", sync_map_format)
-        logger.debug("Output path:       %r", output_file_path)
-        logger.debug("Output parameters: %r", parameters)
+                node.remove()
 
         # select levels and head/tail format
         pruned_syncmap = copy.deepcopy(self)
-        try:
-            select_levels(pruned_syncmap, parameters[gc.PPN_TASK_OS_FILE_LEVELS])
-        except Exception:
-            logger.warning("No %s parameter specified", gc.PPN_TASK_OS_FILE_LEVELS)
-        try:
+
+        if (levels := parameters.get(gc.PPN_TASK_OS_FILE_LEVELS)) is not None:
+            select_levels(pruned_syncmap, levels=levels)
+
+        if gc.PPN_TASK_OS_FILE_HEAD_TAIL_FORMAT in parameters:
             set_head_tail_format(
-                pruned_syncmap, parameters[gc.PPN_TASK_OS_FILE_HEAD_TAIL_FORMAT]
-            )
-        except Exception:
-            logger.warning(
-                "No %s parameter specified", gc.PPN_TASK_OS_FILE_HEAD_TAIL_FORMAT
+                pruned_syncmap,
+                head_tail_format=parameters[gc.PPN_TASK_OS_FILE_HEAD_TAIL_FORMAT],
             )
 
         # create writer
@@ -509,11 +463,4 @@ class SyncMap:
             parameters=parameters,
         )
 
-        # create dir hierarchy, if needed
-        gf.ensure_parent_directory(output_file_path)
-
-        # open file for writing
-        logger.debug("Writing output file...")
-        with open(output_file_path, "w", encoding="utf-8") as output_file:
-            output_file.write(writer.format(syncmap=pruned_syncmap))
-        logger.debug("Writing output file... done")
+        fobj.write(writer.format(syncmap=pruned_syncmap))

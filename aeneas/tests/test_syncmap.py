@@ -18,6 +18,7 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+import io
 import unittest
 import tempfile
 import typing
@@ -44,7 +45,7 @@ class BaseSyncMapCase(unittest.TestCase):
         gc.PPN_SYNCMAP_LANGUAGE: Language.ENG,
     }
 
-    def read(self, fmt, multiline: bool = False, utf8: bool = False):
+    def load(self, fmt, multiline: bool = False, utf8: bool = False):
         if multiline and utf8:
             path = f"res/syncmaps/sonnet001_mu.{fmt}"
         elif multiline:
@@ -54,11 +55,10 @@ class BaseSyncMapCase(unittest.TestCase):
         else:
             path = f"res/syncmaps/sonnet001.{fmt}"
 
-        syn = SyncMap()
-        syn.read(fmt, gf.absolute_path(path, __file__), parameters=self.PARAMETERS)
-        return syn
+        with open(gf.absolute_path(path, __file__), mode="rb") as f:
+            return SyncMap.load(f, fmt, parameters=self.PARAMETERS)
 
-    def write(
+    def dump(
         self,
         fmt: str,
         multiline: bool = False,
@@ -68,9 +68,8 @@ class BaseSyncMapCase(unittest.TestCase):
         if parameters is self.NOT_SET:
             parameters = self.PARAMETERS
 
-        syn = self.read(SyncMapFormat.XML, multiline=multiline, utf8=utf8)
-        with tempfile.NamedTemporaryFile(suffix=f".{fmt}") as tmp_file:
-            syn.write(fmt, tmp_file.name, parameters)
+        syn = self.load(SyncMapFormat.XML, multiline=multiline, utf8=utf8)
+        syn.dump(io.StringIO(), fmt, parameters=parameters)
 
 
 class TestSyncMap(BaseSyncMapCase):
@@ -146,7 +145,7 @@ class TestSyncMap(BaseSyncMapCase):
         self.assertEqual(len(syn.fragments), 0)
 
     def test_fragments(self):
-        syn = self.read("txt")
+        syn = self.load("txt")
         self.assertTrue(syn.fragments)
 
     def test_leaves_empty(self):
@@ -154,15 +153,15 @@ class TestSyncMap(BaseSyncMapCase):
         self.assertFalse(syn.leaves())
 
     def test_leaves(self):
-        syn = self.read("txt")
+        syn = self.load("txt")
         self.assertTrue(syn.leaves())
 
     def test_json_string(self):
-        syn = self.read("txt")
+        syn = self.load("txt")
         self.assertTrue(syn.json_string)
 
     def test_clear(self):
-        syn = self.read("txt")
+        syn = self.load("txt")
         self.assertEqual(len(syn), 15)
         syn.clear()
         self.assertEqual(len(syn), 0)
@@ -172,7 +171,7 @@ class TestSyncMap(BaseSyncMapCase):
         self.assertTrue(syn.has_adjacent_leaves_only)
 
     def test_has_adjacent_leaves_only_not_empty(self):
-        syn = self.read("txt")
+        syn = self.load("txt")
         self.assertTrue(syn.has_adjacent_leaves_only)
 
     def test_has_adjacent_leaves_only(self):
@@ -197,7 +196,7 @@ class TestSyncMap(BaseSyncMapCase):
         self.assertFalse(syn.has_zero_length_leaves)
 
     def test_has_zero_length_leaves_not_empty(self):
-        syn = self.read("txt")
+        syn = self.load("txt")
         self.assertFalse(syn.has_zero_length_leaves)
 
     def test_has_zero_length_leaves(self):
@@ -222,7 +221,7 @@ class TestSyncMap(BaseSyncMapCase):
         self.assertTrue(syn.leaves_are_consistent)
 
     def test_leaves_are_consistent_not_empty(self):
-        syn = self.read("txt")
+        syn = self.load("txt")
         self.assertTrue(syn.leaves_are_consistent)
 
     def test_leaves_are_consistent(self):
@@ -256,49 +255,33 @@ class TestSyncMap(BaseSyncMapCase):
 
             self.assertEqual(syn.leaves_are_consistent, expexted)
 
-    def test_read_none(self):
-        syn = SyncMap()
-        with self.assertRaises(ValueError):
-            syn.read(None, self.EXISTING_SRT)
+    def test_load_unknown_format_raises_keyerror(self):
+        with self.assertRaises(KeyError):
+            SyncMap.load(io.BytesIO(), "foo")
 
-    def test_read_invalid_format(self):
+    def test_dump_unknown_format_raises_keyerror(self):
         syn = SyncMap()
-        with self.assertRaises(ValueError):
-            syn.read("foo", self.EXISTING_SRT)
+        with self.assertRaises(KeyError):
+            syn.dump(io.StringIO(), "foo")
 
-    def test_read_not_existing_path(self):
-        syn = SyncMap()
-        with self.assertRaises(OSError):
-            syn.read(SyncMapFormat.SRT, self.NOT_EXISTING_SRT)
-
-    def test_write_none(self):
-        syn = SyncMap()
-        with self.assertRaises(ValueError):
-            syn.write(None, self.NOT_EXISTING_SRT)
-
-    def test_write_invalid_format(self):
-        syn = SyncMap()
-        with self.assertRaises(ValueError):
-            syn.write("foo", self.NOT_EXISTING_SRT)
-
-    def test_write_smil_no_both(self):
+    def test_dump_smil_no_both(self):
         fmt = SyncMapFormat.SMIL
         with self.assertRaises(SyncMapMissingParameterError):
-            self.write(fmt, parameters=None)
+            self.dump(fmt, parameters=None)
 
-    def test_write_smil_no_page(self):
+    def test_dump_smil_no_page(self):
         fmt = SyncMapFormat.SMIL
         parameters = {gc.PPN_TASK_OS_FILE_SMIL_AUDIO_REF: "sonnet001.mp3"}
         with self.assertRaises(SyncMapMissingParameterError):
-            self.write(fmt, parameters=parameters)
+            self.dump(fmt, parameters=parameters)
 
-    def test_write_smil_no_audio(self):
+    def test_dump_smil_no_audio(self):
         fmt = SyncMapFormat.SMIL
         parameters = {gc.PPN_TASK_OS_FILE_SMIL_PAGE_REF: "sonnet001.xhtml"}
         with self.assertRaises(SyncMapMissingParameterError):
-            self.write(fmt, parameters=parameters)
+            self.dump(fmt, parameters=parameters)
 
-    def _write_smil(
+    def _dump_smil(
         self, intervals: list[tuple[str, str, str]], *, parameters: dict | None = None
     ) -> str:
         tree = Tree()
@@ -308,21 +291,18 @@ class TestSyncMap(BaseSyncMapCase):
                 end=TimeValue(end),
                 text_fragment=TextFragment(text_fragment),
             )
-            child = Tree(value=smf)
-            tree.add_child(child, as_last=True)
+            tree.add_child(Tree(value=smf), as_last=True)
+
         syn = SyncMap(tree=tree)
 
-        with tempfile.TemporaryDirectory() as tmp_dir:
-            smil_path = os.path.join(tmp_dir, "test.smil")
-            syn.write(SyncMapFormat.SMIL, smil_path, parameters=parameters)
+        buf = io.StringIO()
+        syn.dump(buf, SyncMapFormat.SMIL, parameters=parameters)
+        return buf.getvalue().strip()
 
-            with open(smil_path, mode="rb") as f:
-                return f.read().decode("utf-8").strip()
-
-    def test_write_valid_smil(self):
+    def test_dump_valid_smil(self):
         intervals = [("0.000", "1.000", "foo"), ("1.000", "2.000", "bar")]
 
-        data = self._write_smil(intervals, parameters=self.PARAMETERS)
+        data = self._dump_smil(intervals, parameters=self.PARAMETERS)
 
         self.assertEqual(
             data,
@@ -343,10 +323,10 @@ class TestSyncMap(BaseSyncMapCase):
 </smil>""".strip(),
         )
 
-    def test_write_smil_spaces_in_refs_are_quoted(self):
+    def test_dump_smil_spaces_in_refs_are_quoted(self):
         intervals = [("0.000", "1.000", "foo"), ("1.000", "2.000", "bar")]
 
-        data = self._write_smil(
+        data = self._dump_smil(
             intervals,
             parameters={
                 gc.PPN_TASK_OS_FILE_SMIL_PAGE_REF: "sonnet 001.xhtml",
@@ -374,16 +354,16 @@ class TestSyncMap(BaseSyncMapCase):
 </smil>""".strip(),
         )
 
-    def test_write_ttml_no_language(self):
+    def test_dump_ttml_no_language(self):
         fmt = SyncMapFormat.TTML
-        self.write(fmt, parameters=None)
+        self.dump(fmt, parameters=None)
 
-    def test_write_ttml_language(self):
-        fmt = SyncMapFormat.TTML
-        parameters = {gc.PPN_SYNCMAP_LANGUAGE: Language.ENG}
-        self.write(fmt, parameters=parameters)
+    def test_dump_ttml_language(self):
+        self.dump(
+            SyncMapFormat.TTML, parameters={gc.PPN_SYNCMAP_LANGUAGE: Language.ENG}
+        )
 
     def test_output_html_for_tuning(self):
-        syn = self.read(SyncMapFormat.XML, multiline=True, utf8=True)
+        syn = self.load(SyncMapFormat.XML, multiline=True, utf8=True)
         with tempfile.NamedTemporaryFile(suffix=".html") as tmp_file:
             syn.output_html_for_tuning("foo.mp3", tmp_file.name, parameters=None)

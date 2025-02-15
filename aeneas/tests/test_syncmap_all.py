@@ -18,8 +18,9 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import tempfile
+import io
 import itertools
+import tempfile
 import typing
 
 from aeneas.syncmap import SyncMapFormat
@@ -36,19 +37,18 @@ class TestSyncMapAllFormats(BaseSyncMapCase):
     def test_read(self):
         for fmt, multiline, utf8 in self.iter_cases():
             with self.subTest(fmt=fmt, multiline=multiline, utf8=utf8):
-                syn = self.read(fmt, multiline=multiline, utf8=utf8)
+                syn = self.load(fmt, multiline=multiline, utf8=utf8)
                 self.assertEqual(len(syn), 15)
                 try:
                     str(syn)
                 except Exception as e:
                     raise AssertionError("Failed to convert to string") from e
 
-    def test_write(self):
+    def test_dump(self):
         for fmt, multiline, utf8 in self.iter_cases():
             with self.subTest(fmt=fmt, multiline=multiline, utf8=utf8):
-                syn = self.read(SyncMapFormat.XML, multiline, utf8)
-                with tempfile.NamedTemporaryFile(suffix=f".{fmt}") as tmp_file:
-                    try:
-                        syn.write(fmt, tmp_file.name, self.PARAMETERS)
-                    except Exception as e:
-                        raise AssertionError("Failed to write syncmap") from e
+                syn = self.load(SyncMapFormat.XML, multiline, utf8)
+                try:
+                    syn.dump(io.StringIO(), fmt, parameters=self.PARAMETERS)
+                except Exception as e:
+                    raise AssertionError("Failed to write syncmap") from e
