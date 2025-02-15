@@ -265,29 +265,14 @@ class SyncMap:
         :param fragment: the sync map fragment to be added
         :type  fragment: :class:`~aeneas.syncmap.fragment.SyncMapFragment`
         :param bool as_last: if ``True``, append fragment; otherwise prepend it
-        :raises: TypeError: if ``fragment`` is ``None`` or
-                            it is not an instance of :class:`~aeneas.syncmap.fragment.SyncMapFragment`
         """
-        if not isinstance(fragment, SyncMapFragment):
-            raise TypeError("fragment is not an instance of SyncMapFragment")
         self.fragments_tree.add_child(Tree(value=fragment), as_last=as_last)
 
     def clear(self):
         """
         Clear the sync map, removing all the current fragments.
         """
-        logger.debug("Clearing sync map")
         self.fragments_tree = Tree()
-
-    def clone(self):
-        """
-        Return a deep copy of this sync map.
-
-        .. versionadded:: 1.7.0
-
-        :rtype: :class:`~aeneas.syncmap.SyncMap`
-        """
-        return copy.deepcopy(self)
 
     def output_html_for_tuning(
         self,
@@ -486,8 +471,9 @@ class SyncMap:
                 logger.debug("Marked TAIL as REGULAR")
             # remove all fragments that are not REGULAR
             for node in list(tree.dfs):
-                if (node.value is not None) and (
-                    node.value.fragment_type != FragmentType.REGULAR
+                if (
+                    node.value is not None
+                    and node.value.fragment_type != FragmentType.REGULAR
                 ):
                     node.remove()
 
@@ -501,7 +487,7 @@ class SyncMap:
         logger.debug("Output parameters: %r", parameters)
 
         # select levels and head/tail format
-        pruned_syncmap = self.clone()
+        pruned_syncmap = copy.deepcopy(self)
         try:
             select_levels(pruned_syncmap, parameters[gc.PPN_TASK_OS_FILE_LEVELS])
         except Exception:
@@ -518,7 +504,7 @@ class SyncMap:
         # create writer
         # the constructor will check for required parameters, if any
         # if some are missing, it will raise a SyncMapMissingParameterError
-        writer = (SyncMapFormat.CODE_TO_CLASS[sync_map_format])(
+        writer = SyncMapFormat.CODE_TO_CLASS[sync_map_format](
             variant=sync_map_format,
             parameters=parameters,
         )

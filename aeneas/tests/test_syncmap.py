@@ -167,16 +167,6 @@ class TestSyncMap(BaseSyncMapCase):
         syn.clear()
         self.assertEqual(len(syn), 0)
 
-    def test_clone(self):
-        syn = self.read("txt")
-        text_first_fragment = syn.fragments[0].text
-        syn2 = syn.clone()
-        syn2.fragments[0].text_fragment.lines = ["foo"]
-        text_first_fragment2 = syn2.fragments[0].text
-        self.assertEqual(syn.fragments[0].text, text_first_fragment)
-        self.assertNotEqual(syn2.fragments[0].text, text_first_fragment)
-        self.assertEqual(syn2.fragments[0].text, text_first_fragment2)
-
     def test_has_adjacent_leaves_only_empty(self):
         syn = SyncMap()
         self.assertTrue(syn.has_adjacent_leaves_only)
@@ -265,16 +255,6 @@ class TestSyncMap(BaseSyncMapCase):
             syn = SyncMap(tree=self.build_tree_from_intervals(intervals))
 
             self.assertEqual(syn.leaves_are_consistent, expexted)
-
-    def test_append_none(self):
-        syn = SyncMap()
-        with self.assertRaises(TypeError):
-            syn.add_fragment(None)
-
-    def test_append_invalid_fragment(self):
-        syn = SyncMap()
-        with self.assertRaises(TypeError):
-            syn.add_fragment("foo")
 
     def test_read_none(self):
         syn = SyncMap()
