@@ -101,10 +101,6 @@ class TestSyncMap(BaseSyncMapCase):
         syn = SyncMap(tree=None)
         self.assertEqual(len(syn), 0)
 
-    def test_constructor_invalid(self):
-        with self.assertRaises(TypeError):
-            SyncMap(tree=[])
-
     def test_fragments_tree_not_given(self):
         syn = SyncMap()
         self.assertEqual(len(syn.fragments_tree), 0)

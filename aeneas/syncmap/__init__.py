@@ -93,11 +93,7 @@ class SyncMap:
     FINETUNEAS_PATH = "../res/finetuneas.html"
 
     def __init__(self, tree: Tree | None = None):
-        if tree is not None and not isinstance(tree, Tree):
-            raise TypeError("tree is not an instance of Tree")
-        if tree is None:
-            tree = Tree()
-        self.fragments_tree = tree
+        self.fragments_tree = Tree() if tree is None else tree
 
     def __len__(self) -> int:
         return len(self.fragments)
