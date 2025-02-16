@@ -34,7 +34,7 @@ import logging
 from aeneas.exacttiming import TimeValue
 from aeneas.language import Language
 from aeneas.runtimeconfiguration import RuntimeConfiguration
-from aeneas.ttswrappers.basettswrapper import BaseTTSWrapper
+from aeneas.ttswrappers.basettswrapper import BaseTTSWrapper, AudioFormat
 import aeneas.globalfunctions as gf
 
 logger = logging.getLogger(__name__)
@@ -775,7 +775,7 @@ class ESPEAKTTSWrapper(BaseTTSWrapper):
 
     DEFAULT_TTS_PATH = "espeak"
 
-    OUTPUT_AUDIO_FORMAT = ("pcm_s16le", 1, 22050)
+    OUTPUT_AUDIO_FORMAT = AudioFormat("pcm_s16le", 1, 22050)
 
     HAS_SUBPROCESS_CALL = True
 
@@ -795,6 +795,9 @@ class ESPEAKTTSWrapper(BaseTTSWrapper):
                 self.CLI_PARAMETER_TEXT_STDIN,
             ]
         )
+
+    def _synthesize_single_python_helper(self, *a, **kw):
+        raise ValueError("Not supported")
 
     def _synthesize_multiple_c_extension(
         self, text_file, output_file_path, quit_after=None, backwards=False

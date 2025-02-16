@@ -66,7 +66,7 @@ class Synthesizer:
     def from_rconf(cls, rconf: RuntimeConfiguration):
         match rconf[RuntimeConfiguration.TTS]:
             case cls.ESPEAK:
-                tts_cls = ESPEAKTTSWrapper
+                tts_cls: type[BaseTTSWrapper] = ESPEAKTTSWrapper
             case cls.ESPEAKNG:
                 tts_cls = ESPEAKNGTTSWrapper
             case cls.FESTIVAL:

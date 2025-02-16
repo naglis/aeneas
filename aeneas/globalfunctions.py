@@ -31,7 +31,6 @@ import os
 import re
 import shutil
 import sys
-import tempfile
 import typing
 
 from aeneas.exacttiming import TimeValue
@@ -129,20 +128,6 @@ def print_warning(msg: str, color: bool = True):
         safe_print(f"{ANSI_WARNING}[WARN] {msg}{ANSI_END}")
     else:
         safe_print(f"[WARN] {msg}")
-
-
-def tmp_file(suffix: str = "", root=None):
-    """
-    Return a (handler, path) tuple
-    for a temporary file with given suffix created by ``tempfile``.
-
-    :param string suffix: the suffix (e.g., the extension) of the file
-    :param string root: path to the root temporary directory;
-                        if ``None``, the default temporary directory
-                        will be used instead
-    :rtype: tuple
-    """
-    return tempfile.mkstemp(suffix=suffix, dir=root)
 
 
 def datetime_string(time_zone: bool = False) -> str:
@@ -621,30 +606,12 @@ def run_c_extension_with_fallback(
     return result
 
 
-def close_file_handler(handler):
-    """
-    Safely close the given file handler.
-
-    :param object handler: the file handler (as returned by tempfile)
-    """
-    if handler is None:
-        return
-
-    with contextlib.suppress(Exception):
-        os.close(handler)
-
-
-def delete_file(handler, path: str | None):
+def delete_file(path: str):
     """
     Safely delete file.
 
-    :param object handler: the file handler (as returned by tempfile)
     :param string path: the file path
     """
-    close_file_handler(handler)
-    if path is None:
-        return
-
     with contextlib.suppress(Exception):
         os.remove(path)
 

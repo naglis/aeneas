@@ -260,7 +260,9 @@ class Validator(Configurable):
             return self.result
 
         if external_name:
-            required_parameters = self.TASK_REQUIRED_PARAMETERS_EXTERNAL_NAME
+            required_parameters: tuple[str, str, str, str] | tuple[str, str, str] = (
+                self.TASK_REQUIRED_PARAMETERS_EXTERNAL_NAME
+            )
         else:
             required_parameters = self.TASK_REQUIRED_PARAMETERS
 

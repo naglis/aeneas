@@ -76,7 +76,7 @@ class TestFFMPEGWrapper(unittest.TestCase):
                     try:
                         yield
                     finally:
-                        gf.delete_file(None, path)
+                        gf.delete_file(path)
 
                 exit_stack.enter_context(delete_file(ofp))
                 output_file_path = ofp

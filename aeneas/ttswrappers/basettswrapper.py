@@ -21,15 +21,14 @@
 """
 This module contains the following classes:
 
-* :class:`~aeneas.ttswrappers.basettswrapper.TTSCache`,
-  a TTS cache;
 * :class:`~aeneas.ttswrappers.basettswrapper.BaseTTSWrapper`,
   an abstract wrapper for a TTS engine.
 """
 
-import collections.abc
+import abc
 import contextlib
 import logging
+import os.path
 import subprocess
 import tempfile
 import typing
@@ -43,6 +42,12 @@ from aeneas.textfile import TextFile
 import aeneas.globalfunctions as gf
 
 logger = logging.getLogger(__name__)
+
+
+class AudioFormat(typing.NamedTuple):
+    name: str
+    channels: int
+    sample_rate: int
 
 
 class SynthesisResult(typing.NamedTuple):
@@ -59,56 +64,7 @@ class HelperFunc(typing.Protocol):
     ) -> SynthesisResult: ...
 
 
-class TTSCache(collections.abc.MutableMapping):
-    """
-    A TTS cache, that is,
-    a dictionary whose keys are pairs
-    ``(fragment_language, fragment_text)``
-    and whose values are pairs
-    ``(file_handler, file_path)``.
-
-    An item in the cache means that the text of the key
-    has been synthesized to the file
-    located at the path of the corresponding value.
-
-    Note that it is not enough to store
-    the string of the text as the key,
-    since the same text might be pronounced in a different language.
-
-    Also note that the values also store the file handler,
-    since we might want to close it explicitly
-    before removing the file from disk.
-    """
-
-    def __init__(self):
-        self.cache = {}
-
-    def __getitem__(self, key: tuple[str, str]):
-        """
-        Get the value associated with the given key.
-
-        :param fragment_info: the text key
-        :type  fragment_info: tuple of str ``(language, text)``
-        :raises: KeyError if the key is not present in the cache
-        """
-        return self.cache[key]
-
-    def __setitem__(self, key: tuple[str, str], value):
-        self.cache[key] = value
-
-    def __delitem__(self, key: tuple[str, str]):
-        file_handler, file_info = self.cache.pop(key)
-        logger.debug("Removing file %r", file_info)
-        gf.delete_file(file_handler, file_info)
-
-    def __iter__(self):
-        return iter(self.cache)
-
-    def __len__(self):
-        return len(self.cache)
-
-
-class BaseTTSWrapper(Configurable):
+class BaseTTSWrapper(abc.ABC, Configurable):
     """
     An abstract wrapper for a TTS engine.
 
@@ -195,7 +151,7 @@ class BaseTTSWrapper(Configurable):
     List of all language codes with their human-readable names.
     """
 
-    OUTPUT_AUDIO_FORMAT: typing.ClassVar[tuple[str, int, int] | None] = None
+    OUTPUT_AUDIO_FORMAT: typing.ClassVar[tuple[str, int, int]]
     """
     A tuple ``(codec, channels, rate)``
     specifying the format
@@ -266,7 +222,7 @@ class BaseTTSWrapper(Configurable):
             self.tts_path = self.DEFAULT_TTS_PATH
 
         self.use_cache = self.rconf[RuntimeConfiguration.TTS_CACHE]
-        self.cache = TTSCache() if self.use_cache else None
+        self.cache = {} if self.use_cache else None
         logger.debug("TTS path is             %s", self.tts_path)
         logger.debug("TTS cache?              %s", self.use_cache)
         logger.debug("Has Python      call?   %s", self.HAS_PYTHON_CALL)
@@ -457,8 +413,13 @@ class BaseTTSWrapper(Configurable):
         logger.debug("Synthesizing multiple via a Python call... done")
         return ret
 
+    @abc.abstractmethod
     def _synthesize_single_python_helper(
-        self, text, voice_code, output_file_path=None, return_audio_data=True
+        self,
+        text: str,
+        voice_code: str,
+        output_file_path: str | None = None,
+        return_audio_data: bool = True,
     ):
         """
         This is an helper function to synthesize a single text fragment via a Python call.
@@ -472,36 +433,20 @@ class BaseTTSWrapper(Configurable):
 
         :rtype: tuple (result, (duration, sample_rate, codec, data)) or (result, None)
         """
-        raise NotImplementedError(
-            "This function must be implemented in concrete subclasses supporting Python call"
-        )
 
+    @abc.abstractmethod
     def _synthesize_multiple_c_extension(
-        self, text_file, output_file_path, quit_after=None, backwards=False
+        self,
+        text_file: TextFile,
+        output_file_path: str,
+        quit_after=None,
+        backwards: bool = False,
     ):
         """
         Synthesize multiple fragments via a Python C extension.
 
         :rtype: tuple (result, (anchors, current_time, num_chars))
         """
-        raise NotImplementedError(
-            "This function must be implemented in concrete subclasses supporting C extension call"
-        )
-
-    def _synthesize_single_c_extension_helper(
-        self, text, voice_code, output_file_path=None
-    ):
-        """
-        This is an helper function to synthesize a single text fragment via a Python C extension.
-
-        If ``output_file_path`` is ``None``,
-        the audio data will not persist to file at the end of the method.
-
-        :rtype: tuple (result, (duration, sample_rate, codec, data))
-        """
-        raise NotImplementedError(
-            "This function might be implemented in concrete subclasses supporting C extension call"
-        )
 
     def _synthesize_multiple_subprocess(
         self, text_file, output_file_path, quit_after=None, backwards=False
@@ -807,43 +752,28 @@ class BaseTTSWrapper(Configurable):
         fragment_info = (fragment.language, fragment.filtered_text)
         if fragment_info in self.cache:
             logger.debug("Fragment cached: retrieving audio data from cache")
-
-            # read data from file, whose path is in the cache
-            file_handler, file_path = self.cache.get(fragment_info)
-            logger.debug("Reading cached fragment at %r...", file_path)
-            return self._read_audio_data(file_path)
+            return self.cache.get(fragment_info)
         else:
             logger.debug("Fragment not cached: synthesizing and caching")
-
-            # creating destination file
-            file_info = gf.tmp_file(
-                suffix=".cache.wav", root=self.rconf[RuntimeConfiguration.TMP_PATH]
-            )
-            file_handler, file_path = file_info
-            logger.debug("Synthesizing fragment to %r...", file_path)
 
             # synthesize and get the duration of the output file
             voice_code = self._language_to_voice_code(fragment.language)
             logger.debug("Calling helper function")
-            result = helper_function(
-                text=fragment.filtered_text,
-                voice_code=voice_code,
-                output_file_path=file_path,
-                return_audio_data=True,
-            )
+            with tempfile.TemporaryDirectory(
+                prefix="aeneas.tts.", dir=self.rconf[RuntimeConfiguration.TMP_PATH]
+            ) as tmp_dir:
+                file_path = os.path.join(tmp_dir, "audio.wav")
+                logger.debug("Synthesizing fragment to %r...", file_path)
+                result = helper_function(
+                    text=fragment.filtered_text,
+                    voice_code=voice_code,
+                    output_file_path=file_path,
+                    return_audio_data=True,
+                )
             # check output
             if not result.success:
                 logger.critical("An unexpected error occurred in helper_function")
                 return result
             logger.debug("Synthesizing fragment to %r... done", file_path)
-            if result.audio_length > 0:
-                logger.debug("Fragment has > 0 duration, adding it to cache")
-                self.cache[fragment_info] = file_info
-                logger.debug("Added fragment to cache")
-            else:
-                logger.debug("Fragment has zero duration, not adding it to cache")
-            logger.debug(
-                "Closing file handler for cached output file path %r", file_path
-            )
-            gf.close_file_handler(file_handler)
+            self.cache[fragment_info] = result
             return result

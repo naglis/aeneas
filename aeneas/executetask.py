@@ -70,33 +70,18 @@ class ExecuteTask(Configurable):
     :type  rconf: :class:`~aeneas.runtimeconfiguration.RuntimeConfiguration`
     """
 
-    def __init__(self, task: Task | None = None, rconf=None):
+    def __init__(self, task: Task, rconf=None):
         super().__init__(rconf=rconf)
         self.task = task
         self.step_index = 1
         self.step_label = ""
-        self.step_begin_time = None
-        self.synthesizer = None
-        if task is not None:
-            self.load_task(self.task)
-
-    def load_task(self, task: Task):
-        """
-        Load the task from the given ``Task`` object.
-
-        :param task: the task to load
-        :type  task: :class:`~aeneas.task.Task`
-        :raises: :class:`~aeneas.executetask.ExecuteTaskInputError`: if ``task`` is not an instance of :class:`~aeneas.task.Task`
-        """
-        self.task = task
+        self.synthesizer = Synthesizer.from_rconf(self.rconf)
 
     def _step_begin(self, label, log: bool = True):
         """Log begin of a step"""
         if log:
             self.step_label = label
-            self.step_begin_time = logger.debug(
-                "STEP %d BEGIN (%s)", self.step_index, label
-            )
+            logger.debug("STEP %d BEGIN (%s)", self.step_index, label)
 
     def _step_end(self, log: bool = True):
         """Log end of a step"""
@@ -193,7 +178,6 @@ class ExecuteTask(Configurable):
             self._step_end()
 
             # compute alignment, outputting a tree of time intervals
-            self._set_synthesizer()
             sync_root = Tree()
             self._execute_inner(
                 real_wave_mfcc,
@@ -329,7 +313,6 @@ class ExecuteTask(Configurable):
         :param bool force_aba_auto: if ``True``, force using the AUTO ABA algorithm
         :rtype: (list, list)
         """
-        self._set_synthesizer()
         next_level_text_files = []
         next_level_sync_roots = []
         for text_file_index, text_file in enumerate(text_files):
@@ -383,7 +366,7 @@ class ExecuteTask(Configurable):
         self,
         audio_file_mfcc: AudioFileMFCC,
         text_file: TextFile,
-        sync_root: Tree | None = None,
+        sync_root: Tree,
         force_aba_auto: bool = False,
         log: bool = True,
         leaf_level: bool = False,
@@ -550,10 +533,6 @@ class ExecuteTask(Configurable):
         logger.debug("Process: %s", gf.safe_float(process_length, None))
         logger.debug("Tail:    %s", gf.safe_float(tail_length, None))
         return (head_length, process_length, tail_length)
-
-    def _set_synthesizer(self):
-        """Create synthesizer"""
-        self.synthesizer = Synthesizer.from_rconf(self.rconf)
 
     def _clear_cache_synthesizer(self):
         """Clear the cache of the synthesizer"""

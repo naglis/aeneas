@@ -28,16 +28,6 @@ import aeneas.globalfunctions as gf
 
 
 class TestGlobalFunctions(unittest.TestCase):
-    def test_tmp_file(self):
-        tmp_handler, tmp_file = gf.tmp_file()
-        self.assertTrue(os.path.isfile(tmp_file))
-        gf.delete_file(tmp_handler, tmp_file)
-
-    def test_tmp_file_suffix(self):
-        tmp_handler, tmp_file = gf.tmp_file(suffix=".txt")
-        self.assertTrue(os.path.isfile(tmp_file))
-        gf.delete_file(tmp_handler, tmp_file)
-
     def test_safe_float(self):
         for value, default, expected in (
             ("3.14", 1.23, 3.14),
@@ -304,25 +294,10 @@ class TestGlobalFunctions(unittest.TestCase):
     def test_run_c_extension_with_fallback(self):
         self.skipTest("TODO")
 
-    def test_close_file_handler(self):
-        handler, path = gf.tmp_file()
-        self.assertTrue(os.path.isfile(path))
-        gf.close_file_handler(handler)
-        self.assertTrue(os.path.isfile(path))
-        gf.delete_file(handler, path)
-        self.assertFalse(os.path.isfile(path))
-
-    def test_delete_file_existing(self):
-        handler, path = gf.tmp_file()
-        self.assertTrue(os.path.isfile(path))
-        gf.delete_file(handler, path)
-        self.assertFalse(os.path.isfile(path))
-
     def test_delete_file_not_existing(self):
-        handler = None
         path = "/foo/bar/baz"
         self.assertFalse(os.path.isfile(path))
-        gf.delete_file(handler, path)
+        gf.delete_file(path)
         self.assertFalse(os.path.isfile(path))
 
     def test_relative_path(self):

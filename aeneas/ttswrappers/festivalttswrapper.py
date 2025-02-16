@@ -33,7 +33,7 @@ import logging
 
 from aeneas.exacttiming import TimeValue
 from aeneas.language import Language
-from aeneas.ttswrappers.basettswrapper import BaseTTSWrapper
+from aeneas.ttswrappers.basettswrapper import AudioFormat, BaseTTSWrapper
 import aeneas.globalfunctions as gf
 
 logger = logging.getLogger(__name__)
@@ -145,7 +145,7 @@ class FESTIVALTTSWrapper(BaseTTSWrapper):
 
     DEFAULT_TTS_PATH = "text2wave"
 
-    OUTPUT_AUDIO_FORMAT = ("pcm_s16le", 1, 16000)
+    OUTPUT_AUDIO_FORMAT = AudioFormat("pcm_s16le", 1, 16000)
 
     HAS_SUBPROCESS_CALL = True
 
@@ -167,6 +167,9 @@ class FESTIVALTTSWrapper(BaseTTSWrapper):
 
     def _voice_code_to_subprocess(self, voice_code):
         return ["-eval", self.VOICE_CODE_TO_SUBPROCESS[voice_code]]
+
+    def _synthesize_single_python_helper(self, *a, **kw):
+        raise ValueError("Not supported")
 
     def _synthesize_multiple_c_extension(
         self, text_file, output_file_path, quit_after=None, backwards=False
