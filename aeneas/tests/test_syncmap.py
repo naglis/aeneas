@@ -22,7 +22,6 @@ import io
 import unittest
 import tempfile
 import typing
-import os.path
 
 from aeneas.exacttiming import TimeInterval, TimeValue
 from aeneas.language import Language

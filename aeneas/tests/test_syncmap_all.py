@@ -20,7 +20,6 @@
 
 import io
 import itertools
-import tempfile
 import typing
 
 from aeneas.syncmap import SyncMapFormat
