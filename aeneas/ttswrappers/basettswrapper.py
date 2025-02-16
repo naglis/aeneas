@@ -39,9 +39,24 @@ from aeneas.exacttiming import TimeValue
 from aeneas.language import Language
 from aeneas.logger import Configurable
 from aeneas.runtimeconfiguration import RuntimeConfiguration
+from aeneas.textfile import TextFile
 import aeneas.globalfunctions as gf
 
 logger = logging.getLogger(__name__)
+
+
+class SynthesisResult(typing.NamedTuple):
+    success: bool
+    audio_length: TimeValue
+    audio_sample_rate: int
+    audio_format: str
+    audio_samples: int
+
+
+class HelperFunc(typing.Protocol):
+    def __call__(
+        self, text: str, voice_code: str, output_file_path: str | None = None
+    ) -> SynthesisResult: ...
 
 
 class TTSCache(collections.abc.MutableMapping):
@@ -509,27 +524,17 @@ class BaseTTSWrapper(Configurable):
 
     def _synthesize_single_subprocess_helper(
         self, text, voice_code, output_file_path=None, return_audio_data=True
-    ):
+    ) -> SynthesisResult:
         """
         This is an helper function to synthesize a single text fragment via ``subprocess``.
 
         If ``output_file_path`` is ``None``,
         the audio data will not persist to file at the end of the method.
-
-        If ``return_audio_data`` is ``True``,
-        return the audio data at the end of the function call;
-        if ``False``, just return ``(True, None)`` in case of success.
-
-        :rtype: tuple (result, (duration, sample_rate, codec, data)) or (result, None)
         """
         # return zero if text is the empty string
         if not text:
-            #
-            # NOTE sample_rate, codec, data do not matter
-            #      if the duration is 0.000 => set them to None
-            #
-            logger.debug("`text` is empty: returning 0.000")
-            return (True, (TimeValue("0.000"), None, None, None))
+            # NOTE sample_rate, codec, data do not matter if the duration is 0.000
+            return SynthesisResult(True, TimeValue("0.000"), 0, "", 0)
 
         with contextlib.ExitStack() as exit_stack:
             # create a temporary output file if needed
@@ -615,9 +620,12 @@ class BaseTTSWrapper(Configurable):
                     logger.debug("Passing text via file...")
                     (stdoutdata, stderrdata) = proc.communicate()
                     logger.debug("Passing text via file... done")
-                proc.stdout.close()
-                proc.stdin.close()
-                proc.stderr.close()
+                if proc.stdout is not None:
+                    proc.stdout.close()
+                if proc.stdin is not None:
+                    proc.stdin.close()
+                if proc.stderr is not None:
+                    proc.stderr.close()
 
                 if self.CLI_PARAMETER_WAVE_STDOUT in self.subprocess_arguments:
                     logger.debug("TTS engine wrote audio data to stdout")
@@ -635,23 +643,17 @@ class BaseTTSWrapper(Configurable):
                 logger.exception(
                     "An unexpected error occurred while calling TTS engine via subprocess",
                 )
-                return (False, None)
+                return SynthesisResult(False, TimeValue("0.000"), 0, "", 0)
 
-            # read audio data
-            ret = (
+            return (
                 self._read_audio_data(output_file_path)
                 if return_audio_data
-                else (True, None)
+                else SynthesisResult(True, TimeValue("0.000"), 0, "", 0)
             )
 
-            # return audio data or (True, None)
-            return ret
-
-    def _read_audio_data(self, file_path):
+    def _read_audio_data(self, file_path) -> SynthesisResult:
         """
         Read audio data from file.
-
-        :rtype: tuple (True, (duration, sample_rate, codec, data)) or (False, None) on exception
         """
         try:
             logger.debug("Reading audio data...")
@@ -667,26 +669,24 @@ class BaseTTSWrapper(Configurable):
             audio_file.read_samples_from_file()
             logger.debug("Duration of %r: %f", file_path, audio_file.audio_length)
             logger.debug("Reading audio data... done")
-            return (
+            return SynthesisResult(
                 True,
-                (
-                    audio_file.audio_length,
-                    audio_file.audio_sample_rate,
-                    audio_file.audio_format,
-                    audio_file.audio_samples,
-                ),
+                audio_file.audio_length,
+                audio_file.audio_sample_rate,
+                audio_file.audio_format,
+                audio_file.audio_samples,
             )
         except (AudioFileUnsupportedFormatError, OSError):
             logger.exception("An unexpected error occurred while reading audio data")
-            return (False, None)
+            return SynthesisResult(False, TimeValue("0.000"), 0, "", 0)
 
     def _synthesize_multiple_generic(
         self,
-        helper_function,
-        text_file,
-        output_file_path,
+        helper_function: HelperFunc,
+        text_file: TextFile,
+        output_file_path: str,
         quit_after=None,
-        backwards=False,
+        backwards: bool = False,
     ):
         """
         Synthesize multiple fragments, generic function.
@@ -702,21 +702,22 @@ class BaseTTSWrapper(Configurable):
 
         # get sample rate and codec
         logger.debug("Determining codec and sample rate...")
-        if (self.OUTPUT_AUDIO_FORMAT is None) or (len(self.OUTPUT_AUDIO_FORMAT) != 3):
+        if self.OUTPUT_AUDIO_FORMAT is None or len(self.OUTPUT_AUDIO_FORMAT) != 3:
             logger.debug("Determining codec and sample rate with dummy text...")
-            succeeded, data = helper_function(
+            result = helper_function(
                 text="Dummy text to get sample_rate",
                 voice_code=self._language_to_voice_code(self.DEFAULT_LANGUAGE),
                 output_file_path=None,
             )
-            if not succeeded:
+            if not result.success:
                 logger.critical("An unexpected error occurred in helper_function")
                 return (False, None)
-            du_nu, sample_rate, codec, da_nu = data
+            sample_rate = result.audio_sample_rate
+            codec = result.audio_format
             logger.debug("Determining codec and sample rate with dummy text... done")
         else:
             logger.debug("Reading codec and sample rate from OUTPUT_AUDIO_FORMAT")
-            codec, channels_nu, sample_rate = self.OUTPUT_AUDIO_FORMAT
+            codec, _, sample_rate = self.OUTPUT_AUDIO_FORMAT
         logger.debug("Determining codec and sample rate... done")
         logger.debug("  codec:       %s", codec)
         logger.debug("  sample rate: %d", sample_rate)
@@ -736,13 +737,14 @@ class BaseTTSWrapper(Configurable):
             fragments = fragments[::-1]
         loop_function = self._loop_use_cache if self.use_cache else self._loop_no_cache
         for num, fragment in enumerate(fragments):
-            succeeded, data = loop_function(
+            result = loop_function(
                 helper_function=helper_function, num=num, fragment=fragment
             )
-            if not succeeded:
+            if not result.success:
                 logger.critical("An unexpected error occurred in loop_function")
                 return (False, None)
-            duration, sr_nu, enc_nu, samples = data
+            duration = result.audio_length
+            samples = result.audio_samples
             # store for later output
             anchors.append([current_time, fragment.identifier, fragment.text])
             # increase the character counter
@@ -756,7 +758,7 @@ class BaseTTSWrapper(Configurable):
             else:
                 logger.debug("Fragment %d has zero duration", num)
             # check if we must stop synthesizing because we have enough audio
-            if (quit_after is not None) and (current_time > quit_after):
+            if quit_after is not None and current_time > quit_after:
                 logger.debug("Quitting after reached duration %.3f", current_time)
                 break
 
@@ -786,26 +788,20 @@ class BaseTTSWrapper(Configurable):
         logger.debug("Calling TTS engine using multiple generic function... done")
         return (True, (anchors, current_time, num_chars))
 
-    def _loop_no_cache(self, helper_function, num, fragment):
+    def _loop_no_cache(self, helper_function, num, fragment) -> SynthesisResult:
         """Synthesize all fragments without using the cache"""
         logger.debug("Examining fragment %d (no cache)...", num)
         # synthesize and get the duration of the output file
         voice_code = self._language_to_voice_code(fragment.language)
         logger.debug("Calling helper function")
-        succeeded, data = helper_function(
+        return helper_function(
             text=fragment.filtered_text,
             voice_code=voice_code,
             output_file_path=None,
             return_audio_data=True,
         )
-        # check output
-        if not succeeded:
-            logger.critical("An unexpected error occurred in helper_function")
-            return (False, None)
-        logger.debug("Examining fragment %d (no cache)... done", num)
-        return (True, data)
 
-    def _loop_use_cache(self, helper_function, num, fragment):
+    def _loop_use_cache(self, helper_function, num, fragment) -> SynthesisResult:
         """Synthesize all fragments using the cache"""
         logger.debug("Examining fragment %d (cache)...", num)
         fragment_info = (fragment.language, fragment.filtered_text)
@@ -815,13 +811,7 @@ class BaseTTSWrapper(Configurable):
             # read data from file, whose path is in the cache
             file_handler, file_path = self.cache.get(fragment_info)
             logger.debug("Reading cached fragment at %r...", file_path)
-            succeeded, data = self._read_audio_data(file_path)
-            if not succeeded:
-                logger.critical(
-                    "An unexpected error occurred while reading cached audio file"
-                )
-                return (False, None)
-            logger.debug("Reading cached fragment at %r... done", file_path)
+            return self._read_audio_data(file_path)
         else:
             logger.debug("Fragment not cached: synthesizing and caching")
 
@@ -835,19 +825,18 @@ class BaseTTSWrapper(Configurable):
             # synthesize and get the duration of the output file
             voice_code = self._language_to_voice_code(fragment.language)
             logger.debug("Calling helper function")
-            succeeded, data = helper_function(
+            result = helper_function(
                 text=fragment.filtered_text,
                 voice_code=voice_code,
                 output_file_path=file_path,
                 return_audio_data=True,
             )
             # check output
-            if not succeeded:
+            if not result.success:
                 logger.critical("An unexpected error occurred in helper_function")
-                return (False, None)
+                return result
             logger.debug("Synthesizing fragment to %r... done", file_path)
-            duration, sr_nu, enc_nu, samples = data
-            if duration > 0:
+            if result.audio_length > 0:
                 logger.debug("Fragment has > 0 duration, adding it to cache")
                 self.cache[fragment_info] = file_info
                 logger.debug("Added fragment to cache")
@@ -857,5 +846,4 @@ class BaseTTSWrapper(Configurable):
                 "Closing file handler for cached output file path %r", file_path
             )
             gf.close_file_handler(file_handler)
-        logger.debug("Examining fragment %d (cache)... done", num)
-        return (True, data)
+            return result

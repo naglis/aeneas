@@ -88,8 +88,6 @@ class BaseTTSWrapperCase(unittest.TestCase):
                     anchors, total_time, num_chars = tts_engine.synthesize_multiple(
                         text_file, output_file_path, quit_after, backwards
                     )
-                    if case.cache:
-                        tts_engine.clear_cache()
 
                     if zero_length:
                         self.assertEqual(total_time, 0.0)
@@ -97,10 +95,11 @@ class BaseTTSWrapperCase(unittest.TestCase):
                         self.assertGreater(total_time, 0.0)
 
                 except (OSError, TypeError, UnicodeDecodeError, ValueError) as exc:
-                    if case.cache and tts_engine is not None:
-                        tts_engine.clear_cache()
                     with self.assertRaises(expected_exc):
                         raise exc
+                finally:
+                    if case.cache and tts_engine is not None:
+                        tts_engine.clear_cache()
 
         for case in self.iter_synthesize_cases():
             with self.subTest(case=case):
