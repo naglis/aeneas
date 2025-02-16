@@ -18,8 +18,6 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import unittest
-
 from aeneas.idsortingalgorithm import IDSortingAlgorithm
 from aeneas.language import Language
 from aeneas.textfile import (
@@ -33,8 +31,10 @@ from aeneas.textfile import (
 import aeneas.globalconstants as gc
 import aeneas.globalfunctions as gf
 
+from .common import BaseCase
 
-class TestTextFile(unittest.TestCase):
+
+class TestTextFile(BaseCase):
     NOT_EXISTING_PATH = gf.absolute_path("not_existing.txt", __file__)
     NOT_WRITEABLE_PATH = gf.absolute_path("x/y/z/not_writeable.txt", __file__)
     EMPTY_FILE_PATH = "res/inputtext/empty.txt"

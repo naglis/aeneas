@@ -19,15 +19,16 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import copy
-import unittest
 import typing
 
 from aeneas.exacttiming import TimeInterval, TimeValue
 from aeneas.syncmap.fragment import FragmentType, SyncMapFragment
 from aeneas.syncmap.fragmentlist import SyncMapFragmentList
 
+from .common import BaseCase
 
-class TestSyncMapFragmentList(unittest.TestCase):
+
+class TestSyncMapFragmentList(BaseCase):
     def build_fragment_list_from_intervals(
         self,
         intervals: typing.Sequence[tuple[str, str]],

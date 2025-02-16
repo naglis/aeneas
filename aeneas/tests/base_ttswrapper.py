@@ -22,12 +22,13 @@ import contextlib
 import os
 import tempfile
 import typing
-import unittest
 
 from aeneas.exacttiming import TimeValue
 from aeneas.textfile import TextFile, TextFragment
 from aeneas.ttswrappers.basettswrapper import BaseTTSWrapper
 from aeneas.runtimeconfiguration import RuntimeConfiguration
+
+from .common import BaseCase
 
 
 class SynthesizeCase(typing.NamedTuple):
@@ -36,13 +37,13 @@ class SynthesizeCase(typing.NamedTuple):
     cache: bool
 
 
-class TestBaseTTSWrapper(unittest.TestCase):
+class TestBaseTTSWrapper(BaseCase):
     def test_not_implemented(self):
         with self.assertRaises(NotImplementedError):
             BaseTTSWrapper()
 
 
-class BaseTTSWrapperCase(unittest.TestCase):
+class BaseTTSWrapperCase(BaseCase):
     TTS = ""
     TTS_PATH = ""
 

@@ -21,16 +21,16 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import numpy
-import unittest
 
-from aeneas.audiofile import AudioFile
-from aeneas.audiofile import AudioFileUnsupportedFormatError
+from aeneas.audiofile import AudioFile, AudioFileUnsupportedFormatError
 from aeneas.audiofilemfcc import AudioFileMFCC
 from aeneas.exacttiming import TimeValue
 import aeneas.globalfunctions as gf
 
+from .common import BaseCase
 
-class TestAudioFileMFCC(unittest.TestCase):
+
+class TestAudioFileMFCC(BaseCase):
     AUDIO_FILE_WAVE = "res/audioformats/mono.16000.wav"
     AUDIO_FILE_EMPTY = "res/audioformats/p001.empty"
     NOT_EXISTING_FILE = "res/audioformats/x/y/z/not_existing.wav"

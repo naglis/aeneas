@@ -18,7 +18,6 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import unittest
 import tempfile
 
 import numpy
@@ -31,8 +30,10 @@ from aeneas.audiofile import (
 from aeneas.exacttiming import TimeValue
 import aeneas.globalfunctions as gf
 
+from .common import BaseCase
 
-class TestAudioFile(unittest.TestCase):
+
+class TestAudioFile(BaseCase):
     AUDIO_FILE_WAVE = "res/audioformats/mono.16000.wav"
     AUDIO_FILE_EMPTY = "res/audioformats/p001.empty"
     AUDIO_FILE_NOT_WAVE = "res/audioformats/p001.mp3"

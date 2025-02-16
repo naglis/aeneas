@@ -21,15 +21,16 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import numpy
-import unittest
 
 from aeneas.audiofilemfcc import AudioFileMFCC
 from aeneas.dtw import DTWAligner
 from aeneas.dtw import DTWAlignerNotInitialized
 import aeneas.globalfunctions as gf
 
+from .common import BaseCase
 
-class TestDTWAligner(unittest.TestCase):
+
+class TestDTWAligner(BaseCase):
     AUDIO_FILE = gf.absolute_path("res/audioformats/mono.16000.wav", __file__)
     NUMPY_ARRAY_1 = numpy.loadtxt(gf.absolute_path("res/cdtw/mfcc1_12_1332", __file__))
     NUMPY_ARRAY_2 = numpy.loadtxt(gf.absolute_path("res/cdtw/mfcc2_12_868", __file__))

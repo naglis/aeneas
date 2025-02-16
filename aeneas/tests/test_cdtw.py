@@ -25,12 +25,14 @@ import numpy
 
 import aeneas.globalfunctions as gf
 
+from .common import BaseCase
+
 
 @unittest.skipIf(
     importlib.util.find_spec("aeneas.cdtw.cdtw") is None,
     "CDTW C extension is not available",
 )
-class TestCDTW(unittest.TestCase):
+class TestCDTW(BaseCase):
     MFCC1 = gf.absolute_path("res/cdtw/mfcc1_12_1332", __file__)
     MFCC2 = gf.absolute_path("res/cdtw/mfcc2_12_868", __file__)
 
@@ -39,8 +41,8 @@ class TestCDTW(unittest.TestCase):
 
         mfcc1 = numpy.loadtxt(self.MFCC1)
         mfcc2 = numpy.loadtxt(self.MFCC2)
-        l, n = mfcc1.shape
-        l, m = mfcc2.shape
+        _, n = mfcc1.shape
+        _, m = mfcc2.shape
         delta = 3000
         if delta > m:
             delta = m

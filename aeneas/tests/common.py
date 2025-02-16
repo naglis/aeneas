@@ -26,7 +26,12 @@ bench_test = unittest.skipIf(
 )
 
 
-class ExecuteCLICase(unittest.TestCase):
+class BaseCase(unittest.TestCase):
+    # Do not truncate diffs.
+    maxDiff = None
+
+
+class ExecuteCLICase(BaseCase):
     CLI_CLS: typing.ClassVar
 
     def execute(

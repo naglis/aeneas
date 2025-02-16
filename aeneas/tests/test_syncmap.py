@@ -19,7 +19,6 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import io
-import unittest
 import tempfile
 import typing
 
@@ -32,11 +31,13 @@ from aeneas.textfile import TextFragment
 import aeneas.globalconstants as gc
 import aeneas.globalfunctions as gf
 
+from .common import BaseCase
+
 
 class _Sentinel: ...
 
 
-class BaseSyncMapCase(unittest.TestCase):
+class BaseSyncMapCase(BaseCase):
     NOT_SET = _Sentinel()
     PARAMETERS = {
         gc.PPN_TASK_OS_FILE_SMIL_PAGE_REF: "sonnet001.xhtml",
@@ -72,8 +73,6 @@ class BaseSyncMapCase(unittest.TestCase):
 
 
 class TestSyncMap(BaseSyncMapCase):
-    maxDiff = None
-
     NOT_EXISTING_SRT = gf.absolute_path("not_existing.srt", __file__)
     EXISTING_SRT = gf.absolute_path("res/syncmaps/sonnet001.srt", __file__)
     EMPTY_INTERVAL = TimeInterval(begin=TimeValue("0.000"), end=TimeValue("0.000"))

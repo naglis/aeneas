@@ -19,21 +19,22 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import decimal
-import unittest
 
 import numpy
 
 from aeneas.exacttiming import TimeInterval, TimeValue
 
+from .common import BaseCase
 
-class TestExactTiming(unittest.TestCase):
+
+class TestExactTiming(BaseCase):
     def check(self, value, expected=None):
-        self.assertTrue(isinstance(value, TimeValue))
+        self.assertIsInstance(value, TimeValue)
         if expected is not None:
             self.assertEqual(value, expected)
 
     def check_numpy(self, value, expected=None):
-        self.assertTrue(isinstance(value[0], TimeValue))
+        self.assertIsInstance(value[0], TimeValue)
         self.assertTrue((value == expected).all())
 
     def test_create_from_float(self):
@@ -263,7 +264,7 @@ class TestExactTiming(unittest.TestCase):
             ("1.000", 44100, True),
         ]:
             prod = TimeValue(m) * s
-            self.assertTrue(isinstance(prod, TimeValue))
+            self.assertIsInstance(prod, TimeValue)
             self.assertEqual(int(prod) == prod, e)
             self.assertEqual(prod.is_integer, e)
 

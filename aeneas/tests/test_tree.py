@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 # aeneas is a Python/C library and a set of tools
 # to automagically synchronize audio and text (aka forced alignment)
 #
@@ -20,12 +18,12 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import unittest
-
 from aeneas.tree import Tree
 
+from .common import BaseCase
 
-class TestTree(unittest.TestCase):
+
+class TestTree(BaseCase):
     def create_tree1(self, soon=True):
         root = Tree(value="root")
         c1 = Tree(value="c1")

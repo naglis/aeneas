@@ -18,7 +18,6 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import unittest
 import itertools
 import tempfile
 
@@ -29,8 +28,10 @@ from aeneas.synthesizer import Synthesizer
 from aeneas.textfile import TextFile, TextFileFormat
 import aeneas.globalfunctions as gf
 
+from .common import BaseCase
 
-class TestSynthesizer(unittest.TestCase):
+
+class TestSynthesizer(BaseCase):
     PATH_NOT_WRITEABLE = gf.absolute_path("x/y/z/not_writeable.wav", __file__)
 
     def perform(

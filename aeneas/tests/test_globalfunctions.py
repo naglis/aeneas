@@ -21,13 +21,14 @@
 import os
 import sys
 import tempfile
-import unittest
 
 from aeneas.exacttiming import TimeValue
 import aeneas.globalfunctions as gf
 
+from .common import BaseCase
 
-class TestGlobalFunctions(unittest.TestCase):
+
+class TestGlobalFunctions(BaseCase):
     def test_safe_float(self):
         for value, default, expected in (
             ("3.14", 1.23, 3.14),

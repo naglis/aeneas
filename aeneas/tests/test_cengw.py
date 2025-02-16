@@ -22,12 +22,14 @@ import importlib.util
 import tempfile
 import unittest
 
+from .common import BaseCase
+
 
 @unittest.skipIf(
     importlib.util.find_spec("aeneas.cengw.cengw") is None,
     "CENGW C extension is not available",
 )
-class TestCENGW(unittest.TestCase):
+class TestCENGW(BaseCase):
     def test_cengw_synthesize_multiple(self):
         for name, (
             c_text,

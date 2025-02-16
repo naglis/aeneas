@@ -20,14 +20,14 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import unittest
-
 from aeneas.audiofile import AudioFileUnsupportedFormatError
 from aeneas.audiofilemfcc import AudioFileMFCC
 import aeneas.globalfunctions as gf
 
+from .common import BaseCase
 
-class TestVAD(unittest.TestCase):
+
+class TestVAD(BaseCase):
     FILES = (
         {
             "path": "res/vad/nsn.wav",

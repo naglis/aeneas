@@ -18,13 +18,13 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import unittest
-
 from aeneas.exacttiming import TimeValue
 from aeneas.runtimeconfiguration import RuntimeConfiguration
 
+from .common import BaseCase
 
-class TestRuntimeConfiguration(unittest.TestCase):
+
+class TestRuntimeConfiguration(BaseCase):
     def test_config_string(self):
         rconf = RuntimeConfiguration()
         rconf.config_string

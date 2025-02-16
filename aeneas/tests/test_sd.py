@@ -18,8 +18,6 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import unittest
-
 from aeneas.audiofilemfcc import AudioFileMFCC
 from aeneas.language import Language
 from aeneas.sd import SD
@@ -27,8 +25,10 @@ from aeneas.textfile import TextFile
 from aeneas.textfile import TextFileFormat
 import aeneas.globalfunctions as gf
 
+from .common import BaseCase
 
-class TestSD(unittest.TestCase):
+
+class TestSD(BaseCase):
     AUDIO_FILE = gf.absolute_path("res/audioformats/mono.16000.wav", __file__)
     TEXT_FILE = gf.absolute_path("res/inputtext/sonnet_plain.txt", __file__)
 

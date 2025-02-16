@@ -18,13 +18,13 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import unittest
-
 from aeneas.validator import Validator
 import aeneas.globalfunctions as gf
 
+from .common import BaseCase
 
-class TestValidator(unittest.TestCase):
+
+class TestValidator(BaseCase):
     def test_check_raw_string(self):
         for name, value, passed in (
             ("none_not_ok", None, False),

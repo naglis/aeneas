@@ -19,14 +19,15 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import decimal
-import unittest
 
 from aeneas.exacttiming import TimeInterval, TimeValue
 from aeneas.syncmap.fragment import FragmentType, SyncMapFragment
 from aeneas.textfile import TextFragment
 
+from .common import BaseCase
 
-class TestSyncMap(unittest.TestCase):
+
+class TestSyncMap(BaseCase):
     EMPTY_INTERVAL = TimeInterval(begin=TimeValue("0.000"), end=TimeValue("0.000"))
 
     def test_fragment_constructor(self):

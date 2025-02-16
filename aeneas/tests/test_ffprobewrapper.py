@@ -18,14 +18,14 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import unittest
-
 from aeneas.exacttiming import TimeValue
 from aeneas.ffprobewrapper import FFPROBEUnsupportedFormatError, FFPROBEWrapper
 import aeneas.globalfunctions as gf
 
+from .common import BaseCase
 
-class TestFFPROBEWrapper(unittest.TestCase):
+
+class TestFFPROBEWrapper(BaseCase):
     FILES = (
         "res/audioformats/p001.aac",
         "res/audioformats/p001.aiff",

@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 # aeneas is a Python/C library and a set of tools
 # to automagically synchronize audio and text (aka forced alignment)
 #
@@ -26,21 +24,23 @@ import importlib.util
 from aeneas.audiofile import AudioFile
 import aeneas.globalfunctions as gf
 
+from .common import BaseCase
+
 
 @unittest.skipIf(
     importlib.util.find_spec("aeneas.cmfcc.cmfcc") is None,
     "CMFCC C extension is not available",
 )
-class TestCMFCC(unittest.TestCase):
+class TestCMFCC(BaseCase):
     AUDIO = gf.absolute_path("res/audioformats/mono.16000.wav", __file__)
 
     def test_compute_mfcc(self):
-        import aeneas.cmfcc.cmfcc
+        import aeneas.cmfcc.cmfcc as cmfcc
 
         audio_file = AudioFile(self.AUDIO)
         audio_file.read_samples_from_file()
         mfcc_c = (
-            aeneas.cmfcc.cmfcc.compute_from_data(
+            cmfcc.compute_from_data(
                 audio_file.audio_samples,
                 audio_file.audio_sample_rate,
                 40,

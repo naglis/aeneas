@@ -21,7 +21,6 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import os
-import unittest
 import tempfile
 import contextlib
 
@@ -29,8 +28,10 @@ from aeneas.ffmpegwrapper import FFMPEGWrapper
 from aeneas.runtimeconfiguration import RuntimeConfiguration
 import aeneas.globalfunctions as gf
 
+from .common import BaseCase
 
-class TestFFMPEGWrapper(unittest.TestCase):
+
+class TestFFMPEGWrapper(BaseCase):
     FILES = [
         {
             "path": "res/audioformats/p001.aac",

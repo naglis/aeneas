@@ -18,7 +18,6 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import unittest
 import tempfile
 
 from aeneas.adjustboundaryalgorithm import AdjustBoundaryAlgorithm
@@ -36,10 +35,10 @@ from aeneas.textfile import TextFileFormat, TextFragment
 from aeneas.tree import Tree
 import aeneas.globalfunctions as gf
 
+from .common import BaseCase
 
-class TestTask(unittest.TestCase):
-    maxDiff = None
 
+class TestTask(BaseCase):
     def assertTextFragmentsEqual(self, text_file, expected):
         self.assertSequenceEqual(
             [(f.identifier, f.text) for f in text_file.fragments], expected

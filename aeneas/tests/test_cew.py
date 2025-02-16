@@ -22,12 +22,14 @@ import importlib.util
 import tempfile
 import unittest
 
+from .common import BaseCase
+
 
 @unittest.skipIf(
     importlib.util.find_spec("aeneas.cew.cew") is None,
     "CEW C extension is not available",
 )
-class TestCEW(unittest.TestCase):
+class TestCEW(BaseCase):
     def test_cew_synthesize_multiple(self):
         for name, (
             c_text,
