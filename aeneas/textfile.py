@@ -30,6 +30,7 @@ This module contains the following classes:
 * :class:`~aeneas.textfile.TransliterationMap`, a full transliteration map.
 """
 
+import collections.abc
 import contextlib
 import io
 import logging
@@ -303,7 +304,7 @@ class TextFileFormat:
     """ List of all the allowed values """
 
 
-class TextFragment:
+class TextFragment(collections.abc.Sized):
     """
     A text fragment.
 
@@ -315,9 +316,7 @@ class TextFragment:
     :param list lines: the lines in which text is split up
     :param list filtered_lines: the lines in which text is split up,
                                 possibly filtered for the alignment purpose
-    :raises: TypeError: if ``identifier`` is not a Unicode string
-    :raises: TypeError: if ``lines`` is not an instance of ``list`` or
-                        it contains an element which is not a Unicode string
+    :raises: TypeError: if ``identifier`` is not a string
     """
 
     def __init__(
@@ -329,12 +328,10 @@ class TextFragment:
     ) -> None:
         self.identifier = identifier
         self.language = language
-        self.lines = lines
+        self.lines = lines or []
         self.filtered_lines = filtered_lines
 
     def __len__(self) -> int:
-        if self.lines is None:
-            return 0
         return len(self.lines)
 
     def __str__(self) -> str:
@@ -372,7 +369,7 @@ class TextFragment:
         self.__language = language
 
     @property
-    def lines(self) -> list[str] | None:
+    def lines(self) -> list[str]:
         """
         The lines of the text fragment.
 
@@ -382,13 +379,7 @@ class TextFragment:
 
     @lines.setter
     def lines(self, lines: list[str] | None):
-        if lines is not None:
-            if not isinstance(lines, list):
-                raise TypeError("lines is not an instance of list")
-            for line in lines:
-                if not isinstance(line, str):
-                    raise TypeError("lines contains an element which is not a string")
-        self.__lines = lines
+        self.__lines = lines or []
 
     @property
     def text(self) -> str:
@@ -397,8 +388,6 @@ class TextFragment:
 
         :rtype: string
         """
-        if self.lines is None:
-            return ""
         return " ".join(self.lines)
 
     @property
@@ -419,8 +408,6 @@ class TextFragment:
 
         :rtype: int
         """
-        if self.lines is None:
-            return 0
         return sum(len(line) for line in self.lines)
 
     @property
@@ -430,8 +417,6 @@ class TextFragment:
 
         :rtype: string
         """
-        if self.filtered_lines is None:
-            return ""
         return " ".join(self.filtered_lines)
 
     @property
@@ -444,7 +429,7 @@ class TextFragment:
         return len(self.filtered_text)
 
 
-class TextFile:
+class TextFile(collections.abc.Sized):
     """
     A tree of text fragments, representing a text file.
 

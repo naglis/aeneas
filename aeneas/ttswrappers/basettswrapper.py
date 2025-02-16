@@ -27,6 +27,7 @@ This module contains the following classes:
   an abstract wrapper for a TTS engine.
 """
 
+import collections.abc
 import contextlib
 import logging
 import subprocess
@@ -43,7 +44,7 @@ import aeneas.globalfunctions as gf
 logger = logging.getLogger(__name__)
 
 
-class TTSCache(Configurable):
+class TTSCache(collections.abc.MutableMapping):
     """
     A TTS cache, that is,
     a dictionary whose keys are pairs
@@ -62,54 +63,12 @@ class TTSCache(Configurable):
     Also note that the values also store the file handler,
     since we might want to close it explicitly
     before removing the file from disk.
-
-    :param rconf: a runtime configuration
-    :type  rconf: :class:`~aeneas.runtimeconfiguration.RuntimeConfiguration`
     """
 
-    def __init__(self, rconf=None):
-        super().__init__(rconf=rconf)
-        self._initialize_cache()
+    def __init__(self):
+        self.cache = {}
 
-    def _initialize_cache(self):
-        self.cache = dict()
-        logger.debug("Cache initialized")
-
-    def __len__(self):
-        return len(self.cache)
-
-    def keys(self):
-        """
-        Return the sorted list of keys currently in the cache.
-
-        :rtype: list of tuples ``(language, text)``
-        """
-        return sorted(list(self.cache.keys()))
-
-    def is_cached(self, fragment_info):
-        """
-        Return ``True`` if the given ``(language, text)`` key
-        is present in the cache, or ``False`` otherwise.
-
-        :rtype: bool
-        """
-        return fragment_info in self.cache
-
-    def add(self, fragment_info, file_info):
-        """
-        Add the given ``(key, value)`` pair to the cache.
-
-        :param fragment_info: the text key
-        :type  fragment_info: tuple of str ``(language, text)``
-        :param file_info: the path value
-        :type  file_info: tuple ``(handler, path)``
-        :raises: ValueError if the key is already present in the cache
-        """
-        if self.is_cached(fragment_info):
-            raise ValueError("Attempt to add text already cached")
-        self.cache[fragment_info] = file_info
-
-    def get(self, fragment_info):
+    def __getitem__(self, key: tuple[str, str]):
         """
         Get the value associated with the given key.
 
@@ -117,20 +76,21 @@ class TTSCache(Configurable):
         :type  fragment_info: tuple of str ``(language, text)``
         :raises: KeyError if the key is not present in the cache
         """
-        if not self.is_cached(fragment_info):
-            raise KeyError("Attempt to get text not cached")
-        return self.cache[fragment_info]
+        return self.cache[key]
 
-    def clear(self):
-        """
-        Clear the cache and remove all the files from disk.
-        """
-        logger.debug("Clearing cache...")
-        for file_handler, file_info in self.cache.values():
-            logger.debug("  Removing file %r", file_info)
-            gf.delete_file(file_handler, file_info)
-        self._initialize_cache()
-        logger.debug("Clearing cache... done")
+    def __setitem__(self, key: tuple[str, str], value):
+        self.cache[key] = value
+
+    def __delitem__(self, key: tuple[str, str]):
+        file_handler, file_info = self.cache.pop(key)
+        logger.debug("Removing file %r", file_info)
+        gf.delete_file(file_handler, file_info)
+
+    def __iter__(self):
+        return iter(self.cache)
+
+    def __len__(self):
+        return len(self.cache)
 
 
 class BaseTTSWrapper(Configurable):
@@ -291,7 +251,7 @@ class BaseTTSWrapper(Configurable):
             self.tts_path = self.DEFAULT_TTS_PATH
 
         self.use_cache = self.rconf[RuntimeConfiguration.TTS_CACHE]
-        self.cache = TTSCache(rconf=rconf) if self.use_cache else None
+        self.cache = TTSCache() if self.use_cache else None
         logger.debug("TTS path is             %s", self.tts_path)
         logger.debug("TTS cache?              %s", self.use_cache)
         logger.debug("Has Python      call?   %s", self.HAS_PYTHON_CALL)
@@ -849,7 +809,7 @@ class BaseTTSWrapper(Configurable):
         """Synthesize all fragments using the cache"""
         logger.debug("Examining fragment %d (cache)...", num)
         fragment_info = (fragment.language, fragment.filtered_text)
-        if self.cache.is_cached(fragment_info):
+        if fragment_info in self.cache:
             logger.debug("Fragment cached: retrieving audio data from cache")
 
             # read data from file, whose path is in the cache
@@ -889,7 +849,7 @@ class BaseTTSWrapper(Configurable):
             duration, sr_nu, enc_nu, samples = data
             if duration > 0:
                 logger.debug("Fragment has > 0 duration, adding it to cache")
-                self.cache.add(fragment_info, file_info)
+                self.cache[fragment_info] = file_info
                 logger.debug("Added fragment to cache")
             else:
                 logger.debug("Fragment has zero duration, not adding it to cache")

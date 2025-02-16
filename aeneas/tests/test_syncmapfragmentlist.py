@@ -18,6 +18,7 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+import copy
 import unittest
 import typing
 
@@ -374,7 +375,7 @@ class TestSyncMapFragmentList(unittest.TestCase):
             with self.subTest(intervals=intervals):
                 fragment_list = self.build_fragment_list_from_intervals(intervals)
 
-                c = fragment_list.clone()
+                c = copy.deepcopy(fragment_list)
 
                 self.assertNotEqual(id(fragment_list), id(c))
                 self.assertEqual(len(fragment_list), len(c))

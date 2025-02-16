@@ -19,7 +19,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import bisect
-import copy
+import collections.abc
 import decimal
 import logging
 import typing
@@ -32,7 +32,7 @@ import aeneas.globalconstants as gc
 logger = logging.getLogger(__name__)
 
 
-class SyncMapFragmentList:
+class SyncMapFragmentList(collections.abc.MutableSequence):
     """
     A type representing a list of sync map fragments,
     with some constraints:
@@ -89,14 +89,20 @@ class SyncMapFragmentList:
         self.__sorted = True
         self.__fragments: list[SyncMapFragment] = []
 
-    def __len__(self):
-        return len(self.__fragments)
-
     def __getitem__(self, index: int) -> SyncMapFragment:
         return self.__fragments[index]
 
     def __setitem__(self, index, value):
         self.__fragments[index] = value
+
+    def __delitem__(self, index):
+        del self.__fragments[index]
+
+    def __len__(self):
+        return len(self.__fragments)
+
+    def insert(self, index, value):
+        self.__fragments.insert(index, value)
 
     def _is_valid_index(self, index: int | list[int]) -> bool:
         """
@@ -104,7 +110,7 @@ class SyncMapFragmentList:
         is valid.
         """
         if isinstance(index, int):
-            return (index >= 0) and (index < len(self))
+            return index >= 0 and index < len(self)
         if isinstance(index, list):
             valid = True
             for i in index:
@@ -168,14 +174,6 @@ class SyncMapFragmentList:
             )
         return min_index, max_index
 
-    def clone(self) -> "SyncMapFragmentList":
-        """
-        Return a deep copy of this configuration object.
-
-        :rtype: :class:`~aeneas.syncmap.fragmentlist.SyncMapFragmentList`
-        """
-        return copy.deepcopy(self)
-
     @property
     def is_guaranteed_sorted(self) -> bool:
         """
@@ -234,8 +232,7 @@ class SyncMapFragmentList:
             raise ValueError("The given list of indices is not valid")
         new_fragments = []
         sorted_indices = sorted(indices)
-        i = 0
-        j = 0
+        i = j = 0
         while i < len(self) and j < len(sorted_indices):
             if i != sorted_indices[j]:
                 new_fragments.append(self[i])
@@ -258,7 +255,7 @@ class SyncMapFragmentList:
             logger.debug("Already sorted, returning")
             return
         logger.debug("Sorting...")
-        self.__fragments = sorted(self.__fragments)
+        self.__fragments.sort()
         logger.debug("Sorting... done")
         logger.debug("Checking relative positions...")
         for i in range(len(self) - 1):

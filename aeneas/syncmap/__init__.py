@@ -32,6 +32,7 @@ This package contains the following classes:
 * :class:`~aeneas.syncmap.missingparametererror.SyncMapMissingParameterError`, an error raised when reading sync maps from file;
 """
 
+import collections.abc
 import copy
 import io
 import itertools
@@ -40,7 +41,6 @@ import os
 import typing
 
 from aeneas.syncmap.format import SyncMapFormat
-from aeneas.syncmap.smfjson import SyncMapFormatJSON
 from aeneas.syncmap.fragment import SyncMapFragment, FragmentType
 from aeneas.syncmap.fragmentlist import SyncMapFragmentList
 from aeneas.syncmap.headtailformat import SyncMapHeadTailFormat
@@ -51,7 +51,7 @@ import aeneas.globalfunctions as gf
 logger = logging.getLogger(__name__)
 
 
-class SyncMap:
+class SyncMap(collections.abc.Sized):
     """
     A synchronization map, that is, a tree of
     :class:`~aeneas.syncmap.fragment.SyncMapFragment`

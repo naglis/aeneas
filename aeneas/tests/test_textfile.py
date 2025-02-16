@@ -99,46 +99,22 @@ class TestTextFile(unittest.TestCase):
         self.assertEqual(string_out, expected_out)
 
     def test_tf_identifier_str(self):
-        with self.assertRaises(TypeError):
-            TextFragment(identifier=b"foo")
-
-    def test_tf_identifier_unicode(self):
         tf = TextFragment(identifier="foo")
         self.assertEqual(len(tf), 0)
 
-    def test_tf_lines_invalid(self):
-        with self.assertRaises(TypeError):
-            TextFragment(lines="foo")
-
-    def test_tf_lines_invalid_none(self):
-        with self.assertRaises(TypeError):
-            TextFragment(lines=[None])
-
-    def test_tf_lines_invalid_none_mixed(self):
-        with self.assertRaises(TypeError):
-            TextFragment(lines=["foo", None, "bar"])
-
-    def test_tf_lines_invalid_str(self):
-        with self.assertRaises(TypeError):
-            TextFragment(lines=[b"foo"])
-
-    def test_tf_lines_invalid_str_mixed(self):
-        with self.assertRaises(TypeError):
-            TextFragment(lines=["foo", b"bar", "baz"])
-
-    def test_tf_lines_unicode(self):
+    def test_tf_lines_string(self):
         tf = TextFragment(lines=["foo"])
         self.assertEqual(len(tf), 1)
 
-    def test_tf_lines_unicode_multiple(self):
+    def test_tf_lines_string_multiple(self):
         tf = TextFragment(lines=["foo", "bar", "baz"])
         self.assertEqual(len(tf), 3)
 
-    def test_tf_lines_unicode_empty_string(self):
+    def test_tf_lines_empty_string(self):
         tf = TextFragment(lines=[""])
         self.assertEqual(len(tf), 1)
 
-    def test_tf_lines_unicode_empty_string_multiple(self):
+    def test_tf_lines_empty_string_multiple(self):
         tf = TextFragment(lines=["", "", ""])
         self.assertEqual(len(tf), 3)
 
@@ -602,10 +578,10 @@ class TestTextFile(unittest.TestCase):
     def test_filter_transliterate_replace_range(self):
         self.filter_transliterate(["pill"], ["pull"])
 
-    def test_filter_transliterate_replace_single_unicode(self):
+    def test_filter_transliterate_replace_single_string(self):
         self.filter_transliterate(["wàrm"], ["warm"])
 
-    def test_filter_transliterate_replace_range_unicode(self):
+    def test_filter_transliterate_replace_range_string(self):
         self.filter_transliterate(["wàrèm"], ["warem"])
 
     def test_filter_transliterate_replace_codepoint(self):

@@ -24,7 +24,7 @@ A generic rooted, ordered, levelled tree.
 .. versionadded:: 1.5.0
 """
 
-import copy
+import collections.abc
 import logging
 import typing
 
@@ -33,7 +33,7 @@ import aeneas.globalfunctions as gf
 logger = logging.getLogger(__name__)
 
 
-class Tree:
+class Tree(collections.abc.Sized):
     """
     A generic rooted, ordered, levelled tree.
 
@@ -69,15 +69,6 @@ class Tree:
 
     def __len__(self):
         return len(self.children)
-
-    def clone(self) -> "Tree":
-        """
-        Return a deep copy of this node
-        and of any children it might have.
-
-        .. versionadded:: 1.7.0
-        """
-        return copy.deepcopy(self)
 
     @property
     def value(self):
