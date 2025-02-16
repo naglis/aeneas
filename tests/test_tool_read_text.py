@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 # aeneas is a Python/C library and a set of tools
 # to automagically synchronize audio and text (aka forced alignment)
 #
@@ -20,9 +18,9 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-
-from aeneas.tests.common import ExecuteCLICase
 from aeneas.tools.read_text import ReadTextCLI
+
+from .common import ExecuteCLICase
 
 
 class TestReadTextCLI(ExecuteCLICase):
@@ -41,19 +39,21 @@ class TestReadTextCLI(ExecuteCLICase):
         )
 
     def test_read_parsed(self):
-        self.execute([("", "parsed"), ("in", "../tools/res/parsed.txt")], 0)
+        self.execute([("", "parsed"), ("in", "../aeneas/tools/res/parsed.txt")], 0)
 
     def test_read_plain(self):
-        self.execute([("", "plain"), ("in", "../tools/res/plain.txt")], 0)
+        self.execute([("", "plain"), ("in", "../aeneas/tools/res/plain.txt")], 0)
 
     def test_read_subtitles(self):
-        self.execute([("", "subtitles"), ("in", "../tools/res/subtitles.txt")], 0)
+        self.execute(
+            [("", "subtitles"), ("in", "../aeneas/tools/res/subtitles.txt")], 0
+        )
 
     def test_read_subtitles_id_format(self):
         self.execute(
             [
                 ("", "subtitles"),
-                ("in", "../tools/res/subtitles.txt"),
+                ("in", "../aeneas/tools/res/subtitles.txt"),
                 ("", "--id-format=Sub%03d"),
             ],
             0,
@@ -63,7 +63,7 @@ class TestReadTextCLI(ExecuteCLICase):
         self.execute(
             [
                 ("", "unparsed"),
-                ("in", "../tools/res/unparsed.xhtml"),
+                ("in", "../aeneas/tools/res/unparsed.xhtml"),
                 ("", "--id-regex=f[0-9]*"),
             ],
             0,
@@ -73,7 +73,7 @@ class TestReadTextCLI(ExecuteCLICase):
         self.execute(
             [
                 ("", "unparsed"),
-                ("in", "../tools/res/unparsed.xhtml"),
+                ("in", "../aeneas/tools/res/unparsed.xhtml"),
                 ("", "--class-regex=ra"),
                 ("", "--sort=unsorted"),
             ],
@@ -84,7 +84,7 @@ class TestReadTextCLI(ExecuteCLICase):
         self.execute(
             [
                 ("", "unparsed"),
-                ("in", "../tools/res/unparsed.xhtml"),
+                ("in", "../aeneas/tools/res/unparsed.xhtml"),
                 ("", "--id-regex=f[0-9]*"),
                 ("", "--sort=numeric"),
             ],
@@ -95,7 +95,7 @@ class TestReadTextCLI(ExecuteCLICase):
         self.execute(
             [
                 ("", "unparsed"),
-                ("in", "../tools/res/unparsed.xhtml"),
+                ("in", "../aeneas/tools/res/unparsed.xhtml"),
                 ("", "--id-regex=f[0-9]*"),
                 ("", "--sort=lexicographic"),
             ],
@@ -112,4 +112,6 @@ class TestReadTextCLI(ExecuteCLICase):
         self.execute([("", "plain"), ("", "/foo/bar/baz.wav")], 1)
 
     def test_read_unparsed_missing(self):
-        self.execute([("", "unparsed"), ("in", "../tools/res/unparsed.xhtml")], 1)
+        self.execute(
+            [("", "unparsed"), ("in", "../aeneas/tools/res/unparsed.xhtml")], 1
+        )

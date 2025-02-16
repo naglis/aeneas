@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 # aeneas is a Python/C library and a set of tools
 # to automagically synchronize audio and text (aka forced alignment)
 #
@@ -20,7 +18,7 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from aeneas.tests.common import ExecuteTaskCLICase, slow_test, extra_test
+from .common import ExecuteTaskCLICase, slow_test, extra_test
 
 
 @slow_test
@@ -28,7 +26,7 @@ class TestExecuteTaskCLI(ExecuteTaskCLICase):
     def test_exec_tts_no_cache_empty_fragments(self):
         self.execute(
             [
-                ("in", "../tools/res/audio.mp3"),
+                ("in", "../aeneas/tools/res/audio.mp3"),
                 ("in", "../tests/res/inputtext/plain_with_empty_lines.txt"),
                 ("", "task_language=eng|is_text_type=plain|os_task_file_format=json"),
                 ("out", "sonnet.json"),
@@ -40,7 +38,7 @@ class TestExecuteTaskCLI(ExecuteTaskCLICase):
     def test_exec_tts_cache_empty_fragments(self):
         self.execute(
             [
-                ("in", "../tools/res/audio.mp3"),
+                ("in", "../aeneas/tools/res/audio.mp3"),
                 ("in", "../tests/res/inputtext/plain_with_empty_lines.txt"),
                 ("", "task_language=eng|is_text_type=plain|os_task_file_format=json"),
                 ("out", "sonnet.json"),
@@ -52,7 +50,7 @@ class TestExecuteTaskCLI(ExecuteTaskCLICase):
     def test_exec_tts_cache_empty_fragments_pure(self):
         self.execute(
             [
-                ("in", "../tools/res/audio.mp3"),
+                ("in", "../aeneas/tools/res/audio.mp3"),
                 ("in", "../tests/res/inputtext/plain_with_empty_lines.txt"),
                 ("", "task_language=eng|is_text_type=plain|os_task_file_format=json"),
                 ("out", "sonnet.json"),
@@ -65,7 +63,7 @@ class TestExecuteTaskCLI(ExecuteTaskCLICase):
     def test_exec_tts_cache_empty_fragments_festival(self):
         self.execute(
             [
-                ("in", "../tools/res/audio.mp3"),
+                ("in", "../aeneas/tools/res/audio.mp3"),
                 ("in", "../tests/res/inputtext/plain_with_empty_lines.txt"),
                 ("", "task_language=eng|is_text_type=plain|os_task_file_format=json"),
                 ("out", "sonnet.json"),
@@ -78,7 +76,7 @@ class TestExecuteTaskCLI(ExecuteTaskCLICase):
     def test_exec_tts_cache_empty_fragments_festival_pure(self):
         self.execute(
             [
-                ("in", "../tools/res/audio.mp3"),
+                ("in", "../aeneas/tools/res/audio.mp3"),
                 ("in", "../tests/res/inputtext/plain_with_empty_lines.txt"),
                 ("", "task_language=eng|is_text_type=plain|os_task_file_format=json"),
                 ("out", "sonnet.json"),
@@ -90,8 +88,8 @@ class TestExecuteTaskCLI(ExecuteTaskCLICase):
     def test_exec_rateaggressive_remove_nonspeech(self):
         self.execute(
             [
-                ("in", "../tools/res/audio.mp3"),
-                ("in", "../tools/res/subtitles.txt"),
+                ("in", "../aeneas/tools/res/audio.mp3"),
+                ("in", "../aeneas/tools/res/subtitles.txt"),
                 (
                     "",
                     "task_language=eng|is_text_type=subtitles|os_task_file_format=srt|task_adjust_boundary_algorithm=rateaggressive|task_adjust_boundary_rate_value=14.000|task_adjust_boundary_nonspeech_min=0.500|task_adjust_boundary_nonspeech_string=REMOVE",
@@ -104,8 +102,8 @@ class TestExecuteTaskCLI(ExecuteTaskCLICase):
     def test_exec_rateaggressive_remove_nonspeech_add(self):
         self.execute(
             [
-                ("in", "../tools/res/audio.mp3"),
-                ("in", "../tools/res/subtitles.txt"),
+                ("in", "../aeneas/tools/res/audio.mp3"),
+                ("in", "../aeneas/tools/res/subtitles.txt"),
                 (
                     "",
                     "task_language=eng|is_text_type=subtitles|os_task_file_format=srt|task_adjust_boundary_algorithm=rateaggressive|task_adjust_boundary_rate_value=14.000|task_adjust_boundary_nonspeech_min=0.500|task_adjust_boundary_nonspeech_string=REMOVE|os_task_file_head_tail_format=add",
@@ -118,8 +116,8 @@ class TestExecuteTaskCLI(ExecuteTaskCLICase):
     def test_exec_rateaggressive_remove_nonspeech_smaller_rate(self):
         self.execute(
             [
-                ("in", "../tools/res/audio.mp3"),
-                ("in", "../tools/res/subtitles.txt"),
+                ("in", "../aeneas/tools/res/audio.mp3"),
+                ("in", "../aeneas/tools/res/subtitles.txt"),
                 (
                     "",
                     "task_language=eng|is_text_type=subtitles|os_task_file_format=srt|task_adjust_boundary_algorithm=rateaggressive|task_adjust_boundary_rate_value=12.000|task_adjust_boundary_nonspeech_min=0.500|task_adjust_boundary_nonspeech_string=REMOVE",
@@ -132,8 +130,8 @@ class TestExecuteTaskCLI(ExecuteTaskCLICase):
     def test_exec_rateaggressive_remove_nonspeech_idiotic_rate(self):
         self.execute(
             [
-                ("in", "../tools/res/audio.mp3"),
-                ("in", "../tools/res/subtitles.txt"),
+                ("in", "../aeneas/tools/res/audio.mp3"),
+                ("in", "../aeneas/tools/res/subtitles.txt"),
                 (
                     "",
                     "task_language=eng|is_text_type=subtitles|os_task_file_format=srt|task_adjust_boundary_algorithm=rateaggressive|task_adjust_boundary_rate_value=2.000|task_adjust_boundary_nonspeech_min=0.500|task_adjust_boundary_nonspeech_string=REMOVE",
@@ -146,8 +144,8 @@ class TestExecuteTaskCLI(ExecuteTaskCLICase):
     def test_exec_rateaggressive_remove_nonspeech_nozero(self):
         self.execute(
             [
-                ("in", "../tools/res/audio.mp3"),
-                ("in", "../tools/res/subtitles.txt"),
+                ("in", "../aeneas/tools/res/audio.mp3"),
+                ("in", "../aeneas/tools/res/subtitles.txt"),
                 (
                     "",
                     "task_language=eng|is_text_type=subtitles|os_task_file_format=srt|task_adjust_boundary_algorithm=rateaggressive|task_adjust_boundary_rate_value=14.000|task_adjust_boundary_nonspeech_min=0.500|task_adjust_boundary_nonspeech_string=REMOVE|task_adjust_boundary_no_zero=True",
@@ -160,8 +158,8 @@ class TestExecuteTaskCLI(ExecuteTaskCLICase):
     def test_exec_rateaggressive_nozero(self):
         self.execute(
             [
-                ("in", "../tools/res/audio.mp3"),
-                ("in", "../tools/res/subtitles.txt"),
+                ("in", "../aeneas/tools/res/audio.mp3"),
+                ("in", "../aeneas/tools/res/subtitles.txt"),
                 (
                     "",
                     "task_language=eng|is_text_type=subtitles|os_task_file_format=srt|task_adjust_boundary_algorithm=rateaggressive|task_adjust_boundary_rate_value=14.000|task_adjust_boundary_no_zero=True",
@@ -174,8 +172,8 @@ class TestExecuteTaskCLI(ExecuteTaskCLICase):
     def test_exec_rateaggressive_nozero_add(self):
         self.execute(
             [
-                ("in", "../tools/res/audio.mp3"),
-                ("in", "../tools/res/subtitles.txt"),
+                ("in", "../aeneas/tools/res/audio.mp3"),
+                ("in", "../aeneas/tools/res/subtitles.txt"),
                 (
                     "",
                     "task_language=eng|is_text_type=subtitles|os_task_file_format=srt|task_adjust_boundary_algorithm=rateaggressive|task_adjust_boundary_rate_value=14.000|task_adjust_boundary_no_zero=True|os_task_file_head_tail_format=add",
@@ -188,8 +186,8 @@ class TestExecuteTaskCLI(ExecuteTaskCLICase):
     def test_exec_mplain_rateaggressive_remove_nonspeech(self):
         self.execute(
             [
-                ("in", "../tools/res/audio.mp3"),
-                ("in", "../tools/res/mplain.txt"),
+                ("in", "../aeneas/tools/res/audio.mp3"),
+                ("in", "../aeneas/tools/res/mplain.txt"),
                 (
                     "",
                     "task_language=eng|is_text_type=mplain|os_task_file_format=json|task_adjust_boundary_algorithm=rateaggressive|task_adjust_boundary_rate_value=14.000|task_adjust_boundary_nonspeech_min=0.500|task_adjust_boundary_nonspeech_string=REMOVE",
@@ -202,8 +200,8 @@ class TestExecuteTaskCLI(ExecuteTaskCLICase):
     def test_exec_mplain_rateaggressive_remove_nonspeech_add(self):
         self.execute(
             [
-                ("in", "../tools/res/audio.mp3"),
-                ("in", "../tools/res/mplain.txt"),
+                ("in", "../aeneas/tools/res/audio.mp3"),
+                ("in", "../aeneas/tools/res/mplain.txt"),
                 (
                     "",
                     "task_language=eng|is_text_type=mplain|os_task_file_format=json|task_adjust_boundary_algorithm=rateaggressive|task_adjust_boundary_rate_value=14.000|task_adjust_boundary_nonspeech_min=0.500|task_adjust_boundary_nonspeech_string=REMOVE|os_task_file_head_tail_format=add",
@@ -216,8 +214,8 @@ class TestExecuteTaskCLI(ExecuteTaskCLICase):
     def test_exec_mplain_rateaggressive_remove_nonspeech_smaller_rate(self):
         self.execute(
             [
-                ("in", "../tools/res/audio.mp3"),
-                ("in", "../tools/res/mplain.txt"),
+                ("in", "../aeneas/tools/res/audio.mp3"),
+                ("in", "../aeneas/tools/res/mplain.txt"),
                 (
                     "",
                     "task_language=eng|is_text_type=mplain|os_task_file_format=json|task_adjust_boundary_algorithm=rateaggressive|task_adjust_boundary_rate_value=12.000|task_adjust_boundary_nonspeech_min=0.500|task_adjust_boundary_nonspeech_string=REMOVE",
@@ -230,8 +228,8 @@ class TestExecuteTaskCLI(ExecuteTaskCLICase):
     def test_exec_mplain_rateaggressive_remove_nonspeech_idiotic_rate(self):
         self.execute(
             [
-                ("in", "../tools/res/audio.mp3"),
-                ("in", "../tools/res/mplain.txt"),
+                ("in", "../aeneas/tools/res/audio.mp3"),
+                ("in", "../aeneas/tools/res/mplain.txt"),
                 (
                     "",
                     "task_language=eng|is_text_type=mplain|os_task_file_format=json|task_adjust_boundary_algorithm=rateaggressive|task_adjust_boundary_rate_value=2.000|task_adjust_boundary_nonspeech_min=0.500|task_adjust_boundary_nonspeech_string=REMOVE",
@@ -244,8 +242,8 @@ class TestExecuteTaskCLI(ExecuteTaskCLICase):
     def test_exec_mplain_rateaggressive_remove_nonspeech_nozero(self):
         self.execute(
             [
-                ("in", "../tools/res/audio.mp3"),
-                ("in", "../tools/res/mplain.txt"),
+                ("in", "../aeneas/tools/res/audio.mp3"),
+                ("in", "../aeneas/tools/res/mplain.txt"),
                 (
                     "",
                     "task_language=eng|is_text_type=mplain|os_task_file_format=json|task_adjust_boundary_algorithm=rateaggressive|task_adjust_boundary_rate_value=14.000|task_adjust_boundary_nonspeech_min=0.500|task_adjust_boundary_nonspeech_string=REMOVE|task_adjust_boundary_no_zero=True",
@@ -258,8 +256,8 @@ class TestExecuteTaskCLI(ExecuteTaskCLICase):
     def test_exec_mplain_rateaggressive_nozero(self):
         self.execute(
             [
-                ("in", "../tools/res/audio.mp3"),
-                ("in", "../tools/res/mplain.txt"),
+                ("in", "../aeneas/tools/res/audio.mp3"),
+                ("in", "../aeneas/tools/res/mplain.txt"),
                 (
                     "",
                     "task_language=eng|is_text_type=mplain|os_task_file_format=json|task_adjust_boundary_algorithm=rateaggressive|task_adjust_boundary_rate_value=14.000|task_adjust_boundary_no_zero=True",
@@ -272,8 +270,8 @@ class TestExecuteTaskCLI(ExecuteTaskCLICase):
     def test_exec_mplain_rateaggressive_nozero_add(self):
         self.execute(
             [
-                ("in", "../tools/res/audio.mp3"),
-                ("in", "../tools/res/mplain.txt"),
+                ("in", "../aeneas/tools/res/audio.mp3"),
+                ("in", "../aeneas/tools/res/mplain.txt"),
                 (
                     "",
                     "task_language=eng|is_text_type=mplain|os_task_file_format=json|task_adjust_boundary_algorithm=rateaggressive|task_adjust_boundary_rate_value=14.000|task_adjust_boundary_no_zero=True|os_task_file_head_tail_format=add",

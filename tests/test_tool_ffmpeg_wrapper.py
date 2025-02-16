@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 # aeneas is a Python/C library and a set of tools
 # to automagically synchronize audio and text (aka forced alignment)
 #
@@ -22,7 +20,8 @@
 
 
 from aeneas.tools.ffmpeg_wrapper import FFMPEGWrapperCLI
-from aeneas.tests.common import ExecuteCLICase
+
+from .common import ExecuteCLICase
 
 
 class TestFFMPEGWrapperCLI(ExecuteCLICase):
@@ -36,15 +35,15 @@ class TestFFMPEGWrapperCLI(ExecuteCLICase):
         self.execute([("", "--version")], 2)
 
     def test_convert(self):
-        self.execute([("in", "../tools/res/audio.wav"), ("out", "audio.wav")], 0)
+        self.execute([("in", "../aeneas/tools/res/audio.wav"), ("out", "audio.wav")], 0)
 
     def test_convert_mp3(self):
-        self.execute([("in", "../tools/res/audio.mp3"), ("out", "audio.wav")], 0)
+        self.execute([("in", "../aeneas/tools/res/audio.mp3"), ("out", "audio.wav")], 0)
 
     def test_convert_16000(self):
         self.execute(
             [
-                ("in", "../tools/res/audio.wav"),
+                ("in", "../aeneas/tools/res/audio.wav"),
                 ("out", "audio.wav"),
                 ("", '-r="ffmpeg_sample_rate=16000"'),
             ],
@@ -54,7 +53,7 @@ class TestFFMPEGWrapperCLI(ExecuteCLICase):
     def test_convert_22050(self):
         self.execute(
             [
-                ("in", "../tools/res/audio.wav"),
+                ("in", "../aeneas/tools/res/audio.wav"),
                 ("out", "audio.wav"),
                 ("", '-r="ffmpeg_sample_rate=22050"'),
             ],
@@ -64,7 +63,7 @@ class TestFFMPEGWrapperCLI(ExecuteCLICase):
     def test_convert_44100(self):
         self.execute(
             [
-                ("in", "../tools/res/audio.wav"),
+                ("in", "../aeneas/tools/res/audio.wav"),
                 ("out", "audio.wav"),
                 ("", '-r="ffmpeg_sample_rate=44100"'),
             ],
@@ -75,7 +74,7 @@ class TestFFMPEGWrapperCLI(ExecuteCLICase):
         path = "/foo/bar/ffmpeg"
         self.execute(
             [
-                ("in", "../tools/res/audio.wav"),
+                ("in", "../aeneas/tools/res/audio.wav"),
                 ("out", "audio.wav"),
                 ("", '-r="ffmpeg_path=%s"' % path),
             ],
@@ -83,7 +82,7 @@ class TestFFMPEGWrapperCLI(ExecuteCLICase):
         )
 
     def test_convert_missing_1(self):
-        self.execute([("in", "../tools/res/audio.wav")], 2)
+        self.execute([("in", "../aeneas/tools/res/audio.wav")], 2)
 
     def test_convert_missing_2(self):
         self.execute([("out", "audio.wav")], 2)
@@ -98,4 +97,6 @@ class TestFFMPEGWrapperCLI(ExecuteCLICase):
         )
 
     def test_convert_cannot_write(self):
-        self.execute([("in", "../tools/res/audio.wav"), ("", "/foo/bar/baz.wav")], 1)
+        self.execute(
+            [("in", "../aeneas/tools/res/audio.wav"), ("", "/foo/bar/baz.wav")], 1
+        )

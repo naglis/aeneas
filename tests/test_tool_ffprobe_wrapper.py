@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 # aeneas is a Python/C library and a set of tools
 # to automagically synchronize audio and text (aka forced alignment)
 #
@@ -22,7 +20,8 @@
 
 
 from aeneas.tools.ffprobe_wrapper import FFPROBEWrapperCLI
-from aeneas.tests.common import ExecuteCLICase
+
+from .common import ExecuteCLICase
 
 
 class TestFFPROBEWrapperCLI(ExecuteCLICase):
@@ -36,15 +35,19 @@ class TestFFPROBEWrapperCLI(ExecuteCLICase):
         self.execute([("", "--version")], 2)
 
     def test_probe(self):
-        self.execute([("in", "../tools/res/audio.wav")], 0)
+        self.execute([("in", "../aeneas/tools/res/audio.wav")], 0)
 
     def test_probe_mp3(self):
-        self.execute([("in", "../tools/res/audio.mp3")], 0)
+        self.execute([("in", "../aeneas/tools/res/audio.mp3")], 0)
 
     def test_probe_path_bad(self):
         path = "/foo/bar/ffprobe"
         self.execute(
-            [("in", "../tools/res/audio.wav"), ("", '-r="ffprobe_path=%s"' % path)], 1
+            [
+                ("in", "../aeneas/tools/res/audio.wav"),
+                ("", '-r="ffprobe_path=%s"' % path),
+            ],
+            1,
         )
 
     def test_probe_cannot_read(self):

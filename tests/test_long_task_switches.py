@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 # aeneas is a Python/C library and a set of tools
 # to automagically synchronize audio and text (aka forced alignment)
 #
@@ -21,7 +19,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-from aeneas.tests.common import ExecuteTaskCLICase, slow_test
+from .common import ExecuteTaskCLICase, slow_test
 
 
 @slow_test
@@ -29,8 +27,8 @@ class TestExecuteTaskCLI(ExecuteTaskCLICase):
     def test_exec_faster_rate(self):
         self.execute(
             [
-                ("in", "../tools/res/audio.mp3"),
-                ("in", "../tools/res/subtitles.txt"),
+                ("in", "../aeneas/tools/res/audio.mp3"),
+                ("in", "../aeneas/tools/res/subtitles.txt"),
                 (
                     "",
                     "task_language=eng|is_text_type=subtitles|os_task_file_format=srt|task_adjust_boundary_algorithm=rate|task_adjust_boundary_rate_value=12.000",
@@ -44,8 +42,8 @@ class TestExecuteTaskCLI(ExecuteTaskCLICase):
     def test_exec_output_html(self):
         self.execute(
             [
-                ("in", "../tools/res/audio.mp3"),
-                ("in", "../tools/res/subtitles.txt"),
+                ("in", "../aeneas/tools/res/audio.mp3"),
+                ("in", "../aeneas/tools/res/subtitles.txt"),
                 (
                     "",
                     "task_language=eng|is_text_type=subtitles|os_task_file_format=srt",
@@ -59,8 +57,8 @@ class TestExecuteTaskCLI(ExecuteTaskCLICase):
     def test_exec_presets_word(self):
         self.execute(
             [
-                ("in", "../tools/res/audio.mp3"),
-                ("in", "../tools/res/words.txt"),
+                ("in", "../aeneas/tools/res/audio.mp3"),
+                ("in", "../aeneas/tools/res/words.txt"),
                 ("", "task_language=eng|is_text_type=plain|os_task_file_format=json"),
                 ("out", "sonnet.json"),
                 ("", "--presets-word"),
@@ -71,8 +69,8 @@ class TestExecuteTaskCLI(ExecuteTaskCLICase):
     def test_exec_rate(self):
         self.execute(
             [
-                ("in", "../tools/res/audio.mp3"),
-                ("in", "../tools/res/subtitles.txt"),
+                ("in", "../aeneas/tools/res/audio.mp3"),
+                ("in", "../aeneas/tools/res/subtitles.txt"),
                 (
                     "",
                     "task_language=eng|is_text_type=subtitles|os_task_file_format=srt|task_adjust_boundary_algorithm=rate|task_adjust_boundary_rate_value=12.000",
@@ -86,8 +84,8 @@ class TestExecuteTaskCLI(ExecuteTaskCLICase):
     def test_exec_skip_validator(self):
         self.execute(
             [
-                ("in", "../tools/res/audio.mp3"),
-                ("in", "../tools/res/subtitles.txt"),
+                ("in", "../aeneas/tools/res/audio.mp3"),
+                ("in", "../aeneas/tools/res/subtitles.txt"),
                 (
                     "",
                     "task_language=eng|is_text_type=subtitles|os_task_file_format=srt",
@@ -101,8 +99,8 @@ class TestExecuteTaskCLI(ExecuteTaskCLICase):
     def test_exec_zero(self):
         self.execute(
             [
-                ("in", "../tools/res/audio.mp3"),
-                ("in", "../tools/res/subtitles.txt"),
+                ("in", "../aeneas/tools/res/audio.mp3"),
+                ("in", "../aeneas/tools/res/subtitles.txt"),
                 (
                     "",
                     "task_language=eng|is_text_type=subtitles|os_task_file_format=srt",

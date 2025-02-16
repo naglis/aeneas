@@ -8,5 +8,5 @@ in the ``aeneas.ttswrappers`` subpackage.
 The ``aeneas.tools`` subpackage define several command line tools
 which use the main ``aeneas`` library.
 
-Unit tests are contained in the ``aeneas.tests`` subpackage.
+Unit tests are contained in the ``tests`` subpackage.
 

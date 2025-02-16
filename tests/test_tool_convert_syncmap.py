@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 # aeneas is a Python/C library and a set of tools
 # to automagically synchronize audio and text (aka forced alignment)
 #
@@ -22,7 +20,8 @@
 
 
 from aeneas.tools.convert_syncmap import ConvertSyncMapCLI
-from aeneas.tests.common import ExecuteCLICase
+
+from .common import ExecuteCLICase
 
 
 class TestConvertSyncMapCLI(ExecuteCLICase):
@@ -36,24 +35,32 @@ class TestConvertSyncMapCLI(ExecuteCLICase):
         self.execute([("", "--version")], 2)
 
     def test_convert(self):
-        self.execute([("in", "../tools/res/sonnet.json"), ("out", "syncmap.srt")], 0)
+        self.execute(
+            [("in", "../aeneas/tools/res/sonnet.json"), ("out", "syncmap.srt")], 0
+        )
 
     def test_convert_cannot_read(self):
         self.execute([("", "/foo/bar/baz.json"), ("out", "syncmap.srt")], 1)
 
     def test_convert_cannot_write(self):
-        self.execute([("in", "../tools/res/sonnet.json"), ("", "/foo/bar/baz.srt")], 1)
+        self.execute(
+            [("in", "../aeneas/tools/res/sonnet.json"), ("", "/foo/bar/baz.srt")], 1
+        )
 
     def test_convert_bad_format_1(self):
-        self.execute([("in", "../tools/res/sonnet.zzz"), ("out", "syncmap.txt")], 1)
+        self.execute(
+            [("in", "../aeneas/tools/res/sonnet.zzz"), ("out", "syncmap.txt")], 1
+        )
 
     def test_convert_bad_format_2(self):
-        self.execute([("in", "../tools/res/sonnet.json"), ("out", "syncmap.zzz")], 1)
+        self.execute(
+            [("in", "../aeneas/tools/res/sonnet.json"), ("out", "syncmap.zzz")], 1
+        )
 
     def test_convert_output_format(self):
         self.execute(
             [
-                ("in", "../tools/res/sonnet.json"),
+                ("in", "../aeneas/tools/res/sonnet.json"),
                 ("out", "syncmap.dat"),
                 ("", "--output-format=txt"),
             ],
@@ -63,7 +70,7 @@ class TestConvertSyncMapCLI(ExecuteCLICase):
     def test_convert_output_format_bad(self):
         self.execute(
             [
-                ("in", "../tools/res/sonnet.json"),
+                ("in", "../aeneas/tools/res/sonnet.json"),
                 ("out", "syncmap.dat"),
                 ("", "--output-format=foo"),
             ],
@@ -73,7 +80,7 @@ class TestConvertSyncMapCLI(ExecuteCLICase):
     def test_convert_input_format(self):
         self.execute(
             [
-                ("in", "../tools/res/sonnet.zzz"),
+                ("in", "../aeneas/tools/res/sonnet.zzz"),
                 ("out", "syncmap.txt"),
                 ("", "--input-format=csv"),
             ],
@@ -83,7 +90,7 @@ class TestConvertSyncMapCLI(ExecuteCLICase):
     def test_convert_input_format_bad(self):
         self.execute(
             [
-                ("in", "../tools/res/sonnet.zzz"),
+                ("in", "../aeneas/tools/res/sonnet.zzz"),
                 ("out", "syncmap.txt"),
                 ("", "--input-format=foo"),
             ],
@@ -93,7 +100,7 @@ class TestConvertSyncMapCLI(ExecuteCLICase):
     def test_convert_language(self):
         self.execute(
             [
-                ("in", "../tools/res/sonnet.csv"),
+                ("in", "../aeneas/tools/res/sonnet.csv"),
                 ("out", "syncmap.json"),
                 ("", "--language=en"),
             ],
@@ -103,7 +110,7 @@ class TestConvertSyncMapCLI(ExecuteCLICase):
     def test_convert_smil(self):
         self.execute(
             [
-                ("in", "../tools/res/sonnet.json"),
+                ("in", "../aeneas/tools/res/sonnet.json"),
                 ("out", "syncmap.smil"),
                 ("", "--audio-ref=audio/sonnet001.mp3"),
                 ("", "--page-ref=text/sonnet001.xhtml"),
@@ -114,7 +121,7 @@ class TestConvertSyncMapCLI(ExecuteCLICase):
     def test_convert_smil_missing_1(self):
         self.execute(
             [
-                ("in", "../tools/res/sonnet.json"),
+                ("in", "../aeneas/tools/res/sonnet.json"),
                 ("out", "syncmap.smil"),
                 ("", "--audio-ref=audio/sonnet001.mp3"),
             ],
@@ -124,7 +131,7 @@ class TestConvertSyncMapCLI(ExecuteCLICase):
     def test_convert_smil_missing_2(self):
         self.execute(
             [
-                ("in", "../tools/res/sonnet.json"),
+                ("in", "../aeneas/tools/res/sonnet.json"),
                 ("out", "syncmap.smil"),
                 ("", "--page-ref=text/sonnet001.xhtml"),
             ],
@@ -134,9 +141,9 @@ class TestConvertSyncMapCLI(ExecuteCLICase):
     def test_convert_html(self):
         self.execute(
             [
-                ("in", "../tools/res/sonnet.json"),
+                ("in", "../aeneas/tools/res/sonnet.json"),
                 ("out", "sonnet.html"),
-                ("in", "../tools/res/audio.mp3"),
+                ("in", "../aeneas/tools/res/audio.mp3"),
                 ("", "--output-html"),
             ],
             0,
@@ -145,7 +152,7 @@ class TestConvertSyncMapCLI(ExecuteCLICase):
     def test_convert_html_missing(self):
         self.execute(
             [
-                ("in", "../tools/res/sonnet.json"),
+                ("in", "../aeneas/tools/res/sonnet.json"),
                 ("out", "sonnet.html"),
                 ("", "--output-html"),
             ],

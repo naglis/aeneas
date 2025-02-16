@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 # aeneas is a Python/C library and a set of tools
 # to automagically synchronize audio and text (aka forced alignment)
 #
@@ -22,8 +20,9 @@
 
 import itertools
 
-from aeneas.tests.base_ttswrapper import BaseTTSWrapperCase, SynthesizeCase
 from aeneas.ttswrappers.espeakttswrapper import ESPEAKTTSWrapper
+
+from .base_ttswrapper import BaseTTSWrapperCase, SynthesizeCase
 
 
 class TestESPEAKTTSWrapper(BaseTTSWrapperCase):

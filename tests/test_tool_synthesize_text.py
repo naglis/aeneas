@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 # aeneas is a Python/C library and a set of tools
 # to automagically synchronize audio and text (aka forced alignment)
 #
@@ -20,9 +18,9 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-
 from aeneas.tools.synthesize_text import SynthesizeTextCLI
-from aeneas.tests.common import ExecuteCLICase
+
+from .common import ExecuteCLICase
 
 
 class TestSynthesizeTextCLI(ExecuteCLICase):
@@ -50,7 +48,7 @@ class TestSynthesizeTextCLI(ExecuteCLICase):
         self.execute(
             [
                 ("", "parsed"),
-                ("in", "../tools/res/parsed.txt"),
+                ("in", "../aeneas/tools/res/parsed.txt"),
                 ("", "eng"),
                 ("out", "synthesized.wav"),
             ],
@@ -61,7 +59,7 @@ class TestSynthesizeTextCLI(ExecuteCLICase):
         self.execute(
             [
                 ("", "plain"),
-                ("in", "../tools/res/plain.txt"),
+                ("in", "../aeneas/tools/res/plain.txt"),
                 ("", "eng"),
                 ("out", "synthesized.wav"),
             ],
@@ -72,7 +70,7 @@ class TestSynthesizeTextCLI(ExecuteCLICase):
         self.execute(
             [
                 ("", "subtitles"),
-                ("in", "../tools/res/subtitles.txt"),
+                ("in", "../aeneas/tools/res/subtitles.txt"),
                 ("", "eng"),
                 ("out", "synthesized.wav"),
             ],
@@ -83,7 +81,7 @@ class TestSynthesizeTextCLI(ExecuteCLICase):
         self.execute(
             [
                 ("", "unparsed"),
-                ("in", "../tools/res/unparsed.xhtml"),
+                ("in", "../aeneas/tools/res/unparsed.xhtml"),
                 ("", "eng"),
                 ("out", "synthesized.wav"),
                 ("", "--id-regex=f[0-9]*"),
@@ -95,7 +93,7 @@ class TestSynthesizeTextCLI(ExecuteCLICase):
         self.execute(
             [
                 ("", "unparsed"),
-                ("in", "../tools/res/unparsed.xhtml"),
+                ("in", "../aeneas/tools/res/unparsed.xhtml"),
                 ("", "eng"),
                 ("out", "synthesized.wav"),
                 ("", "--class-regex=ra"),
@@ -108,7 +106,7 @@ class TestSynthesizeTextCLI(ExecuteCLICase):
         self.execute(
             [
                 ("", "unparsed"),
-                ("in", "../tools/res/unparsed.xhtml"),
+                ("in", "../aeneas/tools/res/unparsed.xhtml"),
                 ("", "eng"),
                 ("out", "synthesized.wav"),
                 ("", "--id-regex=f[0-9]*"),
@@ -121,7 +119,7 @@ class TestSynthesizeTextCLI(ExecuteCLICase):
         self.execute(
             [
                 ("", "unparsed"),
-                ("in", "../tools/res/unparsed.xhtml"),
+                ("in", "../aeneas/tools/res/unparsed.xhtml"),
                 ("", "eng"),
                 ("out", "synthesized.wav"),
                 ("", "--id-regex=f[0-9]*"),
@@ -131,7 +129,9 @@ class TestSynthesizeTextCLI(ExecuteCLICase):
         )
 
     def test_synt_missing_1(self):
-        self.execute([("", "list"), ("", "eng"), ("in", "../tools/res/audio.mp3")], 2)
+        self.execute(
+            [("", "list"), ("", "eng"), ("in", "../aeneas/tools/res/audio.mp3")], 2
+        )
 
     def test_synt_missing_2(self):
         self.execute(
@@ -178,7 +178,7 @@ class TestSynthesizeTextCLI(ExecuteCLICase):
         self.execute(
             [
                 ("", "unparsed"),
-                ("in", "../tools/res/unparsed.xhtml"),
+                ("in", "../aeneas/tools/res/unparsed.xhtml"),
                 ("", "eng"),
                 ("out", "synthesized.wav"),
             ],
@@ -189,7 +189,7 @@ class TestSynthesizeTextCLI(ExecuteCLICase):
         self.execute(
             [
                 ("", "plain"),
-                ("in", "../tools/res/plain.txt"),
+                ("in", "../aeneas/tools/res/plain.txt"),
                 ("", "eng"),
                 ("out", "synthesized.wav"),
                 ("", "--start=5"),
@@ -201,7 +201,7 @@ class TestSynthesizeTextCLI(ExecuteCLICase):
         self.execute(
             [
                 ("", "plain"),
-                ("in", "../tools/res/plain.txt"),
+                ("in", "../aeneas/tools/res/plain.txt"),
                 ("", "eng"),
                 ("out", "synthesized.wav"),
                 ("", "--end=10"),
@@ -213,7 +213,7 @@ class TestSynthesizeTextCLI(ExecuteCLICase):
         self.execute(
             [
                 ("", "plain"),
-                ("in", "../tools/res/plain.txt"),
+                ("in", "../aeneas/tools/res/plain.txt"),
                 ("", "eng"),
                 ("out", "synthesized.wav"),
                 ("", "--start=5"),
@@ -226,7 +226,7 @@ class TestSynthesizeTextCLI(ExecuteCLICase):
         self.execute(
             [
                 ("", "plain"),
-                ("in", "../tools/res/plain.txt"),
+                ("in", "../aeneas/tools/res/plain.txt"),
                 ("", "eng"),
                 ("out", "synthesized.wav"),
                 ("", "--backwards"),
@@ -238,7 +238,7 @@ class TestSynthesizeTextCLI(ExecuteCLICase):
         self.execute(
             [
                 ("", "plain"),
-                ("in", "../tools/res/plain.txt"),
+                ("in", "../aeneas/tools/res/plain.txt"),
                 ("", "eng"),
                 ("out", "synthesized.wav"),
                 ("", "--quit-after=10.0"),
@@ -250,7 +250,7 @@ class TestSynthesizeTextCLI(ExecuteCLICase):
         self.execute(
             [
                 ("", "plain"),
-                ("in", "../tools/res/plain.txt"),
+                ("in", "../aeneas/tools/res/plain.txt"),
                 ("", "eng"),
                 ("out", "synthesized.wav"),
                 ("", "--backwards"),
@@ -263,7 +263,7 @@ class TestSynthesizeTextCLI(ExecuteCLICase):
         self.execute(
             [
                 ("", "plain"),
-                ("in", "../tools/res/plain.txt"),
+                ("in", "../aeneas/tools/res/plain.txt"),
                 ("", "eng"),
                 ("out", "synthesized.wav"),
                 ("", '-r="c_extensions=False"'),
@@ -275,7 +275,7 @@ class TestSynthesizeTextCLI(ExecuteCLICase):
         self.execute(
             [
                 ("", "plain"),
-                ("in", "../tools/res/plain.txt"),
+                ("in", "../aeneas/tools/res/plain.txt"),
                 ("", "eng"),
                 ("out", "synthesized.wav"),
                 ("", '-r="cew=False"'),
@@ -287,7 +287,7 @@ class TestSynthesizeTextCLI(ExecuteCLICase):
         self.execute(
             [
                 ("", "plain"),
-                ("in", "../tools/res/plain.txt"),
+                ("in", "../aeneas/tools/res/plain.txt"),
                 ("", "eng"),
                 ("out", "synthesized.wav"),
                 ("", '-r="cew_subprocess_enabled=True"'),
@@ -300,7 +300,7 @@ class TestSynthesizeTextCLI(ExecuteCLICase):
         self.execute(
             [
                 ("", "plain"),
-                ("in", "../tools/res/plain.txt"),
+                ("in", "../aeneas/tools/res/plain.txt"),
                 ("", "eng"),
                 ("out", "synthesized.wav"),
                 ("", '-r="c_extensions=False|tts=espeak|tts_path=%s"' % path),

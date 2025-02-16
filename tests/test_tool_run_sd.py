@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 # aeneas is a Python/C library and a set of tools
 # to automagically synchronize audio and text (aka forced alignment)
 #
@@ -20,9 +18,9 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-
 from aeneas.tools.run_sd import RunSDCLI
-from aeneas.tests.common import ExecuteCLICase
+
+from .common import ExecuteCLICase
 
 
 class TestRunSDCLI(ExecuteCLICase):
@@ -41,7 +39,7 @@ class TestRunSDCLI(ExecuteCLICase):
                 ("", "list"),
                 ("", "From|fairest|creatures|we|desire|increase"),
                 ("", "eng"),
-                ("in", "../tools/res/audio.mp3"),
+                ("in", "../aeneas/tools/res/audio.mp3"),
             ],
             0,
         )
@@ -50,9 +48,9 @@ class TestRunSDCLI(ExecuteCLICase):
         self.execute(
             [
                 ("", "parsed"),
-                ("in", "../tools/res/parsed.txt"),
+                ("in", "../aeneas/tools/res/parsed.txt"),
                 ("", "eng"),
-                ("in", "../tools/res/audio.mp3"),
+                ("in", "../aeneas/tools/res/audio.mp3"),
             ],
             0,
         )
@@ -61,9 +59,9 @@ class TestRunSDCLI(ExecuteCLICase):
         self.execute(
             [
                 ("", "plain"),
-                ("in", "../tools/res/plain.txt"),
+                ("in", "../aeneas/tools/res/plain.txt"),
                 ("", "eng"),
-                ("in", "../tools/res/audio.mp3"),
+                ("in", "../aeneas/tools/res/audio.mp3"),
             ],
             0,
         )
@@ -72,9 +70,9 @@ class TestRunSDCLI(ExecuteCLICase):
         self.execute(
             [
                 ("", "subtitles"),
-                ("in", "../tools/res/subtitles.txt"),
+                ("in", "../aeneas/tools/res/subtitles.txt"),
                 ("", "eng"),
-                ("in", "../tools/res/audio.mp3"),
+                ("in", "../aeneas/tools/res/audio.mp3"),
             ],
             0,
         )
@@ -83,9 +81,9 @@ class TestRunSDCLI(ExecuteCLICase):
         self.execute(
             [
                 ("", "unparsed"),
-                ("in", "../tools/res/unparsed.xhtml"),
+                ("in", "../aeneas/tools/res/unparsed.xhtml"),
                 ("", "eng"),
-                ("in", "../tools/res/audio.mp3"),
+                ("in", "../aeneas/tools/res/audio.mp3"),
                 ("", "--id-regex=f[0-9]*"),
             ],
             0,
@@ -95,9 +93,9 @@ class TestRunSDCLI(ExecuteCLICase):
         self.execute(
             [
                 ("", "unparsed"),
-                ("in", "../tools/res/unparsed.xhtml"),
+                ("in", "../aeneas/tools/res/unparsed.xhtml"),
                 ("", "eng"),
-                ("in", "../tools/res/audio.mp3"),
+                ("in", "../aeneas/tools/res/audio.mp3"),
                 ("", "--class-regex=ra"),
                 ("", "--sort=unsorted"),
             ],
@@ -108,9 +106,9 @@ class TestRunSDCLI(ExecuteCLICase):
         self.execute(
             [
                 ("", "unparsed"),
-                ("in", "../tools/res/unparsed.xhtml"),
+                ("in", "../aeneas/tools/res/unparsed.xhtml"),
                 ("", "eng"),
-                ("in", "../tools/res/audio.mp3"),
+                ("in", "../aeneas/tools/res/audio.mp3"),
                 ("", "--id-regex=f[0-9]*"),
                 ("", "--sort=numeric"),
             ],
@@ -121,9 +119,9 @@ class TestRunSDCLI(ExecuteCLICase):
         self.execute(
             [
                 ("", "unparsed"),
-                ("in", "../tools/res/unparsed.xhtml"),
+                ("in", "../aeneas/tools/res/unparsed.xhtml"),
                 ("", "eng"),
-                ("in", "../tools/res/audio.mp3"),
+                ("in", "../aeneas/tools/res/audio.mp3"),
                 ("", "--id-regex=f[0-9]*"),
                 ("", "--sort=lexicographic"),
             ],
@@ -131,14 +129,16 @@ class TestRunSDCLI(ExecuteCLICase):
         )
 
     def test_sd_missing_1(self):
-        self.execute([("", "list"), ("", "eng"), ("in", "../tools/res/audio.mp3")], 2)
+        self.execute(
+            [("", "list"), ("", "eng"), ("in", "../aeneas/tools/res/audio.mp3")], 2
+        )
 
     def test_sd_missing_2(self):
         self.execute(
             [
                 ("", "From|fairest|creatures|we|desire|increase"),
                 ("", "eng"),
-                ("in", "../tools/res/audio.mp3"),
+                ("in", "../aeneas/tools/res/audio.mp3"),
             ],
             2,
         )
@@ -148,7 +148,7 @@ class TestRunSDCLI(ExecuteCLICase):
             [
                 ("", "list"),
                 ("", "From|fairest|creatures|we|desire|increase"),
-                ("in", "../tools/res/audio.mp3"),
+                ("in", "../aeneas/tools/res/audio.mp3"),
             ],
             2,
         )
@@ -169,7 +169,7 @@ class TestRunSDCLI(ExecuteCLICase):
                 ("", "plain"),
                 ("", "/foo/bar/baz.wav"),
                 ("", "eng"),
-                ("in", "../tools/res/audio.mp3"),
+                ("in", "../aeneas/tools/res/audio.mp3"),
             ],
             1,
         )
@@ -178,9 +178,9 @@ class TestRunSDCLI(ExecuteCLICase):
         self.execute(
             [
                 ("", "unparsed"),
-                ("in", "../tools/res/unparsed.xhtml"),
+                ("in", "../aeneas/tools/res/unparsed.xhtml"),
                 ("", "eng"),
-                ("in", "../tools/res/audio.mp3"),
+                ("in", "../aeneas/tools/res/audio.mp3"),
             ],
             1,
         )
@@ -189,9 +189,9 @@ class TestRunSDCLI(ExecuteCLICase):
         self.execute(
             [
                 ("", "parsed"),
-                ("in", "../tools/res/parsed.txt"),
+                ("in", "../aeneas/tools/res/parsed.txt"),
                 ("", "eng"),
-                ("in", "../tools/res/audio.mp3"),
+                ("in", "../aeneas/tools/res/audio.mp3"),
                 ("", "--min-head=0.0"),
                 ("", "--max-head=5.0"),
             ],
@@ -202,9 +202,9 @@ class TestRunSDCLI(ExecuteCLICase):
         self.execute(
             [
                 ("", "parsed"),
-                ("in", "../tools/res/parsed.txt"),
+                ("in", "../aeneas/tools/res/parsed.txt"),
                 ("", "eng"),
-                ("in", "../tools/res/audio.mp3"),
+                ("in", "../aeneas/tools/res/audio.mp3"),
                 ("", "--min-tail=1.0"),
                 ("", "--max-tail=5.0"),
             ],
@@ -215,9 +215,9 @@ class TestRunSDCLI(ExecuteCLICase):
         self.execute(
             [
                 ("", "parsed"),
-                ("in", "../tools/res/parsed.txt"),
+                ("in", "../aeneas/tools/res/parsed.txt"),
                 ("", "eng"),
-                ("in", "../tools/res/audio.mp3"),
+                ("in", "../aeneas/tools/res/audio.mp3"),
                 ("", "--min-head=0.0"),
                 ("", "--max-head=5.0"),
                 ("", "--min-tail=1.0"),
@@ -232,7 +232,7 @@ class TestRunSDCLI(ExecuteCLICase):
                 ("", "list"),
                 ("", "From|fairest|creatures|we|desire|increase"),
                 ("", "eng"),
-                ("in", "../tools/res/audio.mp3"),
+                ("in", "../aeneas/tools/res/audio.mp3"),
                 ("", '-r="c_extensions=False"'),
             ],
             0,
@@ -244,7 +244,7 @@ class TestRunSDCLI(ExecuteCLICase):
                 ("", "list"),
                 ("", "From|fairest|creatures|we|desire|increase"),
                 ("", "eng"),
-                ("in", "../tools/res/audio.mp3"),
+                ("in", "../aeneas/tools/res/audio.mp3"),
                 ("", '-r="cew=False"'),
             ],
             0,
@@ -256,7 +256,7 @@ class TestRunSDCLI(ExecuteCLICase):
                 ("", "list"),
                 ("", "From|fairest|creatures|we|desire|increase"),
                 ("", "eng"),
-                ("in", "../tools/res/audio.mp3"),
+                ("in", "../aeneas/tools/res/audio.mp3"),
                 ("", '-r="cmfcc=False"'),
             ],
             0,
@@ -268,7 +268,7 @@ class TestRunSDCLI(ExecuteCLICase):
                 ("", "list"),
                 ("", "From|fairest|creatures|we|desire|increase"),
                 ("", "eng"),
-                ("in", "../tools/res/audio.mp3"),
+                ("in", "../aeneas/tools/res/audio.mp3"),
                 ("", '-r="cdtw=False"'),
             ],
             0,

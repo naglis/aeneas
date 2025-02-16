@@ -24,7 +24,7 @@ import typing
 
 from aeneas.syncmap import SyncMapFormat
 
-from aeneas.tests.test_syncmap import BaseSyncMapCase
+from .test_syncmap import BaseSyncMapCase
 
 
 class TestSyncMapAllFormats(BaseSyncMapCase):

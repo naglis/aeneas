@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 # aeneas is a Python/C library and a set of tools
 # to automagically synchronize audio and text (aka forced alignment)
 #
@@ -22,7 +20,8 @@
 
 
 from aeneas.tools.extract_mfcc import ExtractMFCCCLI
-from aeneas.tests.common import ExecuteCLICase
+
+from .common import ExecuteCLICase
 
 
 class TestExtractMFCCCLI(ExecuteCLICase):
@@ -37,18 +36,18 @@ class TestExtractMFCCCLI(ExecuteCLICase):
 
     def test_extract(self):
         self.execute(
-            [("in", "../tools/res/audio.wav"), ("out", "audio.wav.mfcc.txt")], 0
+            [("in", "../aeneas/tools/res/audio.wav"), ("out", "audio.wav.mfcc.txt")], 0
         )
 
     def test_extract_mp3(self):
         self.execute(
-            [("in", "../tools/res/audio.mp3"), ("out", "audio.mp3.mfcc.txt")], 0
+            [("in", "../aeneas/tools/res/audio.mp3"), ("out", "audio.mp3.mfcc.txt")], 0
         )
 
     def test_extract_pure(self):
         self.execute(
             [
-                ("in", "../tools/res/audio.wav"),
+                ("in", "../aeneas/tools/res/audio.wav"),
                 ("out", "audio.wav.mfcc.txt"),
                 ("", '-r="c_extensions=False"'),
             ],
@@ -58,7 +57,7 @@ class TestExtractMFCCCLI(ExecuteCLICase):
     def test_extract_no_cmfcc(self):
         self.execute(
             [
-                ("in", "../tools/res/audio.wav"),
+                ("in", "../aeneas/tools/res/audio.wav"),
                 ("out", "audio.wav.mfcc.txt"),
                 ("", '-r="cmfcc=False"'),
             ],
@@ -68,7 +67,7 @@ class TestExtractMFCCCLI(ExecuteCLICase):
     def test_extract_mfcc_filters(self):
         self.execute(
             [
-                ("in", "../tools/res/audio.wav"),
+                ("in", "../aeneas/tools/res/audio.wav"),
                 ("out", "audio.wav.mfcc.txt"),
                 ("", '-r="mfcc_filters=26"'),
             ],
@@ -78,7 +77,7 @@ class TestExtractMFCCCLI(ExecuteCLICase):
     def test_extract_mfcc_size(self):
         self.execute(
             [
-                ("in", "../tools/res/audio.wav"),
+                ("in", "../aeneas/tools/res/audio.wav"),
                 ("out", "audio.wav.mfcc.txt"),
                 ("", '-r="mfcc_size=17"'),
             ],
@@ -88,7 +87,7 @@ class TestExtractMFCCCLI(ExecuteCLICase):
     def test_extract_mfcc_fft_order(self):
         self.execute(
             [
-                ("in", "../tools/res/audio.wav"),
+                ("in", "../aeneas/tools/res/audio.wav"),
                 ("out", "audio.wav.mfcc.txt"),
                 ("", '-r="mfcc_fft_order=1024"'),
             ],
@@ -98,7 +97,7 @@ class TestExtractMFCCCLI(ExecuteCLICase):
     def test_extract_mfcc_lower_frequency(self):
         self.execute(
             [
-                ("in", "../tools/res/audio.wav"),
+                ("in", "../aeneas/tools/res/audio.wav"),
                 ("out", "audio.wav.mfcc.txt"),
                 ("", '-r="mfcc_lower_frequency=100"'),
             ],
@@ -108,7 +107,7 @@ class TestExtractMFCCCLI(ExecuteCLICase):
     def test_extract_mfcc_upper_frequency(self):
         self.execute(
             [
-                ("in", "../tools/res/audio.wav"),
+                ("in", "../aeneas/tools/res/audio.wav"),
                 ("out", "audio.wav.mfcc.txt"),
                 ("", '-r="mfcc_upper_frequency=7000"'),
             ],
@@ -120,7 +119,7 @@ class TestExtractMFCCCLI(ExecuteCLICase):
         with self.assertRaises(RuntimeError):
             self.execute(
                 [
-                    ("in", "../tools/res/audio.wav"),
+                    ("in", "../aeneas/tools/res/audio.wav"),
                     ("out", "audio.wav.mfcc.txt"),
                     ("", '-r="mfcc_upper_frequency=88200"'),
                 ],
@@ -130,7 +129,7 @@ class TestExtractMFCCCLI(ExecuteCLICase):
     def test_extract_mfcc_emphasis_factor(self):
         self.execute(
             [
-                ("in", "../tools/res/audio.wav"),
+                ("in", "../aeneas/tools/res/audio.wav"),
                 ("out", "audio.wav.mfcc.txt"),
                 ("", '-r="mfcc_emphasis_factor=0.95"'),
             ],
@@ -140,7 +139,7 @@ class TestExtractMFCCCLI(ExecuteCLICase):
     def test_extract_mfcc_window_length(self):
         self.execute(
             [
-                ("in", "../tools/res/audio.wav"),
+                ("in", "../aeneas/tools/res/audio.wav"),
                 ("out", "audio.wav.mfcc.txt"),
                 ("", '-r="mfcc_window_length=0.200"'),
             ],
@@ -150,7 +149,7 @@ class TestExtractMFCCCLI(ExecuteCLICase):
     def test_extract_mfcc_window_shift(self):
         self.execute(
             [
-                ("in", "../tools/res/audio.wav"),
+                ("in", "../aeneas/tools/res/audio.wav"),
                 ("out", "audio.wav.mfcc.txt"),
                 ("", '-r="mfcc_window_shift=0.010"'),
             ],
@@ -158,7 +157,7 @@ class TestExtractMFCCCLI(ExecuteCLICase):
         )
 
     def test_extract_missing_1(self):
-        self.execute([("in", "../tools/res/audio.wav")], 2)
+        self.execute([("in", "../aeneas/tools/res/audio.wav")], 2)
 
     def test_extract_missing_2(self):
         self.execute([("out", "audio.wav.mfcc.txt")], 2)
@@ -173,4 +172,6 @@ class TestExtractMFCCCLI(ExecuteCLICase):
         )
 
     def test_extract_cannot_write(self):
-        self.execute([("in", "../tools/res/audio.wav"), ("", "/foo/bar/baz.wav")], 1)
+        self.execute(
+            [("in", "../aeneas/tools/res/audio.wav"), ("", "/foo/bar/baz.wav")], 1
+        )

@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 # aeneas is a Python/C library and a set of tools
 # to automagically synchronize audio and text (aka forced alignment)
 #
@@ -21,12 +19,13 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-from aeneas.tools.read_audio import ReadAudioCLI
-from aeneas.tests.common import ExecuteCLICase
+from aeneas.tools.validate import ValidateCLI
+
+from .common import ExecuteCLICase
 
 
-class TestReadAudioCLI(ExecuteCLICase):
-    CLI_CLS = ReadAudioCLI
+class TestValidateCLI(ExecuteCLICase):
+    CLI_CLS = ValidateCLI
 
     def test_help(self):
         self.execute([], 2)
@@ -35,23 +34,44 @@ class TestReadAudioCLI(ExecuteCLICase):
         self.execute([("", "--help-rconf")], 2)
         self.execute([("", "--version")], 2)
 
-    def test_read_audio(self):
-        self.execute([("in", "../tools/res/audio.wav")], 0)
+    def test_bad_type(self):
+        self.execute([("", "foo"), ("in", "../aeneas/tools/res/config.txt")], 2)
 
-    def test_read_audio_full(self):
-        self.execute([("in", "../tools/res/audio.wav"), ("", "-f")], 0)
-
-    def test_read_audio_mp3(self):
-        self.execute([("in", "../tools/res/audio.mp3")], 0)
-
-    def test_read_audio_mp3_full(self):
-        self.execute([("in", "../tools/res/audio.mp3"), ("", "-f")], 0)
-
-    def test_read_audio_path_bad(self):
-        path = "/foo/bar/ffprobe"
+    def test_task(self):
         self.execute(
-            [("in", "../tools/res/audio.wav"), ("", '-r="ffprobe_path=%s"' % path)], 1
+            [
+                ("", "task"),
+                (
+                    "",
+                    "task_language=it|is_text_type=plain|os_task_file_name=output.txt|os_task_file_format=txt",
+                ),
+            ],
+            0,
         )
 
-    def test_read_audio_cannot_read(self):
-        self.execute([("", "/foo/bar/baz.wav")], 1)
+    def test_task_bad(self):
+        self.execute(
+            [
+                ("", "task"),
+                (
+                    "",
+                    "task_language=it|is_text_type=plain|os_task_file_name=output.txt",
+                ),
+            ],
+            1,
+        )
+
+    def test_read_missing_1(self):
+        self.execute([("", "config")], 2)
+
+    def test_read_missing_2(self):
+        self.execute([("in", "../aeneas/tools/res/config.txt")], 2)
+
+    def test_read_missing_3(self):
+        self.execute(
+            [
+                ("", "job_language=it|invalid=string"),
+                ("in", "../aeneas/tools/res/job_no_config.zip"),
+            ],
+            2,
+        )

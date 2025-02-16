@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 # aeneas is a Python/C library and a set of tools
 # to automagically synchronize audio and text (aka forced alignment)
 #
@@ -20,8 +18,7 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-
-from aeneas.tests.common import ExecuteTaskCLICase, slow_test
+from .common import ExecuteTaskCLICase, slow_test
 
 
 @slow_test
@@ -29,8 +26,8 @@ class TestExecuteTaskCLI(ExecuteTaskCLICase):
     def test_exec_aud(self):
         self.execute(
             [
-                ("in", "../tools/res/audio.mp3"),
-                ("in", "../tools/res/plain.txt"),
+                ("in", "../aeneas/tools/res/audio.mp3"),
+                ("in", "../aeneas/tools/res/plain.txt"),
                 ("", "task_language=eng|is_text_type=plain|os_task_file_format=aud"),
                 ("out", "sonnet.aud"),
             ],
@@ -40,8 +37,8 @@ class TestExecuteTaskCLI(ExecuteTaskCLICase):
     def test_exec_audh(self):
         self.execute(
             [
-                ("in", "../tools/res/audio.mp3"),
-                ("in", "../tools/res/plain.txt"),
+                ("in", "../aeneas/tools/res/audio.mp3"),
+                ("in", "../aeneas/tools/res/plain.txt"),
                 ("", "task_language=eng|is_text_type=plain|os_task_file_format=audh"),
                 ("out", "sonnet.audh"),
             ],
@@ -51,8 +48,8 @@ class TestExecuteTaskCLI(ExecuteTaskCLICase):
     def test_exec_audm(self):
         self.execute(
             [
-                ("in", "../tools/res/audio.mp3"),
-                ("in", "../tools/res/plain.txt"),
+                ("in", "../aeneas/tools/res/audio.mp3"),
+                ("in", "../aeneas/tools/res/plain.txt"),
                 ("", "task_language=eng|is_text_type=plain|os_task_file_format=audm"),
                 ("out", "sonnet.audm"),
             ],
@@ -62,8 +59,8 @@ class TestExecuteTaskCLI(ExecuteTaskCLICase):
     def test_exec_csv(self):
         self.execute(
             [
-                ("in", "../tools/res/audio.mp3"),
-                ("in", "../tools/res/plain.txt"),
+                ("in", "../aeneas/tools/res/audio.mp3"),
+                ("in", "../aeneas/tools/res/plain.txt"),
                 ("", "task_language=eng|is_text_type=plain|os_task_file_format=csv"),
                 ("out", "sonnet.csv"),
             ],
@@ -73,8 +70,8 @@ class TestExecuteTaskCLI(ExecuteTaskCLICase):
     def test_exec_csvh(self):
         self.execute(
             [
-                ("in", "../tools/res/audio.mp3"),
-                ("in", "../tools/res/plain.txt"),
+                ("in", "../aeneas/tools/res/audio.mp3"),
+                ("in", "../aeneas/tools/res/plain.txt"),
                 ("", "task_language=eng|is_text_type=plain|os_task_file_format=csvh"),
                 ("out", "sonnet.csvh"),
             ],
@@ -84,8 +81,8 @@ class TestExecuteTaskCLI(ExecuteTaskCLICase):
     def test_exec_dfxp(self):
         self.execute(
             [
-                ("in", "../tools/res/audio.mp3"),
-                ("in", "../tools/res/plain.txt"),
+                ("in", "../aeneas/tools/res/audio.mp3"),
+                ("in", "../aeneas/tools/res/plain.txt"),
                 ("", "task_language=eng|is_text_type=plain|os_task_file_format=dfxp"),
                 ("out", "sonnet.dfxp"),
             ],
@@ -95,8 +92,8 @@ class TestExecuteTaskCLI(ExecuteTaskCLICase):
     def test_exec_eaf(self):
         self.execute(
             [
-                ("in", "../tools/res/audio.mp3"),
-                ("in", "../tools/res/plain.txt"),
+                ("in", "../aeneas/tools/res/audio.mp3"),
+                ("in", "../aeneas/tools/res/plain.txt"),
                 ("", "task_language=eng|is_text_type=plain|os_task_file_format=eaf"),
                 ("out", "sonnet.eaf"),
             ],
@@ -106,8 +103,8 @@ class TestExecuteTaskCLI(ExecuteTaskCLICase):
     def test_exec_json(self):
         self.execute(
             [
-                ("in", "../tools/res/audio.mp3"),
-                ("in", "../tools/res/plain.txt"),
+                ("in", "../aeneas/tools/res/audio.mp3"),
+                ("in", "../aeneas/tools/res/plain.txt"),
                 ("", "task_language=eng|is_text_type=plain|os_task_file_format=json"),
                 ("out", "sonnet.json"),
             ],
@@ -117,8 +114,8 @@ class TestExecuteTaskCLI(ExecuteTaskCLICase):
     def test_exec_sbv(self):
         self.execute(
             [
-                ("in", "../tools/res/audio.mp3"),
-                ("in", "../tools/res/subtitles.txt"),
+                ("in", "../aeneas/tools/res/audio.mp3"),
+                ("in", "../aeneas/tools/res/subtitles.txt"),
                 (
                     "",
                     "task_language=eng|is_text_type=subtitles|os_task_file_format=sbv",
@@ -131,8 +128,8 @@ class TestExecuteTaskCLI(ExecuteTaskCLICase):
     def test_exec_smil(self):
         self.execute(
             [
-                ("in", "../tools/res/audio.mp3"),
-                ("in", "../tools/res/page.xhtml"),
+                ("in", "../aeneas/tools/res/audio.mp3"),
+                ("in", "../aeneas/tools/res/page.xhtml"),
                 (
                     "",
                     "task_language=eng|is_text_type=unparsed|is_text_unparsed_id_regex=f[0-9]+|is_text_unparsed_id_sort=numeric|os_task_file_format=smil|os_task_file_smil_audio_ref=p001.mp3|os_task_file_smil_page_ref=p001.xhtml",
@@ -145,8 +142,8 @@ class TestExecuteTaskCLI(ExecuteTaskCLICase):
     def test_exec_smilh(self):
         self.execute(
             [
-                ("in", "../tools/res/audio.mp3"),
-                ("in", "../tools/res/page.xhtml"),
+                ("in", "../aeneas/tools/res/audio.mp3"),
+                ("in", "../aeneas/tools/res/page.xhtml"),
                 (
                     "",
                     "task_language=eng|is_text_type=unparsed|is_text_unparsed_id_regex=f[0-9]+|is_text_unparsed_id_sort=numeric|os_task_file_format=smilh|os_task_file_smil_audio_ref=p001.mp3|os_task_file_smil_page_ref=p001.xhtml",
@@ -159,8 +156,8 @@ class TestExecuteTaskCLI(ExecuteTaskCLICase):
     def test_exec_smilm(self):
         self.execute(
             [
-                ("in", "../tools/res/audio.mp3"),
-                ("in", "../tools/res/page.xhtml"),
+                ("in", "../aeneas/tools/res/audio.mp3"),
+                ("in", "../aeneas/tools/res/page.xhtml"),
                 (
                     "",
                     "task_language=eng|is_text_type=unparsed|is_text_unparsed_id_regex=f[0-9]+|is_text_unparsed_id_sort=numeric|os_task_file_format=smilm|os_task_file_smil_audio_ref=p001.mp3|os_task_file_smil_page_ref=p001.xhtml",
@@ -173,8 +170,8 @@ class TestExecuteTaskCLI(ExecuteTaskCLICase):
     def test_exec_srt(self):
         self.execute(
             [
-                ("in", "../tools/res/audio.mp3"),
-                ("in", "../tools/res/subtitles.txt"),
+                ("in", "../aeneas/tools/res/audio.mp3"),
+                ("in", "../aeneas/tools/res/subtitles.txt"),
                 (
                     "",
                     "task_language=eng|is_text_type=subtitles|os_task_file_format=srt",
@@ -187,8 +184,8 @@ class TestExecuteTaskCLI(ExecuteTaskCLICase):
     def test_exec_ssv(self):
         self.execute(
             [
-                ("in", "../tools/res/audio.mp3"),
-                ("in", "../tools/res/plain.txt"),
+                ("in", "../aeneas/tools/res/audio.mp3"),
+                ("in", "../aeneas/tools/res/plain.txt"),
                 ("", "task_language=eng|is_text_type=plain|os_task_file_format=ssv"),
                 ("out", "sonnet.ssv"),
             ],
@@ -198,8 +195,8 @@ class TestExecuteTaskCLI(ExecuteTaskCLICase):
     def test_exec_ssvh(self):
         self.execute(
             [
-                ("in", "../tools/res/audio.mp3"),
-                ("in", "../tools/res/plain.txt"),
+                ("in", "../aeneas/tools/res/audio.mp3"),
+                ("in", "../aeneas/tools/res/plain.txt"),
                 ("", "task_language=eng|is_text_type=plain|os_task_file_format=ssvh"),
                 ("out", "sonnet.ssvh"),
             ],
@@ -209,8 +206,8 @@ class TestExecuteTaskCLI(ExecuteTaskCLICase):
     def test_exec_ssvm(self):
         self.execute(
             [
-                ("in", "../tools/res/audio.mp3"),
-                ("in", "../tools/res/plain.txt"),
+                ("in", "../aeneas/tools/res/audio.mp3"),
+                ("in", "../aeneas/tools/res/plain.txt"),
                 ("", "task_language=eng|is_text_type=plain|os_task_file_format=ssvm"),
                 ("out", "sonnet.ssvm"),
             ],
@@ -220,8 +217,8 @@ class TestExecuteTaskCLI(ExecuteTaskCLICase):
     def test_exec_sub(self):
         self.execute(
             [
-                ("in", "../tools/res/audio.mp3"),
-                ("in", "../tools/res/subtitles.txt"),
+                ("in", "../aeneas/tools/res/audio.mp3"),
+                ("in", "../aeneas/tools/res/subtitles.txt"),
                 (
                     "",
                     "task_language=eng|is_text_type=subtitles|os_task_file_format=sub",
@@ -234,8 +231,8 @@ class TestExecuteTaskCLI(ExecuteTaskCLICase):
     def test_exec_tab(self):
         self.execute(
             [
-                ("in", "../tools/res/audio.mp3"),
-                ("in", "../tools/res/plain.txt"),
+                ("in", "../aeneas/tools/res/audio.mp3"),
+                ("in", "../aeneas/tools/res/plain.txt"),
                 ("", "task_language=eng|is_text_type=plain|os_task_file_format=tab"),
                 ("out", "sonnet.tab"),
             ],
@@ -245,8 +242,8 @@ class TestExecuteTaskCLI(ExecuteTaskCLICase):
     def test_exec_tsv(self):
         self.execute(
             [
-                ("in", "../tools/res/audio.mp3"),
-                ("in", "../tools/res/plain.txt"),
+                ("in", "../aeneas/tools/res/audio.mp3"),
+                ("in", "../aeneas/tools/res/plain.txt"),
                 ("", "task_language=eng|is_text_type=plain|os_task_file_format=tsv"),
                 ("out", "sonnet.tsv"),
             ],
@@ -256,8 +253,8 @@ class TestExecuteTaskCLI(ExecuteTaskCLICase):
     def test_exec_tsvh(self):
         self.execute(
             [
-                ("in", "../tools/res/audio.mp3"),
-                ("in", "../tools/res/plain.txt"),
+                ("in", "../aeneas/tools/res/audio.mp3"),
+                ("in", "../aeneas/tools/res/plain.txt"),
                 ("", "task_language=eng|is_text_type=plain|os_task_file_format=tsvh"),
                 ("out", "sonnet.tsvh"),
             ],
@@ -267,8 +264,8 @@ class TestExecuteTaskCLI(ExecuteTaskCLICase):
     def test_exec_tsvm(self):
         self.execute(
             [
-                ("in", "../tools/res/audio.mp3"),
-                ("in", "../tools/res/plain.txt"),
+                ("in", "../aeneas/tools/res/audio.mp3"),
+                ("in", "../aeneas/tools/res/plain.txt"),
                 ("", "task_language=eng|is_text_type=plain|os_task_file_format=tsvm"),
                 ("out", "sonnet.tsvm"),
             ],
@@ -278,8 +275,8 @@ class TestExecuteTaskCLI(ExecuteTaskCLICase):
     def test_exec_ttml(self):
         self.execute(
             [
-                ("in", "../tools/res/audio.mp3"),
-                ("in", "../tools/res/subtitles.txt"),
+                ("in", "../aeneas/tools/res/audio.mp3"),
+                ("in", "../aeneas/tools/res/subtitles.txt"),
                 (
                     "",
                     "task_language=eng|is_text_type=subtitles|os_task_file_format=ttml",
@@ -292,8 +289,8 @@ class TestExecuteTaskCLI(ExecuteTaskCLICase):
     def test_exec_txt(self):
         self.execute(
             [
-                ("in", "../tools/res/audio.mp3"),
-                ("in", "../tools/res/plain.txt"),
+                ("in", "../aeneas/tools/res/audio.mp3"),
+                ("in", "../aeneas/tools/res/plain.txt"),
                 ("", "task_language=eng|is_text_type=plain|os_task_file_format=txt"),
                 ("out", "sonnet.txt"),
             ],
@@ -303,8 +300,8 @@ class TestExecuteTaskCLI(ExecuteTaskCLICase):
     def test_exec_txth(self):
         self.execute(
             [
-                ("in", "../tools/res/audio.mp3"),
-                ("in", "../tools/res/plain.txt"),
+                ("in", "../aeneas/tools/res/audio.mp3"),
+                ("in", "../aeneas/tools/res/plain.txt"),
                 ("", "task_language=eng|is_text_type=plain|os_task_file_format=txth"),
                 ("out", "sonnet.txth"),
             ],
@@ -314,8 +311,8 @@ class TestExecuteTaskCLI(ExecuteTaskCLICase):
     def test_exec_txtm(self):
         self.execute(
             [
-                ("in", "../tools/res/audio.mp3"),
-                ("in", "../tools/res/plain.txt"),
+                ("in", "../aeneas/tools/res/audio.mp3"),
+                ("in", "../aeneas/tools/res/plain.txt"),
                 ("", "task_language=eng|is_text_type=plain|os_task_file_format=txtm"),
                 ("out", "sonnet.txtm"),
             ],
@@ -325,8 +322,8 @@ class TestExecuteTaskCLI(ExecuteTaskCLICase):
     def test_exec_vtt(self):
         self.execute(
             [
-                ("in", "../tools/res/audio.mp3"),
-                ("in", "../tools/res/subtitles.txt"),
+                ("in", "../aeneas/tools/res/audio.mp3"),
+                ("in", "../aeneas/tools/res/subtitles.txt"),
                 (
                     "",
                     "task_language=eng|is_text_type=subtitles|os_task_file_format=vtt",
@@ -339,8 +336,8 @@ class TestExecuteTaskCLI(ExecuteTaskCLICase):
     def test_exec_xml(self):
         self.execute(
             [
-                ("in", "../tools/res/audio.mp3"),
-                ("in", "../tools/res/plain.txt"),
+                ("in", "../aeneas/tools/res/audio.mp3"),
+                ("in", "../aeneas/tools/res/plain.txt"),
                 ("", "task_language=eng|is_text_type=plain|os_task_file_format=xml"),
                 ("out", "sonnet.xml"),
             ],

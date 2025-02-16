@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 # aeneas is a Python/C library and a set of tools
 # to automagically synchronize audio and text (aka forced alignment)
 #
@@ -20,8 +18,7 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-
-from aeneas.tests.common import ExecuteTaskCLICase
+from .common import ExecuteTaskCLICase
 
 
 class TestExecuteTaskCLI(ExecuteTaskCLICase):
@@ -82,8 +79,8 @@ class TestExecuteTaskCLI(ExecuteTaskCLICase):
     def test_exec_srt_max_audio_length(self):
         self.execute(
             [
-                ("in", "../tools/res/audio.mp3"),
-                ("in", "../tools/res/subtitles.txt"),
+                ("in", "../aeneas/tools/res/audio.mp3"),
+                ("in", "../aeneas/tools/res/subtitles.txt"),
                 (
                     "",
                     "task_language=eng|is_text_type=subtitles|os_task_file_format=srt",
@@ -97,8 +94,8 @@ class TestExecuteTaskCLI(ExecuteTaskCLICase):
     def test_exec_srt_max_text_length(self):
         self.execute(
             [
-                ("in", "../tools/res/audio.mp3"),
-                ("in", "../tools/res/subtitles.txt"),
+                ("in", "../aeneas/tools/res/audio.mp3"),
+                ("in", "../aeneas/tools/res/subtitles.txt"),
                 (
                     "",
                     "task_language=eng|is_text_type=subtitles|os_task_file_format=srt",
@@ -113,7 +110,7 @@ class TestExecuteTaskCLI(ExecuteTaskCLICase):
         self.execute(
             [
                 ("", "/foo/bar/baz.mp3"),
-                ("in", "../tools/res/subtitles.txt"),
+                ("in", "../aeneas/tools/res/subtitles.txt"),
                 (
                     "",
                     "task_language=eng|is_text_type=subtitles|os_task_file_format=srt",
@@ -126,7 +123,7 @@ class TestExecuteTaskCLI(ExecuteTaskCLICase):
     def test_exec_cannot_read_2(self):
         self.execute(
             [
-                ("in", "../tools/res/audio.mp3"),
+                ("in", "../aeneas/tools/res/audio.mp3"),
                 ("", "/foo/bar/baz.txt"),
                 (
                     "",
@@ -140,8 +137,8 @@ class TestExecuteTaskCLI(ExecuteTaskCLICase):
     def test_exec_cannot_write(self):
         self.execute(
             [
-                ("in", "../tools/res/audio.mp3"),
-                ("in", "../tools/res/subtitles.txt"),
+                ("in", "../aeneas/tools/res/audio.mp3"),
+                ("in", "../aeneas/tools/res/subtitles.txt"),
                 (
                     "",
                     "task_language=eng|is_text_type=subtitles|os_task_file_format=srt",
@@ -154,7 +151,7 @@ class TestExecuteTaskCLI(ExecuteTaskCLICase):
     def test_exec_missing_1(self):
         self.execute(
             [
-                ("in", "../tools/res/subtitles.txt"),
+                ("in", "../aeneas/tools/res/subtitles.txt"),
                 (
                     "",
                     "task_language=eng|is_text_type=subtitles|os_task_file_format=srt",
@@ -167,7 +164,7 @@ class TestExecuteTaskCLI(ExecuteTaskCLICase):
     def test_exec_missing_2(self):
         self.execute(
             [
-                ("in", "../tools/res/audio.mp3"),
+                ("in", "../aeneas/tools/res/audio.mp3"),
                 (
                     "",
                     "task_language=eng|is_text_type=subtitles|os_task_file_format=srt",
@@ -180,8 +177,8 @@ class TestExecuteTaskCLI(ExecuteTaskCLICase):
     def test_exec_missing_3(self):
         self.execute(
             [
-                ("in", "../tools/res/audio.mp3"),
-                ("in", "../tools/res/subtitles.txt"),
+                ("in", "../aeneas/tools/res/audio.mp3"),
+                ("in", "../aeneas/tools/res/subtitles.txt"),
                 ("out", "sonnet.srt"),
             ],
             2,
@@ -190,8 +187,8 @@ class TestExecuteTaskCLI(ExecuteTaskCLICase):
     def test_exec_missing_4(self):
         self.execute(
             [
-                ("in", "../tools/res/audio.mp3"),
-                ("in", "../tools/res/subtitles.txt"),
+                ("in", "../aeneas/tools/res/audio.mp3"),
+                ("in", "../aeneas/tools/res/subtitles.txt"),
                 (
                     "",
                     "task_language=eng|is_text_type=subtitles|os_task_file_format=srt",

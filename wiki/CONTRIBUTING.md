@@ -12,7 +12,7 @@ Just a few rules, to make life easier for both you and me:
 3. Add unit tests for the code you are submitting,
    either adding them to the existing unit tests
    or creating a new file
-   in `aeneas/tests/`.
+   in `tests/`.
 
 4. **By opening a pull request,
    you automatically agree to apply

@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 # aeneas is a Python/C library and a set of tools
 # to automagically synchronize audio and text (aka forced alignment)
 #
@@ -22,7 +20,7 @@
 
 import tempfile
 
-from aeneas.tests.common import ExecuteTaskCLICase, slow_test, extra_test
+from .common import ExecuteTaskCLICase, slow_test, extra_test
 
 
 @slow_test
@@ -30,8 +28,8 @@ class TestExecuteTaskCLI(ExecuteTaskCLICase):
     def test_exec_aba_no_zero_duration(self):
         self.execute(
             [
-                ("in", "../tools/res/audio.mp3"),
-                ("in", "../tools/res/subtitles.txt"),
+                ("in", "../aeneas/tools/res/audio.mp3"),
+                ("in", "../aeneas/tools/res/subtitles.txt"),
                 (
                     "",
                     "task_language=eng|is_text_type=subtitles|os_task_file_format=srt|task_adjust_boundary_no_zero=True",
@@ -45,8 +43,8 @@ class TestExecuteTaskCLI(ExecuteTaskCLICase):
     def test_exec_aba_nonspeech_tolerance(self):
         self.execute(
             [
-                ("in", "../tools/res/audio.mp3"),
-                ("in", "../tools/res/subtitles.txt"),
+                ("in", "../aeneas/tools/res/audio.mp3"),
+                ("in", "../aeneas/tools/res/subtitles.txt"),
                 (
                     "",
                     "task_language=eng|is_text_type=subtitles|os_task_file_format=srt|task_adjust_boundary_no_zero=True",
@@ -60,8 +58,8 @@ class TestExecuteTaskCLI(ExecuteTaskCLICase):
     def test_exec_allow_unlisted_language(self):
         self.execute(
             [
-                ("in", "../tools/res/audio.mp3"),
-                ("in", "../tools/res/subtitles.txt"),
+                ("in", "../aeneas/tools/res/audio.mp3"),
+                ("in", "../aeneas/tools/res/subtitles.txt"),
                 (
                     "",
                     "task_language=en-zz|is_text_type=subtitles|os_task_file_format=srt",
@@ -76,8 +74,8 @@ class TestExecuteTaskCLI(ExecuteTaskCLICase):
     def test_exec_c_extensions(self):
         self.execute(
             [
-                ("in", "../tools/res/audio.mp3"),
-                ("in", "../tools/res/subtitles.txt"),
+                ("in", "../aeneas/tools/res/audio.mp3"),
+                ("in", "../aeneas/tools/res/subtitles.txt"),
                 (
                     "",
                     "task_language=eng|is_text_type=subtitles|os_task_file_format=srt",
@@ -91,8 +89,8 @@ class TestExecuteTaskCLI(ExecuteTaskCLICase):
     def test_exec_cdtw(self):
         self.execute(
             [
-                ("in", "../tools/res/audio.mp3"),
-                ("in", "../tools/res/subtitles.txt"),
+                ("in", "../aeneas/tools/res/audio.mp3"),
+                ("in", "../aeneas/tools/res/subtitles.txt"),
                 (
                     "",
                     "task_language=eng|is_text_type=subtitles|os_task_file_format=srt",
@@ -106,8 +104,8 @@ class TestExecuteTaskCLI(ExecuteTaskCLICase):
     def test_exec_cew(self):
         self.execute(
             [
-                ("in", "../tools/res/audio.mp3"),
-                ("in", "../tools/res/subtitles.txt"),
+                ("in", "../aeneas/tools/res/audio.mp3"),
+                ("in", "../aeneas/tools/res/subtitles.txt"),
                 (
                     "",
                     "task_language=eng|is_text_type=subtitles|os_task_file_format=srt",
@@ -121,8 +119,8 @@ class TestExecuteTaskCLI(ExecuteTaskCLICase):
     def test_exec_cew_subprocess_enabled(self):
         self.execute(
             [
-                ("in", "../tools/res/audio.mp3"),
-                ("in", "../tools/res/subtitles.txt"),
+                ("in", "../aeneas/tools/res/audio.mp3"),
+                ("in", "../aeneas/tools/res/subtitles.txt"),
                 (
                     "",
                     "task_language=eng|is_text_type=subtitles|os_task_file_format=srt",
@@ -136,8 +134,8 @@ class TestExecuteTaskCLI(ExecuteTaskCLICase):
     def test_exec_cew_subprocess_path(self):
         self.execute(
             [
-                ("in", "../tools/res/audio.mp3"),
-                ("in", "../tools/res/subtitles.txt"),
+                ("in", "../aeneas/tools/res/audio.mp3"),
+                ("in", "../aeneas/tools/res/subtitles.txt"),
                 (
                     "",
                     "task_language=eng|is_text_type=subtitles|os_task_file_format=srt",
@@ -152,8 +150,8 @@ class TestExecuteTaskCLI(ExecuteTaskCLICase):
     def test_exec_cfw(self):
         self.execute(
             [
-                ("in", "../tools/res/audio.mp3"),
-                ("in", "../tools/res/subtitles.txt"),
+                ("in", "../aeneas/tools/res/audio.mp3"),
+                ("in", "../aeneas/tools/res/subtitles.txt"),
                 (
                     "",
                     "task_language=eng|is_text_type=subtitles|os_task_file_format=srt",
@@ -167,8 +165,8 @@ class TestExecuteTaskCLI(ExecuteTaskCLICase):
     def test_exec_cmfcc(self):
         self.execute(
             [
-                ("in", "../tools/res/audio.mp3"),
-                ("in", "../tools/res/subtitles.txt"),
+                ("in", "../aeneas/tools/res/audio.mp3"),
+                ("in", "../aeneas/tools/res/subtitles.txt"),
                 (
                     "",
                     "task_language=eng|is_text_type=subtitles|os_task_file_format=srt",
@@ -182,8 +180,8 @@ class TestExecuteTaskCLI(ExecuteTaskCLICase):
     def test_exec_dtw_algorithm(self):
         self.execute(
             [
-                ("in", "../tools/res/audio.mp3"),
-                ("in", "../tools/res/subtitles.txt"),
+                ("in", "../aeneas/tools/res/audio.mp3"),
+                ("in", "../aeneas/tools/res/subtitles.txt"),
                 (
                     "",
                     "task_language=eng|is_text_type=subtitles|os_task_file_format=srt",
@@ -197,8 +195,8 @@ class TestExecuteTaskCLI(ExecuteTaskCLICase):
     def test_exec_dtw_margin(self):
         self.execute(
             [
-                ("in", "../tools/res/audio.mp3"),
-                ("in", "../tools/res/subtitles.txt"),
+                ("in", "../aeneas/tools/res/audio.mp3"),
+                ("in", "../aeneas/tools/res/subtitles.txt"),
                 (
                     "",
                     "task_language=eng|is_text_type=subtitles|os_task_file_format=srt",
@@ -212,8 +210,8 @@ class TestExecuteTaskCLI(ExecuteTaskCLICase):
     def test_exec_ffmpeg_sample_rate(self):
         self.execute(
             [
-                ("in", "../tools/res/audio.mp3"),
-                ("in", "../tools/res/subtitles.txt"),
+                ("in", "../aeneas/tools/res/audio.mp3"),
+                ("in", "../aeneas/tools/res/subtitles.txt"),
                 (
                     "",
                     "task_language=eng|is_text_type=subtitles|os_task_file_format=srt",
@@ -227,8 +225,8 @@ class TestExecuteTaskCLI(ExecuteTaskCLICase):
     def test_exec_mfcc_emphasis_factor(self):
         self.execute(
             [
-                ("in", "../tools/res/audio.mp3"),
-                ("in", "../tools/res/subtitles.txt"),
+                ("in", "../aeneas/tools/res/audio.mp3"),
+                ("in", "../aeneas/tools/res/subtitles.txt"),
                 (
                     "",
                     "task_language=eng|is_text_type=subtitles|os_task_file_format=srt",
@@ -242,8 +240,8 @@ class TestExecuteTaskCLI(ExecuteTaskCLICase):
     def test_exec_mfcc_fft_order(self):
         self.execute(
             [
-                ("in", "../tools/res/audio.mp3"),
-                ("in", "../tools/res/subtitles.txt"),
+                ("in", "../aeneas/tools/res/audio.mp3"),
+                ("in", "../aeneas/tools/res/subtitles.txt"),
                 (
                     "",
                     "task_language=eng|is_text_type=subtitles|os_task_file_format=srt",
@@ -257,8 +255,8 @@ class TestExecuteTaskCLI(ExecuteTaskCLICase):
     def test_exec_mfcc_filters(self):
         self.execute(
             [
-                ("in", "../tools/res/audio.mp3"),
-                ("in", "../tools/res/subtitles.txt"),
+                ("in", "../aeneas/tools/res/audio.mp3"),
+                ("in", "../aeneas/tools/res/subtitles.txt"),
                 (
                     "",
                     "task_language=eng|is_text_type=subtitles|os_task_file_format=srt",
@@ -272,8 +270,8 @@ class TestExecuteTaskCLI(ExecuteTaskCLICase):
     def test_exec_mfcc_lower_frequency(self):
         self.execute(
             [
-                ("in", "../tools/res/audio.mp3"),
-                ("in", "../tools/res/subtitles.txt"),
+                ("in", "../aeneas/tools/res/audio.mp3"),
+                ("in", "../aeneas/tools/res/subtitles.txt"),
                 (
                     "",
                     "task_language=eng|is_text_type=subtitles|os_task_file_format=srt",
@@ -287,8 +285,8 @@ class TestExecuteTaskCLI(ExecuteTaskCLICase):
     def test_exec_mfcc_size(self):
         self.execute(
             [
-                ("in", "../tools/res/audio.mp3"),
-                ("in", "../tools/res/subtitles.txt"),
+                ("in", "../aeneas/tools/res/audio.mp3"),
+                ("in", "../aeneas/tools/res/subtitles.txt"),
                 (
                     "",
                     "task_language=eng|is_text_type=subtitles|os_task_file_format=srt",
@@ -302,8 +300,8 @@ class TestExecuteTaskCLI(ExecuteTaskCLICase):
     def test_exec_mfcc_upper_frequency(self):
         self.execute(
             [
-                ("in", "../tools/res/audio.mp3"),
-                ("in", "../tools/res/subtitles.txt"),
+                ("in", "../aeneas/tools/res/audio.mp3"),
+                ("in", "../aeneas/tools/res/subtitles.txt"),
                 (
                     "",
                     "task_language=eng|is_text_type=subtitles|os_task_file_format=srt",
@@ -317,8 +315,8 @@ class TestExecuteTaskCLI(ExecuteTaskCLICase):
     def test_exec_mfcc_window_length(self):
         self.execute(
             [
-                ("in", "../tools/res/audio.mp3"),
-                ("in", "../tools/res/subtitles.txt"),
+                ("in", "../aeneas/tools/res/audio.mp3"),
+                ("in", "../aeneas/tools/res/subtitles.txt"),
                 (
                     "",
                     "task_language=eng|is_text_type=subtitles|os_task_file_format=srt",
@@ -332,8 +330,8 @@ class TestExecuteTaskCLI(ExecuteTaskCLICase):
     def test_exec_mfcc_window_shift(self):
         self.execute(
             [
-                ("in", "../tools/res/audio.mp3"),
-                ("in", "../tools/res/subtitles.txt"),
+                ("in", "../aeneas/tools/res/audio.mp3"),
+                ("in", "../aeneas/tools/res/subtitles.txt"),
                 (
                     "",
                     "task_language=eng|is_text_type=subtitles|os_task_file_format=srt",
@@ -347,8 +345,8 @@ class TestExecuteTaskCLI(ExecuteTaskCLICase):
     def test_exec_mfcc_mask_nonspeech(self):
         self.execute(
             [
-                ("in", "../tools/res/audio.mp3"),
-                ("in", "../tools/res/subtitles.txt"),
+                ("in", "../aeneas/tools/res/audio.mp3"),
+                ("in", "../aeneas/tools/res/subtitles.txt"),
                 (
                     "",
                     "task_language=eng|is_text_type=subtitles|os_task_file_format=srt|task_adjust_boundary_nonspeech_min=0.500|task_adjust_boundary_nonspeech_string=REMOVE",
@@ -362,8 +360,8 @@ class TestExecuteTaskCLI(ExecuteTaskCLICase):
     def test_exec_mfcc_mask_extend_speech_after(self):
         self.execute(
             [
-                ("in", "../tools/res/audio.mp3"),
-                ("in", "../tools/res/subtitles.txt"),
+                ("in", "../aeneas/tools/res/audio.mp3"),
+                ("in", "../aeneas/tools/res/subtitles.txt"),
                 (
                     "",
                     "task_language=eng|is_text_type=subtitles|os_task_file_format=srt|task_adjust_boundary_nonspeech_min=0.500|task_adjust_boundary_nonspeech_string=REMOVE",
@@ -377,8 +375,8 @@ class TestExecuteTaskCLI(ExecuteTaskCLICase):
     def test_exec_mfcc_mask_extend_speech_before(self):
         self.execute(
             [
-                ("in", "../tools/res/audio.mp3"),
-                ("in", "../tools/res/subtitles.txt"),
+                ("in", "../aeneas/tools/res/audio.mp3"),
+                ("in", "../aeneas/tools/res/subtitles.txt"),
                 (
                     "",
                     "task_language=eng|is_text_type=subtitles|os_task_file_format=srt|task_adjust_boundary_nonspeech_min=0.500|task_adjust_boundary_nonspeech_string=REMOVE",
@@ -392,8 +390,8 @@ class TestExecuteTaskCLI(ExecuteTaskCLICase):
     def test_exec_mfcc_mask_log_energy_threshold(self):
         self.execute(
             [
-                ("in", "../tools/res/audio.mp3"),
-                ("in", "../tools/res/subtitles.txt"),
+                ("in", "../aeneas/tools/res/audio.mp3"),
+                ("in", "../aeneas/tools/res/subtitles.txt"),
                 (
                     "",
                     "task_language=eng|is_text_type=subtitles|os_task_file_format=srt|task_adjust_boundary_nonspeech_min=0.500|task_adjust_boundary_nonspeech_string=REMOVE",
@@ -410,8 +408,8 @@ class TestExecuteTaskCLI(ExecuteTaskCLICase):
     def test_exec_mfcc_mask_min_nonspeech_length(self):
         self.execute(
             [
-                ("in", "../tools/res/audio.mp3"),
-                ("in", "../tools/res/subtitles.txt"),
+                ("in", "../aeneas/tools/res/audio.mp3"),
+                ("in", "../aeneas/tools/res/subtitles.txt"),
                 (
                     "",
                     "task_language=eng|is_text_type=subtitles|os_task_file_format=srt|task_adjust_boundary_nonspeech_min=0.500|task_adjust_boundary_nonspeech_string=REMOVE",
@@ -425,8 +423,8 @@ class TestExecuteTaskCLI(ExecuteTaskCLICase):
     def test_exec_safety_checks(self):
         self.execute(
             [
-                ("in", "../tools/res/audio.mp3"),
-                ("in", "../tools/res/subtitles.txt"),
+                ("in", "../aeneas/tools/res/audio.mp3"),
+                ("in", "../aeneas/tools/res/subtitles.txt"),
                 (
                     "",
                     "task_language=eng|is_text_type=subtitles|os_task_file_format=srt",
@@ -441,8 +439,8 @@ class TestExecuteTaskCLI(ExecuteTaskCLICase):
         with tempfile.TemporaryDirectory() as tmp_dir:
             self.execute(
                 [
-                    ("in", "../tools/res/audio.mp3"),
-                    ("in", "../tools/res/subtitles.txt"),
+                    ("in", "../aeneas/tools/res/audio.mp3"),
+                    ("in", "../aeneas/tools/res/subtitles.txt"),
                     (
                         "",
                         "task_language=eng|is_text_type=subtitles|os_task_file_format=srt",
@@ -457,8 +455,8 @@ class TestExecuteTaskCLI(ExecuteTaskCLICase):
     def test_exec_tts(self):
         self.execute(
             [
-                ("in", "../tools/res/audio.mp3"),
-                ("in", "../tools/res/subtitles.txt"),
+                ("in", "../aeneas/tools/res/audio.mp3"),
+                ("in", "../aeneas/tools/res/subtitles.txt"),
                 (
                     "",
                     "task_language=eng|is_text_type=subtitles|os_task_file_format=srt",
@@ -473,8 +471,8 @@ class TestExecuteTaskCLI(ExecuteTaskCLICase):
     def test_exec_tts_cache(self):
         self.execute(
             [
-                ("in", "../tools/res/audio.mp3"),
-                ("in", "../tools/res/subtitles.txt"),
+                ("in", "../aeneas/tools/res/audio.mp3"),
+                ("in", "../aeneas/tools/res/subtitles.txt"),
                 (
                     "",
                     "task_language=eng|is_text_type=subtitles|os_task_file_format=srt",
@@ -488,8 +486,8 @@ class TestExecuteTaskCLI(ExecuteTaskCLICase):
     def test_exec_voice_code(self):
         self.execute(
             [
-                ("in", "../tools/res/audio.mp3"),
-                ("in", "../tools/res/subtitles.txt"),
+                ("in", "../aeneas/tools/res/audio.mp3"),
+                ("in", "../aeneas/tools/res/subtitles.txt"),
                 (
                     "",
                     "task_language=eng|is_text_type=subtitles|os_task_file_format=srt",
@@ -503,8 +501,8 @@ class TestExecuteTaskCLI(ExecuteTaskCLICase):
     def test_exec_vad_extend_speech_after(self):
         self.execute(
             [
-                ("in", "../tools/res/audio.mp3"),
-                ("in", "../tools/res/subtitles.txt"),
+                ("in", "../aeneas/tools/res/audio.mp3"),
+                ("in", "../aeneas/tools/res/subtitles.txt"),
                 (
                     "",
                     "task_language=eng|is_text_type=subtitles|os_task_file_format=srt|task_adjust_boundary_algorithm=rate|task_adjust_boundary_rate_value=12.000",
@@ -518,8 +516,8 @@ class TestExecuteTaskCLI(ExecuteTaskCLICase):
     def test_exec_vad_extend_speech_before(self):
         self.execute(
             [
-                ("in", "../tools/res/audio.mp3"),
-                ("in", "../tools/res/subtitles.txt"),
+                ("in", "../aeneas/tools/res/audio.mp3"),
+                ("in", "../aeneas/tools/res/subtitles.txt"),
                 (
                     "",
                     "task_language=eng|is_text_type=subtitles|os_task_file_format=srt|task_adjust_boundary_algorithm=rate|task_adjust_boundary_rate_value=12.000",
@@ -533,8 +531,8 @@ class TestExecuteTaskCLI(ExecuteTaskCLICase):
     def test_exec_vad_log_energy_threshold(self):
         self.execute(
             [
-                ("in", "../tools/res/audio.mp3"),
-                ("in", "../tools/res/subtitles.txt"),
+                ("in", "../aeneas/tools/res/audio.mp3"),
+                ("in", "../aeneas/tools/res/subtitles.txt"),
                 (
                     "",
                     "task_language=eng|is_text_type=subtitles|os_task_file_format=srt|task_adjust_boundary_algorithm=rate|task_adjust_boundary_rate_value=12.000",
@@ -548,8 +546,8 @@ class TestExecuteTaskCLI(ExecuteTaskCLICase):
     def test_exec_vad_min_nonspeech_length(self):
         self.execute(
             [
-                ("in", "../tools/res/audio.mp3"),
-                ("in", "../tools/res/subtitles.txt"),
+                ("in", "../aeneas/tools/res/audio.mp3"),
+                ("in", "../aeneas/tools/res/subtitles.txt"),
                 (
                     "",
                     "task_language=eng|is_text_type=subtitles|os_task_file_format=srt|task_adjust_boundary_algorithm=rate|task_adjust_boundary_rate_value=12.000",

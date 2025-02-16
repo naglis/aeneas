@@ -35,13 +35,13 @@ is a verbatim copy from the
 courtesy of Firat Ozdemir.
 See [licenses/finetuneas.txt](https://raw.githubusercontent.com/readbeyond/aeneas/master/licenses/finetuneas.txt) for details.
 
-Audio files contained in the unit tests `aeneas/tests/res/` directory
+Audio files contained in the unit tests `tests/res/` directory
 are adapted from recordings produced by
 the [LibriVox Project](http://www.librivox.org)
 and they are in the public domain.
 See [licenses/LibriVox.txt](https://raw.githubusercontent.com/readbeyond/aeneas/master/licenses/LibriVox.txt) for details.
 
-Text files contained in the unit tests `aeneas/tests/res/` directory
+Text files contained in the unit tests `tests/res/` directory
 are adapted from files produced by
 the [Project Gutenberg](http://www.gutenberg.org)
 and they are in the public domain.

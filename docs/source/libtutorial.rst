@@ -337,7 +337,7 @@ The main ``aeneas`` package contains several subpackages:
 * :mod:`aeneas.cmfcc` (Python C extension)
 * :mod:`aeneas.cwave` (Python C extension)
 * :mod:`aeneas.syncmap`
-* :mod:`aeneas.tests`
+* :mod:`tests`
 * :mod:`aeneas.tools`
 * :mod:`aeneas.ttswrappers`
 
@@ -372,14 +372,14 @@ and the following modules:
     validator
 
 
-Package ``aeneas.tests``
+Package ``tests``
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
-The ``aeneas.tests`` package contains the **unit test** files for ``aeneas``.
+The ``tests`` package contains the **unit test** files for ``aeneas``.
 
 Resources needed to run the tests,
 for example audio and text files,
-are located in the ``aeneas/tests/res/`` directory.
+are located in the ``tests/res/`` directory.
 
 .. _libtutorial_tools:
 

@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 # aeneas is a Python/C library and a set of tools
 # to automagically synchronize audio and text (aka forced alignment)
 #
@@ -20,9 +18,9 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-
 from aeneas.tools.run_vad import RunVADCLI
-from aeneas.tests.common import ExecuteCLICase
+
+from .common import ExecuteCLICase
 
 
 class TestRunVADCLI(ExecuteCLICase):
@@ -38,7 +36,7 @@ class TestRunVADCLI(ExecuteCLICase):
     def test_run_both(self):
         self.execute(
             [
-                ("in", "../tools/res/audio.mp3"),
+                ("in", "../aeneas/tools/res/audio.mp3"),
                 ("", "both"),
                 ("out", "both.txt"),
             ],
@@ -48,7 +46,7 @@ class TestRunVADCLI(ExecuteCLICase):
     def test_run_both_stdout(self):
         self.execute(
             [
-                ("in", "../tools/res/audio.mp3"),
+                ("in", "../aeneas/tools/res/audio.mp3"),
                 ("", "both"),
             ],
             0,
@@ -57,7 +55,7 @@ class TestRunVADCLI(ExecuteCLICase):
     def test_run_speech(self):
         self.execute(
             [
-                ("in", "../tools/res/audio.mp3"),
+                ("in", "../aeneas/tools/res/audio.mp3"),
                 ("", "speech"),
                 ("out", "speech.txt"),
             ],
@@ -67,7 +65,7 @@ class TestRunVADCLI(ExecuteCLICase):
     def test_run_speech_stdout(self):
         self.execute(
             [
-                ("in", "../tools/res/audio.mp3"),
+                ("in", "../aeneas/tools/res/audio.mp3"),
                 ("", "speech"),
             ],
             0,
@@ -76,7 +74,7 @@ class TestRunVADCLI(ExecuteCLICase):
     def test_run_nonspeech(self):
         self.execute(
             [
-                ("in", "../tools/res/audio.mp3"),
+                ("in", "../aeneas/tools/res/audio.mp3"),
                 ("", "nonspeech"),
                 ("out", "nonspeech.txt"),
             ],
@@ -86,7 +84,7 @@ class TestRunVADCLI(ExecuteCLICase):
     def test_run_nonspeech_stdout(self):
         self.execute(
             [
-                ("in", "../tools/res/audio.mp3"),
+                ("in", "../aeneas/tools/res/audio.mp3"),
                 ("", "nonspeech"),
             ],
             0,
@@ -95,7 +93,7 @@ class TestRunVADCLI(ExecuteCLICase):
     def test_run_pure(self):
         self.execute(
             [
-                ("in", "../tools/res/audio.mp3"),
+                ("in", "../aeneas/tools/res/audio.mp3"),
                 ("", "both"),
                 ("out", "both.txt"),
                 ("", '-r="c_extensions=False"'),
@@ -106,7 +104,7 @@ class TestRunVADCLI(ExecuteCLICase):
     def test_run_no_cmfcc(self):
         self.execute(
             [
-                ("in", "../tools/res/audio.mp3"),
+                ("in", "../aeneas/tools/res/audio.mp3"),
                 ("", "both"),
                 ("out", "both.txt"),
                 ("", '-r="cmfcc=False"'),
@@ -117,7 +115,7 @@ class TestRunVADCLI(ExecuteCLICase):
     def test_run_extend_after(self):
         self.execute(
             [
-                ("in", "../tools/res/audio.mp3"),
+                ("in", "../aeneas/tools/res/audio.mp3"),
                 ("", "both"),
                 ("out", "both.txt"),
                 ("", '-r="vad_extend_speech_after=0.100"'),
@@ -128,7 +126,7 @@ class TestRunVADCLI(ExecuteCLICase):
     def test_run_extend_before(self):
         self.execute(
             [
-                ("in", "../tools/res/audio.mp3"),
+                ("in", "../aeneas/tools/res/audio.mp3"),
                 ("", "both"),
                 ("out", "both.txt"),
                 ("", '-r="vad_extend_speech_before=0.100"'),
@@ -139,7 +137,7 @@ class TestRunVADCLI(ExecuteCLICase):
     def test_run_energy_threshold(self):
         self.execute(
             [
-                ("in", "../tools/res/audio.mp3"),
+                ("in", "../aeneas/tools/res/audio.mp3"),
                 ("", "both"),
                 ("out", "both.txt"),
                 ("", '-r="vad_log_energy_threshold=0.8"'),
@@ -150,7 +148,7 @@ class TestRunVADCLI(ExecuteCLICase):
     def test_run_min_nonspeech(self):
         self.execute(
             [
-                ("in", "../tools/res/audio.mp3"),
+                ("in", "../aeneas/tools/res/audio.mp3"),
                 ("", "both"),
                 ("out", "both.txt"),
                 ("", '-r="vad_min_nonspeech_length=0.5"'),
@@ -171,7 +169,7 @@ class TestRunVADCLI(ExecuteCLICase):
     def test_run_missing_1(self):
         self.execute(
             [
-                ("in", "../tools/res/audio.mp3"),
+                ("in", "../aeneas/tools/res/audio.mp3"),
                 ("out", "both.txt"),
             ],
             2,
@@ -189,7 +187,7 @@ class TestRunVADCLI(ExecuteCLICase):
     def test_run_bad(self):
         self.execute(
             [
-                ("in", "../tools/res/audio.mp3"),
+                ("in", "../aeneas/tools/res/audio.mp3"),
                 ("", "foo"),
                 ("out", "both.txt"),
             ],
