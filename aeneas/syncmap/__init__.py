@@ -33,6 +33,7 @@ This package contains the following classes:
 """
 
 import copy
+import io
 import itertools
 import logging
 import os
@@ -55,31 +56,28 @@ class SyncMap:
     A synchronization map, that is, a tree of
     :class:`~aeneas.syncmap.fragment.SyncMapFragment`
     objects.
-
-    :param tree: the tree of fragments; if ``None``, an empty one will be created
-    :type  tree: :class:`~aeneas.tree.Tree`
     """
 
-    FINETUNEAS_REPLACEMENTS = [
-        ["<!-- AENEAS_REPLACE_COMMENT_BEGIN -->", "<!-- AENEAS_REPLACE_COMMENT_BEGIN"],
-        ["<!-- AENEAS_REPLACE_COMMENT_END -->", "AENEAS_REPLACE_COMMENT_END -->"],
-        [
+    FINETUNEAS_REPLACEMENTS = (
+        ("<!-- AENEAS_REPLACE_COMMENT_BEGIN -->", "<!-- AENEAS_REPLACE_COMMENT_BEGIN"),
+        ("<!-- AENEAS_REPLACE_COMMENT_END -->", "AENEAS_REPLACE_COMMENT_END -->"),
+        (
             "<!-- AENEAS_REPLACE_UNCOMMENT_BEGIN",
             "<!-- AENEAS_REPLACE_UNCOMMENT_BEGIN -->",
-        ],
-        ["AENEAS_REPLACE_UNCOMMENT_END -->", "<!-- AENEAS_REPLACE_UNCOMMENT_END -->"],
-        ["// AENEAS_REPLACE_SHOW_ID", "showID = true;"],
-        ["// AENEAS_REPLACE_ALIGN_TEXT", 'alignText = "left"'],
-        ["// AENEAS_REPLACE_CONTINUOUS_PLAY", "continuousPlay = true;"],
-        ["// AENEAS_REPLACE_TIME_FORMAT", "timeFormatHHMMSSmmm = true;"],
-    ]
+        ),
+        ("AENEAS_REPLACE_UNCOMMENT_END -->", "<!-- AENEAS_REPLACE_UNCOMMENT_END -->"),
+        ("// AENEAS_REPLACE_SHOW_ID", "showID = true;"),
+        ("// AENEAS_REPLACE_ALIGN_TEXT", 'alignText = "left"'),
+        ("// AENEAS_REPLACE_CONTINUOUS_PLAY", "continuousPlay = true;"),
+        ("// AENEAS_REPLACE_TIME_FORMAT", "timeFormatHHMMSSmmm = true;"),
+    )
     FINETUNEAS_REPLACE_AUDIOFILEPATH = "// AENEAS_REPLACE_AUDIOFILEPATH"
     FINETUNEAS_REPLACE_FRAGMENTS = "// AENEAS_REPLACE_FRAGMENTS"
     FINETUNEAS_REPLACE_OUTPUT_FORMAT = "// AENEAS_REPLACE_OUTPUT_FORMAT"
     FINETUNEAS_REPLACE_SMIL_AUDIOREF = "// AENEAS_REPLACE_SMIL_AUDIOREF"
     FINETUNEAS_REPLACE_SMIL_PAGEREF = "// AENEAS_REPLACE_SMIL_PAGEREF"
     FINETUNEAS_REPLACE_SUGGESTED_FILENAME = "// AENEAS_REPLACE_SUGGESTED_FILENAME"
-    FINETUNEAS_ALLOWED_FORMATS = [
+    FINETUNEAS_ALLOWED_FORMATS = (
         "csv",
         "json",
         "smil",
@@ -90,7 +88,7 @@ class SyncMap:
         "txt",
         "vtt",
         "xml",
-    ]
+    )
     FINETUNEAS_PATH = "../res/finetuneas.html"
 
     def __init__(self, tree: Tree | None = None):
@@ -214,9 +212,11 @@ class SyncMap:
         logger.debug("  Creating SyncMapFragmentList... done")
         logger.debug("  Sorting SyncMapFragmentList...")
         result = True
-        not_head_tail = [leaf for leaf in leaves if not leaf.is_head_or_tail]
+
+        not_head_tail = (leaf for leaf in leaves if not leaf.is_head_or_tail)
         for leaf in not_head_tail:
             smf.add(leaf, sort=False)
+
         try:
             smf.sort()
             logger.debug("  Sorting completed => return True")
@@ -288,6 +288,11 @@ class SyncMap:
         with open(template_path_absolute, encoding="utf-8") as file_obj:
             template = file_obj.read()
 
+        # Serialize to JSON using the JSON SyncMap format.
+        buf = io.StringIO()
+        self.dump(buf, SyncMapFormat.JSON, parameters=parameters)
+        json_string = buf.getvalue()
+
         for search_string, replacement in (
             *self.FINETUNEAS_REPLACEMENTS,
             (
@@ -296,7 +301,7 @@ class SyncMap:
             ),
             (
                 self.FINETUNEAS_REPLACE_FRAGMENTS,
-                f"fragments = ({SyncMapFormatJSON().format(self)}).fragments;",
+                f"fragments = ({json_string}).fragments;",
             ),
             (
                 self.FINETUNEAS_REPLACE_SUGGESTED_FILENAME,

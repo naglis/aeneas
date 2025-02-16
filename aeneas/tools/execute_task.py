@@ -542,6 +542,9 @@ class ExecuteTaskCLI(AbstractCLIProgram):
 
         if output_html:
             parameters = {
+                gc.PPN_TASK_OS_FILE_HEAD_TAIL_FORMAT: task.configuration[
+                    "os_task_file_head_tail_format"
+                ],
                 gc.PPN_TASK_OS_FILE_FORMAT: task.configuration["o_format"],
                 gc.PPN_TASK_OS_FILE_EAF_AUDIO_REF: task.configuration[
                     "o_eaf_audio_ref"

@@ -97,5 +97,5 @@ class SyncMapHeadTailFormat:
 
     """
 
-    ALLOWED_VALUES = [ADD, HIDDEN, STRETCH]
+    ALLOWED_VALUES = (ADD, HIDDEN, STRETCH)
     """ List of all the allowed values """
