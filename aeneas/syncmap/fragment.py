@@ -90,12 +90,7 @@ class SyncMapFragment:
         )
 
     def __str__(self):
-        return "%s %d %.3f %.3f" % (
-            self.text_fragment.identifier,
-            self.fragment_type,
-            self.begin,
-            self.end,
-        )
+        return f"{self.text_fragment.identifier} {self.fragment_type:d} {self.begin:.3f} {self.end:.3f}"
 
     def __eq__(self, other):
         if not isinstance(other, SyncMapFragment):
@@ -116,10 +111,10 @@ class SyncMapFragment:
         return self.interval < other.interval
 
     def __ge__(self, other):
-        return (self > other) or (self == other)
+        return self > other or self == other
 
     def __le__(self, other):
-        return (self < other) or (self == other)
+        return self < other or self == other
 
     @property
     def text_fragment(self) -> TextFragment | None:
@@ -193,12 +188,7 @@ class SyncMapFragment:
 
         .. versionadded:: 1.7.0
         """
-        return "{}\t{:.3f}\t{:.3f}\t{}".format(
-            self.identifier or "",
-            self.interval.begin,
-            self.interval.end,
-            self.text or "",
-        )
+        return f"{self.identifier or ''}\t{self.interval.begin:.3f}\t{self.interval.end:.3f}\t{self.text or ''}"
 
     @property
     def identifier(self) -> str | None:

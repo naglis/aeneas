@@ -257,7 +257,7 @@ class SD(Configurable):
         with tempfile.NamedTemporaryFile(
             suffix=".wav", dir=self.rconf[RuntimeConfiguration.TMP_PATH]
         ) as tmp_file:
-            synt = Synthesizer(rconf=self.rconf)
+            synt = Synthesizer.from_rconf(self.rconf)
             anchors, total_time, synthesized_chars = synt.synthesize(
                 self.text_file, tmp_file.name, quit_after=synt_duration, backwards=tail
             )

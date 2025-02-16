@@ -45,10 +45,13 @@ class TestSynthesizer(unittest.TestCase):
         def inner(c_ext: bool, cew_subprocess: bool, tts_cache: bool):
             tfl = TextFile(gf.absolute_path(path, __file__), TextFileFormat.PLAIN)
             tfl.set_language(Language.ENG)
-            synth = Synthesizer()
-            synth.rconf[RuntimeConfiguration.C_EXTENSIONS] = c_ext
-            synth.rconf[RuntimeConfiguration.CEW_SUBPROCESS_ENABLED] = cew_subprocess
-            synth.rconf[RuntimeConfiguration.TTS_CACHE] = tts_cache
+
+            synth_rconf = RuntimeConfiguration()
+            synth_rconf[RuntimeConfiguration.C_EXTENSIONS] = c_ext
+            synth_rconf[RuntimeConfiguration.CEW_SUBPROCESS_ENABLED] = cew_subprocess
+            synth_rconf[RuntimeConfiguration.TTS_CACHE] = tts_cache
+            synth = Synthesizer.from_rconf(synth_rconf)
+
             with tempfile.NamedTemporaryFile(suffix=".wav") as tmp_file:
                 anchors, total_time, _ = synth.synthesize(
                     tfl, tmp_file.name, quit_after=quit_after, backwards=backwards
@@ -63,16 +66,16 @@ class TestSynthesizer(unittest.TestCase):
             inner(c_ext, cew_subprocess, tts_cache)
 
     def test_clear_cache(self):
-        synth = Synthesizer()
+        synth = Synthesizer.from_rconf(RuntimeConfiguration())
         synth.clear_cache()
 
     def test_synthesize_none(self):
-        synth = Synthesizer()
+        synth = Synthesizer.from_rconf(RuntimeConfiguration())
         with self.assertRaises(TypeError):
             synth.synthesize(None, self.PATH_NOT_WRITEABLE)
 
     def test_synthesize_invalid_text_file(self):
-        synth = Synthesizer()
+        synth = Synthesizer.from_rconf(RuntimeConfiguration())
         with self.assertRaises(TypeError):
             synth.synthesize("foo", self.PATH_NOT_WRITEABLE)
 

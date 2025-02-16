@@ -551,7 +551,7 @@ class ExecuteTask(Configurable):
 
     def _set_synthesizer(self):
         """Create synthesizer"""
-        self.synthesizer = Synthesizer(rconf=self.rconf)
+        self.synthesizer = Synthesizer.from_rconf(self.rconf)
 
     def _clear_cache_synthesizer(self):
         """Clear the cache of the synthesizer"""

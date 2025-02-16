@@ -176,18 +176,19 @@ class SynthesizeTextCLI(AbstractCLIProgram):
         if quit_after is not None:
             self.print_info(f"Stop synthesizing upon reaching {quit_after:.3f} seconds")
 
+        synt = Synthesizer.from_rconf(self.rconf)
         try:
-            synt = Synthesizer(rconf=self.rconf)
             synt.synthesize(
                 text_slice, output_file_path, quit_after=quit_after, backwards=backwards
             )
             self.print_info(f"Created file {output_file_path!r}")
-            synt.clear_cache()
             return self.NO_ERROR_EXIT_CODE
         except Exception as exc:
             self.print_error(
                 f"An unexpected error occurred while synthesizing text: {exc}"
             )
+        finally:
+            synt.clear_cache()
 
         return self.ERROR_EXIT_CODE
 

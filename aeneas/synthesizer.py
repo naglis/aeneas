@@ -31,9 +31,9 @@ This module contains the following classes:
 import logging
 import os.path
 
-from aeneas.logger import Configurable
 from aeneas.runtimeconfiguration import RuntimeConfiguration
 from aeneas.textfile import TextFile
+from aeneas.ttswrappers.basettswrapper import BaseTTSWrapper
 from aeneas.ttswrappers.espeakngttswrapper import ESPEAKNGTTSWrapper
 from aeneas.ttswrappers.espeakttswrapper import ESPEAKTTSWrapper
 from aeneas.ttswrappers.festivalttswrapper import FESTIVALTTSWrapper
@@ -41,16 +41,10 @@ from aeneas.ttswrappers.festivalttswrapper import FESTIVALTTSWrapper
 logger = logging.getLogger(__name__)
 
 
-class Synthesizer(Configurable):
+class Synthesizer:
     """
-    A class to synthesize text fragments into
-    an audio file,
+    A class to synthesize text fragments into an audio file,
     along with the corresponding time anchors.
-
-    :param rconf: a runtime configuration
-    :type  rconf: :class:`~aeneas.runtimeconfiguration.RuntimeConfiguration`
-    :raises: OSError: if a custom TTS engine is requested
-                      but it cannot be loaded
     """
 
     ESPEAK = "espeak"
@@ -62,38 +56,28 @@ class Synthesizer(Configurable):
     FESTIVAL = "festival"
     """ Select Festival wrapper """
 
-    ALLOWED_VALUES = [ESPEAK, ESPEAKNG, FESTIVAL]
+    ALLOWED_VALUES = (ESPEAK, ESPEAKNG, FESTIVAL)
     """ List of all the allowed values """
 
-    def __init__(self, rconf=None):
-        super().__init__(rconf=rconf)
-        self.tts_engine = None
-        self._select_tts_engine()
+    def __init__(self, tts_engine: BaseTTSWrapper):
+        self.tts_engine = tts_engine
 
-    def _select_tts_engine(self):
-        """
-        Select the TTS engine to be used by looking at the rconf object.
-        """
-        logger.debug("Selecting TTS engine...")
-        requested_tts_engine = self.rconf[RuntimeConfiguration.TTS]
-        tts_cls = None
-        match requested_tts_engine:
-            case self.ESPEAK:
+    @classmethod
+    def from_rconf(cls, rconf: RuntimeConfiguration):
+        match rconf[RuntimeConfiguration.TTS]:
+            case cls.ESPEAK:
                 tts_cls = ESPEAKTTSWrapper
-            case self.ESPEAKNG:
+            case cls.ESPEAKNG:
                 tts_cls = ESPEAKNGTTSWrapper
-            case self.FESTIVAL:
+            case cls.FESTIVAL:
                 tts_cls = FESTIVALTTSWrapper
             case _ as other:
                 raise ValueError(f"Invalid TTS engine type {other!r}")
 
-        logger.debug("Creating %r instance...", tts_cls.__name__)
-        self.tts_engine = tts_cls(rconf=self.rconf)
-        logger.debug("Creating %r instance... done", tts_cls.__name__)
-        logger.debug("Selecting TTS engine... done")
+        return cls(tts_cls(rconf=rconf))
 
     @property
-    def output_audio_format(self):
+    def output_audio_format(self) -> tuple[str, int, int]:
         """
         Return a tuple ``(codec, channels, rate)``
         specifying the audio format
@@ -101,9 +85,7 @@ class Synthesizer(Configurable):
 
         :rtype: tuple
         """
-        if self.tts_engine is not None:
-            return self.tts_engine.OUTPUT_AUDIO_FORMAT
-        return None
+        return self.tts_engine.OUTPUT_AUDIO_FORMAT
 
     def clear_cache(self):
         """
@@ -111,8 +93,7 @@ class Synthesizer(Configurable):
 
         .. versionadded:: 1.6.0
         """
-        if self.tts_engine is not None:
-            self.tts_engine.clear_cache()
+        self.tts_engine.clear_cache()
 
     def synthesize(
         self,
@@ -135,15 +116,11 @@ class Synthesizer(Configurable):
         :param bool backwards: if ``True``, synthesizing from the end of the text file
         :rtype: tuple
         :raises: TypeError: if ``text_file`` is ``None`` or not an instance of ``TextFile``
-        :raises: OSError: if ``tts=custom`` in the RuntimeConfiguration and ``tts_path`` cannot be read
-        :raises: ValueError: if the TTS engine has not been set yet
         """
         if text_file is None:
             raise TypeError("`text_file` is None")
         if not isinstance(text_file, TextFile):
             raise TypeError("`text_file` is not an instance of TextFile")
-        if self.tts_engine is None:
-            raise ValueError("Cannot select the TTS engine")
 
         # synthesize
         logger.debug("Synthesizing text...")
