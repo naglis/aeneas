@@ -580,7 +580,7 @@ class AdjustBoundaryAlgorithm(Configurable):
         """
         logger.debug("Called _adjust_on_nonspeech")
         logger.debug("  Getting nonspeech intervals...")
-        nonspeech_intervals = real_wave_mfcc.intervals(speech=False, time=True)
+        nonspeech_intervals = real_wave_mfcc.time_intervals(speech=False)
         logger.debug("  Getting nonspeech intervals... done")
 
         logger.debug(
