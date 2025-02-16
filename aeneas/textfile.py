@@ -329,7 +329,7 @@ class TextFragment(collections.abc.Sized):
         self.identifier = identifier
         self.language = language
         self.lines = lines or []
-        self.filtered_lines = filtered_lines
+        self.filtered_lines = filtered_lines or []
 
     def __len__(self) -> int:
         return len(self.lines)
@@ -1041,28 +1041,18 @@ class TextFile(collections.abc.Sized):
         Build a suitable TextFilter object.
         """
         text_filter = TextFilter()
-        for key, cls, param_name in [
-            (gc.PPN_TASK_IS_TEXT_FILE_IGNORE_REGEX, TextFilterIgnoreRegex, "regex"),
-            (
-                gc.PPN_TASK_IS_TEXT_FILE_TRANSLITERATE_MAP,
-                TextFilterTransliterate,
-                "map_file_path",
-            ),
-        ]:
-            cls_name = cls.__name__
-            param_value = gf.safe_get(self.parameters, key, None)
-            if param_value is not None:
-                logger.debug("Creating %s object...", cls_name)
-                params = {param_name: param_value}
-                try:
-                    inner_filter = cls(**params)
-                    text_filter.add_filter(inner_filter)
-                    logger.debug("Creating %s object... done", cls_name)
-                except ValueError:
-                    logger.exception(
-                        "Creating %s object failed",
-                        cls_name,
-                    )
+        if (
+            param_value := gf.safe_get(
+                self.parameters, gc.PPN_TASK_IS_TEXT_FILE_IGNORE_REGEX, None
+            )
+        ) is not None:
+            text_filter.add_filter(TextFilterIgnoreRegex(regex=param_value))
+        if (
+            param_value := gf.safe_get(
+                self.parameters, gc.PPN_TASK_IS_TEXT_FILE_TRANSLITERATE_MAP, None
+            )
+        ) is not None:
+            text_filter.add_filter(TextFilterTransliterate(map_file_path=param_value))
         return text_filter
 
 
@@ -1212,7 +1202,7 @@ class TransliterationMap:
         return cls(trans_map)
 
     @classmethod
-    def _process_first_group(cls, group: str) -> str:
+    def _process_first_group(cls, group: str) -> typing.Iterator[str]:
         """
         Process the first group of a rule.
         """
@@ -1226,11 +1216,9 @@ class TransliterationMap:
             # single char/U+xxxx
             start = cls._parse_codepoint(group)
             end = start
-        result = []
         if start > -1 and end >= start:
             for index in range(start, end + 1):
-                result.append(chr(index))
-        return result
+                yield chr(index)
 
     @classmethod
     def _process_second_group(cls, group: str) -> str:
@@ -1259,15 +1247,14 @@ class TransliterationMap:
         Parse the given string, either a Unicode character or ``U+....``,
         and return the corresponding Unicode code point as int.
         """
-        if len(string) > 1:
-            match = cls.CODEPOINT_REGEX.match(string)
+        if len(string) > 1 and (match := cls.CODEPOINT_REGEX.match(string)):
             return cls._match_to_int(match)
         elif len(string) == 1:
             return cls._chr_to_int(string)
         return -1
 
     @classmethod
-    def _match_to_int(cls, match: re.Match) -> int:
+    def _match_to_int(cls, match: re.Match[str]) -> int:
         """
         Convert to int the first group of the match,
         representing the hex number in :data:`aeneas.textfile.TransliterationMap.CODEPOINT_REGEX`
