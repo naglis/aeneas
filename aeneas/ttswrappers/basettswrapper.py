@@ -30,6 +30,7 @@ import contextlib
 import logging
 import os.path
 import subprocess
+import sys
 import tempfile
 import typing
 
@@ -555,16 +556,18 @@ class BaseTTSWrapper(abc.ABC, Configurable):
                     stdout=subprocess.PIPE,
                     stdin=subprocess.PIPE,
                     stderr=subprocess.PIPE,
-                    universal_newlines=True,
                 )
                 if self.CLI_PARAMETER_TEXT_STDIN in self.subprocess_arguments:
                     logger.debug("Passing text via stdin...")
-                    (stdoutdata, stderrdata) = proc.communicate(input=text)
+                    stdoutdata, stderrdata = proc.communicate(
+                        input=text.encode(sys.stdin.encoding)
+                    )
                     logger.debug("Passing text via stdin... done")
                 else:
                     logger.debug("Passing text via file...")
-                    (stdoutdata, stderrdata) = proc.communicate()
+                    stdoutdata, stderrdata = proc.communicate()
                     logger.debug("Passing text via file... done")
+
                 if proc.stdout is not None:
                     proc.stdout.close()
                 if proc.stdin is not None:
@@ -575,7 +578,7 @@ class BaseTTSWrapper(abc.ABC, Configurable):
                 if self.CLI_PARAMETER_WAVE_STDOUT in self.subprocess_arguments:
                     logger.debug("TTS engine wrote audio data to stdout")
                     logger.debug("Writing audio data to file %r...", output_file_path)
-                    with open(output_file_path, "wb") as output_file:
+                    with open(output_file_path, mode="wb") as output_file:
                         output_file.write(stdoutdata)
                     logger.debug(
                         "Writing audio data to file %r... done", output_file_path
