@@ -29,14 +29,12 @@ from aeneas.textfile import (
     TextFilterTransliterate,
 )
 import aeneas.globalconstants as gc
-import aeneas.globalfunctions as gf
 
 from .common import BaseCase
 
 
 class TestTextFile(BaseCase):
-    NOT_EXISTING_PATH = gf.absolute_path("not_existing.txt", __file__)
-    NOT_WRITEABLE_PATH = gf.absolute_path("x/y/z/not_writeable.txt", __file__)
+    NOT_EXISTING_PATH = "not_existing.txt"
     EMPTY_FILE_PATH = "res/inputtext/empty.txt"
     BLANK_FILE_PATH = "res/inputtext/blank.txt"
     PLAIN_FILE_PATH = "res/inputtext/sonnet_plain.txt"
@@ -54,9 +52,7 @@ class TestTextFile(BaseCase):
     }
     ID_REGEX_PARAMETERS = {gc.PPN_TASK_OS_FILE_ID_REGEX: "word%06d"}
     ID_REGEX_PARAMETERS_BAD = {gc.PPN_TASK_OS_FILE_ID_REGEX: "word"}
-    TRANSLITERATION_MAP_FILE_PATH = gf.absolute_path(
-        "res/transliteration/transliteration.map", __file__
-    )
+    TRANSLITERATION_MAP_FILE_PATH = "res/transliteration/transliteration.map"
 
     def load(
         self,
@@ -65,7 +61,7 @@ class TestTextFile(BaseCase):
         expected_length: int = 15,
         parameters: dict | None = None,
     ):
-        tfl = TextFile(gf.absolute_path(input_file_path, __file__), fmt, parameters)
+        tfl = TextFile(self.file_path(input_file_path), fmt, parameters)
         self.assertEqual(len(tfl), expected_length)
         return tfl
 
@@ -91,10 +87,10 @@ class TestTextFile(BaseCase):
         string_out = fil.apply_filter(string_in)
         self.assertEqual(string_out, expected_out)
 
-    def filter_transliterate(
-        self, string_in, expected_out, map_file_path=TRANSLITERATION_MAP_FILE_PATH
-    ):
-        fil = TextFilterTransliterate(map_file_path=map_file_path)
+    def filter_transliterate(self, string_in, expected_out):
+        fil = TextFilterTransliterate(
+            map_file_path=self.file_path(self.TRANSLITERATION_MAP_FILE_PATH)
+        )
         string_out = fil.apply_filter(string_in)
         self.assertEqual(string_out, expected_out)
 
@@ -124,7 +120,7 @@ class TestTextFile(BaseCase):
 
     def test_file_path_not_existing(self):
         with self.assertRaises(OSError):
-            TextFile(file_path=self.NOT_EXISTING_PATH)
+            TextFile(file_path=self.file_path(self.NOT_EXISTING_PATH))
 
     def test_invalid_format(self):
         with self.assertRaises(ValueError):
@@ -173,32 +169,32 @@ class TestTextFile(BaseCase):
                 self.load(self.BLANK_FILE_PATH, fmt, expected, self.UNPARSED_PARAMETERS)
 
     def test_read_subtitles(self):
-        for path in [
+        for path in (
             "res/inputtext/sonnet_subtitles_with_end_newline.txt",
             "res/inputtext/sonnet_subtitles_no_end_newline.txt",
             "res/inputtext/sonnet_subtitles_multiple_blank.txt",
             "res/inputtext/sonnet_subtitles_multiple_rows.txt",
-        ]:
+        ):
             with self.subTest(path=path):
                 self.load(path, TextFileFormat.SUBTITLES, 15)
 
     def test_read_subtitles_id_regex(self):
-        for path in [
+        for path in (
             "res/inputtext/sonnet_subtitles_with_end_newline.txt",
             "res/inputtext/sonnet_subtitles_no_end_newline.txt",
             "res/inputtext/sonnet_subtitles_multiple_blank.txt",
             "res/inputtext/sonnet_subtitles_multiple_rows.txt",
-        ]:
+        ):
             with self.subTest(path=path):
                 self.load(path, TextFileFormat.SUBTITLES, 15, self.ID_REGEX_PARAMETERS)
 
     def test_read_subtitles_id_regex_bad(self):
-        for path in [
+        for path in (
             "res/inputtext/sonnet_subtitles_with_end_newline.txt",
             "res/inputtext/sonnet_subtitles_no_end_newline.txt",
             "res/inputtext/sonnet_subtitles_multiple_blank.txt",
             "res/inputtext/sonnet_subtitles_multiple_rows.txt",
-        ]:
+        ):
             with self.subTest(path=path), self.assertRaises(ValueError):
                 self.load(
                     path, TextFileFormat.SUBTITLES, 15, self.ID_REGEX_PARAMETERS_BAD
@@ -208,11 +204,11 @@ class TestTextFile(BaseCase):
         self.load(self.MPLAIN_FILE_PATH, TextFileFormat.MPLAIN, 5)
 
     def test_read_mplain_variations(self):
-        for path in [
+        for path in (
             "res/inputtext/sonnet_mplain_with_end_newline.txt",
             "res/inputtext/sonnet_mplain_no_end_newline.txt",
             "res/inputtext/sonnet_mplain_multiple_blank.txt",
-        ]:
+        ):
             with self.subTest(path=path):
                 self.load(path, TextFileFormat.MPLAIN, 5)
 
@@ -319,16 +315,16 @@ class TestTextFile(BaseCase):
         self.load(self.PARSED_FILE_PATH, TextFileFormat.PARSED, 15)
 
     def test_read_parsed_bad(self):
-        for path in [
+        for path in (
             "res/inputtext/badly_parsed_1.txt",
             "res/inputtext/badly_parsed_2.txt",
             "res/inputtext/badly_parsed_3.txt",
-        ]:
+        ):
             with self.subTest(path=path):
                 self.load(path, TextFileFormat.PARSED, 0)
 
     def test_read_unparsed(self):
-        for case in [
+        for case in (
             {
                 "path": "res/inputtext/sonnet_unparsed_soup_1.txt",
                 "parameters": {gc.PPN_TASK_IS_TEXT_UNPARSED_ID_REGEX: "f[0-9]*"},
@@ -348,7 +344,7 @@ class TestTextFile(BaseCase):
                 "path": "res/inputtext/sonnet_unparsed.xhtml",
                 "parameters": {gc.PPN_TASK_IS_TEXT_UNPARSED_ID_REGEX: "f[0-9]*"},
             },
-        ]:
+        ):
             with self.subTest(path=case["path"], parameters=case["parameters"]):
                 self.load(case["path"], TextFileFormat.UNPARSED, 15, case["parameters"])
 
@@ -423,13 +419,13 @@ class TestTextFile(BaseCase):
 
     def test_read_from_list_with_ids(self):
         tfl = TextFile()
-        text_list = [
+        text_list = (
             ("a1", "fragment 1"),
             ("b2", "fragment 2"),
             ("c3", "fragment 3"),
             ("d4", "fragment 4"),
             ("e5", "fragment 5"),
-        ]
+        )
         tfl.read_from_list_with_ids(text_list)
         self.assertEqual(len(tfl), 5)
         self.assertEqual(tfl.chars, 50)

@@ -5,8 +5,6 @@ import tempfile
 
 from aeneas.tools.execute_task import ExecuteTaskCLI
 
-import aeneas.globalfunctions as gf
-
 
 slow_test = unittest.skipIf(
     (val := os.getenv("UNITTEST_RUN_SLOW_TESTS")) is None or val.strip() == "0",
@@ -30,6 +28,10 @@ class BaseCase(unittest.TestCase):
     # Do not truncate diffs.
     maxDiff = None
 
+    @classmethod
+    def file_path(cls, path: str) -> str:
+        return os.path.join(os.path.dirname(__file__), *path.split("/"))
+
 
 class ExecuteCLICase(BaseCase):
     CLI_CLS: typing.ClassVar
@@ -41,7 +43,7 @@ class ExecuteCLICase(BaseCase):
         with tempfile.TemporaryDirectory(prefix="aeneas.") as temp_dir:
             for p_type, p_value in parameters:
                 if p_type == "in":
-                    params.append(gf.absolute_path(p_value, __file__))
+                    params.append(self.file_path(p_value))
                 elif p_type == "out":
                     params.append(os.path.join(temp_dir, p_value))
                 else:

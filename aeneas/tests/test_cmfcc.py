@@ -22,7 +22,6 @@ import unittest
 import importlib.util
 
 from aeneas.audiofile import AudioFile
-import aeneas.globalfunctions as gf
 
 from .common import BaseCase
 
@@ -32,12 +31,10 @@ from .common import BaseCase
     "CMFCC C extension is not available",
 )
 class TestCMFCC(BaseCase):
-    AUDIO = gf.absolute_path("res/audioformats/mono.16000.wav", __file__)
-
     def test_compute_mfcc(self):
         import aeneas.cmfcc.cmfcc as cmfcc
 
-        audio_file = AudioFile(self.AUDIO)
+        audio_file = AudioFile(self.file_path("res/audioformats/mono.16000.wav"))
         audio_file.read_samples_from_file()
         mfcc_c = (
             cmfcc.compute_from_data(

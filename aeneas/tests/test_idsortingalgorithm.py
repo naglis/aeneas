@@ -34,22 +34,22 @@ class TestIDSortingAlgorithm(BaseCase):
         expected = ["b001", "c03", "d4", "a2"]
         idsa = IDSortingAlgorithm(IDSortingAlgorithm.UNSORTED)
         sids = idsa.sort(self.IDS)
-        self.assertTrue(sids == expected)
+        self.assertEqual(sids, expected)
 
     def test_lexicographic(self):
         expected = ["a2", "b001", "c03", "d4"]
         idsa = IDSortingAlgorithm(IDSortingAlgorithm.LEXICOGRAPHIC)
         sids = idsa.sort(self.IDS)
-        self.assertTrue(sids == expected)
+        self.assertEqual(sids, expected)
 
     def test_numeric(self):
         expected = ["b001", "a2", "c03", "d4"]
         idsa = IDSortingAlgorithm(IDSortingAlgorithm.NUMERIC)
         sids = idsa.sort(self.IDS)
-        self.assertTrue(sids == expected)
+        self.assertEqual(sids, expected)
 
     def test_numeric_exception(self):
         bad_ids = ["b002", "d", "c", "a1"]
         idsa = IDSortingAlgorithm(IDSortingAlgorithm.NUMERIC)
         sids = idsa.sort(bad_ids)
-        self.assertTrue(sids == bad_ids)
+        self.assertEqual(sids, bad_ids)

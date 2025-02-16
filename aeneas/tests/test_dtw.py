@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 # aeneas is a Python/C library and a set of tools
 # to automagically synchronize audio and text (aka forced alignment)
 #
@@ -25,15 +23,19 @@ import numpy
 from aeneas.audiofilemfcc import AudioFileMFCC
 from aeneas.dtw import DTWAligner
 from aeneas.dtw import DTWAlignerNotInitialized
-import aeneas.globalfunctions as gf
 
 from .common import BaseCase
 
 
 class TestDTWAligner(BaseCase):
-    AUDIO_FILE = gf.absolute_path("res/audioformats/mono.16000.wav", __file__)
-    NUMPY_ARRAY_1 = numpy.loadtxt(gf.absolute_path("res/cdtw/mfcc1_12_1332", __file__))
-    NUMPY_ARRAY_2 = numpy.loadtxt(gf.absolute_path("res/cdtw/mfcc2_12_868", __file__))
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.AUDIO_FILE = cls.file_path(
+            "res/audioformats/mono.16000.wav",
+        )
+        cls.NUMPY_ARRAY_1 = numpy.loadtxt(cls.file_path("res/cdtw/mfcc1_12_1332"))
+        cls.NUMPY_ARRAY_2 = numpy.loadtxt(cls.file_path("res/cdtw/mfcc2_12_868"))
 
     def test_create_aligner(self):
         aligner = DTWAligner()

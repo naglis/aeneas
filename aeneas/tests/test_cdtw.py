@@ -23,8 +23,6 @@ import unittest
 
 import numpy
 
-import aeneas.globalfunctions as gf
-
 from .common import BaseCase
 
 
@@ -33,14 +31,14 @@ from .common import BaseCase
     "CDTW C extension is not available",
 )
 class TestCDTW(BaseCase):
-    MFCC1 = gf.absolute_path("res/cdtw/mfcc1_12_1332", __file__)
-    MFCC2 = gf.absolute_path("res/cdtw/mfcc2_12_868", __file__)
+    MFCC1 = "res/cdtw/mfcc1_12_1332"
+    MFCC2 = "res/cdtw/mfcc2_12_868"
 
     def test_compute_path(self):
         import aeneas.cdtw.cdtw as cdtw
 
-        mfcc1 = numpy.loadtxt(self.MFCC1)
-        mfcc2 = numpy.loadtxt(self.MFCC2)
+        mfcc1 = numpy.loadtxt(self.file_path(self.MFCC1))
+        mfcc2 = numpy.loadtxt(self.file_path(self.MFCC2))
         _, n = mfcc1.shape
         _, m = mfcc2.shape
         delta = 3000

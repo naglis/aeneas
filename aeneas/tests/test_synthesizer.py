@@ -26,13 +26,12 @@ from aeneas.language import Language
 from aeneas.runtimeconfiguration import RuntimeConfiguration
 from aeneas.synthesizer import Synthesizer
 from aeneas.textfile import TextFile, TextFileFormat
-import aeneas.globalfunctions as gf
 
 from .common import BaseCase
 
 
 class TestSynthesizer(BaseCase):
-    PATH_NOT_WRITEABLE = gf.absolute_path("x/y/z/not_writeable.wav", __file__)
+    PATH_NOT_WRITEABLE = "x/y/z/not_writeable.wav"
 
     def perform(
         self,
@@ -44,7 +43,7 @@ class TestSynthesizer(BaseCase):
         backwards: bool = False,
     ):
         def inner(c_ext: bool, cew_subprocess: bool, tts_cache: bool):
-            tfl = TextFile(gf.absolute_path(path, __file__), TextFileFormat.PLAIN)
+            tfl = TextFile(self.file_path(path), TextFileFormat.PLAIN)
             tfl.set_language(Language.ENG)
 
             synth_rconf = RuntimeConfiguration()
@@ -73,12 +72,12 @@ class TestSynthesizer(BaseCase):
     def test_synthesize_none(self):
         synth = Synthesizer.from_rconf(RuntimeConfiguration())
         with self.assertRaises(TypeError):
-            synth.synthesize(None, self.PATH_NOT_WRITEABLE)
+            synth.synthesize(None, self.file_path(self.PATH_NOT_WRITEABLE))
 
     def test_synthesize_invalid_text_file(self):
         synth = Synthesizer.from_rconf(RuntimeConfiguration())
         with self.assertRaises(TypeError):
-            synth.synthesize("foo", self.PATH_NOT_WRITEABLE)
+            synth.synthesize("foo", self.file_path(self.PATH_NOT_WRITEABLE))
 
     def test_synthesize(self):
         self.perform("res/inputtext/sonnet_plain.txt", 15)

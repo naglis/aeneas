@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 # aeneas is a Python/C library and a set of tools
 # to automagically synchronize audio and text (aka forced alignment)
 #
@@ -22,7 +20,6 @@
 
 from aeneas.audiofile import AudioFileUnsupportedFormatError
 from aeneas.audiofilemfcc import AudioFileMFCC
-import aeneas.globalfunctions as gf
 
 from .common import BaseCase
 
@@ -69,9 +66,11 @@ class TestVAD(BaseCase):
     NOT_EXISTING_PATH = "this_file_does_not_exist.mp3"
     EMPTY_FILE_PATH = "res/audioformats/p001.empty"
 
-    def perform(self, input_file_path, speech_length, nonspeech_length):
-        audiofile = AudioFileMFCC(gf.absolute_path(input_file_path, __file__))
+    def perform(self, input_file_path: str, speech_length: int, nonspeech_length: int):
+        audiofile = AudioFileMFCC(self.file_path(input_file_path))
+
         audiofile.run_vad()
+
         self.assertEqual(len(audiofile.intervals(speech=True)), speech_length)
         self.assertEqual(len(audiofile.intervals(speech=False)), nonspeech_length)
 

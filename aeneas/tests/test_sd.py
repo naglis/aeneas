@@ -21,20 +21,20 @@
 from aeneas.audiofilemfcc import AudioFileMFCC
 from aeneas.language import Language
 from aeneas.sd import SD
-from aeneas.textfile import TextFile
-from aeneas.textfile import TextFileFormat
-import aeneas.globalfunctions as gf
+from aeneas.textfile import TextFile, TextFileFormat
 
 from .common import BaseCase
 
 
 class TestSD(BaseCase):
-    AUDIO_FILE = gf.absolute_path("res/audioformats/mono.16000.wav", __file__)
-    TEXT_FILE = gf.absolute_path("res/inputtext/sonnet_plain.txt", __file__)
+    AUDIO_FILE = "res/audioformats/mono.16000.wav"
+    TEXT_FILE = "res/inputtext/sonnet_plain.txt"
 
     def load(self):
-        audio_file_mfcc = AudioFileMFCC(self.AUDIO_FILE)
-        text_file = TextFile(self.TEXT_FILE, file_format=TextFileFormat.PLAIN)
+        audio_file_mfcc = AudioFileMFCC(self.file_path(self.AUDIO_FILE))
+        text_file = TextFile(
+            self.file_path(self.TEXT_FILE), file_format=TextFileFormat.PLAIN
+        )
         text_file.set_language(Language.ENG)
         return SD(audio_file_mfcc, text_file)
 
@@ -42,7 +42,7 @@ class TestSD(BaseCase):
         try:
             self.load()
         except Exception as e:
-            self.fail("Failed to create sd: %s" % e)
+            self.fail(f"Failed to create sd: {e}")
 
     def test_detect_interval(self):
         begin, end = self.load().detect_interval()

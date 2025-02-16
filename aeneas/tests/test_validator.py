@@ -19,7 +19,6 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from aeneas.validator import Validator
-import aeneas.globalfunctions as gf
 
 from .common import BaseCase
 
@@ -62,7 +61,7 @@ class TestValidator(BaseCase):
         ):
             with self.subTest(name=name, path=path, passed=passed):
                 validator = Validator()
-                result = validator.check_file_encoding(gf.absolute_path(path, __file__))
+                result = validator.check_file_encoding(self.file_path(path))
                 self.assertEqual(result.passed, passed)
 
     def test_check_configuration_string(self):

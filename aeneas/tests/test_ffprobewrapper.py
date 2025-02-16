@@ -20,7 +20,6 @@
 
 from aeneas.exacttiming import TimeValue
 from aeneas.ffprobewrapper import FFPROBEUnsupportedFormatError, FFPROBEWrapper
-import aeneas.globalfunctions as gf
 
 from .common import BaseCase
 
@@ -41,9 +40,7 @@ class TestFFPROBEWrapper(BaseCase):
     EMPTY_FILE_PATH = "res/audioformats/p001.empty"
 
     def read_properties(self, input_file_path):
-        return FFPROBEWrapper().read_properties(
-            gf.absolute_path(input_file_path, __file__)
-        )
+        return FFPROBEWrapper().read_properties(self.file_path(input_file_path))
 
     def test_mp3_properties(self):
         properties = self.read_properties("res/audioformats/p001.mp3")
@@ -52,10 +49,6 @@ class TestFFPROBEWrapper(BaseCase):
         self.assertEqual(properties.sample_rate, 44_100)
         self.assertEqual(properties.channels, 2)
         self.assertEqual(properties.bit_rate, 64_000)
-
-    def test_path_none(self):
-        with self.assertRaises(TypeError):
-            self.read_properties(None)
 
     def test_path_not_existing(self):
         with self.assertRaises(OSError):

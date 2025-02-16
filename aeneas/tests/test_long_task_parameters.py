@@ -22,7 +22,6 @@
 
 
 from aeneas.tests.common import ExecuteTaskCLICase, slow_test
-import aeneas.globalfunctions as gf
 
 
 @slow_test
@@ -140,7 +139,7 @@ class TestExecuteTaskCLI(ExecuteTaskCLICase):
         )
 
     def test_exec_is_text_file_transliterate_map(self):
-        path = gf.absolute_path("res/transliteration/transliteration.map", __file__)
+        path = self.file_path("res/transliteration/transliteration.map")
         self.execute(
             [
                 ("in", "../tools/res/audio.mp3"),

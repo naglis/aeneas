@@ -28,86 +28,90 @@ from aeneas.audiofile import (
     AudioFileUnsupportedFormatError,
 )
 from aeneas.exacttiming import TimeValue
-import aeneas.globalfunctions as gf
 
 from .common import BaseCase
 
 
 class TestAudioFile(BaseCase):
-    AUDIO_FILE_WAVE = "res/audioformats/mono.16000.wav"
-    AUDIO_FILE_EMPTY = "res/audioformats/p001.empty"
-    AUDIO_FILE_NOT_WAVE = "res/audioformats/p001.mp3"
-    AUDIO_FILE_EXACT = "res/audioformats/exact.5600.16000.wav"
-    NOT_EXISTING_FILE = "res/audioformats/x/y/z/not_existing.wav"
-    FILES = (
-        {
-            "path": "res/audioformats/p001.aac",
-            "size": 72196,
-            "rate": 44100,
-            "channels": 2,
-            "format": "aac",
-            "length": TimeValue("9.4"),  # 9.403429
-        },
-        {
-            "path": "res/audioformats/p001.aiff",
-            "size": 1586770,
-            "rate": 44100,
-            "channels": 2,
-            "format": "pcm_s16be",
-            "length": TimeValue("9.0"),  # 8.994989
-        },
-        {
-            "path": "res/audioformats/p001.flac",
-            "size": 569729,
-            "rate": 44100,
-            "channels": 2,
-            "format": "flac",
-            "length": TimeValue("9.0"),  # 8.994989
-        },
-        {
-            "path": "res/audioformats/p001.mp3",
-            "size": 72559,
-            "rate": 44100,
-            "channels": 2,
-            "format": "mp3",
-            "length": TimeValue("9.0"),  # 9.038367
-        },
-        {
-            "path": "res/audioformats/p001.mp4",
-            "size": 74579,
-            "rate": 44100,
-            "channels": 2,
-            "format": "aac",
-            "length": TimeValue("9.0"),  # 9.018209
-        },
-        {
-            "path": "res/audioformats/p001.ogg",
-            "size": 56658,
-            "rate": 44100,
-            "channels": 2,
-            "format": "vorbis",
-            "length": TimeValue("9.0"),  # 8.994989
-        },
-        {
-            "path": "res/audioformats/p001.wav",
-            "size": 1586760,
-            "rate": 44100,
-            "channels": 2,
-            "format": "pcm_s16le",
-            "length": TimeValue("9.0"),  # 8.994989
-        },
-        {
-            "path": "res/audioformats/p001.webm",
-            "size": 59404,
-            "rate": 44100,
-            "channels": 2,
-            "format": "vorbis",
-            "length": TimeValue("9.0"),  # 9.0
-        },
-    )
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.AUDIO_FILE_WAVE = cls.file_path("res/audioformats/mono.16000.wav")
+        cls.AUDIO_FILE_EMPTY = cls.file_path("res/audioformats/p001.empty")
+        cls.AUDIO_FILE_NOT_WAVE = cls.file_path("res/audioformats/p001.mp3")
+        cls.AUDIO_FILE_EXACT = cls.file_path("res/audioformats/exact.5600.16000.wav")
+        cls.NOT_EXISTING_FILE = cls.file_path("res/audioformats/x/y/z/not_existing.wav")
+        cls.FILES = (
+            {
+                "path": cls.file_path("res/audioformats/p001.aac"),
+                "size": 72196,
+                "rate": 44100,
+                "channels": 2,
+                "format": "aac",
+                "length": TimeValue("9.4"),  # 9.403429
+            },
+            {
+                "path": cls.file_path("res/audioformats/p001.aiff"),
+                "size": 1586770,
+                "rate": 44100,
+                "channels": 2,
+                "format": "pcm_s16be",
+                "length": TimeValue("9.0"),  # 8.994989
+            },
+            {
+                "path": cls.file_path("res/audioformats/p001.flac"),
+                "size": 569729,
+                "rate": 44100,
+                "channels": 2,
+                "format": "flac",
+                "length": TimeValue("9.0"),  # 8.994989
+            },
+            {
+                "path": cls.file_path("res/audioformats/p001.mp3"),
+                "size": 72559,
+                "rate": 44100,
+                "channels": 2,
+                "format": "mp3",
+                "length": TimeValue("9.0"),  # 9.038367
+            },
+            {
+                "path": cls.file_path("res/audioformats/p001.mp4"),
+                "size": 74579,
+                "rate": 44100,
+                "channels": 2,
+                "format": "aac",
+                "length": TimeValue("9.0"),  # 9.018209
+            },
+            {
+                "path": cls.file_path("res/audioformats/p001.ogg"),
+                "size": 56658,
+                "rate": 44100,
+                "channels": 2,
+                "format": "vorbis",
+                "length": TimeValue("9.0"),  # 8.994989
+            },
+            {
+                "path": cls.file_path("res/audioformats/p001.wav"),
+                "size": 1586760,
+                "rate": 44100,
+                "channels": 2,
+                "format": "pcm_s16le",
+                "length": TimeValue("9.0"),  # 8.994989
+            },
+            {
+                "path": cls.file_path("res/audioformats/p001.webm"),
+                "size": 59404,
+                "rate": 44100,
+                "channels": 2,
+                "format": "vorbis",
+                "length": TimeValue("9.0"),  # 9.0
+            },
+        )
 
-    def load(self, path, *, read_properties: bool = False, read_samples: bool = False):
-        af = AudioFile(gf.absolute_path(path, __file__))
+    def load(
+        self, path: str, *, read_properties: bool = False, read_samples: bool = False
+    ):
+        af = AudioFile(path)
         if read_properties:
             af.read_properties()
         if read_samples:
@@ -220,7 +224,7 @@ class TestAudioFile(BaseCase):
                 audiofile.clear_data()
 
     def test_write_not_existing_path(self):
-        output_file_path = gf.absolute_path(self.NOT_EXISTING_FILE, __file__)
+        output_file_path = self.file_path(self.NOT_EXISTING_FILE)
         audiofile = self.load(self.AUDIO_FILE_WAVE, read_samples=True)
         with self.assertRaises(OSError):
             audiofile.write(output_file_path)
@@ -228,7 +232,7 @@ class TestAudioFile(BaseCase):
     def test_write(self):
         audiofile = self.load(self.AUDIO_FILE_WAVE, read_samples=True)
         data = audiofile.audio_samples
-        with tempfile.NamedTemporaryFile(prefix="aeneas", suffix=".wav") as tmp_file:
+        with tempfile.NamedTemporaryFile(prefix="aeneas.", suffix=".wav") as tmp_file:
             audiofile.write(tmp_file.name)
             audiocopy = self.load(tmp_file.name)
             datacopy = audiocopy.audio_samples

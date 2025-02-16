@@ -29,7 +29,6 @@ from aeneas.syncmap.missingparametererror import SyncMapMissingParameterError
 from aeneas.tree import Tree
 from aeneas.textfile import TextFragment
 import aeneas.globalconstants as gc
-import aeneas.globalfunctions as gf
 
 from .common import BaseCase
 
@@ -55,7 +54,7 @@ class BaseSyncMapCase(BaseCase):
         else:
             path = f"res/syncmaps/sonnet001.{fmt}"
 
-        with open(gf.absolute_path(path, __file__), mode="rb") as f:
+        with open(self.file_path(path), mode="rb") as f:
             return SyncMap.load(f, fmt, parameters=self.PARAMETERS)
 
     def dump(
@@ -73,8 +72,6 @@ class BaseSyncMapCase(BaseCase):
 
 
 class TestSyncMap(BaseSyncMapCase):
-    NOT_EXISTING_SRT = gf.absolute_path("not_existing.srt", __file__)
-    EXISTING_SRT = gf.absolute_path("res/syncmaps/sonnet001.srt", __file__)
     EMPTY_INTERVAL = TimeInterval(begin=TimeValue("0.000"), end=TimeValue("0.000"))
 
     def build_tree_from_intervals(

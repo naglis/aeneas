@@ -33,7 +33,6 @@ from aeneas.syncmap import (
 from aeneas.task import Task, TaskConfiguration
 from aeneas.textfile import TextFileFormat, TextFragment
 from aeneas.tree import Tree
-import aeneas.globalfunctions as gf
 
 from .common import BaseCase
 
@@ -95,7 +94,7 @@ class TestTask(BaseCase):
             task.configuration["i_t_unparsed_id_regex"] = id_regex
         if id_sort is not None:
             task.configuration["i_t_unparsed_id_sort"] = id_sort
-        task.text_file_path_absolute = gf.absolute_path(path, __file__)
+        task.text_file_path_absolute = self.file_path(path)
         self.assertIsNotNone(task.text_file)
         self.assertEqual(len(task.text_file), expected)
         return task.text_file
@@ -161,8 +160,8 @@ class TestTask(BaseCase):
 
     def test_set_audio_file_path_absolute(self):
         task = Task()
-        task.audio_file_path_absolute = gf.absolute_path(
-            "res/container/job/assets/p001.mp3", __file__
+        task.audio_file_path_absolute = self.file_path(
+            "res/container/job/assets/p001.mp3"
         )
         self.assertIsNotNone(task.audio_file)
         self.assertEqual(task.audio_file.file_size, 426735)
@@ -173,9 +172,7 @@ class TestTask(BaseCase):
     def test_set_audio_file_path_absolute_error(self):
         task = Task()
         with self.assertRaises(OSError):
-            task.audio_file_path_absolute = gf.absolute_path(
-                "not_existing.mp3", __file__
-            )
+            task.audio_file_path_absolute = self.file_path("not_existing.mp3")
 
     def test_set_text_file_unparsed_id(self):
         self.set_text_file(

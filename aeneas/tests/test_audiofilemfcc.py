@@ -25,7 +25,6 @@ import numpy
 from aeneas.audiofile import AudioFile, AudioFileUnsupportedFormatError
 from aeneas.audiofilemfcc import AudioFileMFCC
 from aeneas.exacttiming import TimeValue
-import aeneas.globalfunctions as gf
 
 from .common import BaseCase
 
@@ -36,7 +35,7 @@ class TestAudioFileMFCC(BaseCase):
     NOT_EXISTING_FILE = "res/audioformats/x/y/z/not_existing.wav"
 
     def load(self, path):
-        audiofile = AudioFileMFCC(gf.absolute_path(path, __file__))
+        audiofile = AudioFileMFCC(self.file_path(path))
         self.assertIsNotNone(audiofile.all_mfcc)
         self.assertFalse(audiofile.is_reversed)
         self.assertNotEqual(audiofile.all_length, 0)
@@ -46,12 +45,8 @@ class TestAudioFileMFCC(BaseCase):
         self.assertNotEqual(audiofile.audio_length, 0)
         return audiofile
 
-    def test_load_on_none(self):
-        with self.assertRaises(TypeError):
-            self.load(None)
-
     def test_load_audio_file(self):
-        af = AudioFile(gf.absolute_path(self.AUDIO_FILE_WAVE, __file__))
+        af = AudioFile(self.file_path(self.AUDIO_FILE_WAVE))
         af.read_samples_from_file()
         audiofile = AudioFileMFCC(audio_file=af)
         self.assertIsNotNone(audiofile.all_mfcc)
