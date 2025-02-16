@@ -141,9 +141,17 @@ class ConvertSyncMapCLI(AbstractCLIProgram):
         if output_html:
             try:
                 self.print_info("Writing HTML file...")
-                syncmap.output_html_for_tuning(
-                    audio_file_path, output_file_path, parameters
-                )
+                # Remove the `.html` and the output format suffix (if any).
+                basename = os.path.splitext(
+                    os.path.splitext(os.path.basename(output_file_path))[0]
+                )[0]
+                with open(output_file_path, "w", encoding="utf-8") as file_obj:
+                    syncmap.dump_finetuneas_html(
+                        file_obj,
+                        basename,
+                        audio_file_path,
+                        parameters=parameters,
+                    )
                 self.print_info(f"Created HTML file {output_file_path!r}")
                 return self.NO_ERROR_EXIT_CODE
             except Exception as exc:

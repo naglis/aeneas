@@ -363,7 +363,7 @@ class TestSyncMap(BaseSyncMapCase):
             SyncMapFormat.TTML, parameters={gc.PPN_SYNCMAP_LANGUAGE: Language.ENG}
         )
 
-    def test_output_html_for_tuning(self):
+    def test_dump_finetuneas_html(self):
         syn = self.load(SyncMapFormat.XML, multiline=True, utf8=True)
-        with tempfile.NamedTemporaryFile(suffix=".html") as tmp_file:
-            syn.output_html_for_tuning("foo.mp3", tmp_file.name, parameters=None)
+        with tempfile.NamedTemporaryFile(suffix=".html", mode="w") as tmp_file:
+            syn.dump_finetuneas_html(tmp_file, "test", "foo.mp3")

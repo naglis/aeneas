@@ -541,22 +541,34 @@ class ExecuteTaskCLI(AbstractCLIProgram):
             return self.ERROR_EXIT_CODE
 
         if output_html:
-            try:
-                parameters = {}
-                parameters[gc.PPN_TASK_OS_FILE_FORMAT] = task.configuration["o_format"]
-                parameters[gc.PPN_TASK_OS_FILE_EAF_AUDIO_REF] = task.configuration[
+            parameters = {
+                gc.PPN_TASK_OS_FILE_FORMAT: task.configuration["o_format"],
+                gc.PPN_TASK_OS_FILE_EAF_AUDIO_REF: task.configuration[
                     "o_eaf_audio_ref"
-                ]
-                parameters[gc.PPN_TASK_OS_FILE_SMIL_AUDIO_REF] = task.configuration[
+                ],
+                gc.PPN_TASK_OS_FILE_SMIL_AUDIO_REF: task.configuration[
                     "o_smil_audio_ref"
-                ]
-                parameters[gc.PPN_TASK_OS_FILE_SMIL_PAGE_REF] = task.configuration[
+                ],
+                gc.PPN_TASK_OS_FILE_SMIL_PAGE_REF: task.configuration[
                     "o_smil_page_ref"
-                ]
+                ],
+            }
+
+            # Remove the `.html` and the output format suffix (if any).
+            basename = os.path.splitext(
+                os.path.splitext(os.path.basename(html_file_path))[0]
+            )[0]
+
+            try:
                 self.print_info("Creating output HTML file...")
-                task.sync_map.output_html_for_tuning(
-                    audio_file_path, html_file_path, parameters
-                )
+
+                with open(html_file_path, mode="w", encoding="utf-8") as f:
+                    task.sync_map.dump_finetuneas_html(
+                        f,
+                        basename,
+                        audio_file_path,
+                        parameters=parameters,
+                    )
                 self.print_info(f"Created file {html_file_path!r}")
             except Exception as exc:
                 self.print_error(

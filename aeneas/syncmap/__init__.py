@@ -263,17 +263,18 @@ class SyncMap:
         """
         self.fragments_tree = Tree()
 
-    def output_html_for_tuning(
+    def dump_finetuneas_html(
         self,
+        fobj: typing.IO[str],
+        filename: str,
         audio_file_path: str,
-        output_file_path: str,
+        *,
         parameters: dict | None = None,
     ):
         """
         Output an HTML file for fine tuning the sync map manually.
 
         :param string audio_file_path: the path to the associated audio file
-        :param string output_file_path: the path to the output file to write
         :param dict parameters: additional parameters
 
         .. versionadded:: 1.3.1
@@ -287,11 +288,6 @@ class SyncMap:
         with open(template_path_absolute, encoding="utf-8") as file_obj:
             template = file_obj.read()
 
-        # Remove the `.html` and the output format suffix (if any).
-        basename = os.path.splitext(
-            os.path.splitext(os.path.basename(output_file_path))[0]
-        )[0]
-
         for search_string, replacement in (
             *self.FINETUNEAS_REPLACEMENTS,
             (
@@ -304,7 +300,7 @@ class SyncMap:
             ),
             (
                 self.FINETUNEAS_REPLACE_SUGGESTED_FILENAME,
-                f'suggestedFileName = "{basename}." + outputFormat;',
+                f'suggestedFileName = "{filename}." + outputFormat;',
             ),
         ):
             template = template.replace(search_string, replacement)
@@ -334,8 +330,7 @@ class SyncMap:
                                 placeholder, replacement % parameters[key]
                             )
 
-        with open(output_file_path, "w", encoding="utf-8") as file_obj:
-            file_obj.write(template)
+        fobj.write(template)
 
     @classmethod
     def load(
