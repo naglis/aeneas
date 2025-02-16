@@ -47,7 +47,7 @@ class TestAudioFileMFCC(unittest.TestCase):
         return audiofile
 
     def test_load_on_none(self):
-        with self.assertRaises(ValueError):
+        with self.assertRaises(TypeError):
             self.load(None)
 
     def test_load_audio_file(self):
@@ -331,7 +331,7 @@ class TestAudioFileMFCC(unittest.TestCase):
             audiofile.all_length + 2,
         ]:
             self.assertIsNone(audiofile.inside_nonspeech(index))
-        for begin, end in audiofile.intervals(False, False):
+        for begin, end in audiofile.intervals(speech=False):
             self.assertIsNone(audiofile.inside_nonspeech(begin - 1))
             self.assertEqual(audiofile.inside_nonspeech(begin), (begin, end))
             self.assertEqual(audiofile.inside_nonspeech(begin + 1), (begin, end))
@@ -349,7 +349,7 @@ class TestAudioFileMFCC(unittest.TestCase):
             audiofile.all_length + 2,
         ]:
             self.assertIsNone(audiofile.inside_nonspeech(index))
-        for begin, end in audiofile.intervals(False, False):
+        for begin, end in audiofile.intervals(speech=False):
             self.assertIsNone(audiofile.inside_nonspeech(begin - 1))
             self.assertEqual(audiofile.inside_nonspeech(begin), (begin, end))
             self.assertEqual(audiofile.inside_nonspeech(begin + 1), (begin, end))

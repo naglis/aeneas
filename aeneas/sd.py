@@ -285,7 +285,7 @@ class SD(Configurable):
             query_mfcc.reverse()
 
         # NOTE: VAD will be run here, if not done before
-        speech_intervals = self.real_wave_mfcc.intervals(speech=True, time=False)
+        speech_intervals = self.real_wave_mfcc.intervals(speech=True)
         if len(speech_intervals) < 1:
             logger.debug("No speech intervals, hence no start found")
             if tail:

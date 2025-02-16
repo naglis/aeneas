@@ -35,7 +35,6 @@ from aeneas.logger import Configurable
 from aeneas.runtimeconfiguration import RuntimeConfiguration
 from aeneas.textfile import TextFile, TextFileFormat
 import aeneas.globalfunctions as gf
-import aeneas.globalconstants as gc
 
 logger = logging.getLogger(__name__)
 
@@ -94,9 +93,9 @@ class AbstractCLIProgram(Configurable):
             f"python -m aeneas.tools.{self.NAME}" if invoke is None else invoke
         )
         self.use_sys = use_sys
-        self.formal_arguments_raw = []
-        self.formal_arguments = []
-        self.actual_arguments = []
+        self.formal_arguments_raw: list[str] = []
+        self.formal_arguments: list[str] = []
+        self.actual_arguments: list[str] = []
 
     PREFIX_TO_PRINT_FUNCTION = {
         logging.CRITICAL: gf.print_error,
@@ -182,11 +181,7 @@ class AbstractCLIProgram(Configurable):
         ]
         if "synopsis" in self.HELP:
             for syn, opt in self.HELP["synopsis"]:
-                if opt:
-                    opt = " [OPTIONS]"
-                else:
-                    opt = ""
-                synopsis.append(f"  {self.invoke} {syn}{opt}")
+                synopsis.append(f"  {self.invoke} {syn}{' [OPTIONS]' if opt else ''}")
 
         synopsis.append("")
 
@@ -201,8 +196,8 @@ class AbstractCLIProgram(Configurable):
             "  -vv, --very-verbose : verbose output, print date/time values",
         ]
         if "options" in self.HELP:
-            for opt in self.HELP["options"]:
-                options.append(f"  {opt}")
+            for help_opt in self.HELP["options"]:
+                options.append(f"  {help_opt}")
         options = ["OPTIONS"] + sorted(options) + [""]
 
         parameters = []
@@ -268,7 +263,7 @@ class AbstractCLIProgram(Configurable):
             self.print_generic("\n" + "\n".join(self.RCONF_PARAMETERS) + "\n")
         return self.exit(self.HELP_EXIT_CODE)
 
-    def run(self, arguments: typing.Sequence[str], *, show_help: bool = True) -> int:
+    def run(self, arguments: list[str], *, show_help: bool = True) -> int:
         """
         Program entry point.
 
@@ -283,25 +278,7 @@ class AbstractCLIProgram(Configurable):
         :type  show_help: bool
         :rtype: int
         """
-        # convert arguments into Unicode strings
-        if self.use_sys:
-            # check that sys.stdin.encoding and sys.stdout.encoding are set to utf-8
-            if not gf.FROZEN:
-                if sys.stdin.encoding not in gc.UTF8_ENCODING_VARIANTS:
-                    self.print_warning(
-                        "The default input encoding is not UTF-8. "
-                        "You might want to set 'PYTHONIOENCODING=UTF-8' in your shell."
-                    )
-                if sys.stdout.encoding not in gc.UTF8_ENCODING_VARIANTS:
-                    self.print_warning(
-                        "The default output encoding is not UTF-8. "
-                        "You might want to set 'PYTHONIOENCODING=UTF-8' in your shell."
-                    )
-            # decode using sys.stdin.encoding
-            args = [gf.safe_unicode_stdin(arg) for arg in arguments]
-        else:
-            # decode using utf-8 (but you should pass Unicode strings as parameters anyway)
-            args = [gf.safe_unicode(arg) for arg in arguments]
+        args = arguments[:]
 
         if show_help:
             if "-h" in args:

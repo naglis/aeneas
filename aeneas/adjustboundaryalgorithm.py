@@ -432,7 +432,7 @@ class AdjustBoundaryAlgorithm(Configurable):
             logger.debug("    Tolerance: %.3f", tolerance)
             long_nonspeech_intervals = [
                 i
-                for i in real_wave_mfcc.intervals(speech=False, time=True)
+                for i in real_wave_mfcc.time_intervals(speech=False)
                 if i.length >= ns_min
             ]
             pairs = self.smflist.fragments_ending_inside_nonspeech_intervals(

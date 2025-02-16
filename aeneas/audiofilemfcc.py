@@ -42,6 +42,9 @@ import aeneas.globalfunctions as gf
 logger = logging.getLogger(__name__)
 
 
+Interval = tuple[int, int]
+
+
 class AudioFileMFCC(Configurable):
     """
     A monoaural (single channel) WAVE audio file,
@@ -116,9 +119,9 @@ class AudioFileMFCC(Configurable):
         self.is_reversed = False
         self.__mfcc = None
         self.__mfcc_mask = None
-        self.__mfcc_mask_map = None
-        self.__speech_intervals = []
-        self.__nonspeech_intervals = None
+        self.__mfcc_mask_map = []
+        self.__speech_intervals: list[Interval] = []
+        self.__nonspeech_intervals: list[Interval] = []
         logger.debug("Initializing MFCCs...")
         if mfcc_matrix is not None:
             self.__mfcc = mfcc_matrix
@@ -354,9 +357,7 @@ class AudioFileMFCC(Configurable):
         end = numpy.searchsorted(self.__mfcc_mask_map, self.__middle_end, side="right")
         return (begin, end)
 
-    def intervals(
-        self, speech: bool = True, time: bool = True
-    ) -> list[tuple[int, int]] | list[TimeInterval]:
+    def intervals(self, speech: bool = True) -> list[Interval]:
         """
         Return a list of intervals::
 
@@ -367,8 +368,6 @@ class AudioFileMFCC(Configurable):
 
         :param bool speech: if ``True``, return speech intervals,
                             otherwise return nonspeech intervals
-        :param bool time: if ``True``, return :class:`~aeneas.exacttiming.TimeInterval` objects,
-                          otherwise return indices (int)
         :rtype: list of pairs (see above)
         """
         self._ensure_mfcc_mask()
@@ -378,14 +377,16 @@ class AudioFileMFCC(Configurable):
         else:
             logger.debug("Converting nonspeech runs to intervals...")
             intervals = self.__nonspeech_intervals
-        if time:
-            mws = self.rconf.mws
-            intervals = [
-                TimeInterval(begin=(b * mws), end=((e + 1) * mws)) for b, e in intervals
-            ]
         return intervals
 
-    def inside_nonspeech(self, index: int) -> tuple[int, int] | None:
+    def time_intervals(self, speech: bool = True) -> list[TimeInterval]:
+        mws = self.rconf.mws
+        return [
+            TimeInterval(begin=(b * mws), end=((e + 1) * mws))
+            for b, e in self.intervals(speech=speech)
+        ]
+
+    def inside_nonspeech(self, index: int) -> Interval | None:
         """
         If ``index`` is contained in a nonspeech interval,
         return a pair ``(interval_begin, interval_end)``
@@ -482,51 +483,43 @@ class AudioFileMFCC(Configurable):
         """
         logger.debug("Computing MFCCs using C extension...")
         try:
-            logger.debug("Importing cmfcc...")
             import aeneas.cmfcc.cmfcc as cmfcc
 
-            logger.debug("Importing cmfcc... done")
-
-            self.__mfcc = (
-                cmfcc.compute_from_data(
-                    self.audio_file.audio_samples,
-                    self.audio_file.audio_sample_rate,
-                    self.rconf[RuntimeConfiguration.MFCC_FILTERS],
-                    self.rconf[RuntimeConfiguration.MFCC_SIZE],
-                    self.rconf[RuntimeConfiguration.MFCC_FFT_ORDER],
-                    self.rconf[RuntimeConfiguration.MFCC_LOWER_FREQUENCY],
-                    self.rconf[RuntimeConfiguration.MFCC_UPPER_FREQUENCY],
-                    self.rconf[RuntimeConfiguration.MFCC_EMPHASIS_FACTOR],
-                    self.rconf[RuntimeConfiguration.MFCC_WINDOW_LENGTH],
-                    self.rconf[RuntimeConfiguration.MFCC_WINDOW_SHIFT],
-                )[0]
-            ).transpose()
+            self.__mfcc = cmfcc.compute_from_data(
+                self.audio_file.audio_samples,
+                self.audio_file.audio_sample_rate,
+                self.rconf[RuntimeConfiguration.MFCC_FILTERS],
+                self.rconf[RuntimeConfiguration.MFCC_SIZE],
+                self.rconf[RuntimeConfiguration.MFCC_FFT_ORDER],
+                self.rconf[RuntimeConfiguration.MFCC_LOWER_FREQUENCY],
+                self.rconf[RuntimeConfiguration.MFCC_UPPER_FREQUENCY],
+                self.rconf[RuntimeConfiguration.MFCC_EMPHASIS_FACTOR],
+                self.rconf[RuntimeConfiguration.MFCC_WINDOW_LENGTH],
+                self.rconf[RuntimeConfiguration.MFCC_WINDOW_SHIFT],
+            )[0].transpose()
             logger.debug("Computing MFCCs using C extension... done")
-            return (True, None)
+            return True, None
         except Exception:
             logger.exception("An unexpected error occurred while running cmfcc")
-        return (False, None)
+        return False, None
 
     def _compute_mfcc_pure_python(self) -> tuple[bool, None]:
         """
         Compute MFCCs using the pure Python code.
         """
         logger.debug("Computing MFCCs using pure Python code...")
+        mfcc = MFCC(rconf=self.rconf)
         try:
-            self.__mfcc = (
-                MFCC(rconf=self.rconf)
-                .compute_from_data(
-                    self.audio_file.audio_samples, self.audio_file.audio_sample_rate
-                )
-                .transpose()
-            )
+            self.__mfcc = mfcc.compute_from_data(
+                self.audio_file.audio_samples, self.audio_file.audio_sample_rate
+            ).transpose()
             logger.debug("Computing MFCCs using pure Python code... done")
-            return (True, None)
+            return True, None
         except Exception:
             logger.exception(
                 "An unexpected error occurred while running pure Python code"
             )
-        return (False, None)
+        return False, None
 
     def reverse(self):
         """

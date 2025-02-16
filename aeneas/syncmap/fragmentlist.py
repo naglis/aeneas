@@ -89,7 +89,7 @@ class SyncMapFragmentList(collections.abc.MutableSequence):
         self.__sorted = True
         self.__fragments: list[SyncMapFragment] = []
 
-    def __getitem__(self, index: int) -> SyncMapFragment:
+    def __getitem__(self, index):
         return self.__fragments[index]
 
     def __setitem__(self, index, value):

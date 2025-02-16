@@ -30,6 +30,9 @@ import typing
 
 import aeneas.globalfunctions as gf
 
+if typing.TYPE_CHECKING:
+    from aeneas.syncmap.fragment import SyncMapFragment
+
 logger = logging.getLogger(__name__)
 
 
@@ -110,7 +113,7 @@ class Tree(collections.abc.Sized):
         return [n for n in self.children if not n.is_empty]
 
     @property
-    def vchildren_not_empty(self) -> list["Tree"]:
+    def vchildren_not_empty(self) -> list["SyncMapFragment"]:
         """
         Return the list of values of the not empty direct children of this node.
         """

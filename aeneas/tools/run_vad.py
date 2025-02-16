@@ -115,8 +115,13 @@ class RunVADCLI(AbstractCLIProgram):
         audio_file_mfcc.run_vad()
         self.print_info("Executing VAD... done")
 
-        speech = audio_file_mfcc.intervals(speech=True, time=output_time)
-        nonspeech = audio_file_mfcc.intervals(speech=False, time=output_time)
+        if output_time:
+            speech = audio_file_mfcc.time_intervals(speech=True)
+            nonspeech = audio_file_mfcc.time_intervals(speech=False)
+        else:
+            speech = audio_file_mfcc.intervals(speech=True)
+            nonspeech = audio_file_mfcc.intervals(speech=False)
+
         if mode == "speech":
             if output_time:
                 intervals = [(i.begin, i.end) for i in speech]

@@ -354,6 +354,8 @@ class SyncMap(collections.abc.Sized):
         :param dict parameters: additional parameters (e.g., for ``SMIL`` input)
         """
 
+        parameters = parameters or {}
+
         reader = SyncMapFormat.CODE_TO_CLASS[sync_map_format](
             variant=sync_map_format,
             parameters=parameters,

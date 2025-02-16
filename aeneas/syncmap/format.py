@@ -22,6 +22,7 @@
 
 
 from aeneas.syncmap.smfaudacity import SyncMapFormatAudacity
+from aeneas.syncmap.smfbase import SyncMapFormatBase
 from aeneas.syncmap.smfcsv import SyncMapFormatCSV
 from aeneas.syncmap.smfeaf import SyncMapFormatEAF
 from aeneas.syncmap.smfjson import SyncMapFormatJSON
@@ -604,7 +605,7 @@ class SyncMapFormat:
     * Multiple lines: yes
     """
 
-    CODE_TO_CLASS = {
+    CODE_TO_CLASS: dict[str, type[SyncMapFormatBase]] = {
         AUD: SyncMapFormatAudacity,
         AUDH: SyncMapFormatAudacity,
         AUDM: SyncMapFormatAudacity,

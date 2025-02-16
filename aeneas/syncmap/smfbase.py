@@ -49,7 +49,7 @@ class SyncMapFormatBase(abc.ABC):
         """
         super().__init__()
         self.variant = variant
-        self.parameters = parameters
+        self.parameters = parameters or {}
 
     @abc.abstractmethod
     def parse(self, buf: typing.IO[bytes]) -> typing.Iterator[SyncMapFragment]:

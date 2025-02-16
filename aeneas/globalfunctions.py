@@ -454,7 +454,7 @@ def time_from_srt(string: str) -> TimeValue:
     return time_from_hhmmssmmm(string, decimal_separator=",")
 
 
-def time_to_srt(time_value: TimeValue) -> str:
+def time_to_srt(time_value: float) -> str:
     """
     Format the given time value into a ``HH:MM:SS,mmm`` string,
     as used in the SRT format.
@@ -654,15 +654,13 @@ def relative_path(path: str | None, from_file: str) -> str | None:
     return os.path.relpath(abs_path_target, start=abs_path_cwd)
 
 
-def absolute_path(path: str | None, from_file: str) -> str | None:
+def absolute_path(path: str, from_file: str) -> str:
     """
     Return the absolute path of a file or directory, specified
     as ``path`` relative to (the parent directory of) ``from_file``.
 
     This method is intented to be called with ``__file__``
     as second argument.
-
-    If ``path`` is ``None``, return ``None``.
 
     Example: ::
 
@@ -674,8 +672,6 @@ def absolute_path(path: str | None, from_file: str) -> str | None:
     :param string from_file: the reference file
     :rtype: string
     """
-    if path is None:
-        return None
     current_directory = os.path.dirname(from_file)
     target = os.path.join(current_directory, path)
     return os.path.abspath(target)
