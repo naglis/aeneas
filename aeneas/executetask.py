@@ -127,13 +127,15 @@ class ExecuteTask(Configurable):
             raise ExecuteTaskInputError(
                 "The task does not seem to have its audio file set"
             )
-        if self.task.audio_file.audio_length is None or (
-            self.task.audio_file.audio_length <= 0
+        if (
+            self.task.audio_file.audio_length is None
+            or self.task.audio_file.audio_length <= 0
         ):
             raise ExecuteTaskInputError("The task seems to have an invalid audio file")
         task_max_audio_length = self.rconf[RuntimeConfiguration.TASK_MAX_AUDIO_LENGTH]
-        if (task_max_audio_length > 0) and (
-            self.task.audio_file.audio_length > task_max_audio_length
+        if (
+            task_max_audio_length > 0
+            and self.task.audio_file.audio_length > task_max_audio_length
         ):
             raise ExecuteTaskInputError(
                 f"The audio file of the task has length {self.task.audio_file.audio_length:.3f}, "

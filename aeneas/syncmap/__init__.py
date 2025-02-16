@@ -34,12 +34,12 @@ This package contains the following classes:
 
 import copy
 import itertools
-import json
 import logging
 import os
 import typing
 
 from aeneas.syncmap.format import SyncMapFormat
+from aeneas.syncmap.smfjson import SyncMapFormatJSON
 from aeneas.syncmap.fragment import SyncMapFragment, FragmentType
 from aeneas.syncmap.fragmentlist import SyncMapFragmentList
 from aeneas.syncmap.headtailformat import SyncMapHeadTailFormat
@@ -227,11 +227,11 @@ class SyncMap:
         return result
 
     @property
-    def json_string(self) -> str:
+    def json_dict(self) -> dict[str, list]:
         """
         Return a JSON representation of the sync map.
 
-        :rtype: string
+        :rtype: dict
 
         .. versionadded:: 1.3.1
         """
@@ -255,7 +255,7 @@ class SyncMap:
             return output_fragments
 
         output_fragments = visit_children(self.fragments_tree)
-        return json.dumps({"fragments": output_fragments}, indent=1, sort_keys=True)
+        return {"fragments": output_fragments}
 
     def clear(self):
         """
@@ -296,7 +296,7 @@ class SyncMap:
             ),
             (
                 self.FINETUNEAS_REPLACE_FRAGMENTS,
-                f"fragments = ({self.json_string}).fragments;",
+                f"fragments = ({SyncMapFormatJSON().format(self)}).fragments;",
             ),
             (
                 self.FINETUNEAS_REPLACE_SUGGESTED_FILENAME,

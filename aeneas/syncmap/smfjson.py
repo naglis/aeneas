@@ -46,4 +46,6 @@ class SyncMapFormatJSON(SyncMapFormatBase):
             )
 
     def format(self, syncmap):
-        return syncmap.json_string
+        return json.dumps(
+            syncmap.json_dict, ensure_ascii=False, indent=1, sort_keys=True
+        )

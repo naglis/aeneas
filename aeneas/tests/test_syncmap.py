@@ -156,9 +156,22 @@ class TestSyncMap(BaseSyncMapCase):
         syn = self.load("txt")
         self.assertTrue(syn.leaves())
 
-    def test_json_string(self):
-        syn = self.load("txt")
-        self.assertTrue(syn.json_string)
+    def test_json_dict(self):
+        json_dict = self.load("txt").json_dict
+
+        self.assertIn("fragments", json_dict)
+        self.assertEqual(len(json_dict["fragments"]), 15)
+        self.assertEqual(
+            json_dict["fragments"][0],
+            {
+                "begin": "0.000",
+                "children": [],
+                "end": "2.680",
+                "id": "f000001",
+                "language": Language.ENG,
+                "lines": ["1"],
+            },
+        )
 
     def test_clear(self):
         syn = self.load("txt")
