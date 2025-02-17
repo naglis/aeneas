@@ -53,6 +53,12 @@ import aeneas.globalfunctions as gf
 logger = logging.getLogger(__name__)
 
 
+class AudioFormat(typing.NamedTuple):
+    name: str
+    channels: int
+    sample_rate: int
+
+
 class AudioFileConverterError(Exception):
     """
     Error raised when the audio converter executable cannot be executed.
@@ -189,7 +195,9 @@ class AudioFile(Configurable):
     )
     """ Extensions of common formats for audio (and video) files. """
 
-    def __init__(self, file_path=None, file_format=None, rconf=None):
+    def __init__(
+        self, file_path=None, file_format: AudioFormat | None = None, rconf=None
+    ):
         super().__init__(rconf=rconf)
         self.file_path = file_path
         self.file_format = file_format
@@ -203,9 +211,11 @@ class AudioFile(Configurable):
         self.__samples = None
 
     def __str__(self):
-        fmt = self.file_format
-        if isinstance(fmt, tuple):
-            fmt = "%s %d %d" % fmt
+        if self.file_format is None:
+            fmt = None
+        else:
+            fmt = f"{self.file_format.name} {self.file_format.channels:d} {self.file_format.sample_rate}"
+
         return (
             f"File path:         {self.file_path}"
             "\n"
@@ -389,7 +399,7 @@ class AudioFile(Configurable):
         # determine if we need to convert the audio file
         convert_audio_file = self.file_format is None or (
             self.rconf.safety_checks
-            and self.file_format != ("pcm_s16le", 1, self.rconf.sample_rate)
+            and self.file_format != AudioFormat("pcm_s16le", 1, self.rconf.sample_rate)
         )
 
         with contextlib.ExitStack() as exit_stack:
@@ -411,7 +421,9 @@ class AudioFile(Configurable):
                 try:
                     logger.debug("Converting audio file to mono...")
                     converter.convert(self.file_path, tmp_file_path)
-                    self.file_format = ("pcm_s16le", 1, self.rconf.sample_rate)
+                    self.file_format = AudioFormat(
+                        "pcm_s16le", 1, self.rconf.sample_rate
+                    )
                     logger.debug("Converting audio file to mono... done")
                 except FFMPEGPathError as exc:
                     raise AudioFileConverterError(

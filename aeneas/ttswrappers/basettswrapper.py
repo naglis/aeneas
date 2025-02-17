@@ -34,7 +34,7 @@ import sys
 import tempfile
 import typing
 
-from aeneas.audiofile import AudioFile, AudioFileUnsupportedFormatError
+from aeneas.audiofile import AudioFile, AudioFormat, AudioFileUnsupportedFormatError
 from aeneas.exacttiming import TimeValue
 from aeneas.language import Language
 from aeneas.logger import Configurable
@@ -43,12 +43,6 @@ from aeneas.textfile import TextFile
 import aeneas.globalfunctions as gf
 
 logger = logging.getLogger(__name__)
-
-
-class AudioFormat(typing.NamedTuple):
-    name: str
-    channels: int
-    sample_rate: int
 
 
 class SynthesisResult(typing.NamedTuple):
@@ -152,7 +146,7 @@ class BaseTTSWrapper(abc.ABC, Configurable):
     List of all language codes with their human-readable names.
     """
 
-    OUTPUT_AUDIO_FORMAT: typing.ClassVar[tuple[str, int, int]]
+    OUTPUT_AUDIO_FORMAT: typing.ClassVar[AudioFormat]
     """
     A tuple ``(codec, channels, rate)``
     specifying the format

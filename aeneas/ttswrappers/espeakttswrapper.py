@@ -31,10 +31,11 @@ for further details.
 
 import logging
 
+from aeneas.audiofile import AudioFormat
 from aeneas.exacttiming import TimeValue
 from aeneas.language import Language
 from aeneas.runtimeconfiguration import RuntimeConfiguration
-from aeneas.ttswrappers.basettswrapper import BaseTTSWrapper, AudioFormat
+from aeneas.ttswrappers.basettswrapper import BaseTTSWrapper
 import aeneas.globalfunctions as gf
 
 logger = logging.getLogger(__name__)
