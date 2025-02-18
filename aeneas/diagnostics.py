@@ -34,6 +34,7 @@ This module can be executed from command line with::
 """
 
 import contextlib
+import os.path
 import sys
 import tempfile
 
@@ -107,7 +108,7 @@ class Diagnostics:
             return False
 
     @classmethod
-    def check_ffmpeg(cls):
+    def check_ffmpeg(cls, tmp_dir: str):
         """
         Check whether ``ffmpeg`` can be called.
 
@@ -120,10 +121,8 @@ class Diagnostics:
 
             input_file_path = gf.absolute_path("tools/res/audio.mp3", __file__)
             converter = FFMPEGWrapper()
-            with tempfile.NamedTemporaryFile(
-                prefix="aeneas.diagnostics.", suffix=".wav"
-            ) as tmp_file:
-                result = converter.convert(input_file_path, tmp_file.name)
+            tmp_file_path = os.path.join(tmp_dir, "ffmpegwrapper.wav")
+            result = converter.convert(input_file_path, tmp_file_path)
             if result:
                 gf.print_success("ffmpeg         OK")
                 return False
@@ -133,7 +132,7 @@ class Diagnostics:
         return True
 
     @classmethod
-    def check_espeak(cls):
+    def check_espeak(cls, tmp_dir: str):
         """
         Check whether ``espeak`` can be called.
 
@@ -142,8 +141,7 @@ class Diagnostics:
         :rtype: bool
         """
         try:
-            from aeneas.textfile import TextFile
-            from aeneas.textfile import TextFragment
+            from aeneas.textfile import TextFile, TextFragment
             from aeneas.ttswrappers.espeakttswrapper import ESPEAKTTSWrapper
 
             text = "From fairest creatures we desire increase,"
@@ -151,10 +149,8 @@ class Diagnostics:
             text_file.add_fragment(
                 TextFragment(language="eng", lines=[text], filtered_lines=[text])
             )
-            with tempfile.NamedTemporaryFile(
-                prefix="aeneas.diagnostics.", suffix=".wav"
-            ) as tmp_file:
-                ESPEAKTTSWrapper().synthesize_multiple(text_file, tmp_file.name)
+            tmp_file_path = os.path.join(tmp_dir, "espeak.wav")
+            ESPEAKTTSWrapper().synthesize_multiple(text_file, tmp_file_path)
             gf.print_success("espeak         OK")
         except Exception:
             gf.print_error("espeak         ERROR")
@@ -270,14 +266,16 @@ class Diagnostics:
         :rtype: (bool, bool, bool)
         """
         # errors are fatal
-        if cls.check_ffprobe():
-            return (True, False, False)
-        if cls.check_ffmpeg():
-            return (True, False, False)
-        if cls.check_espeak():
-            return (True, False, False)
-        if (tools) and (cls.check_tools()):
-            return (True, False, False)
+        with tempfile.TemporaryDirectory(prefix="aeneas.diagnostics.") as tmp_dir:
+            if cls.check_ffprobe():
+                return True, False, False
+            if cls.check_ffmpeg(tmp_dir):
+                return True, False, False
+            if cls.check_espeak(tmp_dir):
+                return True, False, False
+            if tools and cls.check_tools():
+                return True, False, False
+
         # warnings are non-fatal
         warnings = False
         c_ext_warnings = False
@@ -290,7 +288,7 @@ class Diagnostics:
             c_ext_warnings = cls.check_cengw() or c_ext_warnings
             c_ext_warnings = cls.check_cew() or c_ext_warnings
         # return results
-        return (False, warnings, c_ext_warnings)
+        return False, warnings, c_ext_warnings
 
 
 def main():
