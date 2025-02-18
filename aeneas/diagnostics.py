@@ -167,6 +167,41 @@ class Diagnostics:
             return False
 
     @classmethod
+    def check_espeak_ng(cls, tmp_dir: str):
+        """
+        Check whether ``espeak-ng`` can be called.
+
+        Return ``True`` on failure and ``False`` on success.
+
+        :rtype: bool
+        """
+        try:
+            from aeneas.textfile import TextFile, TextFragment
+            from aeneas.ttswrappers.espeakngttswrapper import ESPEAKNGTTSWrapper
+
+            text = "From fairest creatures we desire increase,"
+            text_file = TextFile()
+            text_file.add_fragment(
+                TextFragment(language="eng", lines=[text], filtered_lines=[text])
+            )
+            tmp_file_path = os.path.join(tmp_dir, "espeak-ng.wav")
+            ESPEAKNGTTSWrapper().synthesize_multiple(text_file, tmp_file_path)
+            gf.print_success("espeak-ng      OK")
+        except Exception:
+            gf.print_error("espeak-ng      ERROR")
+            gf.print_info("  Please make sure you have espeak-ng installed correctly")
+            gf.print_info("  and that its path is in your PATH environment variable")
+            gf.print_info(
+                "  You might also want to check that the espeak-ng-data directory"
+            )
+            gf.print_info(
+                "  is set up correctly, for example, it has the correct permissions"
+            )
+            return True
+        else:
+            return False
+
+    @classmethod
     def check_tools(cls):
         """
         Check whether ``aeneas.tools.*`` can be imported.
@@ -270,6 +305,8 @@ class Diagnostics:
             if cls.check_ffprobe():
                 return True, False, False
             if cls.check_ffmpeg(tmp_dir):
+                return True, False, False
+            if cls.check_espeak_ng(tmp_dir):
                 return True, False, False
             if cls.check_espeak(tmp_dir):
                 return True, False, False
