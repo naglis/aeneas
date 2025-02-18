@@ -91,13 +91,13 @@ class Configuration:
     of this object.
     """
 
-    TRUE_ALIASES = [True, "TRUE", "True", "true", "YES", "Yes", "yes", "1", 1]
+    TRUE_ALIASES = (True, "TRUE", "True", "true", "YES", "Yes", "yes", "1", 1)
     """
     Aliases for a ``True`` value for ``bool`` fields
     """
 
-    def __init__(self, config_string=None):
-        if (config_string is not None) and (not isinstance(config_string, str)):
+    def __init__(self, config_string: str | None = None):
+        if config_string is not None and not isinstance(config_string, str):
             raise TypeError("config_string is not a string")
 
         # set dictionaries up to keep the config data
@@ -106,7 +106,7 @@ class Configuration:
         self.aliases = {}
         self.desc = {}
         for field, info in self.FIELDS:
-            (fdefault, ftype, faliases, fdesc) = info
+            fdefault, ftype, faliases, fdesc = info
             self.data[field] = fdefault
             self.types[field] = ftype
             self.desc[field] = fdesc
@@ -116,9 +116,9 @@ class Configuration:
         if config_string is not None:
             # strip leading/trailing " or ' characters
             if (
-                (len(config_string) > 0)
-                and (config_string[0] == config_string[-1])
-                and (config_string[0] in ['"', "'"])
+                len(config_string) > 0
+                and config_string[0] == config_string[-1]
+                and config_string[0] in ['"', "'"]
             ):
                 config_string = config_string[1:-1]
             # populate values from config_string,
@@ -128,7 +128,7 @@ class Configuration:
                 self.data[key] = properties[key]
 
     def __contains__(self, key):
-        return (key in self.data) or (key in self.aliases)
+        return key in self.data or key in self.aliases
 
     def __setitem__(self, key, value):
         if key in self.aliases:
@@ -147,12 +147,10 @@ class Configuration:
             raise KeyError(key)
 
     def __str__(self):
-        return "\n".join(
-            [f"{fn}: '{self.data[fn]}'" for fn in sorted(self.data.keys())]
-        )
+        return "\n".join([f"{fn}: {self.data[fn]!r}" for fn in sorted(self.data)])
 
     def _cast(self, key, value):
-        if (value is not None) and (self.types[key] is not None):
+        if value is not None and self.types[key] is not None:
             if self.types[key] is bool:
                 return value in self.TRUE_ALIASES
             else:
@@ -170,7 +168,7 @@ class Configuration:
         return copy.deepcopy(self)
 
     @property
-    def config_string(self):
+    def config_string(self) -> str:
         """
         Build the storable string corresponding
         to this configuration object.
@@ -191,7 +189,7 @@ class Configuration:
         return gc.CONFIG_STRING_SEPARATOR_SYMBOL.join(values)
 
     @classmethod
-    def parameters(cls, sort=True, as_strings=False):
+    def parameters(cls, sort: bool = True, as_strings: bool = False):
         """
         Return a list of tuples ``(field, description, type, default)``,
         one for each field of the configuration.
@@ -206,7 +204,7 @@ class Configuration:
             if ftype is None:
                 return ""
 
-            if ftype in [TimeValue, decimal.Decimal, float]:
+            if ftype in (TimeValue, decimal.Decimal, float):
                 cftype = "float"
                 cfdefault = "%.3f" % ftype(fdefault) if fdefault is not None else "None"
             elif ftype is int:

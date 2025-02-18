@@ -786,7 +786,7 @@ class RuntimeConfiguration(Configuration):
     # NOTE not using aliases just not to become confused
     #      about external (user rconf) and internal (lib code) key names
     #      although the functionality might be useful in the future
-    FIELDS = [
+    FIELDS = (
         (
             ABA_NONSPEECH_TOLERANCE,
             ("0.080", TimeValue, [], "adjust nonspeech tolerance, in s"),
@@ -952,10 +952,7 @@ class RuntimeConfiguration(Configuration):
             VAD_MIN_NONSPEECH_LENGTH,
             ("0.200", TimeValue, [], "min nonspeech interval length, in s"),
         ),
-    ]
-
-    def __init__(self, config_string=None):
-        super().__init__(config_string)
+    )
 
     @property
     def safety_checks(self):
@@ -1063,7 +1060,7 @@ class RuntimeConfiguration(Configuration):
 
         :param int level: the desired granularity level
         """
-        if level in self.MFCC_GRANULARITY_MAP.keys():
+        if level in self.MFCC_GRANULARITY_MAP:
             margin_key, mask_key, length_key, shift_key = self.MFCC_GRANULARITY_MAP[
                 level
             ]
@@ -1088,7 +1085,7 @@ class RuntimeConfiguration(Configuration):
 
         :param int level: the desired granularity level
         """
-        if level in self.TTS_GRANULARITY_MAP.keys():
+        if level in self.TTS_GRANULARITY_MAP:
             tts_key, tts_path_key = self.TTS_GRANULARITY_MAP[level]
             self[self.TTS] = self[tts_key]
             self[self.TTS_PATH] = self[tts_path_key]

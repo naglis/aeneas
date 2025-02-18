@@ -441,7 +441,7 @@ class AdjustBoundaryAlgorithm(Configurable):
             # ignore HEAD and TAIL
             min_index = 1
             max_index = len(self.smflist) - 1
-            pairs = [(n, i) for (n, i) in pairs if (i >= min_index) and (i < max_index)]
+            pairs = [(n, i) for n, i in pairs if i >= min_index and i < max_index]
             self.smflist.inject_long_nonspeech_fragments(pairs, ns_string)
             logger.debug("  Checking and fixing... done")
         else:
@@ -455,7 +455,7 @@ class AdjustBoundaryAlgorithm(Configurable):
         logger.debug("Called _smooth_fragment_list")
         self.smflist[0].begin = TimeValue("0.000")
         self.smflist[-1].end = real_wave_mfcc_audio_length
-        if ns_string in [None, gc.PPV_TASK_ADJUST_BOUNDARY_NONSPEECH_REMOVE]:
+        if ns_string in (None, gc.PPV_TASK_ADJUST_BOUNDARY_NONSPEECH_REMOVE):
             logger.debug("Remove all NONSPEECH fragments")
             self.smflist.remove_nonspeech_fragments(zero_length_only=False)
         else:

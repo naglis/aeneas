@@ -196,7 +196,10 @@ class AudioFile(Configurable):
     """ Extensions of common formats for audio (and video) files. """
 
     def __init__(
-        self, file_path=None, file_format: AudioFormat | None = None, rconf=None
+        self,
+        file_path: str | None = None,
+        file_format: AudioFormat | None = None,
+        rconf=None,
     ):
         super().__init__(rconf=rconf)
         self.file_path = file_path

@@ -10,10 +10,10 @@ Functions
 """
 
 import sys
-import numpy
 import struct
 import warnings
 
+import numpy
 
 __all__ = ["WavFileWarning", "read", "write"]
 
