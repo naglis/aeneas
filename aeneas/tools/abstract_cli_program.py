@@ -19,10 +19,11 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 """
-An "abstract" class containing functions common
+An abstract class containing functions common
 to the CLI programs in aeneas.tools.
 """
 
+import abc
 import logging
 import os
 import os.path
@@ -47,7 +48,7 @@ class CLIHelp(typing.TypedDict):
     examples: typing.Sequence[str]
 
 
-class AbstractCLIProgram(Configurable):
+class AbstractCLIProgram(Configurable, abc.ABC):
     """
     This class is an "abstract" CLI program.
 
@@ -401,15 +402,13 @@ class AbstractCLIProgram(Configurable):
                 return "=".join(lis[1:])
         return None
 
+    @abc.abstractmethod
     def perform_command(self) -> int:
         """
         Perform command and return the appropriate exit code.
 
         :rtype: int
         """
-        logger.debug("This function should be overloaded in derived classes")
-        logger.debug("Invoked with %s", self.actual_arguments)
-        return self.NO_ERROR_EXIT_CODE
 
     def check_c_extensions(self, name: str | None = None) -> bool:
         """
@@ -495,14 +494,3 @@ class AbstractCLIProgram(Configurable):
             except OSError:
                 self.print_error(f"Cannot read file {text!r}")
             return None
-
-
-def main() -> int:
-    """
-    Execute program.
-    """
-    return AbstractCLIProgram().run(arguments=sys.argv)
-
-
-if __name__ == "__main__":
-    raise SystemExit(main())
