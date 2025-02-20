@@ -25,11 +25,11 @@ Perform validation on a task configuration string
 import os.path
 import sys
 
-from aeneas.tools.abstract_cli_program import AbstractCLIProgram
+from aeneas.tools.cli_program import CLIProgram
 from aeneas.validator import Validator
 
 
-class ValidateCLI(AbstractCLIProgram):
+class ValidateCLI(CLIProgram):
     """
     Perform validation on a task configuration string
     """

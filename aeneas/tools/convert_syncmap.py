@@ -29,12 +29,12 @@ import os.path
 
 from aeneas.syncmap import SyncMap
 from aeneas.syncmap import SyncMapFormat
-from aeneas.tools.abstract_cli_program import AbstractCLIProgram
+from aeneas.tools.cli_program import CLIProgram
 import aeneas.globalconstants as gc
 import aeneas.globalfunctions as gf
 
 
-class ConvertSyncMapCLI(AbstractCLIProgram):
+class ConvertSyncMapCLI(CLIProgram):
     """
     Convert a sync map from a format to another.
     """

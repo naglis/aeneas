@@ -29,11 +29,11 @@ import sys
 
 from aeneas.ffmpegwrapper import FFMPEGPathError, FFMPEGWrapper
 from aeneas.runtimeconfiguration import RuntimeConfiguration
-from aeneas.tools.abstract_cli_program import AbstractCLIProgram
+from aeneas.tools.cli_program import CLIProgram
 import aeneas.globalfunctions as gf
 
 
-class FFMPEGWrapperCLI(AbstractCLIProgram):
+class FFMPEGWrapperCLI(CLIProgram):
     """
     Convert audio files to mono WAV using the ``ffmpeg`` wrapper.
     """

@@ -31,11 +31,11 @@ from aeneas.audiofile import (
     AudioFileUnsupportedFormatError,
 )
 from aeneas.runtimeconfiguration import RuntimeConfiguration
-from aeneas.tools.abstract_cli_program import AbstractCLIProgram
+from aeneas.tools.cli_program import CLIProgram
 import aeneas.globalfunctions as gf
 
 
-class ReadAudioCLI(AbstractCLIProgram):
+class ReadAudioCLI(CLIProgram):
     """
     Read audio file properties.
     """

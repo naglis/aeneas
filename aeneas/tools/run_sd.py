@@ -36,12 +36,12 @@ from aeneas.audiofilemfcc import AudioFileMFCC
 from aeneas.runtimeconfiguration import RuntimeConfiguration
 from aeneas.sd import SD
 from aeneas.textfile import TextFileFormat
-from aeneas.tools.abstract_cli_program import AbstractCLIProgram
+from aeneas.tools.cli_program import CLIProgram
 import aeneas.globalconstants as gc
 import aeneas.globalfunctions as gf
 
 
-class RunSDCLI(AbstractCLIProgram):
+class RunSDCLI(CLIProgram):
     """
     Detect the audio head and/or tail of the given audio file.
     """

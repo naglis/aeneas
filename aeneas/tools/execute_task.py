@@ -37,7 +37,7 @@ from aeneas.syncmap import SyncMapFormat, SyncMapHeadTailFormat
 from aeneas.syncmap.fragment import FragmentType
 from aeneas.task import Task, TaskConfiguration
 from aeneas.textfile import TextFileFormat
-from aeneas.tools.abstract_cli_program import AbstractCLIProgram
+from aeneas.tools.cli_program import CLIProgram
 from aeneas.ttswrappers.espeakngttswrapper import ESPEAKNGTTSWrapper
 from aeneas.ttswrappers.espeakttswrapper import ESPEAKTTSWrapper
 from aeneas.ttswrappers.festivalttswrapper import FESTIVALTTSWrapper
@@ -46,7 +46,7 @@ import aeneas.globalconstants as gc
 import aeneas.globalfunctions as gf
 
 
-class ExecuteTaskCLI(AbstractCLIProgram):
+class ExecuteTaskCLI(CLIProgram):
     """
     Execute a Task, that is, a pair of audio/text files
     and a configuration string.

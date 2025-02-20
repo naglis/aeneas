@@ -48,7 +48,7 @@ class CLIHelp(typing.TypedDict):
     examples: typing.Sequence[str]
 
 
-class AbstractCLIProgram(Configurable, abc.ABC):
+class CLIProgram(Configurable, abc.ABC):
     """
     This class is an "abstract" CLI program.
 

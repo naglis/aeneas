@@ -36,11 +36,11 @@ from aeneas.audiofile import (
 )
 from aeneas.audiofilemfcc import AudioFileMFCC
 from aeneas.runtimeconfiguration import RuntimeConfiguration
-from aeneas.tools.abstract_cli_program import AbstractCLIProgram
+from aeneas.tools.cli_program import CLIProgram
 import aeneas.globalfunctions as gf
 
 
-class ExtractMFCCCLI(AbstractCLIProgram):
+class ExtractMFCCCLI(CLIProgram):
     """
     Extract MFCCs from a given audio file.
     """

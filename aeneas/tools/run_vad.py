@@ -35,11 +35,11 @@ from aeneas.audiofile import (
 )
 from aeneas.audiofilemfcc import AudioFileMFCC
 from aeneas.runtimeconfiguration import RuntimeConfiguration
-from aeneas.tools.abstract_cli_program import AbstractCLIProgram
+from aeneas.tools.cli_program import CLIProgram
 import aeneas.globalfunctions as gf
 
 
-class RunVADCLI(AbstractCLIProgram):
+class RunVADCLI(CLIProgram):
     """
     Extract a list of speech intervals from the given audio file,
     using the MFCC energy-based VAD algorithm.

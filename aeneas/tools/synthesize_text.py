@@ -30,12 +30,12 @@ import sys
 
 from aeneas.synthesizer import Synthesizer
 from aeneas.textfile import TextFileFormat
-from aeneas.tools.abstract_cli_program import AbstractCLIProgram
+from aeneas.tools.cli_program import CLIProgram
 import aeneas.globalconstants as gc
 import aeneas.globalfunctions as gf
 
 
-class SynthesizeTextCLI(AbstractCLIProgram):
+class SynthesizeTextCLI(CLIProgram):
     """
     Synthesize several text fragments,
     producing a WAV audio file.

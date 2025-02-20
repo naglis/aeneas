@@ -34,11 +34,11 @@ from aeneas.ffprobewrapper import (
     FFPROBEWrapper,
 )
 from aeneas.runtimeconfiguration import RuntimeConfiguration
-from aeneas.tools.abstract_cli_program import AbstractCLIProgram
+from aeneas.tools.cli_program import CLIProgram
 import aeneas.globalfunctions as gf
 
 
-class FFPROBEWrapperCLI(AbstractCLIProgram):
+class FFPROBEWrapperCLI(CLIProgram):
     """
     Read audio file properties using the ``ffprobe`` wrapper.
     """

@@ -3,17 +3,17 @@
 This Python package contains the command line (CLI) tools for ``aeneas``.
 
 Each tool, contained in a separate Python source file,
-extends the abstract class ``AbstractCLIProgram``
-defined in ``abstract_cli_program.py``.
+extends the abstract class ``CLIProgram``
+defined in ``cli_program.py``.
 
-``AbstractCLIProgram`` provides the following main functions, common to all CLI tools:
+``CLIProgram`` provides the following main functions, common to all CLI tools:
 
 * ``run()`` runs the tool: first, it does some basic command line handling and then calls ``perform_command()``;
 * ``perform_command()`` provides the actual logic of the tool and must be implemented by the concrete subclasses; and
 * ``print_help()`` and ``print_name_version()`` print the usage and version messages.
 
 In the overridden ``perform_command()`` function you might want to use the following utility functions,
-all defined in ``AbstractCLIProgram``:
+all defined in ``CLIProgram``:
 
 * ``print_generic()``, ``print_error()``, ``print_info()``, ``print_success()``, and ``print_warning()`` to print messages to stdout;
 * ``exit()`` to terminate the execution of your tool, e.g. on critical errors, returning a suitable exit code;
@@ -47,7 +47,7 @@ for the **aeneas** Task, as specified in the input arguments:
 ```python
 ...
 
-class ExecuteTaskCLI(AbstractCLIProgram):
+class ExecuteTaskCLI(CLIProgram):
     ...
 
     def perform_command(self):
