@@ -40,6 +40,8 @@ import logging
 import os
 import typing
 
+import jinja2
+
 from aeneas.syncmap.format import SyncMapFormat
 from aeneas.syncmap.fragment import SyncMapFragment, FragmentType
 from aeneas.syncmap.fragmentlist import SyncMapFragmentList
@@ -58,25 +60,6 @@ class SyncMap(collections.abc.Sized):
     objects.
     """
 
-    FINETUNEAS_REPLACEMENTS = (
-        ("<!-- AENEAS_REPLACE_COMMENT_BEGIN -->", "<!-- AENEAS_REPLACE_COMMENT_BEGIN"),
-        ("<!-- AENEAS_REPLACE_COMMENT_END -->", "AENEAS_REPLACE_COMMENT_END -->"),
-        (
-            "<!-- AENEAS_REPLACE_UNCOMMENT_BEGIN",
-            "<!-- AENEAS_REPLACE_UNCOMMENT_BEGIN -->",
-        ),
-        ("AENEAS_REPLACE_UNCOMMENT_END -->", "<!-- AENEAS_REPLACE_UNCOMMENT_END -->"),
-        ("// AENEAS_REPLACE_SHOW_ID", "showID = true;"),
-        ("// AENEAS_REPLACE_ALIGN_TEXT", 'alignText = "left"'),
-        ("// AENEAS_REPLACE_CONTINUOUS_PLAY", "continuousPlay = true;"),
-        ("// AENEAS_REPLACE_TIME_FORMAT", "timeFormatHHMMSSmmm = true;"),
-    )
-    FINETUNEAS_REPLACE_AUDIOFILEPATH = "// AENEAS_REPLACE_AUDIOFILEPATH"
-    FINETUNEAS_REPLACE_FRAGMENTS = "// AENEAS_REPLACE_FRAGMENTS"
-    FINETUNEAS_REPLACE_OUTPUT_FORMAT = "// AENEAS_REPLACE_OUTPUT_FORMAT"
-    FINETUNEAS_REPLACE_SMIL_AUDIOREF = "// AENEAS_REPLACE_SMIL_AUDIOREF"
-    FINETUNEAS_REPLACE_SMIL_PAGEREF = "// AENEAS_REPLACE_SMIL_PAGEREF"
-    FINETUNEAS_REPLACE_SUGGESTED_FILENAME = "// AENEAS_REPLACE_SUGGESTED_FILENAME"
     FINETUNEAS_ALLOWED_FORMATS = (
         "csv",
         "json",
@@ -282,60 +265,36 @@ class SyncMap(collections.abc.Sized):
         if parameters is None:
             parameters = {}
 
-        audio_file_path_absolute = gf.fix_slash(os.path.abspath(audio_file_path))
-        template_path_absolute = gf.absolute_path(self.FINETUNEAS_PATH, __file__)
-
-        with open(template_path_absolute, encoding="utf-8") as file_obj:
-            template = file_obj.read()
-
         # Serialize to JSON using the JSON SyncMap format.
         buf = io.StringIO()
         self.dump(buf, SyncMapFormat.JSON, parameters=parameters)
-        json_string = buf.getvalue()
+        fragments = buf.getvalue()
 
-        for search_string, replacement in (
-            *self.FINETUNEAS_REPLACEMENTS,
-            (
-                self.FINETUNEAS_REPLACE_AUDIOFILEPATH,
-                f'audioFilePath = "file://{audio_file_path_absolute}";',
-            ),
-            (
-                self.FINETUNEAS_REPLACE_FRAGMENTS,
-                f"fragments = ({json_string}).fragments;",
-            ),
-            (
-                self.FINETUNEAS_REPLACE_SUGGESTED_FILENAME,
-                f'suggestedFileName = "{filename}." + outputFormat;',
-            ),
-        ):
-            template = template.replace(search_string, replacement)
+        data = {
+            "audio_file_path": gf.fix_slash(os.path.abspath(audio_file_path)),
+            "fragments": fragments,
+            "suggested_filename": f"{filename}.",
+            "output_format": "json",
+            "audio_ref": "",
+            "page_ref": "",
+        }
 
         if gc.PPN_TASK_OS_FILE_FORMAT in parameters:
             output_format = parameters[gc.PPN_TASK_OS_FILE_FORMAT]
             if output_format in self.FINETUNEAS_ALLOWED_FORMATS:
-                template = template.replace(
-                    self.FINETUNEAS_REPLACE_OUTPUT_FORMAT,
-                    f'outputFormat = "{output_format}";',
-                )
-                if output_format == "smil":
-                    for key, placeholder, replacement in [
-                        (
-                            gc.PPN_TASK_OS_FILE_SMIL_AUDIO_REF,
-                            self.FINETUNEAS_REPLACE_SMIL_AUDIOREF,
-                            'audioref = "%s";',
-                        ),
-                        (
-                            gc.PPN_TASK_OS_FILE_SMIL_PAGE_REF,
-                            self.FINETUNEAS_REPLACE_SMIL_PAGEREF,
-                            'pageref = "%s";',
-                        ),
-                    ]:
-                        if key in parameters:
-                            template = template.replace(
-                                placeholder, replacement % parameters[key]
-                            )
+                data["output_format"] = output_format
+                if output_format == SyncMapFormat.SMIL:
+                    data.update(
+                        {
+                            "audio_ref": parameters[gc.PPN_TASK_OS_FILE_SMIL_AUDIO_REF],
+                            "page_ref": parameters[gc.PPN_TASK_OS_FILE_SMIL_PAGE_REF],
+                        }
+                    )
 
-        fobj.write(template)
+        loader = jinja2.FileSystemLoader(gf.absolute_path("../res", __file__))
+        env = jinja2.Environment(loader=loader)
+        template = env.get_template("finetuneas.html")
+        fobj.write(template.render(**data))
 
     @classmethod
     def load(
