@@ -637,18 +637,12 @@ class RuntimeConfiguration(Configuration):
     TTS_CACHE = "tts_cache"
     """
     If set to ``True``, synthesize each distinct text fragment
-    only once, caching the resulting audio data as a file on disk.
-
-    The cache files will be removed after the synthesis is compled.
+    only once, caching the resulting audio parameters.
 
     This option is useful when calling TTS engines,
     via subprocess or remote APIs,
     on text files with many identical fragments,
     for example when aligning at word-level granularity.
-
-    Enabling this option will create the cache files in
-    :data:`~aeneas.runtimeconfiguration.RuntimeConfiguration.TMP_PATH`,
-    so make sure that that path has enough free space.
 
     Default: ``False``.
 
