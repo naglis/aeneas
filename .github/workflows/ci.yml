@@ -29,16 +29,15 @@ jobs:
       - name: Build C/C++ extensions
         # Disabled for the time being.
         # FIXME: Calling C extensions inside GitHub action currently hangs.
-        if: ${{ false }}
         run: |
           cd aeneas/cdtw
           make py
-          cd ../cengw
-          make py
+          # cd ../cengw
+          # make py
           cd ../cmfcc
           make py
-          cd ../cwave
-          make py
+          # cd ../cwave
+          # make py
       - name: Run tests
         run: |
           python -m unittest discover -v
