@@ -13,11 +13,12 @@ from aeneas.executetask import ExecuteTask
 from aeneas.idsortingalgorithm import IDSortingAlgorithm
 from aeneas.language import Language
 from aeneas.runtimeconfiguration import RuntimeConfiguration
+from aeneas.syncmap import SyncMap
 from aeneas.syncmap.format import SyncMapFormat
 from aeneas.syncmap.fragment import FragmentType
 from aeneas.syncmap.headtailformat import SyncMapHeadTailFormat
 from aeneas.task import Task, TaskConfiguration
-from aeneas.textfile import TextFileFormat
+from aeneas.textfile import TextFileFormat, TextFile
 
 
 logger = logging.getLogger(__name__)
@@ -194,6 +195,38 @@ def do_sync(args: argparse.Namespace, rconf: RuntimeConfiguration) -> int:
                 for fragment in faster:
                     print(f"  {fragment.pretty_print}\t{fragment.rate or 0.0:.3f}")
 
+    return 0
+
+
+def do_finetune(args: argparse.Namespace, rconf: RuntimeConfiguration) -> int:
+    text_map = {}
+    text_file = TextFile(
+        file_path=args.text_path,
+        file_format=TextFileFormat.UNPARSED_IMG,
+        parameters={
+            gc.PPN_TASK_IS_TEXT_UNPARSED_ID_REGEX: args.id_regex,
+        },
+    )
+    for f in text_file.fragments:
+        text_map[f.identifier] = f
+    with open(args.smil_path, mode="rb") as smil_f:
+        sync_map = SyncMap.load(smil_f, SyncMapFormat.SMIL)
+
+        for f in sync_map.fragments:
+            f.text_fragment = text_map[f.identifier]
+
+    with open(args.output_path, mode="w", encoding="utf-8") as output_f:
+        sync_map.dump_finetuneas_html(
+            output_f,
+            os.path.splitext(os.path.basename(args.smil_path))[0],
+            args.audio_path,
+            parameters={
+                gc.PPN_SYNCMAP_LANGUAGE: args.language,
+                gc.PPN_TASK_OS_FILE_FORMAT: SyncMapFormat.SMIL,
+                gc.PPN_TASK_OS_FILE_SMIL_AUDIO_REF: args.audio_ref,
+                gc.PPN_TASK_OS_FILE_SMIL_PAGE_REF: args.page_ref,
+            },
+        )
     return 0
 
 
@@ -389,6 +422,38 @@ def main(argv: typing.Sequence[str] | None = None) -> int:
         help="print fragments with zero duration",
     )
     sync_parser.set_defaults(func=do_sync)
+
+    finetune_parser = subparsers.add_parser("finetune")
+    finetune_parser.add_argument("audio_path", help="path to the audio input file")
+    finetune_parser.add_argument("text_path", help="path to the text HTML input file")
+    finetune_parser.add_argument("smil_path", help="path to the SMIL input file")
+    finetune_parser.add_argument(
+        "output_path", help="path to the finetuneas HTML output file"
+    )
+    finetune_parser.add_argument(
+        "--id-regex",
+        metavar="REGEX",
+        required=True,
+        help='regex to match "id" attributes for text fragments',
+    )
+    finetune_parser.add_argument(
+        "--language",
+        metavar="CODE",
+        required=True,
+        # TODO: Fix using `Language` enum
+        choices=[v.value for v in (Language.ENG, Language.LIT)],
+    )
+    finetune_parser.add_argument(
+        "--audio-ref",
+        required=True,
+        help='the value of the "src" attribute for the <audio> element in the SMIL file',
+    )
+    finetune_parser.add_argument(
+        "--page-ref",
+        required=True,
+        help='the value of the "src" attribute for the <text> element in the SMIL file',
+    )
+    finetune_parser.set_defaults(func=do_finetune)
 
     args = parser.parse_args(argv)
 
