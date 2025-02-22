@@ -27,6 +27,7 @@ This module contains the following classes:
 
 import logging
 import os.path
+import typing
 
 from aeneas.executetask import AdjustBoundaryAlgorithm
 from aeneas.idsortingalgorithm import IDSortingAlgorithm
@@ -240,7 +241,9 @@ class Validator(Configurable):
 
         return self.result
 
-    def check_configuration_string(self, config_string, external_name: bool = False):
+    def check_configuration_string(
+        self, config_string: typing.AnyStr, external_name: bool = False
+    ):
         """
         Check whether the given task configuration string
         is well-formed (if ``is_bstring`` is ``True``)

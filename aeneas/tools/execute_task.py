@@ -580,15 +580,16 @@ class ExecuteTaskCLI(CLIProgram):
                 return self.ERROR_EXIT_CODE
 
         if print_zero:
-            zero_duration = [
+            zero_duration = (
                 leaf
                 for leaf in task.sync_map_leaves(FragmentType.REGULAR)
                 if leaf.begin == leaf.end
-            ]
-            if len(zero_duration) > 0:
+            )
+            if (fragment := next(zero_duration, None)) is not None:
                 self.print_warning("Fragments with zero duration:")
+                self.print_generic(fragment.pretty_print)
                 for fragment in zero_duration:
-                    self.print_generic("  %s" % (fragment.pretty_print))
+                    self.print_generic(fragment.pretty_print)
 
         if print_rates:
             self.print_info("Fragments with rates:")
@@ -600,20 +601,22 @@ class ExecuteTaskCLI(CLIProgram):
         if print_faster_rate:
             max_rate = task.configuration["aba_rate_value"]
             if max_rate is not None:
-                faster = [
+                delta = decimal.Decimal("0.001")
+                faster = (
                     leaf
                     for leaf in task.sync_map_leaves(FragmentType.REGULAR)
-                    if leaf.rate >= max_rate + decimal.Decimal("0.001")
-                ]
-                if len(faster) > 0:
+                    if leaf.rate >= max_rate + delta
+                )
+                if (fragment := next(faster, None)) is not None:
                     self.print_warning(
-                        "Fragments with rate greater than %.3f:" % max_rate
+                        f"Fragments with rate greater than {max_rate:.3f}:"
+                    )
+                    self.print_generic(
+                        f"  {fragment.pretty_print}\t{fragment.rate or 0.0:.3f}"
                     )
                     for fragment in faster:
                         self.print_generic(
-                            "  {}\t{:.3f}".format(
-                                fragment.pretty_print, fragment.rate or 0.0
-                            )
+                            f"  {fragment.pretty_print}\t{fragment.rate or 0.0:.3f}"
                         )
 
         return self.NO_ERROR_EXIT_CODE
