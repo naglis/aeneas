@@ -43,6 +43,7 @@ from aeneas.synthesizer import Synthesizer
 from aeneas.task import Task
 from aeneas.textfile import TextFileFormat, TextFile
 from aeneas.tree import Tree
+import aeneas.globalconstants as gc
 import aeneas.globalfunctions as gf
 
 logger = logging.getLogger(__name__)
@@ -149,7 +150,7 @@ class ExecuteTask(Configurable):
 
         # execute
         self.step_index = 1
-        if self.task.text_file.file_format in TextFileFormat.MULTILEVEL_VALUES:
+        if self.task.configuration[gc.PPN_TASK_IS_TEXT_FILE_FORMAT] in TextFileFormat.MULTILEVEL_VALUES:
             self._execute_multi_level_task()
         else:
             self._execute_single_level_task()

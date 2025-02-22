@@ -18,6 +18,8 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+import io
+
 from aeneas.idsortingalgorithm import IDSortingAlgorithm
 from aeneas.language import Language
 from aeneas.textfile import (
@@ -28,6 +30,7 @@ from aeneas.textfile import (
     TextFilterIgnoreRegex,
     TextFilterTransliterate,
 )
+from aeneas.tree import Tree
 import aeneas.globalconstants as gc
 
 from .common import BaseCase
@@ -60,7 +63,8 @@ class TestTextFile(BaseCase):
         expected_length: int = 15,
         parameters: dict | None = None,
     ):
-        tfl = TextFile(self.file_path(input_file_path), fmt, parameters)
+        with open(self.file_path(input_file_path), mode="rb") as text_f:
+            tfl = TextFile.load(text_f, file_format=fmt, parameters=parameters)
         self.assertEqual(len(tfl), expected_length)
         return tfl
 
@@ -114,27 +118,15 @@ class TestTextFile(BaseCase):
         self.assertEqual(len(tf), 3)
 
     def test_constructor(self):
-        tfl = TextFile()
+        tfl = TextFile(fragments_tree=Tree())
         self.assertEqual(len(tfl), 0)
-
-    def test_file_path_not_existing(self):
-        with self.assertRaises(OSError):
-            TextFile(file_path=self.file_path(self.NOT_EXISTING_PATH))
 
     def test_invalid_format(self):
-        with self.assertRaises(ValueError):
-            TextFile(file_format="foo")
-
-    def test_invalid_parameters(self):
-        with self.assertRaises(TypeError):
-            TextFile(parameters=["foo"])
-
-    def test_empty_fragments(self):
-        tfl = TextFile()
-        self.assertEqual(len(tfl), 0)
+        with self.assertRaises(KeyError):
+            TextFile.load(io.BytesIO(), file_format="foo")
 
     def test_invalid_add_fragment(self):
-        tfl = TextFile()
+        tfl = TextFile(fragments_tree=Tree())
         with self.assertRaises(TypeError):
             tfl.add_fragment("foo")
 
@@ -392,47 +384,50 @@ class TestTextFile(BaseCase):
             self.assertEqual(fragment.language, Language.ITA)
 
     def test_set_language_on_empty(self):
-        tfl = TextFile()
+        tfl = TextFile(fragments_tree=Tree())
         self.assertEqual(len(tfl), 0)
         tfl.set_language(Language.ENG)
         self.assertEqual(len(tfl), 0)
         self.assertEqual(tfl.chars, 0)
 
-    def test_read_from_list(self):
-        tfl = TextFile()
-        text_list = [
-            "fragment 1",
-            "fragment 2",
-            "fragment 3",
-            "fragment 4",
-            "fragment 5",
-        ]
-        tfl.read_from_list(text_list)
+    def test_from_list(self):
+        tfl = TextFile.from_list(
+            [
+                "fragment 1",
+                "fragment 2",
+                "fragment 3",
+                "fragment 4",
+                "fragment 5",
+            ],
+        )
+
         self.assertEqual(len(tfl), 5)
         self.assertEqual(tfl.chars, 50)
 
-    def test_read_from_list_with_ids(self):
-        tfl = TextFile()
-        text_list = (
+    def test_from_list_with_ids(self):
+        tfl = TextFile.from_list_with_ids((
+                                              
             ("a1", "fragment 1"),
             ("b2", "fragment 2"),
             ("c3", "fragment 3"),
             ("d4", "fragment 4"),
             ("e5", "fragment 5"),
+                                          )
+            
         )
-        tfl.read_from_list_with_ids(text_list)
+
         self.assertEqual(len(tfl), 5)
         self.assertEqual(tfl.chars, 50)
 
     def test_add_fragment(self):
-        tfl = TextFile()
+        tfl = TextFile(fragments_tree=Tree())
         self.assertEqual(len(tfl), 0)
         tfl.add_fragment(TextFragment("a1", Language.ENG, ["fragment 1"]))
         self.assertEqual(len(tfl), 1)
         self.assertEqual(tfl.chars, 10)
 
     def test_add_fragment_multiple(self):
-        tfl = TextFile()
+        tfl = TextFile(fragments_tree=Tree())
         self.assertEqual(len(tfl), 0)
         tfl.add_fragment(TextFragment("a1", Language.ENG, ["fragment 1"]))
         self.assertEqual(len(tfl), 1)
@@ -441,34 +436,6 @@ class TestTextFile(BaseCase):
         tfl.add_fragment(TextFragment("a3", Language.ENG, ["fragment 3"]))
         self.assertEqual(len(tfl), 3)
         self.assertEqual(tfl.chars, 30)
-
-    def test_get_subtree_bad(self):
-        tfl = self.load()
-        with self.assertRaises(TypeError):
-            tfl.get_subtree("abc")
-        with self.assertRaises(TypeError):
-            tfl.get_subtree(None)
-        with self.assertRaises(TypeError):
-            tfl.get_subtree(tfl.fragments[0])
-
-    def test_get_subtree(self):
-        tfl = self.load(
-            input_file_path=self.MPLAIN_FILE_PATH,
-            fmt=TextFileFormat.MPLAIN,
-            expected_length=5,
-        )
-        children = tfl.fragments_tree.children
-        self.assertEqual(len(children), 5)
-        sub = tfl.get_subtree(children[0])
-        self.assertEqual(len(sub), 1)
-        sub = tfl.get_subtree(children[1])
-        self.assertEqual(len(sub), 4)
-        sub = tfl.get_subtree(children[2])
-        self.assertEqual(len(sub), 4)
-        sub = tfl.get_subtree(children[3])
-        self.assertEqual(len(sub), 4)
-        sub = tfl.get_subtree(children[4])
-        self.assertEqual(len(sub), 2)
 
     def test_children_not_empty(self):
         tfl = self.load(

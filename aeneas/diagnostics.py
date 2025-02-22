@@ -141,11 +141,12 @@ class Diagnostics:
         :rtype: bool
         """
         try:
+            from aeneas.tree import Tree
             from aeneas.textfile import TextFile, TextFragment
             from aeneas.ttswrappers.espeakttswrapper import ESPEAKTTSWrapper
 
             text = "From fairest creatures we desire increase,"
-            text_file = TextFile()
+            text_file = TextFile(fragments_tree=Tree())
             text_file.add_fragment(
                 TextFragment(language="eng", lines=[text], filtered_lines=[text])
             )
@@ -176,11 +177,12 @@ class Diagnostics:
         :rtype: bool
         """
         try:
+            from aeneas.tree import Tree
             from aeneas.textfile import TextFile, TextFragment
             from aeneas.ttswrappers.espeakngttswrapper import ESPEAKNGTTSWrapper
 
             text = "From fairest creatures we desire increase,"
-            text_file = TextFile()
+            text_file = TextFile(fragments_tree=Tree())
             text_file.add_fragment(
                 TextFragment(language="eng", lines=[text], filtered_lines=[text])
             )

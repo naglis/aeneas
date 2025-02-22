@@ -43,7 +43,8 @@ class TestSynthesizer(BaseCase):
         backwards: bool = False,
     ):
         def inner(c_ext: bool, cew_subprocess: bool, tts_cache: bool):
-            tfl = TextFile(self.file_path(path), TextFileFormat.PLAIN)
+            with open(self.file_path(path), mode="rb") as text_f:
+                tfl = TextFile.load(text_f, file_format=TextFileFormat.PLAIN)
             tfl.set_language(Language.ENG)
 
             synth_rconf = RuntimeConfiguration()

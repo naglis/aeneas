@@ -26,6 +26,7 @@ import typing
 from aeneas.exacttiming import TimeValue
 from aeneas.textfile import TextFile, TextFragment
 from aeneas.ttswrappers.basettswrapper import BaseTTSWrapper
+from aeneas.tree import Tree
 from aeneas.runtimeconfiguration import RuntimeConfiguration
 
 from .common import BaseCase
@@ -111,7 +112,7 @@ class BaseTTSWrapperCase(BaseCase):
         yield SynthesizeCase(c_ext=True, cew_subprocess=False, cache=False)
 
     def tfl(self, frags):
-        tfl = TextFile()
+        tfl = TextFile(fragments_tree=Tree())
         for language, lines in frags:
             tfl.add_fragment(
                 TextFragment(language=language, lines=lines, filtered_lines=lines)
@@ -141,7 +142,7 @@ class BaseTTSWrapperCase(BaseCase):
         self.synthesize(tfl, ofp="x/y/z/not_existing.wav", expected_exc=OSError)
 
     def test_no_fragments(self):
-        tfl = TextFile()
+        tfl = TextFile(fragments_tree=Tree())
         tfl.set_language(self.TTS_LANGUAGE)
         self.synthesize(tfl, expected_exc=ValueError)
 

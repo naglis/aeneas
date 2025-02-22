@@ -34,7 +34,7 @@ import typing
 from aeneas import __version__ as aeneas_version
 from aeneas.logger import Configurable
 from aeneas.runtimeconfiguration import RuntimeConfiguration
-from aeneas.textfile import TextFile, TextFileFormat
+from aeneas.textfile import TextFile
 import aeneas.globalfunctions as gf
 
 logger = logging.getLogger(__name__)
@@ -481,18 +481,11 @@ class CLIProgram(Configurable, abc.ABC):
 
     def get_text_file(self, text_format: str, text, parameters):
         if text_format == "list":
-            text_file = TextFile()
-            text_file.read_from_list(text.split("|"))
-            return text_file
+            return TextFile.from_list(text.split("|"), parameters=parameters)
         else:
-            if text_format not in TextFileFormat.ALLOWED_VALUES:
-                self.print_error(
-                    f"File format {text_format!r} is not allowed. "
-                    f"Allowed text file formats: {' '.join(TextFileFormat.ALLOWED_VALUES)}."
-                )
-                return None
             try:
-                return TextFile(text, text_format, parameters)
+                with open(text, mode="rb") as text_f:
+                    return TextFile.load(text_f, text_format, parameters=parameters)
             except OSError:
                 self.print_error(f"Cannot read file {text!r}")
             return None

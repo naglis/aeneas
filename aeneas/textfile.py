@@ -34,7 +34,6 @@ import collections.abc
 import contextlib
 import io
 import logging
-import os.path
 import re
 import typing
 
@@ -432,32 +431,17 @@ class TextFragment(collections.abc.Sized):
 class TextFile(collections.abc.Sized):
     """
     A tree of text fragments, representing a text file.
-
-    :param string file_path: the path to the text file.
-                             If not ``None`` (and also ``file_format`` is not ``None``),
-                             the file will be read immediately.
-    :param file_format: the format of the text file
-    :type  file_format: :class:`~aeneas.textfile.TextFileFormat`
-    :param dict parameters: additional parameters used to parse the text file
-    :raises: OSError: if ``file_path`` cannot be read
-    :raises: TypeError: if ``parameters`` is not an instance of ``dict``
-    :raises: ValueError: if ``file_format`` value is not allowed
     """
 
     DEFAULT_ID_FORMAT = "f%06d"
 
     def __init__(
         self,
-        file_path: str | None = None,
-        file_format: str | None = None,
+        fragments_tree: Tree,
         parameters: dict | None = None,
     ):
-        self.file_path = file_path
-        self.file_format = file_format
+        self.fragments_tree = fragments_tree
         self.parameters = {} if parameters is None else parameters
-        self.fragments_tree = Tree()
-        if self.file_path is not None and self.file_format is not None:
-            self._read_from_file()
 
     def __len__(self):
         return len(self.fragments)
@@ -472,19 +456,6 @@ class TextFile(collections.abc.Sized):
         return "\n".join(msg)
 
     @property
-    def fragments_tree(self):
-        """
-        Return the current tree of fragments.
-
-        :rtype: :class:`~aeneas.tree.Tree`
-        """
-        return self.__fragments_tree
-
-    @fragments_tree.setter
-    def fragments_tree(self, fragments_tree):
-        self.__fragments_tree = fragments_tree
-
-    @property
     def children_not_empty(self):
         """
         Return the direct not empty children of the root of the fragments tree,
@@ -494,55 +465,10 @@ class TextFile(collections.abc.Sized):
         """
         children = []
         for child_node in self.fragments_tree.children_not_empty:
-            child_text_file = self.get_subtree(child_node)
+            child_text_file = TextFile(fragments_tree=child_node)
             child_text_file.set_language(child_node.value.language)
             children.append(child_text_file)
         return children
-
-    @property
-    def file_path(self):
-        """
-        The path of the text file.
-
-        :rtype: string
-        """
-        return self.__file_path
-
-    @file_path.setter
-    def file_path(self, file_path):
-        if file_path is not None and not os.path.isfile(file_path):
-            raise OSError(f"Text file {file_path!r} does not exist or is not a file")
-        self.__file_path = file_path
-
-    @property
-    def file_format(self):
-        """
-        The format of the text file.
-
-        :rtype: :class:`~aeneas.textfile.TextFileFormat`
-        """
-        return self.__file_format
-
-    @file_format.setter
-    def file_format(self, file_format):
-        if file_format is not None and file_format not in TextFileFormat.ALLOWED_VALUES:
-            raise ValueError(f"Text file format {file_format!r} is not allowed")
-        self.__file_format = file_format
-
-    @property
-    def parameters(self):
-        """
-        Additional parameters used to parse the text file.
-
-        :rtype: dict
-        """
-        return self.__parameters
-
-    @parameters.setter
-    def parameters(self, parameters: dict | None):
-        if parameters is not None and not isinstance(parameters, dict):
-            raise TypeError("parameters is not an instance of dict")
-        self.__parameters = parameters
 
     @property
     def chars(self) -> int:
@@ -587,22 +513,6 @@ class TextFile(collections.abc.Sized):
             raise TypeError("fragment is not an instance of TextFragment")
         self.fragments_tree.add_child(Tree(value=fragment), as_last=as_last)
 
-    def get_subtree(self, root: Tree):
-        """
-        Return a new :class:`~aeneas.textfile.TextFile` object,
-        rooted at the given node ``root``.
-
-        :param root: the root node
-        :type  root: :class:`~aeneas.tree.Tree`
-        :rtype: :class:`~aeneas.textfile.TextFile`
-        """
-        if not isinstance(root, Tree):
-            raise TypeError("root is not an instance of Tree")
-
-        new_text_file = TextFile()
-        new_text_file.fragments_tree = root
-        return new_text_file
-
     def get_slice(self, start: int | None = None, end: int | None = None):
         """
         Return a new list of text fragments,
@@ -623,7 +533,7 @@ class TextFile(collections.abc.Sized):
         else:
             end = len(self)
 
-        new_text = TextFile()
+        new_text = TextFile(fragments_tree=Tree())
         for fragment in self.fragments[start:end]:
             new_text.add_fragment(fragment)
         return new_text
@@ -646,7 +556,8 @@ class TextFile(collections.abc.Sized):
         logger.debug("Clearing text fragments")
         self.fragments_tree = Tree()
 
-    def read_from_list(self, lines: typing.Sequence[str]):
+    @classmethod
+    def from_list(cls, lines: typing.Sequence[str], parameters: dict | None = None):
         """
         Read text fragments from a given list of strings::
 
@@ -655,60 +566,68 @@ class TextFile(collections.abc.Sized):
         :param list lines: the text fragments
         """
         logger.debug("Reading text fragments from list")
-        # TODO: Consider either improving this or removing `read_from_list()`.
-        self._read_plain(io.BytesIO(b"\n".join([line.encode() for line in lines])))
+        # TODO: Consider either improving this or removing `from_list()`.
+        return cls(
+            fragments_tree=cls._read_plain(
+                io.BytesIO(b"\n".join([line.encode() for line in lines])),
+                parameters=parameters or {},
+            ),
+            parameters=parameters,
+        )
 
-    def read_from_list_with_ids(self, lines: typing.Sequence[tuple[str, str]]):
+    @classmethod
+    def from_list_with_ids(
+        cls, lines: typing.Sequence[tuple[str, str]], parameters: dict | None = None
+    ):
         """
-        Read text fragments from a given list of tuples::
+        Build text file with fragments from a given list of tuples::
 
             [(id_1, text_1), (id_2, text_2), ..., (id_n, text_n)].
 
         :param list lines: the list of ``[id, text]`` fragments (see above)
         """
         logger.debug("Reading text fragments from list with IDs")
-        self._create_text_fragments(
-            (line_id, [line_text]) for line_id, line_text in lines
+        return cls(
+            fragments_tree=cls._create_text_fragments(
+                ((line_id, [line_text]) for line_id, line_text in lines),
+                parameters=parameters or {},
+            ),
+            parameters=parameters,
         )
 
-    def _read_from_file(self):
+    @classmethod
+    def load(
+        cls,
+        file_obj: typing.IO[bytes],
+        file_format: str,
+        parameters: dict | None = None,
+    ):
         """
-        Read text fragments from file.
+        Read text fragments from a bytes file object.
         """
-        if self.file_format not in TextFileFormat.ALLOWED_VALUES:
-            raise ValueError(f"Text file format {self.file_format!r} is not supported.")
+        tree = {
+            TextFileFormat.MPLAIN: cls._read_mplain,
+            TextFileFormat.MUNPARSED: cls._read_munparsed,
+            TextFileFormat.PARSED: cls._read_parsed,
+            TextFileFormat.PLAIN: cls._read_plain,
+            TextFileFormat.SUBTITLES: cls._read_subtitles,
+            TextFileFormat.UNPARSED: cls._read_unparsed,
+            TextFileFormat.UNPARSED_IMG: cls._read_unparsed_img,
+        }[file_format](file_obj, parameters=parameters or {})
 
-        # clear text fragments
-        self.clear()
+        logger.debug("Parsed %d fragments", len(tree))
 
-        # parse the contents
-        map_read_function = {
-            TextFileFormat.MPLAIN: self._read_mplain,
-            TextFileFormat.MUNPARSED: self._read_munparsed,
-            TextFileFormat.PARSED: self._read_parsed,
-            TextFileFormat.PLAIN: self._read_plain,
-            TextFileFormat.SUBTITLES: self._read_subtitles,
-            TextFileFormat.UNPARSED: self._read_unparsed,
-            TextFileFormat.UNPARSED_IMG: self._read_unparsed_img,
-        }
+        return cls(fragments_tree=tree)
 
-        # read the contents of the file
-        logger.debug("Reading contents of file %r", self.file_path)
-
-        with open(self.file_path, mode="rb") as f:
-            map_read_function[self.file_format](f)
-
-        # log the number of fragments
-        logger.debug("Parsed %d fragments", len(self.fragments))
-
-    def _mplain_word_separator(self):
+    @classmethod
+    def _mplain_word_separator(cls, parameters: dict):
         """
         Get the word separator to split words in mplain format.
 
         :rtype: string
         """
         word_separator = gf.safe_get(
-            self.parameters, gc.PPN_TASK_IS_TEXT_MPLAIN_WORD_SEPARATOR, " "
+            parameters, gc.PPN_TASK_IS_TEXT_MPLAIN_WORD_SEPARATOR, " "
         )
         if word_separator is None or word_separator == "space":
             return " "
@@ -720,14 +639,15 @@ class TextFile(collections.abc.Sized):
             return "\u0009"
         return word_separator
 
-    def _read_mplain(self, buf: typing.IO[bytes]):
+    @classmethod
+    def _read_mplain(cls, buf: typing.IO[bytes], parameters: dict) -> Tree:
         """
         Read text fragments from a multilevel format text file.
 
         :param buf: the bytes file object
         """
         logger.debug("Parsing fragments from subtitles text format")
-        word_separator = self._mplain_word_separator()
+        word_separator = cls._mplain_word_separator(parameters)
         logger.debug("Word separator is: %r", word_separator)
         lines = [line.decode().strip() for line in buf.readlines()]
         i = 1
@@ -789,9 +709,10 @@ class TextFile(collections.abc.Sized):
                 i += 1
             current += 1
 
-        self.fragments_tree = tree
+        return tree
 
-    def _read_munparsed(self, buf: typing.IO[bytes]):
+    @classmethod
+    def _read_munparsed(cls, buf: typing.IO[bytes], parameters: dict) -> Tree:
         """
         Read text fragments from an munparsed format text file.
 
@@ -807,7 +728,7 @@ class TextFile(collections.abc.Sized):
                 gc.PPN_TASK_IS_TEXT_MUNPARSED_L3_ID_REGEX,
             ]
             attribute_name = "id"
-            regex_string = self.parameters[LEVEL_TO_REGEX_MAP[level]]
+            regex_string = parameters[LEVEL_TO_REGEX_MAP[level]]
             logger.debug("Regex for %s: %r", attribute_name, regex_string)
             regex = re.compile(rf".*\b{regex_string}\b.*")
             return root.find_all(attrs={attribute_name: regex})
@@ -867,10 +788,10 @@ class TextFile(collections.abc.Sized):
             except KeyError as exc:
                 logger.warning("KeyError (%s) while parsing a L1 node", exc)
 
-        # append to fragments
-        self.fragments_tree = tree
+        return tree
 
-    def _read_subtitles(self, buf: typing.IO[bytes]):
+    @classmethod
+    def _read_subtitles(cls, buf: typing.IO[bytes], parameters: dict) -> Tree:
         """
         Read text fragments from a subtitles format text file.
 
@@ -878,7 +799,7 @@ class TextFile(collections.abc.Sized):
         :raises: ValueError: if the id regex is not valid
         """
         logger.debug("Parsing fragments from subtitles text format")
-        id_format = self._get_id_format()
+        id_format = cls._get_id_format(parameters=parameters)
         lines = [line.decode().strip() for line in buf.readlines()]
         pairs = []
         i = 1
@@ -896,9 +817,11 @@ class TextFile(collections.abc.Sized):
                 current = following
                 i += 1
             current += 1
-        self._create_text_fragments(pairs)
 
-    def _read_parsed(self, buf: typing.IO[bytes]):
+        return cls._create_text_fragments(pairs, parameters)
+
+    @classmethod
+    def _read_parsed(cls, buf: typing.IO[bytes], parameters: dict) -> Tree:
         """
         Read text fragments from a parsed format text file.
 
@@ -914,9 +837,10 @@ class TextFile(collections.abc.Sized):
             if identifier := pieces[0].strip():
                 text = pieces[1].strip()
                 pairs.append((identifier, [text]))
-        self._create_text_fragments(pairs)
+        return cls._create_text_fragments(pairs, parameters)
 
-    def _read_plain(self, buf: typing.IO[bytes]):
+    @classmethod
+    def _read_plain(cls, buf: typing.IO[bytes], parameters: dict) -> Tree:
         """
         Read text fragments from a plain format text file.
 
@@ -924,10 +848,13 @@ class TextFile(collections.abc.Sized):
         :raises: ValueError: if the id regex is not valid
         """
         logger.debug("Parsing fragments from plain text format")
-        id_format = self._get_id_format()
-        self._create_text_fragments(
-            (id_format % idx, [line.decode().strip()])
-            for idx, line in enumerate(buf.readlines(), start=1)
+        id_format = cls._get_id_format(parameters=parameters)
+        return cls._create_text_fragments(
+            (
+                (id_format % idx, [line.decode().strip()])
+                for idx, line in enumerate(buf.readlines(), start=1)
+            ),
+            parameters=parameters,
         )
 
     @staticmethod
@@ -941,7 +868,10 @@ class TextFile(collections.abc.Sized):
 
         return ""
 
-    def _read_unparsed(self, buf: typing.IO[bytes], *, read_img_alt: bool = False):
+    @classmethod
+    def _read_unparsed(
+        cls, buf: typing.IO[bytes], parameters: dict, *, read_img_alt: bool = False
+    ) -> Tree:
         """
         Read text fragments from an unparsed format text file.
 
@@ -952,7 +882,7 @@ class TextFile(collections.abc.Sized):
         def make_soup_strainer() -> bs4.SoupStrainer:
             return bs4.SoupStrainer(
                 id=re.compile(
-                    rf".*\b{self.parameters[gc.PPN_TASK_IS_TEXT_UNPARSED_ID_REGEX]}\b.*"
+                    rf".*\b{parameters[gc.PPN_TASK_IS_TEXT_UNPARSED_ID_REGEX]}\b.*"
                 )
             )
 
@@ -968,14 +898,14 @@ class TextFile(collections.abc.Sized):
         ids = []
         for node in soup.find_all():
             node_id = node["id"]
-            node_text = self._get_node_text(node, read_img_alt=read_img_alt)
+            node_text = cls._get_node_text(node, read_img_alt=read_img_alt)
 
             text_from_id[node_id] = node_text
             ids.append(node_id)
 
         # sort by ID as requested
         id_sort = gf.safe_get(
-            dictionary=self.parameters,
+            dictionary=parameters,
             key=gc.PPN_TASK_IS_TEXT_UNPARSED_ID_SORT,
             default_value=IDSortingAlgorithm.UNSORTED,
             can_return_none=False,
@@ -983,24 +913,27 @@ class TextFile(collections.abc.Sized):
         logger.debug("Sorting text fragments using %r", id_sort)
         sorted_ids = IDSortingAlgorithm(id_sort).sort(ids)
 
-        # append to fragments
-        self._create_text_fragments((key, [text_from_id[key]]) for key in sorted_ids)
+        return cls._create_text_fragments(
+            ((key, [text_from_id[key]]) for key in sorted_ids), parameters=parameters
+        )
 
-    def _read_unparsed_img(self, buf: typing.IO[bytes]):
+    @classmethod
+    def _read_unparsed_img(cls, buf: typing.IO[bytes], parameters: dict) -> Tree:
         """
         Read text fragments from an unparsed format text file, additionally
         extracting image descriptions.
 
         :param buf: the bytes file object
         """
-        return self._read_unparsed(buf, read_img_alt=True)
+        return cls._read_unparsed(buf, parameters=parameters, read_img_alt=True)
 
-    def _get_id_format(self):
+    @classmethod
+    def _get_id_format(cls, parameters: dict) -> str:
         """Return the id regex from the parameters"""
         id_format = gf.safe_get(
-            self.parameters,
+            parameters,
             gc.PPN_TASK_OS_FILE_ID_REGEX,
-            self.DEFAULT_ID_FORMAT,
+            cls.DEFAULT_ID_FORMAT,
             can_return_none=False,
         )
         try:
@@ -1009,37 +942,45 @@ class TextFile(collections.abc.Sized):
             raise ValueError("String %r is not a valid ID format", id_format) from exc
         return id_format
 
-    def _create_text_fragments(self, pairs: typing.Iterable[tuple[str, list[str]]]):
+    @classmethod
+    def _create_text_fragments(
+        cls, pairs: typing.Iterable[tuple[str, list[str]]], parameters: dict
+    ) -> Tree:
         """
         Create text fragment objects and append them to this list.
 
         :param list pairs: a list of pairs, each pair being (id, [line_1, ..., line_n])
         """
         logger.debug("Creating TextFragment objects")
-        text_filter = self._build_text_filter()
+        text_filter = cls._build_text_filter(parameters=parameters)
+        tree = Tree()
         for identifier, lines in pairs:
-            self.add_fragment(
-                TextFragment(
-                    identifier=identifier,
-                    lines=lines,
-                    filtered_lines=text_filter.apply_filter(lines),
+            tree.add_child(
+                Tree(
+                    value=TextFragment(
+                        identifier=identifier,
+                        lines=lines,
+                        filtered_lines=text_filter.apply_filter(lines),
+                    )
                 )
             )
+        return tree
 
-    def _build_text_filter(self) -> "TextFilter":
+    @classmethod
+    def _build_text_filter(cls, parameters: dict) -> "TextFilter":
         """
         Build a suitable TextFilter object.
         """
         text_filter = TextFilter()
         if (
             param_value := gf.safe_get(
-                self.parameters, gc.PPN_TASK_IS_TEXT_FILE_IGNORE_REGEX, None
+                parameters, gc.PPN_TASK_IS_TEXT_FILE_IGNORE_REGEX, None
             )
         ) is not None:
             text_filter.add_filter(TextFilterIgnoreRegex(regex=param_value))
         if (
             param_value := gf.safe_get(
-                self.parameters, gc.PPN_TASK_IS_TEXT_FILE_TRANSLITERATE_MAP, None
+                parameters, gc.PPN_TASK_IS_TEXT_FILE_TRANSLITERATE_MAP, None
             )
         ) is not None:
             text_filter.add_filter(TextFilterTransliterate(map_file_path=param_value))

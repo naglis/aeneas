@@ -199,16 +199,19 @@ def do_sync(args: argparse.Namespace, rconf: RuntimeConfiguration) -> int:
 
 
 def do_finetune(args: argparse.Namespace, rconf: RuntimeConfiguration) -> int:
+    with open(args.text_path, mode="rb") as text_f:
+        text_file = TextFile.load(
+            text_f,
+            TextFileFormat.UNPARSED_IMG,
+            parameters={
+                gc.PPN_TASK_IS_TEXT_UNPARSED_ID_REGEX: args.id_regex,
+            },
+        )
+
     text_map = {}
-    text_file = TextFile(
-        file_path=args.text_path,
-        file_format=TextFileFormat.UNPARSED_IMG,
-        parameters={
-            gc.PPN_TASK_IS_TEXT_UNPARSED_ID_REGEX: args.id_regex,
-        },
-    )
     for f in text_file.fragments:
         text_map[f.identifier] = f
+
     with open(args.smil_path, mode="rb") as smil_f:
         sync_map = SyncMap.load(smil_f, SyncMapFormat.SMIL)
 

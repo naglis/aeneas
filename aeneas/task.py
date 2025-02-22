@@ -290,11 +290,12 @@ class Task:
                 ],
                 gc.PPN_TASK_OS_FILE_ID_REGEX: self.configuration["o_id_regex"],
             }
-            self.text_file = TextFile(
-                file_path=self.text_file_path_absolute,
-                file_format=self.configuration["i_t_format"],
-                parameters=parameters,
-            )
+            with open(self.text_file_path_absolute, mode="rb") as text_f:
+                self.text_file = TextFile.load(
+                    text_f,
+                    file_format=self.configuration["i_t_format"],
+                    parameters=parameters,
+                )
             self.text_file.set_language(self.configuration["language"])
         else:
             logger.debug("text_file_path_absolute and/or language is None")
