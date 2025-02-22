@@ -18,7 +18,6 @@ is_text_munparsed_l1_id_regex           : regex matching level 1 id attributes (
 is_text_munparsed_l2_id_regex           : regex matching level 2 id attributes (munparsed)
 is_text_munparsed_l3_id_regex           : regex matching level 3 id attributes (munparsed)
 is_text_type                            : text format (REQ, *)
-is_text_unparsed_class_regex            : regex matching class attributes (unparsed)
 is_text_unparsed_id_regex               : regex matching id attributes (unparsed)
 is_text_unparsed_id_sort                : algorithm to sort matched element (unparsed) (*)
 os_task_file_eaf_audio_ref              : audio ref value (eaf)

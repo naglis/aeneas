@@ -282,9 +282,6 @@ class Task:
                 gc.PPN_TASK_IS_TEXT_MUNPARSED_L3_ID_REGEX: self.configuration[
                     "i_t_munparsed_l3_id_regex"
                 ],
-                gc.PPN_TASK_IS_TEXT_UNPARSED_CLASS_REGEX: self.configuration[
-                    "i_t_unparsed_class_regex"
-                ],
                 gc.PPN_TASK_IS_TEXT_UNPARSED_ID_REGEX: self.configuration[
                     "i_t_unparsed_id_regex"
                 ],
@@ -337,7 +334,6 @@ class TaskConfiguration(Configuration):
     * :data:`~aeneas.globalconstants.PPN_TASK_IS_TEXT_MUNPARSED_L1_ID_REGEX`      or ``i_t_munparsed_l1_id_regex``
     * :data:`~aeneas.globalconstants.PPN_TASK_IS_TEXT_MUNPARSED_L2_ID_REGEX`      or ``i_t_munparsed_l2_id_regex``
     * :data:`~aeneas.globalconstants.PPN_TASK_IS_TEXT_MUNPARSED_L3_ID_REGEX`      or ``i_t_munparsed_l3_id_regex``
-    * :data:`~aeneas.globalconstants.PPN_TASK_IS_TEXT_UNPARSED_CLASS_REGEX`       or ``i_t_unparsed_class_regex``
     * :data:`~aeneas.globalconstants.PPN_TASK_IS_TEXT_UNPARSED_ID_REGEX`          or ``i_t_unparsed_id_regex``
     * :data:`~aeneas.globalconstants.PPN_TASK_IS_TEXT_UNPARSED_ID_SORT`           or ``i_t_unparsed_id_sort``
     * :data:`~aeneas.globalconstants.PPN_TASK_OS_FILE_EAF_AUDIO_REF`              or ``o_eaf_audio_ref``
@@ -529,15 +525,6 @@ class TaskConfiguration(Configuration):
                 None,
                 ["i_t_munparsed_l3_id_regex"],
                 "regex matching level 3 id attributes (munparsed)",
-            ),
-        ),
-        (
-            gc.PPN_TASK_IS_TEXT_UNPARSED_CLASS_REGEX,
-            (
-                None,
-                None,
-                ["i_t_unparsed_class_regex"],
-                "regex matching class attributes (unparsed, unparsed_img)",
             ),
         ),
         (

@@ -89,19 +89,6 @@ class TestRunSDCLI(ExecuteCLICase):
             0,
         )
 
-    def test_sd_unparsed_class_regex(self):
-        self.execute(
-            [
-                ("", "unparsed"),
-                ("in", "../aeneas/tools/res/unparsed.xhtml"),
-                ("", "eng"),
-                ("in", "../aeneas/tools/res/audio.mp3"),
-                ("", "--class-regex=ra"),
-                ("", "--sort=unsorted"),
-            ],
-            0,
-        )
-
     def test_sd_unparsed_sort_numeric(self):
         self.execute(
             [

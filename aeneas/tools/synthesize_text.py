@@ -122,7 +122,6 @@ class SynthesizeTextCLI(CLIProgram):
         l2_id_regex = self.has_option_with_value("--l2-id-regex")
         l3_id_regex = self.has_option_with_value("--l3-id-regex")
         id_regex = self.has_option_with_value("--id-regex")
-        class_regex = self.has_option_with_value("--class-regex")
         sort = self.has_option_with_value("--sort")
         backwards = self.has_option(["-b", "--backwards"])
         quit_after = gf.safe_float(self.has_option_with_value("--quit-after"), None)
@@ -132,7 +131,6 @@ class SynthesizeTextCLI(CLIProgram):
             gc.PPN_TASK_IS_TEXT_MUNPARSED_L1_ID_REGEX: l1_id_regex,
             gc.PPN_TASK_IS_TEXT_MUNPARSED_L2_ID_REGEX: l2_id_regex,
             gc.PPN_TASK_IS_TEXT_MUNPARSED_L3_ID_REGEX: l3_id_regex,
-            gc.PPN_TASK_IS_TEXT_UNPARSED_CLASS_REGEX: class_regex,
             gc.PPN_TASK_IS_TEXT_UNPARSED_ID_REGEX: id_regex,
             gc.PPN_TASK_IS_TEXT_UNPARSED_ID_SORT: sort,
         }
@@ -144,12 +142,11 @@ class SynthesizeTextCLI(CLIProgram):
             )
             return self.ERROR_EXIT_CODE
         if (
-            text_format == TextFileFormat.UNPARSED
+            text_format in (TextFileFormat.UNPARSED, TextFileFormat.UNPARSED_IMG)
             and id_regex is None
-            and class_regex is None
         ):
             self.print_error(
-                "You must specify --id-regex and/or --class-regex for unparsed format"
+                "You must specify --id-regex for unparsed and unparsed_img formats"
             )
             return self.ERROR_EXIT_CODE
 

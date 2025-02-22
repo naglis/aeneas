@@ -89,12 +89,10 @@ class Validator(Configurable):
             [gc.PPN_TASK_IS_TEXT_MUNPARSED_L3_ID_REGEX],
         ),
         (
-            # is_text_type=unparsed => is_text_unparsed_class_regex or
-            #                          is_text_unparsed_id_regex
+            # is_text_type=unparsed => is_text_unparsed_id_regex
             gc.PPN_TASK_IS_TEXT_FILE_FORMAT,
             [TextFileFormat.UNPARSED],
             [
-                gc.PPN_TASK_IS_TEXT_UNPARSED_CLASS_REGEX,
                 gc.PPN_TASK_IS_TEXT_UNPARSED_ID_REGEX,
             ],
         ),

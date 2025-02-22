@@ -81,15 +81,12 @@ class TestTask(BaseCase):
         fmt: str,
         expected: int,
         id_regex: str | None = None,
-        class_regex: str | None = None,
         id_sort: str | None = None,
     ):
         task = Task()
         task.configuration = TaskConfiguration()
         task.configuration["language"] = Language.ENG
         task.configuration["i_t_format"] = fmt
-        if class_regex is not None:
-            task.configuration["i_t_unparsed_class_regex"] = class_regex
         if id_regex is not None:
             task.configuration["i_t_unparsed_id_regex"] = id_regex
         if id_sort is not None:
@@ -189,7 +186,6 @@ class TestTask(BaseCase):
             "res/inputtext/sonnet_unparsed_class.xhtml",
             TextFileFormat.UNPARSED,
             0,
-            class_regex="ra",
             id_sort=IDSortingAlgorithm.NUMERIC,
         )
 
@@ -199,7 +195,6 @@ class TestTask(BaseCase):
             TextFileFormat.UNPARSED,
             15,
             id_regex="f[0-9]+",
-            class_regex="ra",
             id_sort=IDSortingAlgorithm.NUMERIC,
         )
 
@@ -210,7 +205,6 @@ class TestTask(BaseCase):
             TextFileFormat.UNPARSED,
             0,
             id_regex="f[0-9]+",
-            class_regex="ra",
             id_sort=IDSortingAlgorithm.NUMERIC,
         )
 
@@ -367,9 +361,6 @@ class TestTask(BaseCase):
 
     def test_tc_is_text_transliterate_map(self):
         self.setter("i_t_transliterate_map", "/tmp/map.txt", "/tmp/map.txt")
-
-    def test_tc_is_text_unparsed_class_regex(self):
-        self.setter("i_t_unparsed_class_regex", "f[0-9]*", "f[0-9]*")
 
     def test_tc_is_text_unparsed_id_regex(self):
         self.setter("i_t_unparsed_id_regex", "ra", "ra")

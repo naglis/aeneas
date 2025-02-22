@@ -194,7 +194,7 @@ class TestExecuteTaskCLI(ExecuteTaskCLICase):
                 ("in", "../aeneas/tools/res/unparsed.xhtml"),
                 (
                     "",
-                    "task_language=eng|is_text_type=unparsed|os_task_file_format=json|is_text_unparsed_class_regex=ra|is_text_unparsed_id_regex=f[0-9]+|is_text_unparsed_id_sort=numeric",
+                    "task_language=eng|is_text_type=unparsed|os_task_file_format=json|is_text_unparsed_id_regex=f[0-9]+|is_text_unparsed_id_sort=numeric",
                 ),
                 ("out", "sonnet.json"),
             ],

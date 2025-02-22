@@ -47,7 +47,6 @@ class TestTextFile(BaseCase):
         gc.PPN_TASK_IS_TEXT_MUNPARSED_L2_ID_REGEX: "p[0-9]+s[0-9]+",
         gc.PPN_TASK_IS_TEXT_MUNPARSED_L3_ID_REGEX: "p[0-9]+s[0-9]+w[0-9]+",
         gc.PPN_TASK_IS_TEXT_UNPARSED_ID_REGEX: "f[0-9]+",
-        gc.PPN_TASK_IS_TEXT_UNPARSED_CLASS_REGEX: "ra",
         gc.PPN_TASK_IS_TEXT_UNPARSED_ID_SORT: IDSortingAlgorithm.UNSORTED,
     }
     ID_REGEX_PARAMETERS = {gc.PPN_TASK_OS_FILE_ID_REGEX: "word%06d"}
@@ -333,12 +332,7 @@ class TestTextFile(BaseCase):
                 "path": "res/inputtext/sonnet_unparsed_soup_2.txt",
                 "parameters": {
                     gc.PPN_TASK_IS_TEXT_UNPARSED_ID_REGEX: "f[0-9]*",
-                    gc.PPN_TASK_IS_TEXT_UNPARSED_CLASS_REGEX: "ra",
                 },
-            },
-            {
-                "path": "res/inputtext/sonnet_unparsed_soup_3.txt",
-                "parameters": {gc.PPN_TASK_IS_TEXT_UNPARSED_CLASS_REGEX: "ra"},
             },
             {
                 "path": "res/inputtext/sonnet_unparsed.xhtml",

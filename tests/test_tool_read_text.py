@@ -69,17 +69,6 @@ class TestReadTextCLI(ExecuteCLICase):
             0,
         )
 
-    def test_read_unparsed_class_regex(self):
-        self.execute(
-            [
-                ("", "unparsed"),
-                ("in", "../aeneas/tools/res/unparsed.xhtml"),
-                ("", "--class-regex=ra"),
-                ("", "--sort=unsorted"),
-            ],
-            0,
-        )
-
     def test_read_unparsed_sort_numeric(self):
         self.execute(
             [

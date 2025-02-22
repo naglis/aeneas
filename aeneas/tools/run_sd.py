@@ -107,30 +107,27 @@ class RunSDCLI(CLIProgram):
         l2_id_regex = self.has_option_with_value("--l2-id-regex")
         l3_id_regex = self.has_option_with_value("--l3-id-regex")
         id_regex = self.has_option_with_value("--id-regex")
-        class_regex = self.has_option_with_value("--class-regex")
         sort = self.has_option_with_value("--sort")
         parameters = {
             gc.PPN_TASK_IS_TEXT_MUNPARSED_L1_ID_REGEX: l1_id_regex,
             gc.PPN_TASK_IS_TEXT_MUNPARSED_L2_ID_REGEX: l2_id_regex,
             gc.PPN_TASK_IS_TEXT_MUNPARSED_L3_ID_REGEX: l3_id_regex,
-            gc.PPN_TASK_IS_TEXT_UNPARSED_CLASS_REGEX: class_regex,
             gc.PPN_TASK_IS_TEXT_UNPARSED_ID_REGEX: id_regex,
             gc.PPN_TASK_IS_TEXT_UNPARSED_ID_SORT: sort,
         }
-        if (text_format == TextFileFormat.MUNPARSED) and (
-            (l1_id_regex is None) or (l2_id_regex is None) or (l3_id_regex is None)
+        if text_format == TextFileFormat.MUNPARSED and (
+            l1_id_regex is None or l2_id_regex is None or l3_id_regex is None
         ):
             self.print_error(
                 "You must specify --l1-id-regex and --l2-id-regex and --l3-id-regex for munparsed format"
             )
             return self.ERROR_EXIT_CODE
         if (
-            (text_format == TextFileFormat.UNPARSED)
-            and (id_regex is None)
-            and (class_regex is None)
+            text_format in (TextFileFormat.UNPARSED, TextFileFormat.UNPARSED_IMG)
+            and id_regex is None
         ):
             self.print_error(
-                "You must specify --id-regex and/or --class-regex for unparsed format"
+                "You must specify --id-regex for unparsed or unparsed_img formats"
             )
             return self.ERROR_EXIT_CODE
 

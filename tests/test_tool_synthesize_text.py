@@ -89,19 +89,6 @@ class TestSynthesizeTextCLI(ExecuteCLICase):
             0,
         )
 
-    def test_synt_unparsed_class_regex(self):
-        self.execute(
-            [
-                ("", "unparsed"),
-                ("in", "../aeneas/tools/res/unparsed.xhtml"),
-                ("", "eng"),
-                ("out", "synthesized.wav"),
-                ("", "--class-regex=ra"),
-                ("", "--sort=unsorted"),
-            ],
-            0,
-        )
-
     def test_synt_unparsed_sort_numeric(self):
         self.execute(
             [

@@ -118,33 +118,18 @@ class TestValidator(BaseCase):
                 False,
             ),
             (
-                "task_missing_unparsed_required_is_text_unparsed_class_regex",
-                "task_language=it|is_text_type=unparsed|os_task_file_name=output.txt|os_task_file_format=txt",
-                False,
-            ),
-            (
-                "task_valid_unparsed_is_text_unparsed_class_regex",
-                "task_language=it|is_text_type=unparsed|is_text_unparsed_class_regex=ra|is_text_unparsed_id_sort=numeric|os_task_file_name=output.txt|os_task_file_format=txt",
-                True,
-            ),
-            (
                 "task_valid_unparsed_is_text_unparsed_id_regex",
                 "task_language=it|is_text_type=unparsed|is_text_unparsed_id_regex=f[0-9]*|is_text_unparsed_id_sort=numeric|os_task_file_name=output.txt|os_task_file_format=txt",
                 True,
             ),
             (
-                "task_valid_unparsed_both",
-                "task_language=it|is_text_type=unparsed|is_text_unparsed_class_regex=ra|is_text_unparsed_id_regex=f[0-9]*|is_text_unparsed_id_sort=numeric|os_task_file_name=output.txt|os_task_file_format=txt",
-                True,
-            ),
-            (
                 "task_invalid_value_is_text_unparsed_id_sort",
-                "task_language=it|is_text_type=unparsed|is_text_unparsed_class_regex=ra|is_text_unparsed_id_regex=f[0-9]*|is_text_unparsed_id_sort=foo|os_task_file_name=output.txt|os_task_file_format=txt",
+                "task_language=it|is_text_type=unparsed|is_text_unparsed_id_regex=f[0-9]*|is_text_unparsed_id_sort=foo|os_task_file_name=output.txt|os_task_file_format=txt",
                 False,
             ),
             (
                 "task_missing_required_is_text_unparsed_id_sort",
-                "task_language=it|is_text_type=unparsed|is_text_unparsed_class_regex=ra|is_text_unparsed_id_regex=f[0-9]*|os_task_file_name=output.txt|os_task_file_format=txt",
+                "task_language=it|is_text_type=unparsed|is_text_unparsed_id_regex=f[0-9]*|os_task_file_name=output.txt|os_task_file_format=txt",
                 False,
             ),
             (

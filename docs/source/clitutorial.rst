@@ -272,8 +272,7 @@ Input Text Formats
 If you use :data:`~aeneas.textfile.TextFileFormat.UNPARSED` files,
 you need to provide the following additional parameters:
 
-* at least one of :data:`~aeneas.globalconstants.PPN_TASK_IS_TEXT_UNPARSED_ID_REGEX`
-  and :data:`~aeneas.globalconstants.PPN_TASK_IS_TEXT_UNPARSED_CLASS_REGEX`,
+* :data:`~aeneas.globalconstants.PPN_TASK_IS_TEXT_UNPARSED_ID_REGEX`
   to select the elements from which text will be considered;
 * :data:`~aeneas.globalconstants.PPN_TASK_IS_TEXT_UNPARSED_ID_SORT`
   to specify how extracted elements should be sorted, based on their ``id`` attributes.
@@ -282,9 +281,7 @@ you need to provide the following additional parameters:
     :language: text
 
 .. note::
-    Even if you only specify the
-    :data:`~aeneas.globalconstants.PPN_TASK_IS_TEXT_UNPARSED_CLASS_REGEX`
-    regex, your XML elements still need to have ``id`` attributes.
+    Your XML elements must have ``id`` attributes.
     This is required for e.g. SMIL output to make sense.
     (Although the EPUB 3 Media Overlays specification allows you
     to specify an EPUB CFI instead of an ``id`` value,
