@@ -3,6 +3,7 @@ import logging
 import decimal
 import os.path
 import typing
+import tempfile
 import sys
 
 from aeneas import globalconstants as gc, globalfunctions as gf
@@ -391,8 +392,6 @@ def main(argv: typing.Sequence[str] | None = None) -> int:
 
     args = parser.parse_args(argv)
 
-    rconf = RuntimeConfiguration(args.runtime_configuration)
-
     loglevel = logging.WARNING
     logformat = "%(levelname)s %(name)s %(message)s"
     if args.verbose == 1:
@@ -404,7 +403,12 @@ def main(argv: typing.Sequence[str] | None = None) -> int:
     logging.basicConfig(filename=args.log, level=loglevel, format=logformat)
 
     if hasattr(args, "func"):
-        return args.func(args, rconf)
+        rconf = RuntimeConfiguration(args.runtime_configuration)
+        with tempfile.TemporaryDirectory(
+            prefix="aeneas.", dir=rconf[RuntimeConfiguration.TMP_PATH]
+        ) as temp_dir:
+            rconf[RuntimeConfiguration.TMP_PATH] = temp_dir
+            return args.func(args, rconf)
     else:
         parser.print_usage()
 
