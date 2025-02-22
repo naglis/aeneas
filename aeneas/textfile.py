@@ -810,7 +810,7 @@ class TextFile(collections.abc.Sized):
             regex_string = self.parameters[LEVEL_TO_REGEX_MAP[level]]
             logger.debug("Regex for %s: %r", attribute_name, regex_string)
             regex = re.compile(rf".*\b{regex_string}\b.*")
-            return root.findAll(attrs={attribute_name: regex})
+            return root.find_all(attrs={attribute_name: regex})
 
         # TODO better and/or parametric parsing,
         #      for example, removing tags but keeping text, etc.
