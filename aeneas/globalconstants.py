@@ -589,7 +589,7 @@ Example::
 PPN_TASK_IS_TEXT_UNPARSED_CLASS_REGEX = "is_text_unparsed_class_regex"
 """
 The regex to match ``class`` attributes for text fragments.
-It applies to ``unparsed`` text files only.
+It applies to ``unparsed`` and ``unparsed_img``` text files only.
 
 Usage: config string, TXT config file, XML config file
 
@@ -606,7 +606,7 @@ Example::
 PPN_TASK_IS_TEXT_UNPARSED_ID_REGEX = "is_text_unparsed_id_regex"
 """
 The regex to match ``id`` attributes for text fragments.
-It applies to ``unparsed`` text files only.
+It applies to ``unparsed`` and ``unparsed_img``` text files only.
 
 Usage: config string, TXT config file, XML config file
 

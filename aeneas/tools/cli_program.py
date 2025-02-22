@@ -279,6 +279,8 @@ class CLIProgram(Configurable, abc.ABC):
         :type  show_help: bool
         :rtype: int
         """
+        self.print_warning("CLIProgram commands are deprecated, use `python -m aeneas`")
+
         args = arguments[:]
 
         if show_help:

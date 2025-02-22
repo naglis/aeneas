@@ -362,9 +362,7 @@ def time_from_ssmmm(string: str | None) -> TimeValue:
     :param string string: the string to be parsed
     :rtype: :class:`~aeneas.exacttiming.TimeValue`
     """
-    if string is None or len(string) < 1:
-        return TimeValue("0.000")
-    return TimeValue(string)
+    return TimeValue(string or "0.000")
 
 
 def time_to_ssmmm(time_value: float | None) -> str:

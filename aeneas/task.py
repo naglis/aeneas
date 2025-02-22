@@ -29,6 +29,7 @@ import decimal
 import logging
 import os
 import uuid
+import typing
 
 from aeneas.adjustboundaryalgorithm import AdjustBoundaryAlgorithm
 from aeneas.audiofile import AudioFile
@@ -53,7 +54,9 @@ class Task:
                         it is not a Unicode string
     """
 
-    def __init__(self, config_string=None):
+    def __init__(
+        self, config: typing.Optional[typing.Union[str, "TaskConfiguration"]] = None
+    ):
         self.identifier = str(uuid.uuid4())
         # relative to input container root
         self.audio_file_path = None
@@ -72,8 +75,11 @@ class Task:
         self.sync_map = None
 
         self.configuration = None
-        if config_string is not None:
-            self.configuration = TaskConfiguration(config_string)
+        if config is not None:
+            if isinstance(config, TaskConfiguration):
+                self.configuration = config
+            else:
+                self.configuration = TaskConfiguration(config)
 
     def __str__(self):
         return (
@@ -531,7 +537,7 @@ class TaskConfiguration(Configuration):
                 None,
                 None,
                 ["i_t_unparsed_class_regex"],
-                "regex matching class attributes (unparsed)",
+                "regex matching class attributes (unparsed, unparsed_img)",
             ),
         ),
         (
@@ -540,7 +546,7 @@ class TaskConfiguration(Configuration):
                 None,
                 None,
                 ["i_t_unparsed_id_regex"],
-                "regex matching id attributes (unparsed)",
+                "regex matching id attributes (unparsed, unparsed_img)",
             ),
         ),
         (
@@ -549,7 +555,7 @@ class TaskConfiguration(Configuration):
                 None,
                 None,
                 ["i_t_unparsed_id_sort"],
-                "algorithm to sort matched element (unparsed) (*)",
+                "algorithm to sort matched element (unparsed, unparsed_img) (*)",
             ),
         ),
         (
