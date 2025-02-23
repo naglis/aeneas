@@ -64,9 +64,9 @@ class TestTextFile(BaseCase):
         parameters: dict | None = None,
     ):
         with open(self.file_path(input_file_path), mode="rb") as text_f:
-            tfl = TextFile.load(text_f, file_format=fmt, parameters=parameters)
-        self.assertEqual(len(tfl), expected_length)
-        return tfl
+            text_file = TextFile.load(text_f, file_format=fmt, parameters=parameters)
+        self.assertEqual(len(text_file), expected_length)
+        return text_file
 
     def load_and_sort_id(
         self, input_file_path: str, id_regex: str, id_sort: str, expected: list[str]
@@ -314,18 +314,46 @@ class TestTextFile(BaseCase):
             with self.subTest(path=path):
                 self.load(path, TextFileFormat.PARSED, 0)
 
-    def test_read_unparsed(self):
-        for path in (
-            "res/inputtext/sonnet_unparsed_soup_1.txt",
+    def test_read_unparsed_xhtml(self):
+        expected_fragments = [
+            TextFragment(identifier=identifier, lines=[line], filtered_lines=[line])
+            for identifier, line in (
+                ("f001", "I"),
+                ("f002", "From fairest creatures we desire increase,"),
+                ("f003", "That thereby beauty’s rose might never die,"),
+                ("f004", "But as the riper should by time decease,"),
+                ("f005", "His tender heir might bear his memory:"),
+                ("f006", "But thou contracted to thine own bright eyes,"),
+                ("f007", "Feed’st thy light’s flame with self-substantial fuel,"),
+                ("f008", "Making a famine where abundance lies,"),
+                ("f009", "Thy self thy foe, to thy sweet self too cruel:"),
+                ("f010", "Thou that art now the world’s fresh ornament,"),
+                ("f011", "And only herald to the gaudy spring,"),
+                ("f012", "Within thine own bud buriest thy content,"),
+                ("f013", "And tender churl mak’st waste in niggarding:"),
+                ("f014", "Pity the world, or else this glutton be,"),
+                ("f015", "To eat the world’s due, by the grave and thee."),
+            )
+        ]
+        text_file = self.load(
             "res/inputtext/sonnet_unparsed.xhtml",
-        ):
-            with self.subTest(path=path):
-                self.load(
-                    path,
-                    TextFileFormat.UNPARSED,
-                    15,
-                    {gc.PPN_TASK_IS_TEXT_UNPARSED_ID_REGEX: "f[0-9]*"},
-                )
+            TextFileFormat.UNPARSED,
+            15,
+            {gc.PPN_TASK_IS_TEXT_UNPARSED_ID_REGEX: "f[0-9]*"},
+        )
+
+        self.assertSequenceEqual(
+            text_file.fragments,
+            expected_fragments,
+        )
+
+    def test_read_unparsed_txt(self):
+        self.load(
+            "res/inputtext/sonnet_unparsed_soup_1.txt",
+            TextFileFormat.UNPARSED,
+            15,
+            {gc.PPN_TASK_IS_TEXT_UNPARSED_ID_REGEX: "f[0-9]*"},
+        )
 
     def test_read_unparsed_unsorted(self):
         self.load_and_sort_id(
@@ -398,15 +426,14 @@ class TestTextFile(BaseCase):
         self.assertEqual(tfl.chars, 50)
 
     def test_from_list_with_ids(self):
-        tfl = TextFile.from_list_with_ids((
-                                              
-            ("a1", "fragment 1"),
-            ("b2", "fragment 2"),
-            ("c3", "fragment 3"),
-            ("d4", "fragment 4"),
-            ("e5", "fragment 5"),
-                                          )
-            
+        tfl = TextFile.from_list_with_ids(
+            [
+                ("a1", "fragment 1"),
+                ("b2", "fragment 2"),
+                ("c3", "fragment 3"),
+                ("d4", "fragment 4"),
+                ("e5", "fragment 5"),
+            ]
         )
 
         self.assertEqual(len(tfl), 5)
