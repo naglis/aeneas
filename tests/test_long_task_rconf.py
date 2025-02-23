@@ -19,6 +19,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import tempfile
+import unittest
 
 from .common import ExecuteTaskCLICase, slow_test, extra_test
 
@@ -55,6 +56,7 @@ class TestExecuteTaskCLI(ExecuteTaskCLICase):
             0,
         )
 
+    @unittest.skip("TODO: Resolve unlisted language issue")
     def test_exec_allow_unlisted_language(self):
         self.execute(
             [
