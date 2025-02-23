@@ -97,9 +97,9 @@ def check_import():
             "    A. you did not download/git-clone the aeneas package properly; or"
         )
         print_info("    B. you did not install the required Python packages:")
-        print_info("      1. BeautifulSoup4")
-        print_info("      2. lxml")
-        print_info("      3. numpy")
+        print_info("      1. lxml")
+        print_info("      2. numpy")
+        print_info("      3. Jinja2")
     except Exception as e:
         print_error(e)
     return True

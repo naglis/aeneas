@@ -63,7 +63,7 @@ in several formats, depending on its application:
 2. [Python](https://python.org/) 2.7 (Linux, OS X, Windows) or 3.5 or later (Linux, OS X)
 3. [FFmpeg](https://www.ffmpeg.org/)
 4. [eSpeak](http://espeak.sourceforge.net/)
-5. Python packages `BeautifulSoup4`, `lxml`, and `numpy`
+5. Python packages `lxml`, `numpy` and `Jinja2`
 6. Python headers to compile the Python C/C++ extensions (optional but strongly recommended)
 7. A shell supporting UTF-8 (optional but strongly recommended)
 

@@ -38,11 +38,6 @@ from .common import BaseCase
 
 
 class TestTask(BaseCase):
-    def assertTextFragmentsEqual(self, text_file, expected):
-        self.assertSequenceEqual(
-            [(f.identifier, f.text) for f in text_file.fragments], expected
-        )
-
     def dummy_sync_map(self):
         tree = Tree()
         for frag in (
@@ -178,56 +173,6 @@ class TestTask(BaseCase):
             15,
             id_regex="f[0-9]+",
             id_sort=IDSortingAlgorithm.NUMERIC,
-        )
-
-    def test_set_text_file_unparsed_img_id_img_alt(self):
-        text_file = self.set_text_file(
-            "res/inputtext/sonnet_unparsed_img_id.xhtml",
-            TextFileFormat.UNPARSED_IMG,
-            3,
-            id_regex="f[0-9]+",
-            id_sort=IDSortingAlgorithm.NUMERIC,
-        )
-        self.assertTextFragmentsEqual(
-            text_file,
-            [
-                ("f001", "I"),
-                ("f002", "From fairest creatures we desire increase,"),
-                ("f003", "This is the image description inside alt tag."),
-            ],
-        )
-
-    def test_set_text_file_unparsed_img_no_id(self):
-        text_file = self.set_text_file(
-            "res/inputtext/sonnet_unparsed_img_no_id.xhtml",
-            TextFileFormat.UNPARSED_IMG,
-            2,
-            id_regex="f[0-9]+",
-            id_sort=IDSortingAlgorithm.NUMERIC,
-        )
-        self.assertTextFragmentsEqual(
-            text_file,
-            [
-                ("f001", "I"),
-                ("f002", "From fairest creatures we desire increase,"),
-            ],
-        )
-
-    def test_set_text_file_unparsed_img_no_alt(self):
-        text_file = self.set_text_file(
-            "res/inputtext/sonnet_unparsed_img_no_alt.xhtml",
-            TextFileFormat.UNPARSED_IMG,
-            3,
-            id_regex="f[0-9]+",
-            id_sort=IDSortingAlgorithm.NUMERIC,
-        )
-        self.assertTextFragmentsEqual(
-            text_file,
-            [
-                ("f001", "I"),
-                ("f002", "From fairest creatures we desire increase,"),
-                ("f003", ""),
-            ],
         )
 
     def test_set_text_file_plain(self):

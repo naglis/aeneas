@@ -49,7 +49,7 @@ PKG_VERSION = "1.7.3.0"
 # required packages to install
 # NOTE: always use exact version numbers
 # NOTE: this list should be the same as requirements.txt
-PKG_INSTALL_REQUIRES = ["BeautifulSoup4>=4.5.1", "lxml>=3.6.0", "numpy>=1.9"]
+PKG_INSTALL_REQUIRES = ["lxml>=3.6.0", "numpy>=1.9", "Jinja2>=3.0.0"]
 
 # packages to be distributed
 # NOTE: not including the aeneas.test package to keep the size small

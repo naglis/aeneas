@@ -33,11 +33,13 @@ This module contains the following classes:
 import collections.abc
 import contextlib
 import io
+import itertools
 import logging
+import operator
 import re
 import typing
 
-import bs4
+import lxml.etree as ET
 
 from aeneas.idsortingalgorithm import IDSortingAlgorithm
 from aeneas.tree import Tree
@@ -46,10 +48,6 @@ import aeneas.globalconstants as gc
 import aeneas.globalfunctions as gf
 
 logger = logging.getLogger(__name__)
-
-
-def get_soup(buf: typing.IO[bytes], *, parse_only=None) -> bs4.BeautifulSoup:
-    return bs4.BeautifulSoup(buf, "lxml", parse_only=parse_only)
 
 
 class TextFileFormat:
@@ -737,74 +735,114 @@ class TextFile(collections.abc.Sized):
         :param buf: the bytes file object
         """
 
-        def nodes_at_level(root, level: int):
-            """Return a dict with the bs4 filter parameters"""
-            LEVEL_TO_REGEX_MAP = [
-                None,
-                gc.PPN_TASK_IS_TEXT_MUNPARSED_L1_ID_REGEX,
-                gc.PPN_TASK_IS_TEXT_MUNPARSED_L2_ID_REGEX,
-                gc.PPN_TASK_IS_TEXT_MUNPARSED_L3_ID_REGEX,
-            ]
-            attribute_name = "id"
-            regex_string = parameters[LEVEL_TO_REGEX_MAP[level]]
-            logger.debug("Regex for %s: %r", attribute_name, regex_string)
-            regex = re.compile(rf".*\b{regex_string}\b.*")
-            return root.find_all(attrs={attribute_name: regex})
+        def parse():
+            l1_re = re.compile(
+                rf".*\b{parameters[gc.PPN_TASK_IS_TEXT_MUNPARSED_L1_ID_REGEX]}\b.*"
+            )
+            l2_re = re.compile(
+                rf".*\b{parameters[gc.PPN_TASK_IS_TEXT_MUNPARSED_L2_ID_REGEX]}\b.*"
+            )
+            l3_re = re.compile(
+                rf".*\b{parameters[gc.PPN_TASK_IS_TEXT_MUNPARSED_L3_ID_REGEX]}\b.*"
+            )
 
-        # TODO better and/or parametric parsing,
-        #      for example, removing tags but keeping text, etc.
-        logger.debug("Parsing fragments from munparsed text format")
-        # transform text in a soup object
-        soup = get_soup(buf)
-        # extract according to id_regex
-        logger.debug("Finding L1 elements")
-        tree = Tree()
-        for l1_node in nodes_at_level(soup, 1):
-            has_word = False
+            l1_id = l2_id = l3_id = None
             try:
-                l1_id = l1_node["id"]
-                logger.debug("Found L1 node with ID: %r", l1_id)
-                paragraph_node = Tree()
-                paragraph_text_parts = []
-                for l2_node in nodes_at_level(l1_node, 2):
-                    l2_id = l2_node["id"]
-                    logger.debug("Found L2 node with ID: %r", l2_id)
-                    sentence_node = Tree()
-                    paragraph_node.add_child(sentence_node)
-                    sentence_text_parts = []
-                    for l3_node in nodes_at_level(l2_node, 3):
-                        l3_id = l3_node["id"]
-                        l3_text = l3_node.text
-                        logger.debug("Found L3 node with ID: %r", l3_id)
-                        logger.debug("Found L3 node with text: %r", l3_text)
-                        word_fragment = TextFragment(
-                            identifier=l3_id, lines=[l3_text], filtered_lines=[l3_text]
-                        )
-                        word_node = Tree(value=word_fragment)
-                        sentence_node.add_child(word_node)
-                        sentence_text_parts.append(l3_text)
-                        has_word = True
-                    sentence_text = " ".join(sentence_text_parts)
-                    paragraph_text_parts.append(sentence_text)
-                    sentence_node.value = TextFragment(
-                        identifier=l2_id,
-                        lines=[sentence_text],
-                        filtered_lines=[sentence_text],
+                for event, node in ET.iterparse(
+                    buf, events=("start", "end"), html=True
+                ):
+                    node_id = node.attrib.get("id")
+                    if not node_id:
+                        if event == "end":
+                            node.clear()
+                        continue
+
+                    if event == "start":
+                        if l1_id is None and l1_re.match(node_id):
+                            l1_id = node_id
+                            continue
+                        elif (
+                            l1_id is not None and l2_id is None and l2_re.match(node_id)
+                        ):
+                            l2_id = node_id
+                            continue
+                        elif (
+                            l1_id is not None
+                            and l2_id is not None
+                            and l3_id is None
+                            and l3_re.match(node_id)
+                        ):
+                            l3_id = node_id
+                            continue
+                    elif event == "end":
+                        if node_id == l1_id:
+                            if l2_id is not None:
+                                raise AssertionError("Expected l2_id to be empty")
+                            if l3_id is not None:
+                                raise AssertionError("Expected l3_id to be empty")
+                            l1_id = None
+                        elif node_id == l2_id:
+                            if l1_id is None:
+                                raise AssertionError("Expected l1_id to not be empty")
+                            if l3_id is not None:
+                                raise AssertionError("Expected l3_id to be empty")
+                            l2_id = None
+                        elif node_id == l3_id:
+                            if l1_id is None:
+                                raise AssertionError("Expected l1_id to not be empty")
+                            if l2_id is None:
+                                raise AssertionError("Expected l2_id to not be empty")
+
+                            yield l1_id, l2_id, l3_id, node.text
+                            l3_id = None
+
+                    node.clear()
+            except ET.XMLSyntaxError as e:
+                # FIXME: This is a very ugly workaround for empty XML file, find a better way.
+                if e.msg == "no element found":
+                    return
+
+                raise
+
+        tree = Tree()
+        for l1_id, l1_items in itertools.groupby(parse(), key=operator.itemgetter(0)):
+            logger.debug("Found L1 node with ID: %r", l1_id)
+            paragraph_node = Tree()
+            paragraph_text_parts = []
+            for l2_id, l2_items in itertools.groupby(
+                l1_items, key=operator.itemgetter(1)
+            ):
+                logger.debug("Found L2 node with ID: %r", l2_id)
+                sentence_node = Tree()
+                paragraph_node.add_child(sentence_node)
+                sentence_text_parts = []
+                for _, _, l3_id, l3_text in l2_items:
+                    logger.debug(
+                        "Found L3 node with ID: %r and text: %r", l3_id, l3_text
                     )
-                    logger.debug("Found L2 node with text: %r", sentence_text)
-                if has_word:
-                    paragraph_text = " ".join(paragraph_text_parts)
-                    paragraph_node.value = TextFragment(
-                        identifier=l1_id,
-                        lines=[paragraph_text],
-                        filtered_lines=[paragraph_text],
+                    word_fragment = TextFragment(
+                        identifier=l3_id, lines=[l3_text], filtered_lines=[l3_text]
                     )
-                    tree.add_child(paragraph_node)
-                    logger.debug("Found L1 node with text: %r", paragraph_text)
-                else:
-                    logger.debug("Found L1 node but it has no words, skipping")
-            except KeyError as exc:
-                logger.warning("KeyError (%s) while parsing a L1 node", exc)
+                    word_node = Tree(value=word_fragment)
+                    sentence_node.add_child(word_node)
+                    sentence_text_parts.append(l3_text)
+                sentence_text = " ".join(sentence_text_parts)
+                paragraph_text_parts.append(sentence_text)
+                sentence_node.value = TextFragment(
+                    identifier=l2_id,
+                    lines=[sentence_text],
+                    filtered_lines=[sentence_text],
+                )
+                logger.debug("Found L2 node with text: %r", sentence_text)
+
+            paragraph_text = " ".join(paragraph_text_parts)
+            paragraph_node.value = TextFragment(
+                identifier=l1_id,
+                lines=[paragraph_text],
+                filtered_lines=[paragraph_text],
+            )
+            tree.add_child(paragraph_node)
+            logger.debug("Found L1 node with text: %r", paragraph_text)
 
         return tree
 
@@ -879,8 +917,8 @@ class TextFile(collections.abc.Sized):
     def _get_node_text(node, *, read_img_alt: bool) -> str:
         if node.text:
             return node.text
-        elif read_img_alt and node.name == "img":
-            alt = node.attrs.get("alt")
+        elif read_img_alt and node.tag == "img":
+            alt = node.attrib.get("alt")
             if alt is not None:
                 return alt
 
@@ -897,29 +935,32 @@ class TextFile(collections.abc.Sized):
         :param bool read_img_alt: if True, read text from `<img/>` tag `alt` attribute
         """
 
-        def make_soup_strainer() -> bs4.SoupStrainer:
-            return bs4.SoupStrainer(
-                id=re.compile(
-                    rf".*\b{parameters[gc.PPN_TASK_IS_TEXT_UNPARSED_ID_REGEX]}\b.*"
-                )
-            )
-
         # TODO better and/or parametric parsing,
         #      for example, removing tags but keeping text, etc.
         logger.debug("Parsing fragments from unparsed text format")
 
-        # transform text in a soup object
-        soup = get_soup(buf, parse_only=make_soup_strainer())
-
-        # extract according to id_regex
         text_from_id = {}
         ids = []
-        for node in soup.find_all():
-            node_id = node["id"]
-            node_text = cls._get_node_text(node, read_img_alt=read_img_alt)
+        id_regex = re.compile(
+            rf".*\b{parameters[gc.PPN_TASK_IS_TEXT_UNPARSED_ID_REGEX]}\b.*"
+        )
 
-            text_from_id[node_id] = node_text
-            ids.append(node_id)
+        try:
+            for _, node in ET.iterparse(buf, events=("end",), html=True):
+                node_id = node.attrib.get("id")
+                if node_id and id_regex.match(node_id):
+                    text_from_id[node_id] = cls._get_node_text(
+                        node, read_img_alt=read_img_alt
+                    )
+                    ids.append(node_id)
+
+                node.clear()
+        except ET.XMLSyntaxError as e:
+            # FIXME: This is very ugly, find a better way.
+            if e.msg == "no element found":
+                return Tree()
+
+            raise
 
         # sort by ID as requested
         id_sort = gf.safe_get(

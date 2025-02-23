@@ -127,12 +127,12 @@ Dependencies
 
 * ``numpy`` (v1.9 or later)
 * ``lxml`` (v3.6.0 or later)
-* ``BeautifulSoup`` (v4.5.1 or later)
+* ``Jinja2`` (v3.0.0 or later)
 
 Only ``numpy`` is actually needed, as it is heavily used for the alignment computation.
 
-The other two dependencies (``lxml`` and ``BeautifulSoup``) are needed
-only if you use XML-like input or output formats.
+``lxml`` is needed only if you use XML-like input or output formats.
+``Jinja2`` is needed if you want to output finetuneas HTML.
 However, since they are popular Python packages, to avoid complex import testing,
 they are listed as requirements.
 This choice might change in the future.

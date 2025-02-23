@@ -69,7 +69,7 @@ deps() {
                 echo "[INFO] Not upgrading numpy (switch --no-numpy-upgrade)"
             fi
         fi
-        pip install -U lxml BeautifulSoup4
+        pip install -U lxml Jinja2
         deactivate
         cd ..
         echo "[INFO] Installing Python dependencies in $1 ... done"

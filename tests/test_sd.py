@@ -33,10 +33,7 @@ class TestSD(BaseCase):
     def load(self):
         audio_file_mfcc = AudioFileMFCC(self.file_path(self.AUDIO_FILE))
         with open(self.file_path(self.TEXT_FILE), mode="rb") as text_f:
-            text_file = TextFile.load(
-                text_f,
-                file_format=TextFileFormat.PLAIN
-            )
+            text_file = TextFile.load(text_f, file_format=TextFileFormat.PLAIN)
         text_file.set_language(Language.ENG)
         return SD(audio_file_mfcc, text_file)
 

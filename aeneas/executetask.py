@@ -143,14 +143,17 @@ class ExecuteTask(Configurable):
                 f"The text file of the task has {len(self.task.text_file):d} fragments, "
                 f"more than the maximum allowed ({task_max_text_length:d})."
             )
-        if self.task.text_file.chars == 0:
+        if not self.task.text_file.chars:
             raise ExecuteTaskInputError("The task text file seems to have empty text")
 
         logger.debug("Both audio and text input file are present")
 
         # execute
         self.step_index = 1
-        if self.task.configuration[gc.PPN_TASK_IS_TEXT_FILE_FORMAT] in TextFileFormat.MULTILEVEL_VALUES:
+        if (
+            self.task.configuration[gc.PPN_TASK_IS_TEXT_FILE_FORMAT]
+            in TextFileFormat.MULTILEVEL_VALUES
+        ):
             self._execute_multi_level_task()
         else:
             self._execute_single_level_task()

@@ -56,6 +56,11 @@ class TestTextFile(BaseCase):
     ID_REGEX_PARAMETERS_BAD = {gc.PPN_TASK_OS_FILE_ID_REGEX: "word"}
     TRANSLITERATION_MAP_FILE_PATH = "res/transliteration/transliteration.map"
 
+    def assertTextFragmentsEqual(self, text_file, expected):
+        self.assertSequenceEqual(
+            [(f.identifier, f.text) for f in text_file.fragments], expected
+        )
+
     def load(
         self,
         input_file_path: str = PLAIN_FILE_PATH,
@@ -353,6 +358,65 @@ class TestTextFile(BaseCase):
             TextFileFormat.UNPARSED,
             15,
             {gc.PPN_TASK_IS_TEXT_UNPARSED_ID_REGEX: "f[0-9]*"},
+        )
+
+    def test_read_unparsed_img_id_img_alt(self):
+        text_file = self.load(
+            "res/inputtext/sonnet_unparsed_img_id.xhtml",
+            TextFileFormat.UNPARSED_IMG,
+            3,
+            {
+                gc.PPN_TASK_IS_TEXT_UNPARSED_ID_REGEX: r"f[0-9]+",
+                gc.PPN_TASK_IS_TEXT_UNPARSED_ID_SORT: IDSortingAlgorithm.NUMERIC,
+            },
+        )
+
+        self.assertTextFragmentsEqual(
+            text_file,
+            [
+                ("f001", "I"),
+                ("f002", "From fairest creatures we desire increase,"),
+                ("f003", "This is the image description inside alt tag."),
+            ],
+        )
+
+    def test_read_unparsed_img_no_id(self):
+        text_file = self.load(
+            "res/inputtext/sonnet_unparsed_img_no_id.xhtml",
+            TextFileFormat.UNPARSED_IMG,
+            2,
+            {
+                gc.PPN_TASK_IS_TEXT_UNPARSED_ID_REGEX: r"f[0-9]+",
+                gc.PPN_TASK_IS_TEXT_UNPARSED_ID_SORT: IDSortingAlgorithm.NUMERIC,
+            },
+        )
+
+        self.assertTextFragmentsEqual(
+            text_file,
+            [
+                ("f001", "I"),
+                ("f002", "From fairest creatures we desire increase,"),
+            ],
+        )
+
+    def test_set_text_file_unparsed_img_no_alt(self):
+        text_file = self.load(
+            "res/inputtext/sonnet_unparsed_img_no_alt.xhtml",
+            TextFileFormat.UNPARSED_IMG,
+            3,
+            {
+                gc.PPN_TASK_IS_TEXT_UNPARSED_ID_REGEX: r"f[0-9]+",
+                gc.PPN_TASK_IS_TEXT_UNPARSED_ID_SORT: IDSortingAlgorithm.NUMERIC,
+            },
+        )
+
+        self.assertTextFragmentsEqual(
+            text_file,
+            [
+                ("f001", "I"),
+                ("f002", "From fairest creatures we desire increase,"),
+                ("f003", ""),
+            ],
         )
 
     def test_read_unparsed_unsorted(self):

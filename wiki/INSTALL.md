@@ -382,15 +382,15 @@ Otherwise, edit your system path so that Python 2.7 is found first.
 #### Manual Procedure Step 5: Install Python packages
 
 There are three Python packages required by **aeneas** to run:
-`BeautifulSoup4`, `lxml`, and `NumPy`.
+`lxml`, `NumPy` and `Jinja2`.
 
 To install these packages, open a Windows command prompt and execute the following:
 
 ```
 conda install setuptools -y --no-deps
-conda install beautifulsoup4 -y --no-deps
 conda install lxml -y --no-deps
-conda install numpy=1.10.0 -y --no-deps
+conda install numpy -y --no-deps
+conda install Jinja2 -y --no-deps
 ```
 
 **Tip**: you can copy each of these lines, then right-click `Paste` into your command prompt.
