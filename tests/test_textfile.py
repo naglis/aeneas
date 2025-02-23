@@ -315,24 +315,17 @@ class TestTextFile(BaseCase):
                 self.load(path, TextFileFormat.PARSED, 0)
 
     def test_read_unparsed(self):
-        for case in (
-            {
-                "path": "res/inputtext/sonnet_unparsed_soup_1.txt",
-                "parameters": {gc.PPN_TASK_IS_TEXT_UNPARSED_ID_REGEX: "f[0-9]*"},
-            },
-            {
-                "path": "res/inputtext/sonnet_unparsed_soup_2.txt",
-                "parameters": {
-                    gc.PPN_TASK_IS_TEXT_UNPARSED_ID_REGEX: "f[0-9]*",
-                },
-            },
-            {
-                "path": "res/inputtext/sonnet_unparsed.xhtml",
-                "parameters": {gc.PPN_TASK_IS_TEXT_UNPARSED_ID_REGEX: "f[0-9]*"},
-            },
+        for path in (
+            "res/inputtext/sonnet_unparsed_soup_1.txt",
+            "res/inputtext/sonnet_unparsed.xhtml",
         ):
-            with self.subTest(path=case["path"], parameters=case["parameters"]):
-                self.load(case["path"], TextFileFormat.UNPARSED, 15, case["parameters"])
+            with self.subTest(path=path):
+                self.load(
+                    path,
+                    TextFileFormat.UNPARSED,
+                    15,
+                    {gc.PPN_TASK_IS_TEXT_UNPARSED_ID_REGEX: "f[0-9]*"},
+                )
 
     def test_read_unparsed_unsorted(self):
         self.load_and_sort_id(

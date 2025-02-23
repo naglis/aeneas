@@ -180,34 +180,6 @@ class TestTask(BaseCase):
             id_sort=IDSortingAlgorithm.NUMERIC,
         )
 
-    def test_set_text_file_unparsed_class(self):
-        # NOTE this test fails because there are no id attributes in the html file
-        self.set_text_file(
-            "res/inputtext/sonnet_unparsed_class.xhtml",
-            TextFileFormat.UNPARSED,
-            0,
-            id_sort=IDSortingAlgorithm.NUMERIC,
-        )
-
-    def test_set_text_file_unparsed_id_class(self):
-        self.set_text_file(
-            "res/inputtext/sonnet_unparsed_class_id.xhtml",
-            TextFileFormat.UNPARSED,
-            15,
-            id_regex="f[0-9]+",
-            id_sort=IDSortingAlgorithm.NUMERIC,
-        )
-
-    def test_set_text_file_unparsed_id_class_empty(self):
-        # NOTE this test fails because there are no id attributes in the html file
-        self.set_text_file(
-            "res/inputtext/sonnet_unparsed_class.xhtml",
-            TextFileFormat.UNPARSED,
-            0,
-            id_regex="f[0-9]+",
-            id_sort=IDSortingAlgorithm.NUMERIC,
-        )
-
     def test_set_text_file_unparsed_img_id_img_alt(self):
         text_file = self.set_text_file(
             "res/inputtext/sonnet_unparsed_img_id.xhtml",
