@@ -333,8 +333,26 @@ class TextFragment(collections.abc.Sized):
     def __len__(self) -> int:
         return len(self.lines)
 
+    def __eq__(self, other) -> bool:
+        return (
+            isinstance(other, TextFragment)
+            and self.identifier == other.identifier
+            and self.language == other.language
+            and self.lines == other.lines
+            and self.filtered_lines == other.filtered_lines
+        )
+
     def __str__(self) -> str:
         return f"{self.identifier} {self.text}"
+
+    def __repr__(self) -> str:
+        return (
+            f"{self.__class__.__name__}("
+            f"identifier={self.identifier!r}, "
+            f"language={self.language!r}, "
+            f"lines={self.lines!r}, "
+            f"filtered_lines={self.filtered_lines!r})"
+        )
 
     @property
     def identifier(self) -> str | None:
