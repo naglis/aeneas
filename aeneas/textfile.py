@@ -33,13 +33,11 @@ This module contains the following classes:
 import collections.abc
 import contextlib
 import io
-import itertools
 import logging
-import operator
 import re
 import typing
 
-import lxml.etree as ET
+import lxml.html
 
 from aeneas.idsortingalgorithm import IDSortingAlgorithm
 from aeneas.tree import Tree
@@ -735,114 +733,73 @@ class TextFile(collections.abc.Sized):
         :param buf: the bytes file object
         """
 
-        def parse():
-            l1_re = re.compile(
-                rf".*\b{parameters[gc.PPN_TASK_IS_TEXT_MUNPARSED_L1_ID_REGEX]}\b.*"
-            )
-            l2_re = re.compile(
-                rf".*\b{parameters[gc.PPN_TASK_IS_TEXT_MUNPARSED_L2_ID_REGEX]}\b.*"
-            )
-            l3_re = re.compile(
-                rf".*\b{parameters[gc.PPN_TASK_IS_TEXT_MUNPARSED_L3_ID_REGEX]}\b.*"
-            )
-
-            l1_id = l2_id = l3_id = None
-            try:
-                for event, node in ET.iterparse(
-                    buf, events=("start", "end"), html=True
-                ):
-                    node_id = node.attrib.get("id")
-                    if not node_id:
-                        if event == "end":
-                            node.clear()
-                        continue
-
-                    if event == "start":
-                        if l1_id is None and l1_re.match(node_id):
-                            l1_id = node_id
-                            continue
-                        elif (
-                            l1_id is not None and l2_id is None and l2_re.match(node_id)
-                        ):
-                            l2_id = node_id
-                            continue
-                        elif (
-                            l1_id is not None
-                            and l2_id is not None
-                            and l3_id is None
-                            and l3_re.match(node_id)
-                        ):
-                            l3_id = node_id
-                            continue
-                    elif event == "end":
-                        if node_id == l1_id:
-                            if l2_id is not None:
-                                raise AssertionError("Expected l2_id to be empty")
-                            if l3_id is not None:
-                                raise AssertionError("Expected l3_id to be empty")
-                            l1_id = None
-                        elif node_id == l2_id:
-                            if l1_id is None:
-                                raise AssertionError("Expected l1_id to not be empty")
-                            if l3_id is not None:
-                                raise AssertionError("Expected l3_id to be empty")
-                            l2_id = None
-                        elif node_id == l3_id:
-                            if l1_id is None:
-                                raise AssertionError("Expected l1_id to not be empty")
-                            if l2_id is None:
-                                raise AssertionError("Expected l2_id to not be empty")
-
-                            yield l1_id, l2_id, l3_id, node.text
-                            l3_id = None
-
-                    node.clear()
-            except ET.XMLSyntaxError as e:
-                # FIXME: This is a very ugly workaround for empty XML file, find a better way.
-                if e.msg == "no element found":
-                    return
-
-                raise
+        l1_re = re.compile(
+            rf".*\b{parameters[gc.PPN_TASK_IS_TEXT_MUNPARSED_L1_ID_REGEX]}\b.*"
+        )
+        l2_re = re.compile(
+            rf".*\b{parameters[gc.PPN_TASK_IS_TEXT_MUNPARSED_L2_ID_REGEX]}\b.*"
+        )
+        l3_re = re.compile(
+            rf".*\b{parameters[gc.PPN_TASK_IS_TEXT_MUNPARSED_L3_ID_REGEX]}\b.*"
+        )
 
         tree = Tree()
-        for l1_id, l1_items in itertools.groupby(parse(), key=operator.itemgetter(0)):
-            logger.debug("Found L1 node with ID: %r", l1_id)
+        for l1_node in lxml.html.parse(buf).iter():
+            l1_node_id = l1_node.attrib.get("id")
+            if not l1_node_id or not l1_re.match(l1_node_id):
+                continue
+
+            logger.debug("Found L1 node with ID: %r", l1_node_id)
+
             paragraph_node = Tree()
             paragraph_text_parts = []
-            for l2_id, l2_items in itertools.groupby(
-                l1_items, key=operator.itemgetter(1)
-            ):
-                logger.debug("Found L2 node with ID: %r", l2_id)
+
+            for l2_node in l1_node.iterdescendants():
+                l2_node_id = l2_node.attrib.get("id")
+                if not l2_node_id or not l2_re.match(l2_node_id):
+                    continue
+
+                logger.debug("Found L2 node with ID: %r", l2_node_id)
                 sentence_node = Tree()
                 paragraph_node.add_child(sentence_node)
                 sentence_text_parts = []
-                for _, _, l3_id, l3_text in l2_items:
+
+                for l3_node in l2_node.iterdescendants():
+                    l3_node_id = l3_node.attrib.get("id")
+                    if not l3_node_id or not l3_re.match(l3_node_id):
+                        continue
+
+                    l3_text = l3_node.text_content()
+
                     logger.debug(
-                        "Found L3 node with ID: %r and text: %r", l3_id, l3_text
+                        "Found L3 node with ID: %r and text: %r", l3_node_id, l3_text
                     )
                     word_fragment = TextFragment(
-                        identifier=l3_id, lines=[l3_text], filtered_lines=[l3_text]
+                        identifier=l3_node_id, lines=[l3_text], filtered_lines=[l3_text]
                     )
                     word_node = Tree(value=word_fragment)
                     sentence_node.add_child(word_node)
                     sentence_text_parts.append(l3_text)
-                sentence_text = " ".join(sentence_text_parts)
-                paragraph_text_parts.append(sentence_text)
-                sentence_node.value = TextFragment(
-                    identifier=l2_id,
-                    lines=[sentence_text],
-                    filtered_lines=[sentence_text],
-                )
-                logger.debug("Found L2 node with text: %r", sentence_text)
 
-            paragraph_text = " ".join(paragraph_text_parts)
-            paragraph_node.value = TextFragment(
-                identifier=l1_id,
-                lines=[paragraph_text],
-                filtered_lines=[paragraph_text],
-            )
-            tree.add_child(paragraph_node)
-            logger.debug("Found L1 node with text: %r", paragraph_text)
+                if sentence_text_parts:
+                    sentence_text = " ".join(sentence_text_parts)
+                    paragraph_text_parts.append(sentence_text)
+                    sentence_node.value = TextFragment(
+                        identifier=l2_node_id,
+                        lines=[sentence_text],
+                        filtered_lines=[sentence_text],
+                    )
+                    logger.debug("Found L2 node with text: %r", sentence_text)
+
+            if paragraph_text_parts:
+                paragraph_text = " ".join(paragraph_text_parts)
+                paragraph_node.value = TextFragment(
+                    identifier=l1_node_id,
+                    lines=[paragraph_text],
+                    filtered_lines=[paragraph_text],
+                )
+                tree.add_child(paragraph_node)
+                logger.debug("Found L1 node with text: %r", paragraph_text)
 
         return tree
 
@@ -915,8 +872,8 @@ class TextFile(collections.abc.Sized):
 
     @staticmethod
     def _get_node_text(node, *, read_img_alt: bool) -> str:
-        if node.text:
-            return node.text
+        if content := node.text_content():
+            return content
         elif read_img_alt and node.tag == "img":
             alt = node.attrib.get("alt")
             if alt is not None:
@@ -945,22 +902,13 @@ class TextFile(collections.abc.Sized):
             rf".*\b{parameters[gc.PPN_TASK_IS_TEXT_UNPARSED_ID_REGEX]}\b.*"
         )
 
-        try:
-            for _, node in ET.iterparse(buf, events=("end",), html=True):
-                node_id = node.attrib.get("id")
-                if node_id and id_regex.match(node_id):
-                    text_from_id[node_id] = cls._get_node_text(
-                        node, read_img_alt=read_img_alt
-                    )
-                    ids.append(node_id)
-
-                node.clear()
-        except ET.XMLSyntaxError as e:
-            # FIXME: This is very ugly, find a better way.
-            if e.msg == "no element found":
-                return Tree()
-
-            raise
+        for node in lxml.html.parse(buf).iter():
+            node_id = node.attrib.get("id")
+            if node_id and id_regex.match(node_id):
+                text_from_id[node_id] = cls._get_node_text(
+                    node, read_img_alt=read_img_alt
+                )
+                ids.append(node_id)
 
         # sort by ID as requested
         id_sort = gf.safe_get(

@@ -340,17 +340,23 @@ class TestTextFile(BaseCase):
                 ("f015", "To eat the world’s due, by the grave and thee."),
             )
         ]
-        text_file = self.load(
-            "res/inputtext/sonnet_unparsed.xhtml",
-            TextFileFormat.UNPARSED,
-            15,
-            {gc.PPN_TASK_IS_TEXT_UNPARSED_ID_REGEX: "f[0-9]*"},
-        )
 
-        self.assertSequenceEqual(
-            text_file.fragments,
-            expected_fragments,
-        )
+        for path in (
+            "res/inputtext/sonnet_unparsed.xhtml",
+            "res/inputtext/sonnet_unparsed_pagebreak.xhtml",
+        ):
+            with self.subTest(path=path):
+                text_file = self.load(
+                    path,
+                    TextFileFormat.UNPARSED,
+                    15,
+                    {gc.PPN_TASK_IS_TEXT_UNPARSED_ID_REGEX: "f[0-9]*"},
+                )
+
+                self.assertSequenceEqual(
+                    text_file.fragments,
+                    expected_fragments,
+                )
 
     def test_read_unparsed_txt(self):
         self.load(
