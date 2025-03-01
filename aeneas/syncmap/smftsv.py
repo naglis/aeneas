@@ -33,9 +33,7 @@ class SyncMapFormatTSV(SyncMapFormatGenericTabular):
 
     MACHINE = "tsvm"
 
-    TAB = "tab"
-
-    MACHINE_ALIASES = (DEFAULT, MACHINE, TAB)
+    MACHINE_ALIASES = (DEFAULT, MACHINE)
 
     FIELD_DELIMITER = "\t"
 

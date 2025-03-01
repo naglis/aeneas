@@ -430,14 +430,6 @@ class SyncMapFormat:
     .. versionadded:: 1.4.1
     """
 
-    TAB = SyncMapFormatTSV.TAB
-    """
-    Deprecated, it will be removed in v2.0.0.
-    Use ``TSV`` instead.
-
-    .. deprecated:: 1.0.3
-    """
-
     TSV = SyncMapFormatTSV.DEFAULT
     """
     Alias for ``TSVM``.
@@ -624,7 +616,6 @@ class SyncMapFormat:
         SSVH: SyncMapFormatSSV,
         SSVM: SyncMapFormatSSV,
         SUB: SyncMapFormatSUB,
-        TAB: SyncMapFormatTSV,
         TSV: SyncMapFormatTSV,
         TSVH: SyncMapFormatTSV,
         TSVM: SyncMapFormatTSV,

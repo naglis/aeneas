@@ -42,7 +42,6 @@ class TestSyncMapAllFormats(BaseSyncMapCase):
                     SyncMapFormat.TSV,
                     SyncMapFormat.TSVH,
                     SyncMapFormat.TSVM,
-                    SyncMapFormat.TAB,
                     SyncMapFormat.SMILM,
                     SyncMapFormat.SMILH,
                     SyncMapFormat.SMIL,
