@@ -309,9 +309,6 @@ class TextFragment(collections.abc.Sized):
     :param language: the language of the text of the fragment
     :type  language: :class:`~aeneas.language.Language`
     :param list lines: the lines in which text is split up
-    :param list filtered_lines: the lines in which text is split up,
-                                possibly filtered for the alignment purpose
-    :raises: TypeError: if ``identifier`` is not a string
     """
 
     def __init__(
@@ -319,12 +316,12 @@ class TextFragment(collections.abc.Sized):
         identifier: str | None = None,
         language: Language | None = None,
         lines: list[str] | None = None,
-        filtered_lines: list[str] | None = None,
+        text_filter: typing.Optional["TextFilter"] = None,
     ) -> None:
         self.identifier = identifier
         self.language = language
+        self.text_filter = text_filter
         self.lines = lines or []
-        self.filtered_lines = filtered_lines or []
 
     def __len__(self) -> int:
         return len(self.lines)
@@ -393,6 +390,11 @@ class TextFragment(collections.abc.Sized):
     @lines.setter
     def lines(self, lines: list[str] | None):
         self.__lines = lines or []
+
+        if self.text_filter is None:
+            self.filtered_lines = self.__lines
+        else:
+            self.filtered_lines = self.text_filter.apply_filter(self.__lines)
 
     @property
     def text(self) -> str:
@@ -684,7 +686,6 @@ class TextFile(collections.abc.Sized):
                 paragraph_fragment = TextFragment(
                     identifier=paragraph_identifier,
                     lines=paragraph_lines,
-                    filtered_lines=paragraph_lines,
                 )
                 paragraph_node = Tree(value=paragraph_fragment)
                 tree.add_child(paragraph_node)
@@ -697,7 +698,6 @@ class TextFile(collections.abc.Sized):
                     sentence_fragment = TextFragment(
                         identifier=sentence_identifier,
                         lines=sentence_lines,
-                        filtered_lines=sentence_lines,
                     )
                     sentence_node = Tree(value=sentence_fragment)
                     paragraph_node.add_child(sentence_node)
@@ -712,7 +712,6 @@ class TextFile(collections.abc.Sized):
                         word_fragment = TextFragment(
                             identifier=word_identifier,
                             lines=word_lines,
-                            filtered_lines=word_lines,
                         )
                         word_node = Tree(value=word_fragment)
                         sentence_node.add_child(word_node)
@@ -774,9 +773,7 @@ class TextFile(collections.abc.Sized):
                     logger.debug(
                         "Found L3 node with ID: %r and text: %r", l3_node_id, l3_text
                     )
-                    word_fragment = TextFragment(
-                        identifier=l3_node_id, lines=[l3_text], filtered_lines=[l3_text]
-                    )
+                    word_fragment = TextFragment(identifier=l3_node_id, lines=[l3_text])
                     word_node = Tree(value=word_fragment)
                     sentence_node.add_child(word_node)
                     sentence_text_parts.append(l3_text)
@@ -787,7 +784,6 @@ class TextFile(collections.abc.Sized):
                     sentence_node.value = TextFragment(
                         identifier=l2_node_id,
                         lines=[sentence_text],
-                        filtered_lines=[sentence_text],
                     )
                     logger.debug("Found L2 node with text: %r", sentence_text)
 
@@ -796,7 +792,6 @@ class TextFile(collections.abc.Sized):
                 paragraph_node.value = TextFragment(
                     identifier=l1_node_id,
                     lines=[paragraph_text],
-                    filtered_lines=[paragraph_text],
                 )
                 tree.add_child(paragraph_node)
                 logger.debug("Found L1 node with text: %r", paragraph_text)
@@ -959,7 +954,7 @@ class TextFile(collections.abc.Sized):
         :param list pairs: a list of pairs, each pair being (id, [line_1, ..., line_n])
         """
         logger.debug("Creating TextFragment objects")
-        text_filter = cls._build_text_filter(parameters=parameters)
+        text_filter = TextFilter.from_params(parameters=parameters)
         tree = Tree()
         for identifier, lines in pairs:
             tree.add_child(
@@ -967,31 +962,11 @@ class TextFile(collections.abc.Sized):
                     value=TextFragment(
                         identifier=identifier,
                         lines=lines,
-                        filtered_lines=text_filter.apply_filter(lines),
+                        text_filter=text_filter,
                     )
                 )
             )
         return tree
-
-    @classmethod
-    def _build_text_filter(cls, parameters: dict) -> "TextFilter":
-        """
-        Build a suitable TextFilter object.
-        """
-        text_filter = TextFilter()
-        if (
-            param_value := gf.safe_get(
-                parameters, gc.PPN_TASK_IS_TEXT_FILE_IGNORE_REGEX, None
-            )
-        ) is not None:
-            text_filter.add_filter(TextFilterIgnoreRegex(regex=param_value))
-        if (
-            param_value := gf.safe_get(
-                parameters, gc.PPN_TASK_IS_TEXT_FILE_TRANSLITERATE_MAP, None
-            )
-        ) is not None:
-            text_filter.add_filter(TextFilterTransliterate(map_file_path=param_value))
-        return text_filter
 
 
 class TextFilter:
@@ -1011,6 +986,33 @@ class TextFilter:
     def __init__(self):
         self.filters = []
 
+    @classmethod
+    def from_params(cls, parameters: dict) -> typing.Optional["TextFilter"]:
+        """
+        Build a suitable TextFilter object.
+        """
+        filters = []
+        if (
+            param_value := gf.safe_get(
+                parameters, gc.PPN_TASK_IS_TEXT_FILE_IGNORE_REGEX, None
+            )
+        ) is not None:
+            filters.append(TextFilterIgnoreRegex(regex=param_value))
+        if (
+            param_value := gf.safe_get(
+                parameters, gc.PPN_TASK_IS_TEXT_FILE_TRANSLITERATE_MAP, None
+            )
+        ) is not None:
+            filters.append(TextFilterTransliterate(map_file_path=param_value))
+
+        if not filters:
+            return None
+
+        text_filter = TextFilter()
+        for filter in filters:
+            text_filter.add_filter(filter)
+        return text_filter
+
     def add_filter(self, new_filter: "TextFilter", as_last: bool = True):
         """
         Compose this filter with the given ``new_filter`` filter.
@@ -1022,7 +1024,7 @@ class TextFilter:
         if as_last:
             self.filters.append(new_filter)
         else:
-            self.filters = [new_filter] + self.filters
+            self.filters.insert(0, new_filter)
 
     def apply_filter(self, strings: list[str]) -> list[str]:
         """

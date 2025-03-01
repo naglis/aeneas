@@ -557,7 +557,6 @@ class SyncMapFragmentList(collections.abc.MutableSequence):
                         identifier=identifier,
                         language=None,
                         lines=lines,
-                        filtered_lines=lines,
                     ),
                     fragment_type=FragmentType.NONSPEECH,
                 ),

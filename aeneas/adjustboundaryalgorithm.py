@@ -327,12 +327,7 @@ class AdjustBoundaryAlgorithm(Configurable):
             SyncMapFragment.from_begin_end(
                 begin=time_values[0],
                 end=time_values[1],
-                # NOTE lines and filtered lines MUST be set,
-                #      otherwise some output format might break
-                #      when adding HEAD/TAIL to output
-                text_fragment=TextFragment(
-                    identifier="HEAD", lines=[], filtered_lines=[]
-                ),
+                text_fragment=TextFragment(identifier="HEAD", lines=[]),
                 fragment_type=FragmentType.HEAD,
             ),
             sort=False,
@@ -359,12 +354,7 @@ class AdjustBoundaryAlgorithm(Configurable):
             SyncMapFragment.from_begin_end(
                 begin=time_values[len(time_values) - 2],
                 end=end,
-                # NOTE lines and filtered lines MUST be set,
-                #      otherwise some output format might break
-                #      when adding HEAD/TAIL to output
-                text_fragment=TextFragment(
-                    identifier="TAIL", lines=[], filtered_lines=[]
-                ),
+                text_fragment=TextFragment(identifier="TAIL", lines=[]),
                 fragment_type=FragmentType.TAIL,
             ),
             sort=False,

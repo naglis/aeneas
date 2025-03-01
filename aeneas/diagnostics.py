@@ -147,9 +147,7 @@ class Diagnostics:
 
             text = "From fairest creatures we desire increase,"
             text_file = TextFile(fragments_tree=Tree())
-            text_file.add_fragment(
-                TextFragment(language="eng", lines=[text], filtered_lines=[text])
-            )
+            text_file.add_fragment(TextFragment(language="eng", lines=[text]))
             tmp_file_path = os.path.join(tmp_dir, "espeak.wav")
             ESPEAKTTSWrapper().synthesize_multiple(text_file, tmp_file_path)
             gf.print_success("espeak         OK")
@@ -183,9 +181,7 @@ class Diagnostics:
 
             text = "From fairest creatures we desire increase,"
             text_file = TextFile(fragments_tree=Tree())
-            text_file.add_fragment(
-                TextFragment(language="eng", lines=[text], filtered_lines=[text])
-            )
+            text_file.add_fragment(TextFragment(language="eng", lines=[text]))
             tmp_file_path = os.path.join(tmp_dir, "espeak-ng.wav")
             ESPEAKNGTTSWrapper().synthesize_multiple(text_file, tmp_file_path)
             gf.print_success("espeak-ng      OK")

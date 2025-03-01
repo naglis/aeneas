@@ -114,9 +114,7 @@ class BaseTTSWrapperCase(BaseCase):
     def tfl(self, frags):
         tfl = TextFile(fragments_tree=Tree())
         for language, lines in frags:
-            tfl.add_fragment(
-                TextFragment(language=language, lines=lines, filtered_lines=lines)
-            )
+            tfl.add_fragment(TextFragment(language=language, lines=lines))
         return tfl
 
     def test_use_cache(self):

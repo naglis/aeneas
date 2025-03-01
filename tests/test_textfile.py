@@ -321,7 +321,7 @@ class TestTextFile(BaseCase):
 
     def test_read_unparsed_xhtml(self):
         expected_fragments = [
-            TextFragment(identifier=identifier, lines=[line], filtered_lines=[line])
+            TextFragment(identifier=identifier, lines=[line])
             for identifier, line in (
                 ("f001", "I"),
                 ("f002", "From fairest creatures we desire increase,"),
