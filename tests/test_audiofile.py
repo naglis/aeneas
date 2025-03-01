@@ -111,7 +111,7 @@ class TestAudioFile(BaseCase):
     def load(
         self, path: str, *, read_properties: bool = False, read_samples: bool = False
     ):
-        af = AudioFile(path)
+        af = AudioFile(path, rconf=self.rconf)
         if read_properties:
             af.read_properties()
         if read_samples:
@@ -232,7 +232,9 @@ class TestAudioFile(BaseCase):
     def test_write(self):
         audiofile = self.load(self.AUDIO_FILE_WAVE, read_samples=True)
         data = audiofile.audio_samples
-        with tempfile.NamedTemporaryFile(prefix="aeneas.", suffix=".wav") as tmp_file:
+        with tempfile.NamedTemporaryFile(
+            prefix="aeneas.", suffix=".wav", dir=self.tmp_dir.name
+        ) as tmp_file:
             audiofile.write(tmp_file.name)
             audiocopy = self.load(tmp_file.name)
             datacopy = audiocopy.audio_samples

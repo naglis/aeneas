@@ -65,7 +65,9 @@ class TestCEW(BaseCase):
             c_quit_after, c_backwards = 0.0, 0
             with (
                 self.subTest(name=name),
-                tempfile.NamedTemporaryFile(suffix=".wav") as tmp_file,
+                tempfile.NamedTemporaryFile(
+                    suffix=".wav", dir=self.tmp_dir.name
+                ) as tmp_file,
             ):
                 actual_sample_rate, actual_fragments, actual_intervals = (
                     cew.synthesize_multiple(

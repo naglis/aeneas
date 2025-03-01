@@ -67,7 +67,7 @@ class TestVAD(BaseCase):
     EMPTY_FILE_PATH = "res/audioformats/p001.empty"
 
     def perform(self, input_file_path: str, speech_length: int, nonspeech_length: int):
-        audiofile = AudioFileMFCC(self.file_path(input_file_path))
+        audiofile = AudioFileMFCC(self.file_path(input_file_path), rconf=self.rconf)
 
         audiofile.run_vad()
 

@@ -30,7 +30,8 @@ This module contains the following classes:
 
 import decimal
 import logging
-import tempfile
+import os.path
+import uuid
 
 import numpy
 
@@ -161,7 +162,7 @@ class SD(Configurable):
         logger.debug("Tail length: %.3f", tail)
         logger.debug("Begin: %.3f", begin)
         logger.debug("End: %.3f", end)
-        if (begin >= TimeValue("0.000")) and (end > begin):
+        if begin >= TimeValue("0.000") and end > begin:
             logger.debug("Returning %.3f %.3f", begin, end)
             return (begin, end)
         logger.debug("Returning (0.000, 0.000)")
@@ -254,21 +255,22 @@ class SD(Configurable):
         logger.debug("Synthesizing query...")
         synt_duration = max_length * self.QUERY_FACTOR
         logger.debug("Synthesizing at least %.3f seconds", synt_duration)
-        with tempfile.NamedTemporaryFile(
-            suffix=".wav", dir=self.rconf[RuntimeConfiguration.TMP_PATH]
-        ) as tmp_file:
-            synt = Synthesizer.from_rconf(self.rconf)
-            anchors, total_time, synthesized_chars = synt.synthesize(
-                self.text_file, tmp_file.name, quit_after=synt_duration, backwards=tail
-            )
-            logger.debug("Synthesizing query... done")
+        output_filename = os.path.join(
+            self.rconf[RuntimeConfiguration.TMP_PATH],
+            f"{uuid.uuid4().hex}.wav",
+        )
+        synt = Synthesizer.from_rconf(self.rconf)
+        anchors, total_time, synthesized_chars = synt.synthesize(
+            self.text_file, output_filename, quit_after=synt_duration, backwards=tail
+        )
+        logger.debug("Synthesizing query... done")
 
-            logger.debug("Extracting MFCCs for query...")
-            query_mfcc = AudioFileMFCC(
-                tmp_file.name,
-                rconf=self.rconf,
-            )
-            logger.debug("Extracting MFCCs for query... done")
+        logger.debug("Extracting MFCCs for query...")
+        query_mfcc = AudioFileMFCC(
+            output_filename,
+            rconf=self.rconf,
+        )
+        logger.debug("Extracting MFCCs for query... done")
 
         search_window = max_length * self.AUDIO_FACTOR
         search_window_end = min(

@@ -26,13 +26,12 @@ This module contains the following classes:
 """
 
 import abc
-import contextlib
 import logging
 import os.path
 import subprocess
 import sys
-import tempfile
 import typing
+import uuid
 
 from aeneas.audiofile import AudioFile, AudioFormat, AudioFileUnsupportedFormatError
 from aeneas.exacttiming import TimeValue
@@ -476,122 +475,111 @@ class BaseTTSWrapper(abc.ABC, Configurable):
             # NOTE sample_rate, codec, data do not matter if the duration is 0.000
             return SynthesisResult(True, TimeValue("0.000"), 0, "", 0)
 
-        with contextlib.ExitStack() as exit_stack:
-            # create a temporary output file if needed
-            synt_tmp_file = output_file_path is None
-            if synt_tmp_file:
-                logger.debug(
-                    "Synthesizer helper called with output_file_path=None => creating temporary output file"
-                )
-                tmp_output_file = tempfile.NamedTemporaryFile(
-                    suffix=".wav", dir=self.rconf[RuntimeConfiguration.TMP_PATH]
-                )
-                exit_stack.enter_context(tmp_output_file)
-                output_file_path = tmp_output_file.name
-
-                logger.debug("Temporary output file path is %r", output_file_path)
-
-            try:
-                # if the TTS engine reads text from file,
-                # write the text into a temporary file
-                if self.CLI_PARAMETER_TEXT_PATH in self.subprocess_arguments:
-                    logger.debug("TTS engine reads text from file")
-
-                    tmp_text_file = tempfile.NamedTemporaryFile(
-                        suffix=".txt",
-                        mode="w",
-                        encoding="utf-8",
-                        dir=self.rconf[RuntimeConfiguration.TMP_PATH],
-                    )
-                    exit_stack.enter_context(tmp_text_file)
-                    tmp_text_file_path = tmp_text_file.name
-
-                    logger.debug(
-                        "Creating temporary text file %r...", tmp_text_file_path
-                    )
-                    tmp_text_file.write(text)
-                    tmp_text_file.flush()
-                    logger.debug(
-                        "Creating temporary text file %r... done",
-                        tmp_text_file_path,
-                    )
-                else:
-                    logger.debug("TTS engine reads text from stdin")
-                    tmp_text_file_path = None
-
-                # copy all relevant arguments
-                logger.debug("Creating arguments list...")
-                arguments = []
-                for arg in self.subprocess_arguments:
-                    if arg == self.CLI_PARAMETER_VOICE_CODE_FUNCTION:
-                        arguments.extend(self._voice_code_to_subprocess(voice_code))
-                    elif arg == self.CLI_PARAMETER_VOICE_CODE_STRING:
-                        arguments.append(voice_code)
-                    elif arg == self.CLI_PARAMETER_TEXT_PATH:
-                        arguments.append(tmp_text_file_path)
-                    elif arg == self.CLI_PARAMETER_WAVE_PATH:
-                        arguments.append(output_file_path)
-                    elif arg == self.CLI_PARAMETER_TEXT_STDIN:
-                        # placeholder, do not append
-                        pass
-                    elif arg == self.CLI_PARAMETER_WAVE_STDOUT:
-                        # placeholder, do not append
-                        pass
-                    else:
-                        arguments.append(arg)
-                logger.debug("Creating arguments list... done")
-
-                # actual call via subprocess
-                logger.debug("Calling TTS engine...")
-                logger.debug("Calling with arguments %r", arguments)
-                logger.debug("Calling with text %r", text)
-                proc = subprocess.Popen(
-                    arguments,
-                    stdout=subprocess.PIPE,
-                    stdin=subprocess.PIPE,
-                    stderr=subprocess.PIPE,
-                )
-                if self.CLI_PARAMETER_TEXT_STDIN in self.subprocess_arguments:
-                    logger.debug("Passing text via stdin...")
-                    stdoutdata, stderrdata = proc.communicate(
-                        input=text.encode(sys.stdin.encoding)
-                    )
-                    logger.debug("Passing text via stdin... done")
-                else:
-                    logger.debug("Passing text via file...")
-                    stdoutdata, stderrdata = proc.communicate()
-                    logger.debug("Passing text via file... done")
-
-                if proc.stdout is not None:
-                    proc.stdout.close()
-                if proc.stdin is not None:
-                    proc.stdin.close()
-                if proc.stderr is not None:
-                    proc.stderr.close()
-
-                if self.CLI_PARAMETER_WAVE_STDOUT in self.subprocess_arguments:
-                    logger.debug("TTS engine wrote audio data to stdout")
-                    logger.debug("Writing audio data to file %r...", output_file_path)
-                    with open(output_file_path, mode="wb") as output_file:
-                        output_file.write(stdoutdata)
-                    logger.debug(
-                        "Writing audio data to file %r... done", output_file_path
-                    )
-                else:
-                    logger.debug("TTS engine wrote audio data to file")
-
-                logger.debug("Calling TTS ... done")
-            except Exception:
-                logger.exception(
-                    "An unexpected error occurred while calling TTS engine via subprocess",
-                )
-                return SynthesisResult(False, TimeValue("0.000"), 0, "", 0)
-
-            return (
-                self._read_audio_data(output_file_path)
-                if return_audio_data
-                else SynthesisResult(True, TimeValue("0.000"), 0, "", 0)
+        # create a temporary output file if needed
+        if output_file_path is None:
+            logger.debug(
+                "Synthesizer helper called with output_file_path=None => creating temporary output file"
             )
+            output_file_path = os.path.join(
+                self.rconf[RuntimeConfiguration.TMP_PATH],
+                f"{uuid.uuid4().hex}.wav",
+            )
+            logger.debug("Temporary output file path is %r", output_file_path)
+
+        try:
+            # if the TTS engine reads text from file,
+            # write the text into a temporary file
+            if self.CLI_PARAMETER_TEXT_PATH in self.subprocess_arguments:
+                logger.debug("TTS engine reads text from file")
+
+                tmp_text_file_path = os.path.join(
+                    self.rconf[RuntimeConfiguration.TMP_PATH],
+                    f"{uuid.uuid4().hex}.txt",
+                )
+
+                logger.debug("Creating temporary text file %r...", tmp_text_file_path)
+                with open(tmp_text_file_path, mode="w", encoding="utf-8") as f:
+                    f.write(text)
+
+                logger.debug(
+                    "Creating temporary text file %r... done",
+                    tmp_text_file_path,
+                )
+            else:
+                logger.debug("TTS engine reads text from stdin")
+                tmp_text_file_path = None
+
+            # copy all relevant arguments
+            logger.debug("Creating arguments list...")
+            arguments = []
+            for arg in self.subprocess_arguments:
+                if arg == self.CLI_PARAMETER_VOICE_CODE_FUNCTION:
+                    arguments.extend(self._voice_code_to_subprocess(voice_code))
+                elif arg == self.CLI_PARAMETER_VOICE_CODE_STRING:
+                    arguments.append(voice_code)
+                elif arg == self.CLI_PARAMETER_TEXT_PATH:
+                    arguments.append(tmp_text_file_path)
+                elif arg == self.CLI_PARAMETER_WAVE_PATH:
+                    arguments.append(output_file_path)
+                elif arg == self.CLI_PARAMETER_TEXT_STDIN:
+                    # placeholder, do not append
+                    pass
+                elif arg == self.CLI_PARAMETER_WAVE_STDOUT:
+                    # placeholder, do not append
+                    pass
+                else:
+                    arguments.append(arg)
+            logger.debug("Creating arguments list... done")
+
+            # actual call via subprocess
+            logger.debug("Calling TTS engine...")
+            logger.debug("Calling with arguments %r", arguments)
+            logger.debug("Calling with text %r", text)
+            proc = subprocess.Popen(
+                arguments,
+                stdout=subprocess.PIPE,
+                stdin=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+            )
+            if self.CLI_PARAMETER_TEXT_STDIN in self.subprocess_arguments:
+                logger.debug("Passing text via stdin...")
+                stdoutdata, stderrdata = proc.communicate(
+                    input=text.encode(sys.stdin.encoding)
+                )
+                logger.debug("Passing text via stdin... done")
+            else:
+                logger.debug("Passing text via file...")
+                stdoutdata, stderrdata = proc.communicate()
+                logger.debug("Passing text via file... done")
+
+            if proc.stdout is not None:
+                proc.stdout.close()
+            if proc.stdin is not None:
+                proc.stdin.close()
+            if proc.stderr is not None:
+                proc.stderr.close()
+
+            if self.CLI_PARAMETER_WAVE_STDOUT in self.subprocess_arguments:
+                logger.debug("TTS engine wrote audio data to stdout")
+                logger.debug("Writing audio data to file %r...", output_file_path)
+                with open(output_file_path, mode="wb") as output_file:
+                    output_file.write(stdoutdata)
+                logger.debug("Writing audio data to file %r... done", output_file_path)
+            else:
+                logger.debug("TTS engine wrote audio data to file")
+
+            logger.debug("Calling TTS ... done")
+        except Exception:
+            logger.exception(
+                "An unexpected error occurred while calling TTS engine via subprocess",
+            )
+            return SynthesisResult(False, TimeValue("0.000"), 0, "", 0)
+
+        return (
+            self._read_audio_data(output_file_path)
+            if return_audio_data
+            else SynthesisResult(True, TimeValue("0.000"), 0, "", 0)
+        )
 
     def _read_audio_data(self, file_path) -> SynthesisResult:
         """
@@ -756,21 +744,23 @@ class BaseTTSWrapper(abc.ABC, Configurable):
             # synthesize and get the duration of the output file
             voice_code = self._language_to_voice_code(fragment.language)
             logger.debug("Calling helper function")
-            with tempfile.TemporaryDirectory(
-                prefix="aeneas.tts.", dir=self.rconf[RuntimeConfiguration.TMP_PATH]
-            ) as tmp_dir:
-                file_path = os.path.join(tmp_dir, "audio.wav")
-                logger.debug("Synthesizing fragment to %r...", file_path)
-                result = helper_function(
-                    text=fragment.filtered_text,
-                    voice_code=voice_code,
-                    output_file_path=file_path,
-                    return_audio_data=True,
-                )
+
+            file_path = os.path.join(
+                self.rconf[RuntimeConfiguration.TMP_PATH], f"{uuid.uuid4().hex}.wav"
+            )
+            logger.debug("Synthesizing fragment to %r...", file_path)
+            result = helper_function(
+                text=fragment.filtered_text,
+                voice_code=voice_code,
+                output_file_path=file_path,
+                return_audio_data=True,
+            )
+
             # check output
             if not result.success:
                 logger.critical("An unexpected error occurred in helper_function")
                 return result
+
             logger.debug("Synthesizing fragment to %r... done", file_path)
             self.cache[fragment_info] = result
             return result

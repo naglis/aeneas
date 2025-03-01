@@ -40,8 +40,9 @@ See the following discussions for details:
 
 import argparse
 import logging
+import os.path
 import subprocess
-import tempfile
+import uuid
 
 from aeneas.exacttiming import TimeValue
 from aeneas.logger import Configurable
@@ -77,52 +78,52 @@ class CEWSubprocess(Configurable):
         logger.debug("c_quit_after: '%.3f'", c_quit_after)
         logger.debug("c_backwards: '%d'", c_backwards)
 
-        with (
-            tempfile.NamedTemporaryFile(suffix=".text") as tmp_text_file,
-            tempfile.NamedTemporaryFile(suffix=".data") as tmp_data_file,
-        ):
-            text_file_path = tmp_text_file.name
-            data_file_path = tmp_data_file.name
+        text_file_path = os.path.join(
+            self.rconf[RuntimeConfiguration.TMP_PATH], f"{uuid.uuid4().hex}.text"
+        )
+        data_file_path = os.path.join(
+            self.rconf[RuntimeConfiguration.TMP_PATH], f"{uuid.uuid4().hex}.data"
+        )
 
-            logger.debug("Temporary text file path: %r", text_file_path)
-            logger.debug("Temporary data file path: %r", data_file_path)
+        logger.debug("Temporary text file path: %r", text_file_path)
+        logger.debug("Temporary data file path: %r", data_file_path)
 
-            logger.debug("Populating the text file...")
-            with open(text_file_path, "w", encoding="utf-8") as tmp_text_file:
-                for f_voice_code, f_text in u_text:
-                    tmp_text_file.write(f"{f_voice_code} {f_text}\n")
-            logger.debug("Populating the text file... done")
+        logger.debug("Populating the text file...")
+        with open(text_file_path, mode="w", encoding="utf-8") as tmp_text_file:
+            for f_voice_code, f_text in u_text:
+                tmp_text_file.write(f"{f_voice_code} {f_text}\n")
+        logger.debug("Populating the text file... done")
 
-            arguments = [
-                self.rconf[RuntimeConfiguration.CEW_SUBPROCESS_PATH],
-                "-m",
-                "aeneas.cewsubprocess",
-                f"{c_quit_after:.3f}",
-                f"{c_backwards:d}",
-                text_file_path,
-                audio_file_path,
-                data_file_path,
-            ]
-            logger.debug("Calling with arguments: %r", " ".join(arguments))
-            subprocess.check_call(
-                arguments,
-                stdout=subprocess.PIPE,
-                stdin=subprocess.PIPE,
-                stderr=subprocess.PIPE,
-                universal_newlines=True,
-            )
+        arguments = [
+            self.rconf[RuntimeConfiguration.CEW_SUBPROCESS_PATH],
+            "-m",
+            "aeneas.cewsubprocess",
+            f"{c_quit_after:.3f}",
+            f"{c_backwards:d}",
+            text_file_path,
+            audio_file_path,
+            data_file_path,
+        ]
+        logger.debug("Calling with arguments: %r", " ".join(arguments))
+        subprocess.check_call(
+            arguments,
+            stdout=subprocess.PIPE,
+            stdin=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            universal_newlines=True,
+        )
 
-            logger.debug("Reading output data...")
-            with open(data_file_path, encoding="utf-8") as data_file:
-                lines = data_file.read().splitlines()
-                sample_rate = int(lines[0])
-                synthesized_frames = int(lines[1])
-                intervals = []
-                for line in lines[2:]:
-                    values = line.split(" ")
-                    if len(values) == 2:
-                        intervals.append((TimeValue(values[0]), TimeValue(values[1])))
-            logger.debug("Reading output data... done")
+        logger.debug("Reading output data...")
+        with open(data_file_path, encoding="utf-8") as data_file:
+            lines = data_file.read().splitlines()
+            sample_rate = int(lines[0])
+            synthesized_frames = int(lines[1])
+            intervals = []
+            for line in lines[2:]:
+                values = line.split(" ")
+                if len(values) == 2:
+                    intervals.append((TimeValue(values[0]), TimeValue(values[1])))
+        logger.debug("Reading output data... done")
 
         return (sample_rate, synthesized_frames, intervals)
 

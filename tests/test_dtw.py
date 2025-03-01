@@ -38,92 +38,92 @@ class TestDTWAligner(BaseCase):
         cls.NUMPY_ARRAY_2 = numpy.loadtxt(cls.file_path("res/cdtw/mfcc2_12_868"))
 
     def test_create_aligner(self):
-        aligner = DTWAligner()
+        aligner = DTWAligner(rconf=self.rconf)
         self.assertIsNone(aligner.real_wave_mfcc)
         self.assertIsNone(aligner.synt_wave_mfcc)
         self.assertIsNone(aligner.real_wave_path)
         self.assertIsNone(aligner.synt_wave_path)
 
     def test_set_real_wave_path(self):
-        aligner = DTWAligner(real_wave_path=self.AUDIO_FILE)
+        aligner = DTWAligner(real_wave_path=self.AUDIO_FILE, rconf=self.rconf)
         self.assertIsNotNone(aligner.real_wave_mfcc)
         self.assertIsNone(aligner.synt_wave_mfcc)
         self.assertIsNotNone(aligner.real_wave_path)
         self.assertIsNone(aligner.synt_wave_path)
 
     def test_set_synt_wave_path(self):
-        aligner = DTWAligner(synt_wave_path=self.AUDIO_FILE)
+        aligner = DTWAligner(synt_wave_path=self.AUDIO_FILE, rconf=self.rconf)
         self.assertIsNone(aligner.real_wave_mfcc)
         self.assertIsNotNone(aligner.synt_wave_path)
         self.assertIsNone(aligner.real_wave_path)
         self.assertIsNotNone(aligner.synt_wave_mfcc)
 
     def test_set_real_wave_mfcc(self):
-        af = AudioFileMFCC(self.AUDIO_FILE)
-        aligner = DTWAligner(real_wave_mfcc=af)
+        af = AudioFileMFCC(self.AUDIO_FILE, rconf=self.rconf)
+        aligner = DTWAligner(real_wave_mfcc=af, rconf=self.rconf)
         self.assertIsNotNone(aligner.real_wave_mfcc)
         self.assertIsNone(aligner.synt_wave_mfcc)
         self.assertIsNone(aligner.real_wave_path)
         self.assertIsNone(aligner.synt_wave_path)
 
     def test_set_synt_wave_mfcc(self):
-        af = AudioFileMFCC(self.AUDIO_FILE)
-        aligner = DTWAligner(synt_wave_mfcc=af)
+        af = AudioFileMFCC(self.AUDIO_FILE, rconf=self.rconf)
+        aligner = DTWAligner(synt_wave_mfcc=af, rconf=self.rconf)
         self.assertIsNone(aligner.real_wave_mfcc)
         self.assertIsNotNone(aligner.synt_wave_mfcc)
         self.assertIsNone(aligner.real_wave_path)
         self.assertIsNone(aligner.synt_wave_path)
 
     def test_compute_acm_none(self):
-        aligner = DTWAligner()
+        aligner = DTWAligner(rconf=self.rconf)
         with self.assertRaises(DTWAlignerNotInitialized):
             aligner.compute_accumulated_cost_matrix()
 
     def test_compute_acm_real_path(self):
-        aligner = DTWAligner(real_wave_path=self.AUDIO_FILE)
+        aligner = DTWAligner(real_wave_path=self.AUDIO_FILE, rconf=self.rconf)
         with self.assertRaises(DTWAlignerNotInitialized):
             aligner.compute_accumulated_cost_matrix()
 
     def test_compute_acm_synt_path(self):
-        aligner = DTWAligner(synt_wave_path=self.AUDIO_FILE)
+        aligner = DTWAligner(synt_wave_path=self.AUDIO_FILE, rconf=self.rconf)
         with self.assertRaises(DTWAlignerNotInitialized):
             aligner.compute_accumulated_cost_matrix()
 
     def test_compute_acm_real_mfcc(self):
-        af = AudioFileMFCC(self.AUDIO_FILE)
-        aligner = DTWAligner(real_wave_mfcc=af)
+        af = AudioFileMFCC(self.AUDIO_FILE, rconf=self.rconf)
+        aligner = DTWAligner(real_wave_mfcc=af, rconf=self.rconf)
         with self.assertRaises(DTWAlignerNotInitialized):
             aligner.compute_accumulated_cost_matrix()
 
     def test_compute_acm_synt_mfcc(self):
-        af = AudioFileMFCC(self.AUDIO_FILE)
-        aligner = DTWAligner(synt_wave_mfcc=af)
+        af = AudioFileMFCC(self.AUDIO_FILE, rconf=self.rconf)
+        aligner = DTWAligner(synt_wave_mfcc=af, rconf=self.rconf)
         with self.assertRaises(DTWAlignerNotInitialized):
             aligner.compute_accumulated_cost_matrix()
 
     def test_compute_path_none(self):
-        aligner = DTWAligner()
+        aligner = DTWAligner(rconf=self.rconf)
         with self.assertRaises(DTWAlignerNotInitialized):
             aligner.compute_accumulated_cost_matrix()
 
     def test_compute_path_real_path(self):
-        aligner = DTWAligner(real_wave_path=self.AUDIO_FILE)
+        aligner = DTWAligner(real_wave_path=self.AUDIO_FILE, rconf=self.rconf)
         with self.assertRaises(DTWAlignerNotInitialized):
             aligner.compute_path()
 
     def test_compute_path_synt_path(self):
-        aligner = DTWAligner(synt_wave_path=self.AUDIO_FILE)
+        aligner = DTWAligner(synt_wave_path=self.AUDIO_FILE, rconf=self.rconf)
         with self.assertRaises(DTWAlignerNotInitialized):
             aligner.compute_path()
 
     def test_compute_path_real_mfcc(self):
-        af = AudioFileMFCC(self.AUDIO_FILE)
-        aligner = DTWAligner(real_wave_mfcc=af)
+        af = AudioFileMFCC(self.AUDIO_FILE, rconf=self.rconf)
+        aligner = DTWAligner(real_wave_mfcc=af, rconf=self.rconf)
         with self.assertRaises(DTWAlignerNotInitialized):
             aligner.compute_path()
 
     def test_compute_path_synt_mfcc(self):
-        af = AudioFileMFCC(self.AUDIO_FILE)
-        aligner = DTWAligner(synt_wave_mfcc=af)
+        af = AudioFileMFCC(self.AUDIO_FILE, rconf=self.rconf)
+        aligner = DTWAligner(synt_wave_mfcc=af, rconf=self.rconf)
         with self.assertRaises(DTWAlignerNotInitialized):
             aligner.compute_path()

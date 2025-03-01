@@ -193,7 +193,9 @@ class TestTask(BaseCase):
         task.configuration["o_format"] = SyncMapFormat.TXT
         task.sync_map = self.dummy_sync_map()
 
-        with tempfile.NamedTemporaryFile(suffix=".txt") as tmp_file:
+        with tempfile.NamedTemporaryFile(
+            suffix=".txt", dir=self.tmp_dir.name
+        ) as tmp_file:
             task.sync_map_file_path_absolute = tmp_file.name
             path = task.output_sync_map_file()
 

@@ -373,5 +373,7 @@ class TestSyncMap(BaseSyncMapCase):
 
     def test_dump_finetuneas_html(self):
         syn = self.load(SyncMapFormat.XML, multiline=True, utf8=True)
-        with tempfile.NamedTemporaryFile(suffix=".html", mode="w") as tmp_file:
+        with tempfile.NamedTemporaryFile(
+            suffix=".html", mode="w", dir=self.tmp_dir.name
+        ) as tmp_file:
             syn.dump_finetuneas_html(tmp_file, "test", "foo.mp3")

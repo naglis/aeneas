@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 # aeneas is a Python/C library and a set of tools
 # to automagically synchronize audio and text (aka forced alignment)
 #
@@ -35,7 +33,7 @@ class TestAudioFileMFCC(BaseCase):
     NOT_EXISTING_FILE = "res/audioformats/x/y/z/not_existing.wav"
 
     def load(self, path):
-        audiofile = AudioFileMFCC(self.file_path(path))
+        audiofile = AudioFileMFCC(self.file_path(path), rconf=self.rconf)
         self.assertIsNotNone(audiofile.all_mfcc)
         self.assertFalse(audiofile.is_reversed)
         self.assertNotEqual(audiofile.all_length, 0)
@@ -46,7 +44,7 @@ class TestAudioFileMFCC(BaseCase):
         return audiofile
 
     def test_load_audio_file(self):
-        af = AudioFile(self.file_path(self.AUDIO_FILE_WAVE))
+        af = AudioFile(self.file_path(self.AUDIO_FILE_WAVE), rconf=self.rconf)
         af.read_samples_from_file()
         audiofile = AudioFileMFCC(audio_file=af)
         self.assertIsNotNone(audiofile.all_mfcc)
@@ -56,7 +54,7 @@ class TestAudioFileMFCC(BaseCase):
 
     def test_load_mfcc_matrix(self):
         mfccs = numpy.zeros((13, 250))
-        audiofile = AudioFileMFCC(mfcc_matrix=mfccs)
+        audiofile = AudioFileMFCC(mfcc_matrix=mfccs, rconf=self.rconf)
         self.assertIsNotNone(audiofile.all_mfcc)
         self.assertAlmostEqual(audiofile.audio_length, TimeValue("10.0"), places=1)
 

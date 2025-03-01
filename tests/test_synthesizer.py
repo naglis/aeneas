@@ -47,13 +47,16 @@ class TestSynthesizer(BaseCase):
                 tfl = TextFile.load(text_f, file_format=TextFileFormat.PLAIN)
             tfl.set_language(Language.ENG)
 
-            synth_rconf = RuntimeConfiguration()
+            synth_rconf = self.rconf.clone()
             synth_rconf[RuntimeConfiguration.C_EXTENSIONS] = c_ext
             synth_rconf[RuntimeConfiguration.CEW_SUBPROCESS_ENABLED] = cew_subprocess
             synth_rconf[RuntimeConfiguration.TTS_CACHE] = tts_cache
             synth = Synthesizer.from_rconf(synth_rconf)
 
-            with tempfile.NamedTemporaryFile(suffix=".wav") as tmp_file:
+            with tempfile.NamedTemporaryFile(
+                suffix=".wav",
+                dir=self.tmp_dir.name,
+            ) as tmp_file:
                 anchors, total_time, _ = synth.synthesize(
                     tfl, tmp_file.name, quit_after=quit_after, backwards=backwards
                 )

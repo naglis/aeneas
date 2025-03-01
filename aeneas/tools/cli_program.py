@@ -24,6 +24,7 @@ to the CLI programs in aeneas.tools.
 """
 
 import abc
+import contextlib
 import logging
 import os
 import os.path
@@ -354,8 +355,15 @@ class CLIProgram(Configurable, abc.ABC):
         logger.debug("Actual arguments: %s", self.actual_arguments)
         logger.debug("Runtime configuration: %r", self.rconf.config_string)
 
+        exit_stack = contextlib.ExitStack()
+        if self.rconf[RuntimeConfiguration.TMP_PATH] is None:
+            tmp_dir = tempfile.TemporaryDirectory(prefix="aeneas.")
+            self.rconf[RuntimeConfiguration.TMP_PATH] = tmp_dir.name
+            exit_stack.enter_context(tmp_dir)
+
         # perform command
-        exit_code = self.perform_command()
+        with exit_stack:
+            exit_code = self.perform_command()
         logger.debug("Execution completed with code %d", exit_code)
 
         return self.exit(exit_code)

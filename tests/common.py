@@ -3,6 +3,7 @@ import typing
 import os
 import tempfile
 
+from aeneas.runtimeconfiguration import RuntimeConfiguration
 from aeneas.tools.execute_task import ExecuteTaskCLI
 
 
@@ -29,6 +30,15 @@ class BaseCase(unittest.TestCase):
     maxDiff = None
 
     @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.tmp_dir = tempfile.TemporaryDirectory(prefix="aeneas.test.")
+        cls.addClassCleanup(cls.tmp_dir.cleanup)
+
+        cls.rconf = RuntimeConfiguration()
+        cls.rconf[RuntimeConfiguration.TMP_PATH] = cls.tmp_dir.name
+
+    @classmethod
     def file_path(cls, path: str) -> str:
         return os.path.join(os.path.dirname(__file__), *path.split("/"))
 
@@ -39,17 +49,21 @@ class ExecuteCLICase(BaseCase):
     def execute(
         self, parameters: typing.Sequence[tuple[str, str]], expected_exit_code: int
     ):
-        params = ["placeholder"]
-        with tempfile.TemporaryDirectory(prefix="aeneas.") as temp_dir:
+        arguments = ["placeholder"]
+        with tempfile.TemporaryDirectory(
+            prefix="cli.", dir=self.tmp_dir.name
+        ) as temp_dir:
             for p_type, p_value in parameters:
                 if p_type == "in":
-                    params.append(self.file_path(p_value))
+                    arguments.append(self.file_path(p_value))
                 elif p_type == "out":
-                    params.append(os.path.join(temp_dir, p_value))
+                    arguments.append(os.path.join(temp_dir, p_value))
                 else:
-                    params.append(p_value)
+                    arguments.append(p_value)
 
-            exit_code = self.CLI_CLS(use_sys=False).run(arguments=params)
+            exit_code = self.CLI_CLS(use_sys=False, rconf=self.rconf).run(
+                arguments=arguments
+            )
 
         self.assertEqual(exit_code, expected_exit_code)
 

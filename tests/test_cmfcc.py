@@ -34,7 +34,9 @@ class TestCMFCC(BaseCase):
     def test_compute_mfcc(self):
         import aeneas.cmfcc.cmfcc as cmfcc
 
-        audio_file = AudioFile(self.file_path("res/audioformats/mono.16000.wav"))
+        audio_file = AudioFile(
+            self.file_path("res/audioformats/mono.16000.wav"), rconf=self.rconf
+        )
         audio_file.read_samples_from_file()
         mfcc_c = (
             cmfcc.compute_from_data(

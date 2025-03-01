@@ -71,14 +71,16 @@ class BaseTTSWrapperCase(BaseCase):
         def inner(case: SynthesizeCase):
             with contextlib.ExitStack() as exit_stack:
                 if ofp is None:
-                    tmp_file = tempfile.NamedTemporaryFile(suffix=".wav")
+                    tmp_file = tempfile.NamedTemporaryFile(
+                        suffix=".wav", dir=self.tmp_dir.name
+                    )
                     exit_stack.enter_context(tmp_file)
                     output_file_path = tmp_file.name
                 else:
                     output_file_path = ofp
 
                 try:
-                    rconf = RuntimeConfiguration()
+                    rconf = self.rconf.clone()
                     rconf[RuntimeConfiguration.TTS] = self.TTS
                     rconf[RuntimeConfiguration.TTS_PATH] = self.TTS_PATH
                     rconf[RuntimeConfiguration.C_EXTENSIONS] = case.c_ext

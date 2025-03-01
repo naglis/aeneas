@@ -28,10 +28,11 @@ This module contains the following classes:
 """
 
 import logging
-import tempfile
+import os.path
+import uuid
 
 from aeneas.adjustboundaryalgorithm import AdjustBoundaryAlgorithm
-from aeneas.audiofile import AudioFile
+from aeneas.audiofile import AudioFile, AudioFormat
 from aeneas.audiofilemfcc import AudioFileMFCC
 from aeneas.dtw import DTWAligner
 from aeneas.exacttiming import TimeValue
@@ -400,20 +401,20 @@ class ExecuteTask(Configurable):
         :rtype: :class:`~aeneas.tree.Tree`
         """
 
-        with tempfile.NamedTemporaryFile(
-            suffix=".wav",
-            dir=self.rconf[RuntimeConfiguration.TMP_PATH],
-        ) as tmp_file:
-            self._step_begin("synthesize text", log=log)
-            synt_anchors, synt_format = self._synthesize(text_file, tmp_file.name)
-            self._step_end(log=log)
+        output_filename = os.path.join(
+            self.rconf[RuntimeConfiguration.TMP_PATH],
+            f"{uuid.uuid4().hex}.wav",
+        )
+        self._step_begin("synthesize text", log=log)
+        synt_anchors, synt_format = self._synthesize(text_file, output_filename)
+        self._step_end(log=log)
 
-            self._step_begin("extract MFCC synt wave", log=log)
-            synt_wave_mfcc = self._extract_mfcc(
-                file_path=tmp_file.name,
-                file_format=synt_format,
-            )
-            self._step_end(log=log)
+        self._step_begin("extract MFCC synt wave", log=log)
+        synt_wave_mfcc = self._extract_mfcc(
+            file_path=output_filename,
+            file_format=synt_format,
+        )
+        self._step_end(log=log)
 
         self._step_begin("align waves", log=log)
         indices = self._align_waves(audio_file_mfcc, synt_wave_mfcc, synt_anchors)
@@ -542,7 +543,9 @@ class ExecuteTask(Configurable):
         """Clear the cache of the synthesizer"""
         self.synthesizer.clear_cache()
 
-    def _synthesize(self, text_file: TextFile, output_path: str) -> tuple[str, list]:
+    def _synthesize(
+        self, text_file: TextFile, output_path: str
+    ) -> tuple[str, AudioFormat]:
         """
         Synthesize text into a WAVE file.
 
@@ -558,10 +561,10 @@ class ExecuteTask(Configurable):
 
         :param text_file: the text to be synthesized
         :type  text_file: :class:`~aeneas.textfile.TextFile`
-        :rtype: tuple (string, list)
+        :rtype: tuple (string, tuple)
         """
-        result = self.synthesizer.synthesize(text_file, output_path)
-        return (result[0], self.synthesizer.output_audio_format)
+        anchors, _, __ = self.synthesizer.synthesize(text_file, output_path)
+        return anchors, self.synthesizer.output_audio_format
 
     def _align_waves(self, real_wave_mfcc, synt_wave_mfcc, synt_anchors):
         """

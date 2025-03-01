@@ -31,11 +31,13 @@ class TestSD(BaseCase):
     TEXT_FILE = "res/inputtext/sonnet_plain.txt"
 
     def load(self):
-        audio_file_mfcc = AudioFileMFCC(self.file_path(self.AUDIO_FILE))
+        audio_file_mfcc = AudioFileMFCC(
+            self.file_path(self.AUDIO_FILE), rconf=self.rconf
+        )
         with open(self.file_path(self.TEXT_FILE), mode="rb") as text_f:
             text_file = TextFile.load(text_f, file_format=TextFileFormat.PLAIN)
         text_file.set_language(Language.ENG)
-        return SD(audio_file_mfcc, text_file)
+        return SD(audio_file_mfcc, text_file, rconf=self.rconf)
 
     def test_create_sd(self):
         try:
