@@ -28,7 +28,6 @@ This module contains the following classes:
 import decimal
 import logging
 import os
-import uuid
 import typing
 
 from aeneas.adjustboundaryalgorithm import AdjustBoundaryAlgorithm
@@ -54,10 +53,7 @@ class Task:
                         it is not a Unicode string
     """
 
-    def __init__(
-        self, config: typing.Optional[typing.Union[str, "TaskConfiguration"]] = None
-    ):
-        self.identifier = str(uuid.uuid4())
+    def __init__(self, config: typing.Union[str, "TaskConfiguration"]):
         # relative to input container root
         self.audio_file_path = None
         # concrete path, file will be read from this!
@@ -74,17 +70,13 @@ class Task:
         self.sync_map_file_path_absolute = None
         self.sync_map = None
 
-        self.configuration = None
-        if config is not None:
-            if isinstance(config, TaskConfiguration):
-                self.configuration = config
-            else:
-                self.configuration = TaskConfiguration(config)
+        if isinstance(config, TaskConfiguration):
+            self.configuration = config
+        else:
+            self.configuration = TaskConfiguration(config)
 
     def __str__(self):
         return (
-            f"{gc.RPN_TASK_IDENTIFIER}: {self.identifier!r}"
-            "\n"
             f"Configuration:\n{self.configuration}"
             "\n"
             f"Audio file path: {self.audio_file_path}"

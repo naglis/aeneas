@@ -78,14 +78,15 @@ class TestTask(BaseCase):
         id_regex: str | None = None,
         id_sort: str | None = None,
     ):
-        task = Task()
-        task.configuration = TaskConfiguration()
-        task.configuration["language"] = Language.ENG
-        task.configuration["i_t_format"] = fmt
+        task_config = TaskConfiguration()
+        task_config["language"] = Language.ENG
+        task_config["i_t_format"] = fmt
         if id_regex is not None:
-            task.configuration["i_t_unparsed_id_regex"] = id_regex
+            task_config["i_t_unparsed_id_regex"] = id_regex
         if id_sort is not None:
-            task.configuration["i_t_unparsed_id_sort"] = id_sort
+            task_config["i_t_unparsed_id_sort"] = id_sort
+
+        task = Task(config=task_config)
         task.text_file_path_absolute = self.file_path(path)
         self.assertIsNotNone(task.text_file)
         self.assertEqual(len(task.text_file), expected)
@@ -107,35 +108,26 @@ class TestTask(BaseCase):
         ]
         self.tc_from_string(config_string, properties)
 
-    def test_task_identifier(self):
-        task = Task()
-        self.assertEqual(len(task.identifier), 36)
-
-    def test_task_empty_configuration(self):
-        task = Task()
-        self.assertIsNone(task.configuration)
-
     def test_task_string_configuration_invalid(self):
         with self.assertRaises(TypeError):
-            Task(1)
+            Task(config=1)
 
     def test_task_string_configuration_str(self):
         with self.assertRaises(TypeError):
-            Task(b"task_language=en")
+            Task(config=b"task_language=en")
 
     def test_task_string_configuration_unicode(self):
-        task = Task("task_language=en")
+        task = Task(config="task_language=en")
         self.assertIsNotNone(task.configuration)
 
     def test_task_set_configuration(self):
-        task = Task()
+        task = Task(config="")
         taskconf = TaskConfiguration()
         task.configuration = taskconf
         self.assertIsNotNone(task.configuration)
 
     def test_task_empty_on_creation(self):
-        task = Task()
-        self.assertIsNone(task.configuration)
+        task = Task(config="")
         self.assertIsNone(task.text_file)
         self.assertIsNone(task.audio_file)
         self.assertIsNone(task.sync_map)
@@ -147,11 +139,11 @@ class TestTask(BaseCase):
         self.assertIsNone(task.sync_map_file_path_absolute)
 
     def test_task_sync_map_leaves_empty(self):
-        task = Task()
+        task = Task(config="")
         self.assertEqual(len(task.sync_map_leaves()), 0)
 
     def test_set_audio_file_path_absolute(self):
-        task = Task()
+        task = Task(config="")
         task.audio_file_path_absolute = self.file_path(
             "res/container/job/assets/p001.mp3"
         )
@@ -162,7 +154,7 @@ class TestTask(BaseCase):
         )
 
     def test_set_audio_file_path_absolute_error(self):
-        task = Task()
+        task = Task(config="")
         with self.assertRaises(OSError):
             task.audio_file_path_absolute = self.file_path("not_existing.mp3")
 
@@ -187,10 +179,11 @@ class TestTask(BaseCase):
         )
 
     def test_output_sync_map(self):
-        task = Task()
-        task.configuration = TaskConfiguration()
-        task.configuration["language"] = Language.ENG
-        task.configuration["o_format"] = SyncMapFormat.TXT
+        task_config = TaskConfiguration()
+        task_config["language"] = Language.ENG
+        task_config["o_format"] = SyncMapFormat.TXT
+
+        task = Task(config=task_config)
         task.sync_map = self.dummy_sync_map()
 
         with tempfile.NamedTemporaryFile(
@@ -203,10 +196,10 @@ class TestTask(BaseCase):
         self.assertEqual(path, tmp_file.name)
 
     def test_task_sync_map_leaves(self):
-        task = Task()
-        task.configuration = TaskConfiguration()
-        task.configuration["language"] = Language.ENG
-        task.configuration["o_format"] = SyncMapFormat.TXT
+        task_config = TaskConfiguration()
+        task_config["language"] = Language.ENG
+        task_config["o_format"] = SyncMapFormat.TXT
+        task = Task(config=task_config)
         task.sync_map = self.dummy_sync_map()
         self.assertEqual(len(task.sync_map_leaves()), 3)
 
