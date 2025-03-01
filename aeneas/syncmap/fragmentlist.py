@@ -438,9 +438,11 @@ class SyncMapFragmentList(collections.abc.MutableSequence):
                           falls within a given nonspeech interval
         :type  tolerance: :class:`~aeneas.exacttiming.TimeValue`
         """
-        logger.debug("Called fragments_ending_inside_nonspeech_intervals")
-        logger.debug("  List begin: %.3f", self.begin)
-        logger.debug("  List end:   %.3f", self.end)
+        logger.debug(
+            "Called fragments_ending_inside_nonspeech_intervals (list begin: %.3f, list end: %.3f)",
+            self.begin,
+            self.end,
+        )
         nsi_index = 0
         frag_index = 0
         nsi_counter: list[tuple[TimeInterval | None, list[int]]] = [
@@ -514,9 +516,8 @@ class SyncMapFragmentList(collections.abc.MutableSequence):
             else:
                 logger.debug("    Fragment is HEAD or TAIL => skipping it")
                 frag_index += 1
-        tbr = [(n, c[0]) for (n, c) in nsi_counter if len(c) == 1]
-        logger.debug("Returning: %s", tbr)
-        return tbr
+
+        return [(n, c[0]) for (n, c) in nsi_counter if len(c) == 1]
 
     def inject_long_nonspeech_fragments(
         self, pairs: typing.Sequence[tuple[TimeInterval, int]], replacement_string: str
@@ -535,37 +536,32 @@ class SyncMapFragmentList(collections.abc.MutableSequence):
         """
         logger.debug("Called inject_long_nonspeech_fragments")
         # set the appropriate fragment text
-        if replacement_string in [None, gc.PPV_TASK_ADJUST_BOUNDARY_NONSPEECH_REMOVE]:
+        if replacement_string in (None, gc.PPV_TASK_ADJUST_BOUNDARY_NONSPEECH_REMOVE):
             logger.debug("  Remove long nonspeech")
             lines = []
         else:
             logger.debug("  Replace long nonspeech with %r", replacement_string)
             lines = [replacement_string]
+
         # first, make room for the nonspeech intervals
-        logger.debug("  First pass: making room...")
         for nsi, index in pairs:
             self[index].interval.end = nsi.begin
             self[index + 1].interval.begin = nsi.end
-        logger.debug("  First pass: making room... done")
-        logger.debug("  Second pass: append nonspeech intervals...")
-        for i, (nsi, index) in enumerate(pairs, 1):
-            identifier = "n%06d" % i
+
+        for i, (nsi, index) in enumerate(pairs, start=1):
             self.add(
                 SyncMapFragment(
                     interval=nsi,
                     text_fragment=TextFragment(
-                        identifier=identifier,
-                        language=None,
+                        identifier=f"n{i:06d}",
                         lines=lines,
                     ),
                     fragment_type=FragmentType.NONSPEECH,
                 ),
                 sort=False,
             )
-        logger.debug("  Second pass: append nonspeech intervals... done")
-        logger.debug("  Third pass: sorting...")
+
         self.sort()
-        logger.debug("  Third pass: sorting... done")
 
     def fix_zero_length_fragments(
         self,
@@ -589,8 +585,7 @@ class SyncMapFragmentList(collections.abc.MutableSequence):
         :raises ValueError: if ``min_index`` is negative or ``max_index``
                             is bigger than the current number of fragments
         """
-        logger.debug("Called fix_zero_length_fragments")
-        logger.debug("  Duration %.3f", duration)
+        logger.debug("Called fix_zero_length_fragments (duration: %.3f)", duration)
         min_index, max_index = self._check_min_max_indices(min_index, max_index)
 
         if len(self) < 1:
@@ -603,12 +598,10 @@ class SyncMapFragmentList(collections.abc.MutableSequence):
 
         original_first_begin = None
         if (
-            (ensure_adjacent)
-            and (min_index > 0)
-            and (
-                self[min_index - 1].interval.is_adjacent_before(
-                    self[min_index].interval
-                )
+            ensure_adjacent
+            and min_index > 0
+            and self[min_index - 1].interval.is_adjacent_before(
+                self[min_index].interval
             )
         ):
             original_first_begin = self[min_index].begin
@@ -616,15 +609,14 @@ class SyncMapFragmentList(collections.abc.MutableSequence):
                 "Original first was adjacent with previous, starting at %.3f",
                 original_first_begin,
             )
+
         original_last_end = None
         if (
-            (ensure_adjacent)
-            and (len(self) > 1)
-            and (max_index < len(self))
-            and (
-                self[max_index - 1].interval.is_adjacent_before(
-                    self[max_index].interval
-                )
+            ensure_adjacent
+            and len(self) > 1
+            and max_index < len(self)
+            and self[max_index - 1].interval.is_adjacent_before(
+                self[max_index].interval
             )
         ):
             original_last_end = self[max_index - 1].end
@@ -632,6 +624,7 @@ class SyncMapFragmentList(collections.abc.MutableSequence):
                 "Original last was adjacent with next, ending at %.3f",
                 original_last_end,
             )
+
         i = min_index
         while i < max_index:
             if self[i].has_zero_length:
@@ -646,7 +639,7 @@ class SyncMapFragmentList(collections.abc.MutableSequence):
                 slack = duration
                 j = i + 1
                 logger.debug("  Entered while with j == %d", j)
-                while (j < max_index) and (self[j].interval.length < slack):
+                while j < max_index and self[j].interval.length < slack:
                     if self[j].has_zero_length:
                         logger.debug(
                             "  Fragment %d (%s) has zero length => ENLARGE",
@@ -665,7 +658,7 @@ class SyncMapFragmentList(collections.abc.MutableSequence):
                     j += 1
                 logger.debug("  Exited while with j == %d", j)
                 fixable = False
-                if (j == max_index) and (self[j - 1].interval.end + slack <= self.end):
+                if j == max_index and self[j - 1].interval.end + slack <= self.end:
                     logger.debug("  Fixable by moving back")
                     current_time = self[j - 1].interval.end + slack
                     fixable = True
@@ -729,6 +722,7 @@ class SyncMapFragmentList(collections.abc.MutableSequence):
             ):
                 logger.debug("Invalid index, returning False")
                 return False
+
             donor_is_previous = donor_index < current_index
             current_fragment = self[current_index]
             donor_fragment = self[donor_index]
@@ -739,6 +733,7 @@ class SyncMapFragmentList(collections.abc.MutableSequence):
                     "Current fragment rate is already <= max_rate, returning True"
                 )
                 return True
+
             if donor_is_previous:
                 if not donor_fragment.interval.is_non_zero_before_non_zero(
                     current_fragment.interval
@@ -759,11 +754,14 @@ class SyncMapFragmentList(collections.abc.MutableSequence):
             logger.debug("Current and donor fragments are adjacent and not zero length")
             current_lack = current_fragment.rate_lack(max_rate)
             donor_slack = donor_fragment.rate_slack(max_rate)
-            logger.debug("Current lack %.3f", current_lack)
-            logger.debug("Donor  slack %.3f", donor_slack)
+            logger.debug(
+                "Current lack: %.3f, donor slack: %.3f", current_lack, donor_slack
+            )
+
             if donor_slack <= 0:
                 logger.debug("Donor has no slack, returning False")
                 return False
+
             logger.debug("Donor has some slack")
             effective_slack = min(current_lack, donor_slack)
             if donor_is_previous:

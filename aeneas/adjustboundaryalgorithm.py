@@ -313,8 +313,10 @@ class AdjustBoundaryAlgorithm(Configurable):
         """
         if not isinstance(time_values, list):
             raise TypeError("time_values is not a list")
+
         if len(time_values) < 4:
             raise ValueError("time_values has length < 4")
+
         logger.debug("Converting time values to fragment list...")
         begin = time_values[0]
         end = time_values[-1]
