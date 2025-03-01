@@ -164,7 +164,7 @@ class TestSyncMap(BaseSyncMapCase):
                 "end": "2.680",
                 "id": "f000001",
                 "language": Language.ENG,
-                "lines": ["1"],
+                "lines": ["I"],
             },
         )
 

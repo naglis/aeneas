@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 # aeneas is a Python/C library and a set of tools
 # to automagically synchronize audio and text (aka forced alignment)
 #
@@ -20,7 +18,7 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from itertools import chain
+import itertools
 
 import lxml.etree as ET
 
@@ -46,26 +44,21 @@ class SyncMapFormatGenericXML(SyncMapFormatBase):
         where the line separator is ``<br xmlns=... />``.
         """
         # TODO more robust parsing
+        parts = []
+        for part in itertools.chain(
+            [node.text],
+            *([ET.tostring(c, with_tail=False), c.tail] for c in node.getchildren()),
+            [node.tail],
+        ):
+            part = gf.safe_unicode(part)
+            if part.startswith("<br "):
+                continue
+            part = part.strip()
+            if not part:
+                continue
+            parts.append(part)
 
-        parts = (
-            [node.text]
-            + list(
-                chain(
-                    *(
-                        [ET.tostring(c, with_tail=False), c.tail]
-                        for c in node.getchildren()
-                    )
-                )
-            )
-            + [node.tail]
-        )
-        parts = [gf.safe_unicode(p) for p in parts]
-        parts = [p.strip() for p in parts if not p.startswith("<br ")]
-        parts = [p for p in parts if len(p) > 0]
-        uparts = []
-        for part in parts:
-            uparts.append(gf.safe_unicode(part))
-        return uparts
+        return parts
 
     @classmethod
     def _tree_to_string(

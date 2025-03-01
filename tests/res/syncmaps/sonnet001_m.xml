@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <map>
   <fragment id="f000001" begin="0.000" end="2.680">
-    <line>1</line>
+    <line>I</line>
     <children/>
   </fragment>
   <fragment id="f000002" begin="2.680" end="5.880">
@@ -10,7 +10,7 @@
     <children/>
   </fragment>
   <fragment id="f000003" begin="5.880" end="9.240">
-    <line>That thereby beauty's rose</line>
+    <line>That thereby beauty’s rose</line>
     <line>might never die,</line>
     <children/>
   </fragment>
@@ -30,7 +30,7 @@
     <children/>
   </fragment>
   <fragment id="f000007" begin="18.600" end="22.800">
-    <line>Feed'st thy light's flame</line>
+    <line>Feed’st thy light’s flame</line>
     <line>with self-substantial fuel,</line>
     <children/>
   </fragment>
@@ -46,7 +46,7 @@
   </fragment>
   <fragment id="f000010" begin="31.240" end="34.280">
     <line>Thou that art now</line>
-    <line>the world's fresh ornament,</line>
+    <line>the world’s fresh ornament,</line>
     <children/>
   </fragment>
   <fragment id="f000011" begin="34.280" end="36.960">
@@ -59,7 +59,7 @@
     <children/>
   </fragment>
   <fragment id="f000013" begin="40.680" end="44.560">
-    <line>And tender churl mak'st waste in niggarding:</line>
+    <line>And tender churl mak’st waste in niggarding:</line>
     <children/>
   </fragment>
   <fragment id="f000014" begin="44.560" end="48.080">
@@ -68,7 +68,7 @@
     <children/>
   </fragment>
   <fragment id="f000015" begin="48.080" end="53.240">
-    <line>To eat the world's due,</line>
+    <line>To eat the world’s due,</line>
     <line>by the grave and thee.</line>
     <children/>
   </fragment>
