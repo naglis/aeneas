@@ -309,7 +309,7 @@ def main(argv: typing.Sequence[str] | None = None) -> int:
         type=parse_time_value,
         help="if specified, alignment will end at this position in the audio file",
     )
-    adjust_group = sync_parser.add_argument_group(title="boundary adjustion options")
+    adjust_group = sync_parser.add_argument_group(title="boundary adjustment options")
     adjust_group.add_argument(
         "--no-zero",
         help="if specified, do not allow zero-length fragments",

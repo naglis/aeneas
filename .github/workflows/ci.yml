@@ -19,13 +19,24 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
-          cache: 'pip'
+      - name: Install poetry
+        uses: abatilo/actions-poetry@v4
+      - name: Setup a local virtual environment for caching
+        run: |
+          poetry config virtualenvs.create true --local
+          poetry config virtualenvs.in-project true --local
+      - uses: actions/cache@v4
+        name: Define a cache for the virtual environment based on the dependencies lock file
+        with:
+          path: ./.venv
+          key: venv-${{ hashFiles('poetry.lock') }}
       - name: Install dependencies
         run: |
           sudo apt-get update
           sudo apt-get install -y ffmpeg espeak-ng libespeak-ng-dev
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt setuptools
+          poetry install
+          # python -m pip install --upgrade pip
+          # pip install -r requirements.txt setuptools
       - name: Build C/C++ extensions
         # Disabled for the time being.
         # FIXME: Calling C extensions inside GitHub action currently hangs.
@@ -41,4 +52,4 @@ jobs:
           make py
       - name: Run tests
         run: |
-          python -m unittest discover -v
+          poetry run python -m unittest discover -v

@@ -17,7 +17,6 @@ include LICENSE
 recursive-include licenses *
 include README.md
 include README.rst
-include requirements.txt
 include setupmeta.py
 recursive-include thirdparty *
 include VERSION
