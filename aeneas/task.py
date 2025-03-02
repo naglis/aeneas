@@ -93,17 +93,6 @@ class Task:
         )
 
     @property
-    def identifier(self) -> str:
-        """
-        The identifier of the task.
-        """
-        return self.__identifier
-
-    @identifier.setter
-    def identifier(self, value):
-        self.__identifier = value
-
-    @property
     def audio_file_path_absolute(self):
         """
         The absolute path of the audio file.
@@ -159,9 +148,9 @@ class Task:
         """
         if self.sync_map is None or self.sync_map.fragments_tree is None:
             return []
-        return [f for f in self.sync_map.leaves(fragment_type)]
+        return self.sync_map.leaves(fragment_type)
 
-    def output_sync_map_file(self, container_root_path=None):
+    def output_sync_map_file(self, container_root_path: str | None = None):
         """
         Output the sync map file for this task.
 
@@ -187,45 +176,28 @@ class Task:
         if container_root_path is not None and self.sync_map_file_path is None:
             raise TypeError("The (internal) path of the sync map has been set")
 
-        logger.debug("container_root_path is %s", container_root_path)
-        logger.debug("self.sync_map_file_path is %s", self.sync_map_file_path)
-        logger.debug(
-            "self.sync_map_file_path_absolute is %s", self.sync_map_file_path_absolute
-        )
-
         if container_root_path is not None and self.sync_map_file_path is not None:
             path = os.path.join(container_root_path, self.sync_map_file_path)
         elif self.sync_map_file_path_absolute:
             path = self.sync_map_file_path_absolute
+
         gf.ensure_parent_directory(path)
         logger.debug("Output sync map to %s", path)
 
-        eaf_audio_ref = self.configuration["o_eaf_audio_ref"]
-        head_tail_format = self.configuration["o_h_t_format"]
-        levels = self.configuration["o_levels"]
-        smil_audio_ref = self.configuration["o_smil_audio_ref"]
-        smil_page_ref = self.configuration["o_smil_page_ref"]
-        sync_map_format = self.configuration["o_format"]
-
-        logger.debug("eaf_audio_ref is %s", eaf_audio_ref)
-        logger.debug("head_tail_format is %s", head_tail_format)
-        logger.debug("levels is %s", levels)
-        logger.debug("smil_audio_ref is %s", smil_audio_ref)
-        logger.debug("smil_page_ref is %s", smil_page_ref)
-        logger.debug("sync_map_format is %s", sync_map_format)
-
+        cfg = self.configuration
         with open(path, mode="w", encoding="utf-8") as f:
             self.sync_map.dump(
                 f,
-                sync_map_format,
+                cfg["o_format"],
                 parameters={
-                    gc.PPN_TASK_OS_FILE_EAF_AUDIO_REF: eaf_audio_ref,
-                    gc.PPN_TASK_OS_FILE_HEAD_TAIL_FORMAT: head_tail_format,
-                    gc.PPN_TASK_OS_FILE_LEVELS: levels,
-                    gc.PPN_TASK_OS_FILE_SMIL_AUDIO_REF: smil_audio_ref,
-                    gc.PPN_TASK_OS_FILE_SMIL_PAGE_REF: smil_page_ref,
+                    gc.PPN_TASK_OS_FILE_EAF_AUDIO_REF: cfg["o_eaf_audio_ref"],
+                    gc.PPN_TASK_OS_FILE_HEAD_TAIL_FORMAT: cfg["o_h_t_format"],
+                    gc.PPN_TASK_OS_FILE_LEVELS: cfg["o_levels"],
+                    gc.PPN_TASK_OS_FILE_SMIL_AUDIO_REF: cfg["o_smil_audio_ref"],
+                    gc.PPN_TASK_OS_FILE_SMIL_PAGE_REF: cfg["o_smil_page_ref"],
                 },
             )
+
         return path
 
     def _populate_audio_file(self):

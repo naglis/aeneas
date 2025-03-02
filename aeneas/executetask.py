@@ -500,19 +500,16 @@ class ExecuteTask(Configurable):
 
         :rtype: tuple (float, float, float)
         """
-        head_length = self.task.configuration["i_a_head"]
-        process_length = self.task.configuration["i_a_process"]
-        tail_length = self.task.configuration["i_a_tail"]
-        head_max = self.task.configuration["i_a_head_max"]
-        head_min = self.task.configuration["i_a_head_min"]
-        tail_max = self.task.configuration["i_a_tail_max"]
-        tail_min = self.task.configuration["i_a_tail_min"]
+        task_config = self.task.configuration
+        head_length = task_config["i_a_head"]
+        process_length = task_config["i_a_process"]
+        tail_length = task_config["i_a_tail"]
         if (
             head_length is not None
             or process_length is not None
             or tail_length is not None
         ):
-            logger.debug("Setting explicit head process tail")
+            logger.debug("Setting explicit head/process/tail length")
         else:
             logger.debug("Detecting head tail...")
             sd = SD(
@@ -523,21 +520,22 @@ class ExecuteTask(Configurable):
             head_length = TimeValue("0.000")
             process_length = None
             tail_length = TimeValue("0.000")
+            head_max = task_config["i_a_head_max"]
+            head_min = task_config["i_a_head_min"]
+            tail_max = task_config["i_a_tail_max"]
+            tail_min = task_config["i_a_tail_min"]
             if head_min is not None or head_max is not None:
-                logger.debug("Detecting HEAD...")
                 head_length = sd.detect_head(head_min, head_max)
-                logger.debug("Detected HEAD: %.3f", head_length)
-                logger.debug("Detecting HEAD... done")
             if tail_min is not None or tail_max is not None:
-                logger.debug("Detecting TAIL...")
                 tail_length = sd.detect_tail(tail_min, tail_max)
-                logger.debug("Detected TAIL: %.3f", tail_length)
-                logger.debug("Detecting TAIL... done")
-            logger.debug("Detecting head tail... done")
-        logger.debug("Head:    %s", gf.safe_float(head_length, None))
-        logger.debug("Process: %s", gf.safe_float(process_length, None))
-        logger.debug("Tail:    %s", gf.safe_float(tail_length, None))
-        return (head_length, process_length, tail_length)
+
+        logger.debug(
+            "Head: %s, process: %s, tail: %s",
+            gf.safe_float(head_length, None),
+            gf.safe_float(process_length, None),
+            gf.safe_float(tail_length, None),
+        )
+        return head_length, process_length, tail_length
 
     def _clear_cache_synthesizer(self):
         """Clear the cache of the synthesizer"""
