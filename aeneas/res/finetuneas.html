@@ -259,8 +259,10 @@ var pageref = "{{ page_ref }}";
 // BEGIN INIT CODE
 //
 //
-applyDefaults();
-autoLoadAudio();
+document.addEventListener("DOMContentLoaded", function(event) {
+    applyDefaults();
+    autoLoadAudio();
+});
 //
 //
 // END INIT CODE
