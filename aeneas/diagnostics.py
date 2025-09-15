@@ -334,21 +334,21 @@ class Diagnostics:
         return False, warnings, c_ext_warnings
 
 
-def main():
+def main() -> int:
     errors, warnings, c_ext_warnings = Diagnostics.check_all()
     if errors:
-        sys.exit(1)
+        return 1
     if c_ext_warnings:
         gf.print_warning(
             "All required dependencies are met but at least one Python C extension is not available"
         )
-        sys.exit(2)
+        return 2
     else:
         gf.print_success(
             "All required dependencies are met and all available Python C extensions are working"
         )
-        sys.exit(0)
+        return 0
 
 
 if __name__ == "__main__":
-    main()
+    raise SystemExit(main())
