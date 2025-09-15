@@ -144,12 +144,16 @@ class Diagnostics:
             from aeneas.tree import Tree
             from aeneas.textfile import TextFile, TextFragment
             from aeneas.ttswrappers.espeakttswrapper import ESPEAKTTSWrapper
+            from aeneas.runtimeconfiguration import RuntimeConfiguration
+
+            rconf = RuntimeConfiguration()
+            rconf[RuntimeConfiguration.TMP_PATH] = tmp_dir
 
             text = "From fairest creatures we desire increase,"
             text_file = TextFile(fragments_tree=Tree())
             text_file.add_fragment(TextFragment(language="eng", lines=[text]))
             tmp_file_path = os.path.join(tmp_dir, "espeak.wav")
-            ESPEAKTTSWrapper().synthesize_multiple(text_file, tmp_file_path)
+            ESPEAKTTSWrapper(rconf=rconf).synthesize_multiple(text_file, tmp_file_path)
             gf.print_success("espeak         OK")
         except Exception:
             gf.print_error("espeak         ERROR")
@@ -178,12 +182,16 @@ class Diagnostics:
             from aeneas.tree import Tree
             from aeneas.textfile import TextFile, TextFragment
             from aeneas.ttswrappers.espeakngttswrapper import ESPEAKNGTTSWrapper
+            from aeneas.runtimeconfiguration import RuntimeConfiguration
+
+            rconf = RuntimeConfiguration()
+            rconf[RuntimeConfiguration.TMP_PATH] = tmp_dir
 
             text = "From fairest creatures we desire increase,"
             text_file = TextFile(fragments_tree=Tree())
             text_file.add_fragment(TextFragment(language="eng", lines=[text]))
             tmp_file_path = os.path.join(tmp_dir, "espeak-ng.wav")
-            ESPEAKNGTTSWrapper().synthesize_multiple(text_file, tmp_file_path)
+            ESPEAKNGTTSWrapper(rconf=rconf).synthesize_multiple(text_file, tmp_file_path)
             gf.print_success("espeak-ng      OK")
         except Exception:
             gf.print_error("espeak-ng      ERROR")
