@@ -84,9 +84,7 @@ PKG_PACKAGE_DATA = {
 # on Linux and Mac OS X, use the file without extension
 # on Windows, use the file with .py extension
 PKG_SCRIPTS = [
-    "bin/aeneas_check_setup",
     "bin/aeneas_convert_syncmap",
-    "bin/aeneas_download",
     "bin/aeneas_execute_task",
     "bin/aeneas_synthesize_text",
     "bin/aeneas_validate",
