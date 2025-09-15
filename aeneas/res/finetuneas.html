@@ -286,7 +286,7 @@ function applyDefaults() {
     }
 }
 function autoLoadAudio() {
-    var audioFilePath = "file://{{ audio_file_path }}";
+    var audioFilePath = "{{ audio_file_path }}";
     loadAudio(audioFilePath);
    
     fragments = ({{ fragments }}).fragments;

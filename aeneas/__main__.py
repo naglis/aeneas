@@ -141,7 +141,8 @@ def do_sync(args: argparse.Namespace, rconf: RuntimeConfiguration) -> int:
     print(f"Wrote SMIL to {path!r}", file=sys.stderr)
 
     if args.output_html:
-        html_file_path = output_path + ".html"
+        base_path = os.path.splitext(audio_path)[0]
+        html_file_path = base_path + ".html"
         parameters = {
             gc.PPN_TASK_OS_FILE_HEAD_TAIL_FORMAT: SyncMapHeadTailFormat.HIDDEN,
             gc.PPN_TASK_OS_FILE_FORMAT: SyncMapFormat.SMIL,

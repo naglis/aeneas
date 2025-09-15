@@ -271,7 +271,7 @@ class SyncMap(collections.abc.Sized):
         fragments = buf.getvalue()
 
         data = {
-            "audio_file_path": gf.fix_slash(os.path.abspath(audio_file_path)),
+            "audio_file_path": os.path.basename(audio_file_path),
             "fragments": fragments,
             "suggested_filename": f"{filename}.",
             "output_format": "json",
