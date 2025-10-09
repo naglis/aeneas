@@ -240,7 +240,7 @@ class TextFileFormat:
     where the text fragments have already been marked up.
 
     This is same as the ``unparsed`` format, but additionally the text from
-    `<img>` `alt` is extracted.
+    `<img>` `alt` and `<svg>` `<title>` is extracted.
 
     The text fragments will be extracted by matching
     the ``id`` attribute of each elements
@@ -277,6 +277,13 @@ class TextFileFormat:
 
            <figure>
             <img alt="This is an image description." src="img.png"/>
+           </figure>
+
+           <figure>
+            <svg width="300" height="130" xmlns="http://www.w3.org/2000/svg">
+              <title>This is a blue rectangle.</title>
+              <rect width="200" height="100" x="10" y="10" rx="20" ry="20" fill="blue" />
+            </svg>
            </figure>
 
           </div>
@@ -867,12 +874,17 @@ class TextFile(collections.abc.Sized):
 
     @staticmethod
     def _get_node_text(node, *, read_img_alt: bool) -> str:
+        if read_img_alt and (node.tag == "img" or node.tag == "svg"):
+            if node.tag == "img":
+                alt = node.attrib.get("alt")
+                if alt is not None:
+                    return alt
+            elif node.tag == "svg":
+                if (title_node := next(node.iterchildren("title"), None)) is not None:
+                    return TextFile._get_node_text(title_node, read_img_alt=False)
+
         if content := node.text_content():
             return content
-        elif read_img_alt and node.tag == "img":
-            alt = node.attrib.get("alt")
-            if alt is not None:
-                return alt
 
         return ""
 
@@ -884,7 +896,8 @@ class TextFile(collections.abc.Sized):
         Read text fragments from an unparsed format text file.
 
         :param buf: the bytes file object
-        :param bool read_img_alt: if True, read text from `<img/>` tag `alt` attribute
+        :param bool read_img_alt: if True, read text from `<img/>` tag `alt`
+                                  attribute and `<svg>` `<title>`
         """
 
         # TODO better and/or parametric parsing,
