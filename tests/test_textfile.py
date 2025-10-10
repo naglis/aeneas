@@ -425,6 +425,46 @@ class TestTextFile(BaseCase):
             ],
         )
 
+    def test_read_unparsed_svg_id_svg_text(self):
+        text_file = self.load(
+            "res/inputtext/sonnet_unparsed_svg_id.xhtml",
+            TextFileFormat.UNPARSED_IMG,
+            3,
+            {
+                gc.PPN_TASK_IS_TEXT_UNPARSED_ID_REGEX: r"f[0-9]+",
+                gc.PPN_TASK_IS_TEXT_UNPARSED_ID_SORT: IDSortingAlgorithm.NUMERIC,
+            },
+        )
+
+        self.assertTextFragmentsEqual(
+            text_file,
+            [
+                ("f001", "I"),
+                ("f002", "From fairest creatures we desire increase,"),
+                ("f003", "This is the image description inside svg title tag."),
+            ],
+        )
+
+    def test_read_unparsed_svg_id_svg_no_title(self):
+        text_file = self.load(
+            "res/inputtext/sonnet_unparsed_svg_no_title.xhtml",
+            TextFileFormat.UNPARSED_IMG,
+            3,
+            {
+                gc.PPN_TASK_IS_TEXT_UNPARSED_ID_REGEX: r"f[0-9]+",
+                gc.PPN_TASK_IS_TEXT_UNPARSED_ID_SORT: IDSortingAlgorithm.NUMERIC,
+            },
+        )
+
+        self.assertTextFragmentsEqual(
+            text_file,
+            [
+                ("f001", "I"),
+                ("f002", "From fairest creatures we desire increase,"),
+                ("f003", ""),
+            ],
+        )
+
     def test_read_unparsed_unsorted(self):
         self.load_and_sort_id(
             "res/inputtext/sonnet_unparsed_order_1.txt",

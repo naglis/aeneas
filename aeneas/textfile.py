@@ -883,7 +883,7 @@ class TextFile(collections.abc.Sized):
                 if (title_node := next(node.iterchildren("title"), None)) is not None:
                     return TextFile._get_node_text(title_node, read_img_alt=False)
 
-        if content := node.text_content():
+        if content := node.text_content().strip():
             return content
 
         return ""
